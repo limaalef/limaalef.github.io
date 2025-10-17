@@ -4,8 +4,7 @@ const AppState = {
     currentView: 'cards',
     currentPage: 1,
     totalPages: 1,
-    itemsPerPage: CONFIG.DEFAULT_ITEMS_PER_PAGE,
-    autoRefreshInterval: null
+    itemsPerPage: CONFIG.DEFAULT_ITEMS_PER_PAGE
 };
 
 const PaginationManager = {
@@ -146,7 +145,7 @@ const Renderer = {
         document.getElementById('totalGames').textContent = totalGames;
         document.getElementById('pendingGames').textContent = pendingCount;
         document.getElementById('futureGames').textContent = futureCount;
-        document.getElementById('totalSize').textContent = (totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        document.getElementById('totalSize').textContent = (totalSize / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
         
         if (apiResponse && apiResponse.total_hours) {
             document.getElementById('totalDuration').textContent = Math.round(apiResponse.total_hours) + 'h';
@@ -185,23 +184,5 @@ const FilterManager = {
             return matchesQuery && matchesYear;
         });
         Renderer.render();
-    }
-};
-
-const AutoRefresh = {
-    start() {
-        if (AppState.autoRefreshInterval) return;
-        AppState.autoRefreshInterval = setInterval(() => {
-            App.loadData();
-            Utils.showNotification('Dados atualizados automaticamente', 'success');
-        }, CONFIG.AUTO_REFRESH_INTERVAL);
-        Utils.showNotification('Atualização automática ativada (5 min)', 'success');
-    },
-    stop() {
-        if (AppState.autoRefreshInterval) {
-            clearInterval(AppState.autoRefreshInterval);
-            AppState.autoRefreshInterval = null;
-            Utils.showNotification('Atualização automática desativada', 'info');
-        }
     }
 };

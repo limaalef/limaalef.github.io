@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <h1>⚽ Minha Coleção de Jogos</h1>
-            <p class="subtitle">Organize e consulte sua coleção de partidas de futebol</p>
+            <p class="subtitle">Organizado e disponível para consulta</p>
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">
                     <div class="stat-value" id="totalGames">0</div>
@@ -41,9 +41,9 @@
                 <label>Itens:</label>
                 <select id="itemsPerPage">
                     <option value="20">20</option>
-                    <option value="50">50</option>
+                    <option value="50" selected>50</option>
                     <option value="200">200</option>
-                    <option value="5000" selected>5000</option>
+                    <option value="5000">5000</option>
                 </select>
             </div>
 
@@ -53,11 +53,6 @@
                 <span class="page-info" id="pageInfo">Página 1 de 1</span>
                 <button id="nextPage">›</button>
                 <button id="lastPage">»</button>
-            </div>
-
-            <div class="control-group">
-                <input type="checkbox" id="autoRefresh">
-                <label for="autoRefresh">Auto (5min)</label>
             </div>
 
             <div class="control-group">

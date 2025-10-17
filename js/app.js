@@ -45,9 +45,6 @@ const App = {
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', () => this.switchView(btn.dataset.view));
         });
-        document.getElementById('autoRefresh').addEventListener('change', (e) => {
-            e.target.checked ? AutoRefresh.start() : AutoRefresh.stop();
-        });
         document.getElementById('itemsPerPage').addEventListener('change', (e) => {
             AppState.itemsPerPage = parseInt(e.target.value);
             AppState.currentPage = 1;
