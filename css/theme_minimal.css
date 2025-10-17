@@ -1,0 +1,47 @@
+:root {
+    --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --border-color: #e2e8f0;
+    --accent-color: #4299e1;
+    --accent-hover: #3182ce;
+    --success-color: #48bb78;
+    --warning-color: #ed8936;
+    --error-color: #f56565;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        --bg-secondary: #2d3748;
+        --bg-tertiary: #1a202c;
+        --text-primary: #f7fafc;
+        --text-secondary: #cbd5e0;
+        --border-color: #4a5568;
+    }
+}
+
+.match-card {
+    border: 1px solid var(--border-color);
+    box-shadow: none;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.match-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
+}
+
+.match-competition {
+    background: transparent;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+}
+
+.tech-badge {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}

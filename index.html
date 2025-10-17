@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Coleção de Jogos</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ Minha Coleção de Jogos</h1>
+            <p class="subtitle">Organize e consulte sua coleção de partidas de futebol</p>
+            <div class="stats" id="stats" style="display: none;">
+                <div class="stat">
+                    <div class="stat-value" id="totalGames">0</div>
+                    <div class="stat-label">Jogos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="pendingGames">0</div>
+                    <div class="stat-label">Pendentes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="futureGames">0</div>
+                    <div class="stat-label">Futuros</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalSize">0 GB</div>
+                    <div class="stat-label">Tamanho Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalDuration">0h</div>
+                    <div class="stat-label">Duração Total</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Itens:</label>
+                <select id="itemsPerPage">
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100" selected>100</option>
+                    <option value="200">200</option>
+                </select>
+            </div>
+
+            <div class="pagination">
+                <button id="firstPage">«</button>
+                <button id="prevPage">‹</button>
+                <span class="page-info" id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage">›</button>
+                <button id="lastPage">»</button>
+            </div>
+
+            <div class="control-group">
+                <input type="checkbox" id="autoRefresh">
+                <label for="autoRefresh">Auto (5min)</label>
+            </div>
+
+            <div class="control-group">
+                <select id="yearFilter">
+                    <option value="">Todos os anos</option>
+                </select>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar...">
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="cards">🎴 Cartões</button>
+                <button class="view-btn" data-view="list">📋 Lista</button>
+            </div>
+        </div>
+
+        <div id="matchesContainer">
+            <div class="empty-state">
+                <h2>Carregando jogos...</h2>
+                <p>Aguarde enquanto buscamos os dados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" onclick="MatchModal.close()">×</button>
+                <h2 id="modalTitle">Detalhes da Partida</h2>
+                <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
+                <div id="modalTeamsLogos" class="modal-teams-logos"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
