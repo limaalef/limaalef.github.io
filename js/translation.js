@@ -210,6 +210,10 @@ const LanguageManager = {
         // Exemplo: "28ª Rodada" -> "28th Round"
         if (this.currentLang === 'en') {
             // Traduz padrões de rodadas
+            if (text.includes('Disputa 3º Lugar')) {
+                return `Play-off for 3rd place`;
+            }
+            
             let leg = '';
             if (text.includes('Ida')) {
                 leg = ' - 1st Leg';
