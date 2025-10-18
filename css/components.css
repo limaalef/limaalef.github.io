@@ -323,6 +323,7 @@ select:focus, input[type="text"]:focus {
 
 .tech-badge {
     padding: 4px 10px;
+    border: 1px solid var(--text-primary);
     border-radius: 4px;
     font-size: 0.75em;
     font-weight: 600;
