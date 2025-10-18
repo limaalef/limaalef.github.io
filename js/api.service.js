@@ -1,13 +1,18 @@
 const APIService = {
     async fetchMatches(page, itemsPerPage) {
-        Utils.showNotification('Carregando dados...', 'info');
+        const loadingMessage = LanguageManager.t('loadingData');
+        Utils.showNotification(loadingMessage, 'info');
+
         const url = new URL(CONFIG.API_URL);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
+
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const data = await response.json();
         if (!data.success) throw new Error('API retornou erro');
+
         return data;
     },
     transformData(apiResponse) {

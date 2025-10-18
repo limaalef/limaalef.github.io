@@ -19,35 +19,35 @@
 <body>
     <div class="container">
         <header>
-            <h1>⚽ Minha Coleção de Jogos</h1>
+            <h1 data-i18n="title">⚽ Minha Coleção de Jogos</h1>
             <p class="subtitle">Organizado e disponível para consulta</p>
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">
                     <div class="stat-value" id="totalGames">0</div>
-                    <div class="stat-label">Jogos</div>
+                    <div class="stat-label" data-i18n="games">Jogos</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="pendingGames">0</div>
-                    <div class="stat-label">Pendentes</div>
+                    <div class="stat-label" data-i18n="pending">Pendentes</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="futureGames">0</div>
-                    <div class="stat-label">Futuros</div>
+                    <div class="stat-label" data-i18n="future">Futuros</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="totalSize">0 GB</div>
-                    <div class="stat-label">Tamanho Total</div>
+                    <div class="stat-label" data-i18n="totalSize">Tamanho Total</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="totalDuration">0h</div>
-                    <div class="stat-label">Duração Total</div>
+                    <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
                 </div>
             </div>
         </header>
 
         <div class="controls">
             <div class="control-group">
-                <label>Itens:</label>
+                <label data-i18n="items">Itens:</label>
                 <select id="itemsPerPage">
                     <option value="20">20</option>
                     <option value="50" selected>50</option>
@@ -59,31 +59,37 @@
             <div class="pagination">
                 <button id="firstPage">«</button>
                 <button id="prevPage">‹</button>
-                <span class="page-info" id="pageInfo">Página 1 de 1</span>
+                <span class="page-info" id="pageInfo" data-i18n="page">Página 1 de 1</span>
                 <button id="nextPage">›</button>
                 <button id="lastPage">»</button>
             </div>
 
             <div class="control-group">
                 <select id="yearFilter">
-                    <option value="">Todos os anos</option>
+                    <option value="" data-i18n="allYears">Todos os anos</option>
                 </select>
             </div>
             
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Buscar...">
+                <input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="🔍 Buscar...">
             </div>
 
             <div class="view-toggle">
-                <button class="view-btn active" data-view="cards">🎴 Cartões</button>
-                <button class="view-btn" data-view="list">📋 Lista</button>
+                <button class="view-btn active" data-view="cards" data-i18n="cards">🎴 Cartões</button>
+                <button class="view-btn" data-view="list" data-i18n="list">📋 Lista</button>
+            </div>
+
+            <div class="control-group">
+                <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
+                    <span id="langFlag">🇧🇷</span>
+                </button>
             </div>
         </div>
 
         <div id="matchesContainer">
             <div class="empty-state">
-                <h2>Carregando jogos...</h2>
-                <p>Aguarde enquanto buscamos os dados</p>
+                <h2 data-i18n="loading">Carregando jogos...</h2>
+                <p data-i18n="loadingMessage">Aguarde enquanto buscamos os dados</p>
             </div>
         </div>
     </div>
@@ -99,6 +105,7 @@
         </div>
     </div>
     <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>

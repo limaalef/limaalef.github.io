@@ -18,6 +18,7 @@ const Utils = {
         }
         return new Date(dateStr);
     },
+    
     formatDate(date, shortFormat = false) {
         if (!date) return 'N/A';
         const d = this.parseDate(date);
@@ -31,12 +32,14 @@ const Utils = {
         if (hours === '00' && minutes === '00') return `${day}/${month}/${year}`;
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     },
+    
     formatSize(size) {
         if (!size) return 'N/A';
         const bytes = parseFloat(size);
         if (isNaN(bytes)) return size;
         return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
     },
+    
     getMatchStatus(match) {
         const hasData = match.Mandante && match.Visitante;
         const hasScores = (match['Gols mandante'] !== undefined && match['Gols mandante'] !== '' && match['Gols mandante'] !== null) &&
@@ -52,13 +55,22 @@ const Utils = {
         }
         return 'completed';
     },
+    
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = 'notification';
         const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
         const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
         notification.style.borderLeft = `4px solid ${colors[type]}`;
-        notification.innerHTML = `<span style="font-size: 1.2em; margin-right: 10px;">${icons[type]}</span><span>${message}</span>`;
+        
+        // Tentar traduzir a mensagem se o LanguageManager estiver disponível
+        const translatedMsg = window.LanguageManager ? (LanguageManager.t(message) || message) : message;
+        
+        notification.innerHTML = `
+            <span style="font-size: 1.2em; margin-right: 10px;">${icons[type]}</span>
+            <span>${translatedMsg}</span>
+        `;
+        
         document.body.appendChild(notification);
         setTimeout(() => {
             notification.style.animation = 'slideInRight 0.3s ease-out reverse';

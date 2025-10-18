@@ -18,10 +18,8 @@ const App = {
                                 apiResponse?.total_records || 
                                 AppState.matches.length;
             
-            Utils.showNotification(
-                `${AppState.matches.length} jogos carregados (${totalRecords} total) - Página ${AppState.currentPage}/${AppState.totalPages}`, 
-                'success'
-            );
+            const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText') || 'carregados'} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
+            Utils.showNotification(message, 'success');
         } catch (error) {
             document.getElementById('matchesContainer').innerHTML = `
                 <div class="empty-state">
@@ -40,6 +38,8 @@ const App = {
         Renderer.render();
     },
     init() {
+        LanguageManager.init();
+        
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());
         document.getElementById('yearFilter').addEventListener('change', () => FilterManager.apply());
         document.querySelectorAll('.view-btn').forEach(btn => {

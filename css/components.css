@@ -176,6 +176,24 @@ select:focus, input[type="text"]:focus {
     transform: translateY(-2px);
 }
 
+.lang-btn {
+    padding: 10px 18px;
+    border: 2px solid var(--accent-color);
+    background: var(--bg-secondary);
+    color: var(--accent-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    background: var(--accent-color);
+    color: white;
+}
+
 .matches-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
