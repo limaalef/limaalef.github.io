@@ -406,10 +406,11 @@ select:focus, input[type="text"]:focus {
 
 .modal-image {
     width: 100%;
-    max-height: 300px;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    border-radius: 15px;
+    margin-bottom: 8px;
+    max-height: 475px;
 }
 
 .modal-teams-logos {
