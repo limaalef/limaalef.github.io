@@ -1,8 +1,8 @@
 const CONFIG = {
     API_URLS: {
-        football: 'https://y6wap1yqwe.execute-api.sa-east-1.amazonaws.com/v1/data?',
-        others: 'https://y6wap1yqwe.execute-api.sa-east-1.amazonaws.com/v1/data?&type=multi'
+        football: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/matches?',
+        others: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/matches?&type=multi'
     },
-    DEFAULT_ITEMS_PER_PAGE: 50,
+    DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football'
 };

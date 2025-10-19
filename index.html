@@ -59,17 +59,21 @@
             <div class="control-group">
                 <label data-i18n="items">Itens:</label>
                 <select id="itemsPerPage">
-                    <option value="20">20</option>
-                    <option value="50" selected>50</option>
-                    <option value="200">200</option>
-                    <option value="5000">5000</option>
+                    <option value="50">50</option>
+                    <option value="200" selected>200</option>
+                    <option value="1000">1000</option>
                 </select>
             </div>
 
             <div class="pagination">
                 <button id="firstPage">«</button>
                 <button id="prevPage">‹</button>
-                <span class="page-info" id="pageInfo" data-i18n="page">Página 1 de 1</span>
+                <span class="page-info" id="pageInfo">
+                    <span class="label" data-i18n="page">Página</span>
+                    <span class="value" id="pageNumber">1</span>
+                    <span class="label" data-i18n="pageSeparator">de</span>
+                    <span class="value" id="pageTotal">1</span>
+                </span>
                 <button id="nextPage">›</button>
                 <button id="lastPage">»</button>
             </div>

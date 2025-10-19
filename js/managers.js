@@ -21,6 +21,9 @@ const PaginationManager = {
         document.getElementById('prevPage').disabled = AppState.currentPage === 1;
         document.getElementById('nextPage').disabled = AppState.currentPage === AppState.totalPages;
         document.getElementById('lastPage').disabled = AppState.currentPage === AppState.totalPages;
+
+        document.getElementById('pageNumber').textContent = AppState.currentPage;
+        document.getElementById('pageTotal').textContent = AppState.totalPages;
     },
     goToFirst() { if (AppState.currentPage > 1) { AppState.currentPage = 1; App.loadData(); } },
     goToPrevious() { if (AppState.currentPage > 1) { AppState.currentPage--; App.loadData(); } },
@@ -269,7 +272,7 @@ const Renderer = {
         if (AppState.matches.length === 0) return;
         document.getElementById('stats').style.display = 'flex';
         
-        let pendingCount = 0, futureCount = 0, totalSize = 0, totalMinutes = 0;
+        let pendingCount = 0, futureCount = 0;
         
         AppState.matches.forEach(match => {
             const status = Utils.getMatchStatus(match);
@@ -278,17 +281,7 @@ const Renderer = {
             if (match.Tamanho) {
                 const size = parseFloat(match.Tamanho);
                 if (!isNaN(size)) totalSize += size;
-            }
-            if (match.Duração) {
-                const duration = String(match.Duração);
-                const parts = duration.match(/(\d+)/g);
-                if (parts && parts.length >= 2) {
-                    const hours = parseInt(parts[0]) || 0;
-                    const minutes = parseInt(parts[1]) || 0;
-                    const seconds = parseInt(parts[2]) || 0;
-                    totalMinutes += hours * 60 + minutes + (seconds / 60);
-                }
-            }
+            }   
         });
 
         const totalGames = apiResponse?.pagination?.total_items || 
@@ -296,15 +289,25 @@ const Renderer = {
                           apiResponse?.total_records || 
                           AppState.matches.length;
         
+        const totalFileSize = apiResponse?.total_size;
+        const totalMinutes = apiResponse?.total_duration;
+        
         document.getElementById('totalGames').textContent = totalGames;
         document.getElementById('pendingGames').textContent = pendingCount;
         document.getElementById('futureGames').textContent = futureCount;
-        document.getElementById('totalSize').textContent = (totalSize / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
+        document.getElementById('totalSize').textContent = pendingCount;
+        document.getElementById('futureGames').textContent = futureCount;
+
+        if (totalFileSize < 1099511627776) {
+            document.getElementById('totalSize').textContent = (totalFileSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        } else {
+            document.getElementById('totalSize').textContent = (totalFileSize / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
+        }
         
         if (apiResponse && apiResponse.total_hours) {
             document.getElementById('totalDuration').textContent = Math.round(apiResponse.total_hours) + 'h';
         } else {
-            document.getElementById('totalDuration').textContent = Math.round(totalMinutes / 60) + 'h';
+            document.getElementById('totalDuration').textContent = Math.round(totalMinutes / 3600) + 'h';
         }
     },
     populateYearFilter() {
