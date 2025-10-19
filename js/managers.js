@@ -126,23 +126,75 @@ const MatchModal = {
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
         
-        title.textContent = `${competition} - ${phase}`;
+        title.innerHTML = `
+            <div class="modal-title-competition">${competition}</div>
+            <div class="modal-title-phase">${phase}</div>
+        `;
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
         
-        let scoreText = '';
+        let scoreHtml = '';
         if (status === 'pending') {
             const pendingText = LanguageManager.t('pendingMatch');
-            scoreText = `${match.Mandante} ${homeGoals} x ${awayGoals} ${match.Visitante} <span class="badge badge-warning" style="margin-left: 15px;">⏳ ${pendingText}</span>`;
-        } else if (status === 'future') {
-            const futureText = LanguageManager.t('futureMatch');
-            scoreText = `${match.Mandante} vs ${match.Visitante} <span class="badge badge-success" style="margin-left: 15px;">📅 ${futureText}</span>`;
+            scoreHtml = `
+                <div class="score-desktop">
+                    <span class="score-team-name">${match.Mandante}</span>
+                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-value">${homeGoals} x ${awayGoals}</span>
+                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${match.Visitante}</span>
+                    <span class="badge badge-warning score-status-badge">⏳ ${pendingText}</span>
+                </div>
+                <div class="score-mobile">
+                    <div class="score-mobile-row">
+                        <div class="score-mobile-team">
+                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${match.Mandante}</span>
+                        </div>
+                        <span class="score-mobile-value">${homeGoals}</span>
+                    </div>
+                    <div class="score-mobile-row">
+                        <div class="score-mobile-team">
+                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${match.Visitante}</span>
+                        </div>
+                        <span class="score-mobile-value">${awayGoals}</span>
+                    </div>
+                    <div class="score-mobile-status">
+                        <span class="badge badge-warning">⏳ ${pendingText}</span>
+                    </div>
+                </div>
+            `;
         } else {
-            scoreText = `${match.Mandante} ${homeGoals} x ${awayGoals} ${match.Visitante}`;
+            scoreHtml = `
+                <div class="score-desktop">
+                    <span class="score-team-name">${match.Mandante}</span>
+                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-value">${homeGoals} x ${awayGoals}</span>
+                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${match.Visitante}</span>
+                </div>
+                <div class="score-mobile">
+                    <div class="score-mobile-row">
+                        <div class="score-mobile-team">
+                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${match.Mandante}</span>
+                        </div>
+                        <span class="score-mobile-value">${homeGoals}</span>
+                    </div>
+                    <div class="score-mobile-row">
+                        <div class="score-mobile-team">
+                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${match.Visitante}</span>
+                        </div>
+                        <span class="score-mobile-value">${awayGoals}</span>
+                    </div>
+                </div>
+            `;
         }
         
-        score.innerHTML = scoreText;
+        score.innerHTML = scoreHtml;
         
         const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
 

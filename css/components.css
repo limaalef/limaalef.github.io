@@ -457,11 +457,6 @@ select:focus, input[type="text"]:focus {
     animation: slideIn 0.3s ease-out;
 }
 
-@keyframes slideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
 .modal-header {
     background: var(--accent-color);
     color: white;
@@ -469,6 +464,115 @@ select:focus, input[type="text"]:focus {
     border-radius: 15px 15px 0 0;
     position: relative;
     transition: background 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+
+@keyframes slideInRight {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.modal-title-competition {
+    text-align: center;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.modal-title-phase {
+    text-align: center;
+    font-size: 0.6em;
+    font-weight: 500;
+}
+
+.score-desktop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.score-mobile {
+    display: none;
+}
+
+.score-team-name {
+    font-weight: 600;
+}
+
+.score-team-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.score-value {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.score-vs {
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.score-status-badge {
+    margin-left: 10px;
+}
+
+.score-mobile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.score-mobile-row:last-of-type {
+    margin-bottom: 0;
+}
+
+.score-mobile-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.score-mobile-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.score-mobile-value {
+    font-size: 1.3em;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: center;
+}
+
+.score-mobile-status {
+    margin-top: 10px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .score-desktop {
+        display: none !important;
+    }
+    
+    .score-mobile {
+        display: block !important;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+    }
 }
 
 .modal-image {

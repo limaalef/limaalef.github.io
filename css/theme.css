@@ -19,12 +19,12 @@
 
 /* Tema para Outros Esportes */
 body.theme-others {
-    --bg-primary: linear-gradient(135deg, #135f8b 0%, #65214e 100%);
+    --bg-primary: linear-gradient(135deg, #4f5aac 0%, #5f37a0 100%);
     --bg-secondary: #ffffff;
-    --bg-tertiary: #f5f8ff;
-    --border-color: #d0f5df;
-    --accent-color: #486ea8;
-    --accent-hover: #13558b;
+    --bg-tertiary: #f5f7fa;
+    --border-color: #e5e7eb;
+    --accent-color: #a78bfa;
+    --accent-hover: #8b5cf6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,9 +42,9 @@ body.theme-others {
     }
 
     body.theme-others {
-        --bg-primary: linear-gradient(135deg, #14343a 0%, #2a1024 100%);
-        --bg-secondary: #1e1e2e;
-        --bg-tertiary: #202a2a;
-        --border-color: #404645;
+        --bg-primary: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+        --bg-secondary: #252535;
+        --bg-tertiary: #2d2d40;
+        --border-color: #3d3d52;
     }
 }
