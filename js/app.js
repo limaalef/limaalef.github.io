@@ -2,23 +2,19 @@ const App = {
     async loadData() {
         try {
             const apiResponse = await APIService.fetchMatches(AppState.currentPage, AppState.itemsPerPage);
-            
-            // Atualiza paginação (suporta ambos formatos)
             PaginationManager.update(apiResponse);
-            
             AppState.matches = APIService.transformData(apiResponse);
             AppState.filteredMatches = AppState.matches;
             Renderer.populateYearFilter();
             Renderer.render();
             Renderer.updateStats(apiResponse);
             
-            // Suporta múltiplos formatos de total
             const totalRecords = apiResponse?.pagination?.total_items || 
                                 apiResponse?.total_registros || 
                                 apiResponse?.total_records || 
                                 AppState.matches.length;
             
-            const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText') || 'carregados'} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
+            const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText')} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
             Utils.showNotification(message, 'success');
         } catch (error) {
             document.getElementById('matchesContainer').innerHTML = `
@@ -37,9 +33,27 @@ const App = {
         });
         Renderer.render();
     },
+    switchSport(sport) {
+        CONFIG.currentSport = sport;
+        AppState.currentPage = 1;
+        document.querySelectorAll('.sport-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.sport === sport);
+        });
+        
+        // Alterna o tema
+        if (sport === 'others') {
+            document.body.classList.add('theme-others');
+        } else {
+            document.body.classList.remove('theme-others');
+        }
+        
+        this.loadData();
+    },
     init() {
         LanguageManager.init();
         
+        document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
+        document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());
         document.getElementById('yearFilter').addEventListener('change', () => FilterManager.apply());
         document.querySelectorAll('.view-btn').forEach(btn => {

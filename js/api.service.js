@@ -3,7 +3,7 @@ const APIService = {
         const loadingMessage = LanguageManager.t('loadingData');
         Utils.showNotification(loadingMessage, 'info');
 
-        const url = new URL(CONFIG.API_URL);
+        const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
 

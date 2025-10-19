@@ -16,10 +16,7 @@ const PaginationManager = {
         } else {
             AppState.totalPages = apiResponse.total_pages || 1;
         }
-        
-        // Usar LanguageManager para atualizar texto
         LanguageManager.updatePageInfo();
-        
         document.getElementById('firstPage').disabled = AppState.currentPage === 1;
         document.getElementById('prevPage').disabled = AppState.currentPage === 1;
         document.getElementById('nextPage').disabled = AppState.currentPage === AppState.totalPages;
@@ -43,10 +40,9 @@ const CardManager = {
         const homeWinner = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
         const awayWinner = homeGoals !== '' && awayGoals !== '' && awayGoals > homeGoals;
         
-        // Usar tradução para status
         const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
         const statusBadge = status === 'pending' ? `<span class="match-status">⏳ ${statusText}</span>` : '';
-        
+
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
         const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
@@ -93,10 +89,9 @@ const ListManager = {
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
         const scoreText = `${homeGoals} x ${awayGoals}`;
         
-        // Usar tradução para status
         const statusText = LanguageManager.t('pendingMatch');
         const statusBadge = status === 'pending' ? `<span class="badge badge-warning" style="font-size: 0.7em; margin-left: 8px;">${statusText}</span>` : '';
-        
+
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
 
@@ -125,14 +120,13 @@ const MatchModal = {
         const body = document.getElementById('modalBody');
         const status = Utils.getMatchStatus(match);
         
-        title.textContent = `${match.Competição} - ${match.Fase}`;
+        const competition = LanguageManager.translateText(match.Competição);
+        const phase = LanguageManager.translateText(match.Fase);
+        
+        title.textContent = `${competition} - ${phase}`;
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
-        
-        const competition = LanguageManager.translateText(match.Competição);
-        const phase = LanguageManager.translateText(match.Fase);
-        title.textContent = `${competition} - ${phase}`;
         
         let scoreText = '';
         if (status === 'pending') {
@@ -147,13 +141,12 @@ const MatchModal = {
         
         score.innerHTML = scoreText;
         
-        const audioFormat = match['Formato de áudio'];
-        
-        // Usar traduções nos títulos das seções
-        const matchInfoTitle = LanguageManager.t('matchInfo') || 'Informações da Partida';
-        const technicalInfoTitle = LanguageManager.t('technicalInfo') || 'Especificações Técnicas';
-        const storageTitle = LanguageManager.t('storageInfo') || 'Armazenamento';
-        const observationsTitle = LanguageManager.t('observations') || 'Observações';
+        const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
+
+        const matchInfoTitle = LanguageManager.t('matchInfo');
+        const technicalInfoTitle = LanguageManager.t('technicalInfo');
+        const storageTitle = LanguageManager.t('storageInfo');
+        const observationsTitle = LanguageManager.t('observations');
         
         body.innerHTML = `
             ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.style.display='none'">` : ''}
@@ -272,7 +265,6 @@ const Renderer = {
             AppState.filteredMatches.forEach(match => list.appendChild(ListManager.create(match)));
         }
     },
-    
     updateStats(apiResponse) {
         if (AppState.matches.length === 0) return;
         document.getElementById('stats').style.display = 'flex';
@@ -315,7 +307,6 @@ const Renderer = {
             document.getElementById('totalDuration').textContent = Math.round(totalMinutes / 60) + 'h';
         }
     },
-    
     populateYearFilter() {
         const years = new Set();
         AppState.matches.forEach(match => {
@@ -323,11 +314,8 @@ const Renderer = {
             if (date) years.add(date.getFullYear());
         });
         const yearFilter = document.getElementById('yearFilter');
-        
-        // Usar tradução para "Todos os anos"
         const allYearsText = LanguageManager.t('allYears');
         yearFilter.innerHTML = `<option value="" data-i18n="allYears">${allYearsText}</option>`;
-        
         Array.from(years).sort((a, b) => b - a).forEach(year => {
             const option = document.createElement('option');
             option.value = year;

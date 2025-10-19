@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Coleção de Jogos</title>
+    <title>Minha Coleção de Esportes</title>
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
@@ -19,8 +19,18 @@
 <body>
     <div class="container">
         <header>
-            <h1 data-i18n="title">⚽ Minha Coleção de Jogos</h1>
-            <p class="subtitle">Organizado e disponível para consulta</p>
+            <h1 data-i18n="title">🏆 Minha Coleção de Esportes</h1>
+            <p class="subtitle" data-i18n="subtitle">Organizado e disponível para consulta. Fale comigo no Telegram ou Discord: @limaalef</p>
+            
+            <div class="sport-selector">
+                <button class="sport-btn active" data-sport="football" id="footballBtn">
+                    ⚽ <span data-i18n="football">Futebol</span>
+                </button>
+                <button class="sport-btn" data-sport="others" id="othersBtn">
+                    🏀 <span data-i18n="otherSports">Outros Esportes</span>
+                </button>
+            </div>
+
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">
                     <div class="stat-value" id="totalGames">0</div>

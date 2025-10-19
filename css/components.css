@@ -10,6 +10,7 @@ body {
     min-height: 100vh;
     padding: 20px;
     color: var(--text-primary);
+    transition: background 0.4s ease;
 }
 
 .container {
@@ -23,6 +24,7 @@ header {
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
     margin-bottom: 25px;
+    transition: all 0.3s ease;
 }
 
 h1 {
@@ -34,6 +36,43 @@ h1 {
 .subtitle {
     color: var(--text-secondary);
     font-size: 1em;
+}
+
+.sport-selector {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid var(--border-color);
+}
+
+.sport-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid var(--accent-color);
+    background: var(--bg-secondary);
+    color: var(--accent-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1em;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sport-btn.active {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.sport-btn:hover:not(.active) {
+    transform: translateY(-2px);
+    background: var(--bg-tertiary);
 }
 
 .stats {
@@ -50,6 +89,7 @@ h1 {
     padding: 12px;
     border-radius: 8px;
     text-align: center;
+    transition: background 0.3s ease;
 }
 
 .stat-value {
@@ -57,6 +97,7 @@ h1 {
     font-weight: 700;
     margin-bottom: 4px;
     color: var(--accent-color);
+    transition: color 0.3s ease;
 }
 
 .stat-label {
@@ -74,6 +115,7 @@ h1 {
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
+    transition: all 0.3s ease;
 }
 
 .control-group {
@@ -139,6 +181,7 @@ select:focus, input[type="text"]:focus {
     font-size: 0.9em;
     font-weight: 600;
     color: var(--text-primary);
+    transition: background 0.3s ease;
 }
 
 .search-box {
@@ -251,6 +294,7 @@ select:focus, input[type="text"]:focus {
     color: var(--accent-color);
     font-weight: 600;
     font-size: 0.9em;
+    transition: color 0.3s ease;
 }
 
 .match-competition {
@@ -260,6 +304,7 @@ select:focus, input[type="text"]:focus {
     border-radius: 12px;
     font-size: 0.8em;
     font-weight: 600;
+    transition: background 0.3s ease;
 }
 
 .match-phase {
@@ -307,6 +352,7 @@ select:focus, input[type="text"]:focus {
     color: var(--accent-color);
     min-width: 35px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
 .score.winner {
@@ -347,6 +393,7 @@ select:focus, input[type="text"]:focus {
     font-weight: 600;
     background: var(--bg-tertiary);
     color: var(--text-primary);
+    transition: background 0.3s ease;
 }
 
 .matches-list {
@@ -354,6 +401,7 @@ select:focus, input[type="text"]:focus {
     border-radius: 10px;
     padding: 12px;
     box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
 }
 
 .list-item {
@@ -420,6 +468,7 @@ select:focus, input[type="text"]:focus {
     padding: 20px;
     border-radius: 15px 15px 0 0;
     position: relative;
+    transition: background 0.3s ease;
 }
 
 .modal-image {
@@ -429,20 +478,6 @@ select:focus, input[type="text"]:focus {
     border-radius: 15px;
     margin-bottom: 8px;
     max-height: 475px;
-}
-
-.modal-teams-logos {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 15px;
-}
-
-.modal-team-logo {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
 }
 
 .close-btn {
@@ -480,6 +515,7 @@ select:focus, input[type="text"]:focus {
     margin-bottom: 12px;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border-color);
+    transition: color 0.3s ease;
 }
 
 .detail-grid {
@@ -492,6 +528,7 @@ select:focus, input[type="text"]:focus {
     padding: 12px;
     background: var(--bg-tertiary);
     border-radius: 8px;
+    transition: background 0.3s ease;
 }
 
 .detail-label {
@@ -555,10 +592,4 @@ select:focus, input[type="text"]:focus {
 @keyframes slideInRight {
     from { transform: translateX(400px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
-}
-
-input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
 }
