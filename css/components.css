@@ -246,7 +246,7 @@ select:focus, input[type="text"]:focus {
 .match-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 16px;
     padding: 16px;
     box-shadow: var(--shadow-md);
     cursor: pointer;
@@ -268,6 +268,44 @@ select:focus, input[type="text"]:focus {
     filter: grayscale(1);
 }
 
+.match-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.competition-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.competition-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.match-competition {
+    background: transparent;
+    color: var(--text-primary);
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.95em;
+    font-weight: 700;
+}
+
+.match-date {
+    color: var(--accent-color);
+    font-weight: 500;
+    font-size: 0.85em;
+}
+
 .match-status {
     position: absolute;
     top: 12px;
@@ -281,36 +319,9 @@ select:focus, input[type="text"]:focus {
     color: white;
 }
 
-.match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.match-date {
-    color: var(--accent-color);
-    font-weight: 600;
-    font-size: 0.9em;
-    transition: color 0.3s ease;
-}
-
-.match-competition {
-    background: var(--accent-color);
-    color: white;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: 600;
-    transition: background 0.3s ease;
-}
-
 .match-phase {
-    font-size: 0.85em;
+    font-size: 0.8em;
     color: var(--text-secondary);
-    margin-bottom: 10px;
     font-weight: 500;
 }
 
@@ -318,7 +329,8 @@ select:focus, input[type="text"]:focus {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 12px;
+    margin: 12px 0;
+    flex: 1;
 }
 
 .team {

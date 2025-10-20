@@ -50,13 +50,33 @@ const CardManager = {
         const phase = LanguageManager.translateText(match.Fase);
         const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
         
+        // Gerar URL do logo da competição
+        let competitionLogo = '';
+        if (match.Competição && match.Data) {
+            const competitionSlug = match.Competição
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .replace(/\s+/g, '_');
+            
+            const matchDate = Utils.parseDate(match.Data);
+            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
+            competitionLogo = `https://raw.githubusercontent.com/limaalef/limaalef.github.io/refs/heads/main/competition_logos/${competitionSlug}_${year}.png`;
+        }
+
+        // Formatar a data
+        const dateDisplay = Utils.formatMatchDate(match.Data);
+        
         card.innerHTML = `
             ${statusBadge}
             <div class="match-header">
-                <span class="match-date">${Utils.formatDate(match.Data)}</span>
-                ${competition ? `<span class="match-competition">${competition}</span>` : ''}
+                ${competitionLogo ? `<img src="${competitionLogo}" alt="${match.Competição}" class="competition-logo" onerror="this.style.display='none'">` : ''}
+                <div class="competition-info">
+                    <div class="match-competition">${competition || 'N/A'}</div>
+                    <div class="match-phase">${phase || ''}</div>
+                </div>
             </div>
-            <div class="match-phase">${phase || ''}</div>
+            <div class="match-date">${dateDisplay}</div>
             <div class="match-teams">
                 <div class="team">
                     ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="team-logo" onerror="this.style.display='none'">` : ''}
@@ -396,3 +416,4 @@ const FilterManager = {
         Renderer.render();
     }
 };
+
