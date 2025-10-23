@@ -61,7 +61,7 @@ const CardManager = {
             
             const matchDate = Utils.parseDate(match.Data);
             const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
-            competitionLogo = `https://raw.githubusercontent.com/limaalef/limaalef.github.io/refs/heads/main/competition_logos/${competitionSlug}_${year}.png`;
+            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
         }
 
         // Formatar a data
