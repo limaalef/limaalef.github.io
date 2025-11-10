@@ -82,6 +82,7 @@ const translations = {
         'CONMEBOL Copa América Feminina': "Women's CONMEBOL Copa América",
         'CONCACAF Copa Ouro': 'CONCACAF Gold Cup',
         'CONCACAF Copa Ouro Feminina': 'CONCACAF W Gold Cup',
+        'CONMEBOL Sul-Americana': "CONMEBOL Sudamericana",
         'Eliminatórias Copa do Mundo FIFA 2014': '2014 FIFA World Cup Qualifiers',
         'Eliminatórias Copa do Mundo FIFA 2018': '2018 FIFA World Cup Qualifiers',
         'Eliminatórias Copa do Mundo FIFA 2022': '2022 FIFA World Cup Qualifiers',
