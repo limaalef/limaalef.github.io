@@ -40,11 +40,14 @@ const App = {
             btn.classList.toggle('active', btn.dataset.sport === sport);
         });
         
-        // Alterna o tema
+        // Remove todos os temas
+        document.body.classList.remove('theme-others', 'theme-motor');
+        
+        // Adiciona o tema apropriado
         if (sport === 'others') {
             document.body.classList.add('theme-others');
-        } else {
-            document.body.classList.remove('theme-others');
+        } else if (sport === 'motor') {
+            document.body.classList.add('theme-motor');
         }
         
         this.loadData();
@@ -54,6 +57,7 @@ const App = {
         
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
         document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
+        document.getElementById('motorBtn').addEventListener('click', () => this.switchSport('motor'));
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());
         document.getElementById('yearFilter').addEventListener('change', () => FilterManager.apply());
         document.querySelectorAll('.view-btn').forEach(btn => {

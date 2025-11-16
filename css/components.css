@@ -8,24 +8,85 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-primary);
     min-height: 100vh;
-    padding: 20px;
     color: var(--text-primary);
     transition: background 0.4s ease;
 }
 
 .container {
     max-width: 1400px;
+    padding: 0px 20px;
     margin: 0 auto;
 }
 
 header {
-    background: var(--bg-secondary);
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-    margin-bottom: 25px;
-    transition: all 0.3s ease;
+    background: var(--header-color);
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+    transition: background 0.3s ease;
+    width: 100%;
 }
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    gap: 0;
+}
+
+.site-logo-img {
+    height: 50px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.site-logo-img:hover {
+    transform: scale(1.05);
+}
+
+.sport-selector {
+    display: flex;
+    gap: 6px;
+    margin-left: 0;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+}
+
+.sport-btn {
+    padding: 6px 6px;
+    border: 0px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.sport-btn.active {
+    padding: 6px 12px;
+    background: white;
+    color: var(--header-color);
+    border-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.sport-btn:hover:not(.active) {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+}
+
 
 h1 {
     color: var(--text-primary);
@@ -38,47 +99,10 @@ h1 {
     font-size: 1em;
 }
 
-.sport-selector {
-    display: flex;
-    gap: 12px;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid var(--border-color);
-}
-
-.sport-btn {
-    flex: 1;
-    padding: 12px 20px;
-    border: 2px solid var(--accent-color);
-    background: var(--bg-secondary);
-    color: var(--accent-color);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1em;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.sport-btn.active {
-    background: var(--accent-color);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.sport-btn:hover:not(.active) {
-    transform: translateY(-2px);
-    background: var(--bg-tertiary);
-}
-
 .stats {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    margin: 12px 0px;
     flex-wrap: wrap;
 }
 
@@ -708,4 +732,256 @@ select:focus, input[type="text"]:focus {
 @keyframes slideInRight {
     from { transform: translateX(400px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+}
+
+.motor-phase-section {
+    margin: 12px 0;
+}
+
+.motor-phase-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.motor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 10px;
+    gap: 10px;
+}
+
+
+.motor-event-item {
+    margin-bottom: 20px;
+}
+
+.motor-event-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Accordion para eventos de automobilismo */
+.motor-event-accordion {
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.motor-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.motor-event-header:hover {
+    background: var(--border-color);
+}
+
+.motor-event-header-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.motor-event-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.motor-event-date {
+    font-size: 0.85em;
+    margin-right: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.motor-event-icon {
+    font-size: 1.2em;
+    color: var(--accent-color);
+    transition: transform 0.3s ease;
+    font-weight: bold;
+}
+
+.motor-event-content {
+    padding: 16px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ajustes para mobile */
+@media (max-width: 768px) {
+    .motor-event-header {
+        padding: 12px;
+    }
+    
+    .motor-event-title {
+        font-size: 1em;
+    }
+    
+    .motor-event-date {
+        font-size: 0.8em;
+    }
+    
+    .motor-event-content {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .motor-event-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .motor-event-title {
+        font-size: 1em;
+    }
+    
+    .motor-event-date {
+        font-size: 0.8em;
+    }
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Para Firefox */
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+    .modal-content::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .modal-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .modal-content {
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+}
+
+.site-footer {
+    background: var(--bg-secondary);
+    margin-top: 40px;
+    padding: 40px 20px 20px;
+    border-top: 2px solid var(--border-color);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.footer-section h3 {
+    color: var(--text-primary);
+    font-size: 1.3em;
+    margin-bottom: 12px;
+}
+
+.footer-section h4 {
+    color: var(--accent-color);
+    font-size: 1.1em;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.footer-section p {
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.footer-section a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-bottom p {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+/* Responsividade do footer */
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 30px 15px 15px;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.2em;
+    }
+    
+    .footer-section h4 {
+        font-size: 1em;
+    }
 }

@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Coleção de Esportes</title>
+    
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="manifest" href="/icons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
@@ -17,10 +36,12 @@
   gtag('config', 'G-JJZTBEGJ91');
 </script>
 <body>
-    <div class="container">
-        <header>
-            <h1 data-i18n="title">🏆 Minha Coleção de Esportes</h1>
-            <p class="subtitle" data-i18n="subtitle">Organizado e disponível para consulta. Fale comigo no Telegram ou Discord: @limaalef</p>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="site-logo" style="display: none;">🏆</div>
+            </div>
             
             <div class="sport-selector">
                 <button class="sport-btn active" data-sport="football" id="footballBtn">
@@ -29,8 +50,15 @@
                 <button class="sport-btn" data-sport="others" id="othersBtn">
                     🏀 <span data-i18n="otherSports">Outros Esportes</span>
                 </button>
+                <button class="sport-btn" data-sport="motor" id="motorBtn">
+                    🏎️ <span data-i18n="motorSports">Automobilismo</span>
+                </button>
             </div>
-
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="statsContainer">
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">
                     <div class="stat-value" id="totalGames">0</div>
@@ -53,7 +81,7 @@
                     <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
                 </div>
             </div>
-        </header>
+        </div>
 
         <div class="controls">
             <div class="control-group">
@@ -118,6 +146,38 @@
             <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" onclick="MatchModal.close()">×</button>
+                <h2 id="modalTitle">Detalhes da Partida</h2>
+                <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🏆 Minha Coleção de Esportes</h3>
+                <p data-i18n="footerDescription">Arquivo pessoal de jogos e eventos esportivos</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4 data-i18n="contact">Contato</h4>
+                <p>Telegram: <a href="https://t.me/limaalef" target="_blank" rel="noopener noreferrer">@limaalef</a></p>
+                <p>Discord: <span>@limaalef</span></p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 <span data-i18n="allRightsReserved">Todos os direitos reservados</span></p>
+        </div>
+    </footer>
+    
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>

@@ -96,5 +96,40 @@ const Utils = {
             notification.style.animation = 'slideInRight 0.3s ease-out reverse';
             setTimeout(() => notification.remove(), 300);
         }, 3000);
+    },
+
+    formatMotorDateRange(startDate, endDate) {
+        if (!startDate || !endDate) return 'N/A';
+        
+        const start = this.parseDate(startDate);
+        const end = this.parseDate(endDate);
+        
+        if (!start || isNaN(start) || !end || isNaN(end)) return 'N/A';
+        
+        const startDay = String(start.getDate()).padStart(2, '0');
+        const startMonth = String(start.getMonth() + 1).padStart(2, '0');
+        const startYear = start.getFullYear();
+        
+        const endDay = String(end.getDate()).padStart(2, '0');
+        const endMonth = String(end.getMonth() + 1).padStart(2, '0');
+        const endYear = end.getFullYear();
+        
+        // Se for a mesma data
+        if (startDay === endDay && startMonth === endMonth && startYear === endYear) {
+            return `${startDay}/${startMonth}/${startYear}`;
+        }
+        
+        // Se ano e mês iguais: 10 a 11/11/2020
+        if (startYear === endYear && startMonth === endMonth) {
+            return `${startDay} a ${endDay}/${endMonth}/${endYear}`;
+        }
+        
+        // Se ano igual e mês diferente: 10/10 a 11/11/2020
+        if (startYear === endYear) {
+            return `${startDay}/${startMonth} a ${endDay}/${endMonth}/${endYear}`;
+        }
+        
+        // Se tudo diferente: 10/10/2020 a 01/01/2021
+        return `${startDay}/${startMonth}/${startYear} a ${endDay}/${endMonth}/${endYear}`;
     }
 };

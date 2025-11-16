@@ -4,6 +4,9 @@ const translations = {
         subtitle: 'Me encontre no Telegram @limaalef e no Discord @limaalef',
         football: 'Futebol',
         otherSports: 'Outros esportes',
+        motorSports: 'Automobilismo',
+        evento: 'evento',
+        eventos: 'eventos',
         games: 'Jogos',
         pending: 'Pendentes',
         future: 'Futuros',
@@ -51,7 +54,11 @@ const translations = {
         errorTitle: 'Erro ao carregar dados',
         errorMessage: 'Verifique a URL da API',
         error: 'Erro',
-        loadedText: 'carregados'
+        loadedText: 'carregados',
+        footerDescription: 'Arquivo pessoal de jogos e eventos esportivos',
+        contact: 'Contato',
+        statistics: 'Estatísticas',
+        allRightsReserved: 'Todos os direitos reservados'
     },
     'en': {
         'Copa São Paulo de Futebol Júnior': 'Under-20 Sao Paulo Cup',
@@ -99,10 +106,21 @@ const translations = {
         'Superliga de Vôlei': 'Brazilian Volleyball Super League',
         'Copa do Mundo de Rugby': 'Rugby World Cup',
         'Liga Mundial de Vôlei': 'FIVB Volleyball World League',
+        'Treino Livre': 'Free Pratice',
+        'Treino Livre 1': 'Free Pratice 1',
+        'Treino Livre 2': 'Free Pratice 2',
+        'Treino Livre 3': 'Free Pratice 3',
+        'Treino Sprint': 'Sprint Qualifying',
+        'Corrida Sprint': 'Sprint Race',
+        'Treino Classificatório': 'Qualifying',
+        'Corrida': 'Race',
         title: '⚽ My Football Collection',
         subtitle: 'Contact me on Telegram or Discord @limaalef',
         football: 'Football / Soccer',
         otherSports: 'Other sports',
+        motorSports: 'Motorsport',
+        event: 'event',
+        events: 'events',
         games: 'Games',
         pending: 'Pending',
         future: 'Future',
@@ -150,7 +168,11 @@ const translations = {
         errorTitle: 'Error loading data',
         errorMessage: 'Check the API URL',
         error: 'Error',
-        loadedText: 'loaded'
+        loadedText: 'loaded',
+        footerDescription: 'Personal archive of games and sporting events',
+        contact: 'Contact',
+        statistics: 'Statistics',
+        allRightsReserved: 'All rights reserved'
     }
 };
 
@@ -158,8 +180,25 @@ const LanguageManager = {
     currentLang: 'pt-BR',
 
     init() {
-        const savedLang = window.appLang || 'pt-BR';
-        this.setLanguage(savedLang, false); // false = não re-renderizar ainda
+        // Detectar idioma do navegador/sistema
+        const browserLang = navigator.language || navigator.userLanguage;
+        
+        // Verificar se há idioma salvo anteriormente
+        const savedLang = window.appLang;
+        
+        let defaultLang = 'pt-BR';
+        
+        // Se não há idioma salvo, usar detecção automática
+        if (!savedLang) {
+            // Se o idioma do navegador começa com 'pt' (pt-BR, pt-PT, etc), usar português
+            // Caso contrário, usar inglês
+            defaultLang = browserLang.toLowerCase().startsWith('pt') ? 'pt-BR' : 'en';
+        } else {
+            // Usar idioma salvo
+            defaultLang = savedLang;
+        }
+        
+        this.setLanguage(defaultLang, false); // false = não re-renderizar ainda
         
         document.getElementById('langToggle').addEventListener('click', () => {
             const newLang = this.currentLang === 'pt-BR' ? 'en' : 'pt-BR';

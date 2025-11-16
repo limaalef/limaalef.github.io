@@ -16,6 +16,20 @@ const APIService = {
         return data;
     },
     transformData(apiResponse) {
+        if (CONFIG.currentSport === 'motor') {
+            return (apiResponse.data || []).map(item => ({
+                ID: item.id || '',
+                Tipo: 'motor',
+                Campeonato: item.championship?.name || '',
+                Fase: item.championship?.phase || '',
+                DataInicio: item.start_date || '',
+                DataFim: item.end_date || '',
+                Eventos: item.events || [],
+                'Logo emissora': item.main_station_logo || '',
+                type: item.type || ''
+            }));
+        }
+        
         return (apiResponse.data || []).map(item => ({
             ID: item.id || '',
             Data: item.date || '',

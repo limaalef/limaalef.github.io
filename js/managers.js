@@ -31,6 +31,88 @@ const PaginationManager = {
     goToLast() { if (AppState.currentPage < AppState.totalPages) { AppState.currentPage = AppState.totalPages; App.loadData(); } }
 };
 
+const MotorListManager = {
+    create(event) {
+        const item = document.createElement('div');
+        item.className = 'list-item motor-event';
+        item.onclick = () => MotorModal.show(event);
+        
+        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
+        
+        const competition = LanguageManager.translateText(event.Campeonato);
+        const phase = LanguageManager.translateText(event.Fase);
+        
+        const eventCount = event.Eventos?.length || 0;
+        const eventLabel = LanguageManager.currentLang === 'en' 
+            ? (eventCount === 1 ? 'event' : 'events')
+            : (eventCount === 1 ? 'evento' : 'eventos');
+
+        item.innerHTML = `
+            <div><strong>${dateRange}</strong></div>
+            <div>
+                <strong>${phase}</strong>
+                <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
+                    ${competition}
+                </div>
+            </div>
+            <div style="text-align: center; font-size: 0.85em;">${eventCount} ${eventLabel}</div>
+            <div style="text-align: right;">
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
+            </div>
+        `;
+        return item;
+    }
+};
+
+const MotorCardManager = {
+    create(event) {
+        const card = document.createElement('div');
+        card.className = 'match-card motor-event';
+        card.onclick = () => MotorModal.show(event);
+        
+        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
+        
+        const competition = LanguageManager.translateText(event.Campeonato);
+        const phase = LanguageManager.translateText(event.Fase);
+        
+        const eventCount = event.Eventos?.length || 0;
+        const eventLabel = LanguageManager.currentLang === 'en' 
+            ? (eventCount === 1 ? 'event' : 'events')
+            : (eventCount === 1 ? 'evento' : 'eventos');
+        
+        let competitionLogo = '';
+        if (event.Campeonato && event.DataInicio) {
+            const competitionSlug = event.Campeonato
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .replace(/\s+/g, '_');
+            
+            const matchDate = Utils.parseDate(event.DataInicio);
+            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
+            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
+        }
+
+        card.innerHTML = `
+            <div class="match-header">
+                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.Campeonato}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
+                <div class="competition-info">
+                    <div class="match-competition">${competition || 'N/A'}</div>
+                </div>
+            </div>
+            <div class="match-date">${dateRange}</div>
+            <div class="motor-phase-section">
+                <div class="motor-phase-name">${phase || 'N/A'}</div>
+            </div>
+            <div class="motor-footer">
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : '<div></div>'}
+                <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
+            </div>
+        `;
+        return card;
+    }
+};
+
 const CardManager = {
     create(match) {
         const card = document.createElement('div');
@@ -316,6 +398,132 @@ const MatchModal = {
     }
 };
 
+const MotorModal = {
+    show(event) {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const score = document.getElementById('modalScore');
+        const body = document.getElementById('modalBody');
+        
+        const competition = LanguageManager.translateText(event.Campeonato);
+        const phase = LanguageManager.translateText(event.Fase);
+        
+        title.innerHTML = `
+            <div class="modal-title-competition">${competition}</div>
+            <div class="modal-title-phase">${phase}</div>
+        `;
+        
+        const startDate = Utils.formatDate(event.DataInicio);
+        const endDate = Utils.formatDate(event.DataFim);
+        const dateRange = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+        
+        score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
+        
+        const eventsHtml = (event.Eventos || []).map((evt, index) => `
+            <div class="motor-event-accordion">
+                <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
+                    <div class="motor-event-header-content">
+                        <span class="motor-event-title">${LanguageManager.translateText(evt.event_type) || 'Evento'}</span>
+                        <span class="motor-event-date">${Utils.formatDate(evt.date)}</span>
+                    </div>
+                    <span class="motor-event-icon" id="icon-${index}">▼</span>
+                </div>
+                <div class="motor-event-content" id="content-${index}" style="display: none;">
+                    ${evt.image ? `<img src="${evt.image}" alt="${evt.event_type}" class="modal-image" onerror="this.style.display='none'">` : ''}
+                    
+                    <div class="detail-section">
+                        <div class="section-title">${LanguageManager.t('matchInfo')}</div>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('date')}</div>
+                                <div class="detail-value">${Utils.formatDate(evt.date)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('broadcaster')}</div>
+                                <div class="detail-value">${evt.station?.name || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('origin')}</div>
+                                <div class="detail-value">${evt.station?.origem || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('narration')}</div>
+                                <div class="detail-value">${evt.station?.narracao || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <div class="section-title">${LanguageManager.t('technicalInfo')}</div>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('quality')}</div>
+                                <div class="detail-value">${evt.technical_details?.video_quality || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('audioFormat')}</div>
+                                <div class="detail-value">${LanguageManager.translateText(evt.technical_details?.audio_format || 'N/A')}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('bitrate')}</div>
+                                <div class="detail-value">${evt.technical_details?.video_bitrate ? evt.technical_details.video_bitrate + ' Mbps' : 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('duration')}</div>
+                                <div class="detail-value">${evt.technical_details?.duration || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">${LanguageManager.t('fileSize')}</div>
+                                <div class="detail-value">${Utils.formatSize(evt.technical_details?.file_size)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <div class="section-title">${LanguageManager.t('storageInfo')}</div>
+                        <div class="storage-badges">
+                            ${evt.technical_details?.local ? `<span class="badge badge-success">💾 ${evt.technical_details.local}</span>` : ''}
+                            ${evt.technical_details?.cloud ? `<span class="badge badge-info">☁️ ${LanguageManager.t('cloud')}</span>` : ''}
+                            ${!evt.technical_details?.local && !evt.technical_details?.cloud ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento'}</span>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${evt.additional_info ? `
+                        <div class="detail-section">
+                            <div class="section-title">${LanguageManager.t('observations')}</div>
+                            <div class="detail-item" style="grid-column: 1/-1;">
+                                <div class="detail-value">${evt.additional_info}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        body.innerHTML = eventsHtml;
+        modal.classList.add('active');
+    },
+    
+    toggleEvent(index) {
+        const content = document.getElementById(`content-${index}`);
+        const icon = document.getElementById(`icon-${index}`);
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.textContent = '▼';
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            icon.textContent = '▼';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    },
+    
+    close() {
+        document.getElementById('modal').classList.remove('active');
+    }
+};
+
 const Renderer = {
     render() {
         const container = document.getElementById('matchesContainer');
@@ -330,14 +538,25 @@ const Renderer = {
             `;
             return;
         }
+        
         if (AppState.currentView === 'cards') {
             container.innerHTML = '<div class="matches-grid" id="grid"></div>';
             const grid = document.getElementById('grid');
-            AppState.filteredMatches.forEach(match => grid.appendChild(CardManager.create(match)));
+            AppState.filteredMatches.forEach(match => {
+                const card = match.Tipo === 'motor' 
+                    ? MotorCardManager.create(match) 
+                    : CardManager.create(match);
+                grid.appendChild(card);
+            });
         } else {
             container.innerHTML = '<div class="matches-list" id="list"></div>';
             const list = document.getElementById('list');
-            AppState.filteredMatches.forEach(match => list.appendChild(ListManager.create(match)));
+            AppState.filteredMatches.forEach(match => {
+                const item = match.Tipo === 'motor'
+                    ? MotorListManager.create(match)
+                    : ListManager.create(match);
+                list.appendChild(item);
+            });
         }
     },
     updateStats(apiResponse) {
@@ -385,7 +604,8 @@ const Renderer = {
     populateYearFilter() {
         const years = new Set();
         AppState.matches.forEach(match => {
-            const date = Utils.parseDate(match.Data);
+            const dateField = match.Tipo === 'motor' ? match.DataInicio : match.Data;
+            const date = Utils.parseDate(dateField);
             if (date) years.add(date.getFullYear());
         });
         const yearFilter = document.getElementById('yearFilter');
@@ -408,7 +628,8 @@ const FilterManager = {
             const matchesQuery = Object.values(match).some(val => String(val).toLowerCase().includes(query));
             let matchesYear = true;
             if (year) {
-                const date = Utils.parseDate(match.Data);
+                const dateField = match.Tipo === 'motor' ? match.DataInicio : match.Data;
+                const date = Utils.parseDate(dateField);
                 matchesYear = date && date.getFullYear().toString() === year;
             }
             return matchesQuery && matchesYear;
