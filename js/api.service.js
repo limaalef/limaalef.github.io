@@ -7,6 +7,10 @@ const APIService = {
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
 
+        if (CONFIG.videoFilter) {
+            url.searchParams.append('embed', 'true');
+        }
+
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -26,6 +30,7 @@ const APIService = {
                 DataFim: item.end_date || '',
                 Eventos: item.events || [],
                 'Logo emissora': item.main_station_logo || '',
+                'Video Embed': item.embed_video || '',
                 type: item.type || ''
             }));
         }
@@ -54,6 +59,7 @@ const APIService = {
             Qualidade: item.technical_details?.video_quality || '',
             Bitrate: item.technical_details?.video_bitrate || '',
             'Formato de áudio': item.technical_details?.audio_format || '2.0',
+            'Video Embed': item.embed_video || '',
             Tipo: item.type || ''
         }));
     }

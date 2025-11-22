@@ -1,24 +1,38 @@
+/* ========================================
+   VARIÁVEIS DE TEMA - LIGHT MODE
+   ======================================== */
 :root {
+    /* Backgrounds */
     --bg-primary: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
     --bg-secondary: #ffffff;
     --bg-tertiary: #f0f4f8;
+    
+    /* Textos */
     --text-primary: #2c3e50;
     --text-secondary: #64748b;
     --text-tertiary: #94a3b8;
+    
+    /* Cores de Interface */
     --header-color: #2563eb;
     --border-color: #e2e8f0;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    
+    /* Sombras */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
     --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
-    --accent-color: #3b82f6;
-    --accent-hover: #2563eb;
+    
+    /* Cores de Status */
     --success-color: #10b981;
     --warning-color: #f59e0b;
     --error-color: #ef4444;
     --info-color: #3b82f6;
 }
 
-/* Tema para Outros Esportes */
+/* ========================================
+   TEMA: OUTROS ESPORTES
+   ======================================== */
 body.theme-others {
     --bg-primary: linear-gradient(135deg, #4f5aac 0%, #5f37a0 100%);
     --bg-secondary: #ffffff;
@@ -29,6 +43,9 @@ body.theme-others {
     --accent-hover: #8b5cf6;
 }
 
+/* ========================================
+   TEMA: AUTOMOBILISMO
+   ======================================== */
 body.theme-motor {
     --bg-primary: linear-gradient(135deg, #475569 0%, #334155 100%);
     --bg-secondary: #ffffff;
@@ -39,20 +56,31 @@ body.theme-motor {
     --accent-hover: #475569;
 }
 
+/* ========================================
+   DARK MODE - TEMA PADRÃO
+   ======================================== */
 @media (prefers-color-scheme: dark) {
     :root {
+        /* Backgrounds */
         --bg-primary: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         --bg-secondary: #1e293b;
         --bg-tertiary: #28374d;
+        
+        /* Textos */
         --text-primary: #f1f5f9;
         --text-secondary: #cbd5e1;
         --text-tertiary: #94a3b8;
+        
+        /* Interface */
         --border-color: #475569;
+        
+        /* Sombras */
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
         --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
         --shadow-lg: 0 12px 32px rgba(0,0,0,0.7);
     }
 
+    /* Dark Mode - Outros Esportes */
     body.theme-others {
         --bg-primary: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
         --bg-secondary: #252535;
@@ -61,11 +89,11 @@ body.theme-motor {
         --header-color: #514475;
     }
 
+    /* Dark Mode - Automobilismo */
     body.theme-motor {
         --bg-primary: linear-gradient(135deg, #334155 0%, #1e293b 100%);
         --bg-secondary: #1e293b;
         --bg-tertiary: #334155;
         --border-color: #475569;
-        
     }
 }

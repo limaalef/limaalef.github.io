@@ -31,93 +31,12 @@ const PaginationManager = {
     goToLast() { if (AppState.currentPage < AppState.totalPages) { AppState.currentPage = AppState.totalPages; App.loadData(); } }
 };
 
-const MotorListManager = {
-    create(event) {
-        const item = document.createElement('div');
-        item.className = 'list-item motor-event';
-        item.onclick = () => MotorModal.show(event);
-        
-        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
-        
-        const competition = LanguageManager.translateText(event.Campeonato);
-        const phase = LanguageManager.translateText(event.Fase);
-        
-        const eventCount = event.Eventos?.length || 0;
-        const eventLabel = LanguageManager.currentLang === 'en' 
-            ? (eventCount === 1 ? 'event' : 'events')
-            : (eventCount === 1 ? 'evento' : 'eventos');
-
-        item.innerHTML = `
-            <div><strong>${dateRange}</strong></div>
-            <div>
-                <strong>${phase}</strong>
-                <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
-                    ${competition}
-                </div>
-            </div>
-            <div style="text-align: center; font-size: 0.85em;">${eventCount} ${eventLabel}</div>
-            <div style="text-align: right;">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
-            </div>
-        `;
-        return item;
-    }
-};
-
-const MotorCardManager = {
-    create(event) {
-        const card = document.createElement('div');
-        card.className = 'match-card motor-event';
-        card.onclick = () => MotorModal.show(event);
-        
-        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
-        
-        const competition = LanguageManager.translateText(event.Campeonato);
-        const phase = LanguageManager.translateText(event.Fase);
-        
-        const eventCount = event.Eventos?.length || 0;
-        const eventLabel = LanguageManager.currentLang === 'en' 
-            ? (eventCount === 1 ? 'event' : 'events')
-            : (eventCount === 1 ? 'evento' : 'eventos');
-        
-        let competitionLogo = '';
-        if (event.Campeonato && event.DataInicio) {
-            const competitionSlug = event.Campeonato
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-                .replace(/\s+/g, '_');
-            
-            const matchDate = Utils.parseDate(event.DataInicio);
-            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
-            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
-        }
-
-        card.innerHTML = `
-            <div class="match-header">
-                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.Campeonato}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
-                <div class="competition-info">
-                    <div class="match-competition">${competition || 'N/A'}</div>
-                </div>
-            </div>
-            <div class="match-date">${dateRange}</div>
-            <div class="motor-phase-section">
-                <div class="motor-phase-name">${phase || 'N/A'}</div>
-            </div>
-            <div class="motor-footer">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : '<div></div>'}
-                <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
-            </div>
-        `;
-        return card;
-    }
-};
-
 const CardManager = {
     create(match) {
         const card = document.createElement('div');
         const status = Utils.getMatchStatus(match);
-        card.className = `match-card ${status}`;
+        const hasVideo = match['Video Embed'] ? 'has-video' : '';
+        card.className = `match-card ${status} ${hasVideo}`;
         card.onclick = () => MatchModal.show(match);
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
@@ -183,6 +102,56 @@ const CardManager = {
     }
 };
 
+const MotorCardManager = {
+    create(event) {
+        const card = document.createElement('div');
+        const hasVideo = event['Video Embed'] ? 'has-video' : '';
+        card.className = `match-card motor-event ${hasVideo}`;
+        card.onclick = () => MotorModal.show(event);
+        
+        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
+        
+        const competition = LanguageManager.translateText(event.Campeonato);
+        const phase = LanguageManager.translateText(event.Fase);
+        
+        const eventCount = event.Eventos?.length || 0;
+        const eventLabel = LanguageManager.currentLang === 'en' 
+            ? (eventCount === 1 ? 'event' : 'events')
+            : (eventCount === 1 ? 'evento' : 'eventos');
+        
+        let competitionLogo = '';
+        if (event.Campeonato && event.DataInicio) {
+            const competitionSlug = event.Campeonato
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .replace(/\s+/g, '_');
+            
+            const matchDate = Utils.parseDate(event.DataInicio);
+            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
+            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
+        }
+
+        card.innerHTML = `
+            <div class="match-header">
+                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.Campeonato}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
+                <div class="competition-info">
+                    <div class="match-competition">${competition || 'N/A'}</div>
+                </div>
+            </div>
+            <div class="match-date">${dateRange}</div>
+            <div class="motor-phase-section">
+                <div class="motor-phase-name">${phase || 'N/A'}</div>
+            </div>
+            <div class="motor-footer">
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : '<div></div>'}
+                <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
+            </div>
+        `;
+        return card;
+    }
+};
+
 const ListManager = {
     create(match) {
         const item = document.createElement('div');
@@ -217,6 +186,39 @@ const ListManager = {
     }
 };
 
+const MotorListManager = {
+    create(event) {
+        const item = document.createElement('div');
+        item.className = 'list-item motor-event';
+        item.onclick = () => MotorModal.show(event);
+        
+        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
+        
+        const competition = LanguageManager.translateText(event.Campeonato);
+        const phase = LanguageManager.translateText(event.Fase);
+        
+        const eventCount = event.Eventos?.length || 0;
+        const eventLabel = LanguageManager.currentLang === 'en' 
+            ? (eventCount === 1 ? 'event' : 'events')
+            : (eventCount === 1 ? 'evento' : 'eventos');
+
+        item.innerHTML = `
+            <div><strong>${dateRange}</strong></div>
+            <div>
+                <strong>${phase}</strong>
+                <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
+                    ${competition}
+                </div>
+            </div>
+            <div style="text-align: center; font-size: 0.85em;">${eventCount} ${eventLabel}</div>
+            <div style="text-align: right;">
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
+            </div>
+        `;
+        return item;
+    }
+};
+
 const MatchModal = {
     show(match) {
         const modal = document.getElementById('modal');
@@ -235,6 +237,17 @@ const MatchModal = {
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
+
+        const embed = match['Video Embed'];
+        
+        // ADICIONAR: HTML do vídeo embed (se existir)
+        const videoHtml = match['Video Embed'] ? `
+            <div class="watch-button-container">
+                <a href="watch.html?id=${match.ID}" class="watch-match-button">
+                    <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir Jogo'}</span>
+                </a>
+            </div>
+        ` : '';
         
         let scoreHtml = '';
         if (status === 'pending') {
@@ -293,6 +306,7 @@ const MatchModal = {
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
                 </div>
+                ${videoHtml}
             `;
         }
         
@@ -304,6 +318,9 @@ const MatchModal = {
         const technicalInfoTitle = LanguageManager.t('technicalInfo');
         const storageTitle = LanguageManager.t('storageInfo');
         const observationsTitle = LanguageManager.t('observations');
+        const videoTitle = LanguageManager.t('video') || 'Vídeo';
+        const imageTitle = LanguageManager.t('image') || 'Imagem';
+        
         
         body.innerHTML = `
             ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.style.display='none'">` : ''}
@@ -419,7 +436,21 @@ const MotorModal = {
         
         score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
         
-        const eventsHtml = (event.Eventos || []).map((evt, index) => `
+        const eventsHtml = (event.Eventos || []).map((evt, index) => {
+        const videoTitle = LanguageManager.t('video') || 'Vídeo';
+        const videoHtml = event['Video Embed'] ? `
+            <div class="detail-section">
+                <div class="section-title">${videoTitle}</div>
+                <div style="text-align: center; padding: 30px;">
+                    <a href="watch.html?id=${match.ID}" class="watch-button" target="_blank">
+                        <span style="font-size: 3em;">▶️</span>
+                        <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir Jogo</div>
+                    </a>
+                </div>
+            </div>
+        ` : '';
+        
+        return `
             <div class="motor-event-accordion">
                 <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
                     <div class="motor-event-header-content">
@@ -429,9 +460,11 @@ const MotorModal = {
                     <span class="motor-event-icon" id="icon-${index}">▼</span>
                 </div>
                 <div class="motor-event-content" id="content-${index}" style="display: none;">
+                    ${videoHtml}
+                    
                     ${evt.image ? `<img src="${evt.image}" alt="${evt.event_type}" class="modal-image" onerror="this.style.display='none'">` : ''}
                     
-                    <div class="detail-section">
+                   <div class="detail-section">
                         <div class="section-title">${LanguageManager.t('matchInfo')}</div>
                         <div class="detail-grid">
                             <div class="detail-item">
@@ -498,7 +531,8 @@ const MotorModal = {
                     ` : ''}
                 </div>
             </div>
-        `).join('');
+        `;
+    }).join('');
         
         body.innerHTML = eventsHtml;
         modal.classList.add('active');

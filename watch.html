@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistir Jogo - Minha Coleção de Esportes</title>
+    
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/watch.css">
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JJZTBEGJ91');
+</script>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="index.html">
+                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="site-logo" style="display: none;">🏆</div>
+                </a>
+            </div>
+            
+            <div class="header-options">
+                <div class="sport-selector">
+                    <button class="sport-btn" onclick="window.location.href='index.html'">
+                        ⬅️ <span data-i18n="backToCollection">Voltar para Coleção</span>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
+                        <span id="langFlag">🇧🇷</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="watch-container">
+        <!-- Match Header -->
+        <div class="match-info-header">
+            <div class="match-meta">
+                <div class="stadium-info">
+                    <span class="stadium-icon">🏟️</span>
+                    <span id="stadium">-</span>
+                </div>
+                <div class="match-round" id="round">-</div>
+                <div class="match-datetime">
+                    <span class="date-icon">📅</span>
+                    <span id="matchDate">-</span>
+                    <span class="time-icon">🕐</span>
+                    <span id="matchTime">-</span>
+                </div>
+            </div>
+            
+            <div class="match-competition">
+                <div class="competition-badge" id="competition">-</div>
+            </div>
+            
+            <div class="match-score-header">
+                <div class="team-score home">
+                    <div class="team-info">
+                        <div class="team-name" id="homeTeam">-</div>
+                        <span class="team-score-value-inline" id="homeScore-inline">-</span>
+                    </div>
+                    <img src="" alt="" class="team-logo-large" id="homeLogo" style="display: none;">
+                </div>
+                
+                <div class="score-separator">
+                    <div class="team-score-value" id="homeScore">-</div>
+                    <div class="vs-text">X</div>
+                    <div class="team-score-value" id="awayScore">-</div>
+                </div>
+                
+                <div class="team-score away">
+                    <div class="team-info">
+                        <div class="team-name" id="awayTeam">-</div>
+                        <span class="team-score-value-inline" id="awayScore-inline">-</span>
+                    </div>
+                    <img src="" alt="" class="team-logo-large" id="awayLogo" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player Section -->
+        <div class="video-section">
+            <div class="lineup-column home-lineup">
+                <h3 class="lineup-title">
+                    <span class="lineup-icon">👕</span>
+                    <span data-i18n="homeLineup">Escalação Mandante</span>
+                </h3>
+                <div class="lineup-list" id="homeLineup">
+                    <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary);">
+                        <div style="font-size: 2em; margin-bottom: 10px;">⚽</div>
+                        <div style="font-size: 0.9em;">Carregando...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="video-player">
+                <div class="video-container-watch">
+                    <iframe 
+                        id="videoPlayer"
+                        src="" 
+                        frameborder="0" 
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        style="display: none;"
+                    ></iframe>
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary);">
+                        <div style="text-align: center; color: var(--text-secondary);">
+                            <div style="font-size: 4em; margin-bottom: 20px;">⚽</div>
+                            <div style="font-size: 1.2em; font-weight: 600;">Carregando vídeo...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lineup-column away-lineup">
+                <h3 class="lineup-title">
+                    <span class="lineup-icon">👕</span>
+                    <span data-i18n="awayLineup">Escalação Visitante</span>
+                </h3>
+                <div class="lineup-list" id="awayLineup">
+                    <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary);">
+                        <div style="font-size: 2em; margin-bottom: 10px;">⚽</div>
+                        <div style="font-size: 0.9em;">Carregando...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Details -->
+        <div class="match-details">
+            <div class="details-tabs">
+                <button class="tab-btn active" data-tab="technical">
+                    <span data-i18n="technicalInfo">Especificações Técnicas</span>
+                </button>
+                <button class="tab-btn" data-tab="stats">
+                    <span data-i18n="matchStats">Estatísticas</span>
+                </button>
+                <button class="tab-btn" data-tab="highlights">
+                    <span data-i18n="highlights">Destaques</span>
+                </button>
+                <button class="tab-btn" data-tab="commentary">
+                    <span data-i18n="commentary">Narração</span>
+                </button>
+            </div>
+
+            <div class="tab-content active" id="technical">
+                <div class="detail-grid-watch">
+                    <div class="detail-card">
+                        <div class="detail-icon">📺</div>
+                        <div class="detail-label" data-i18n="broadcaster">Emissora</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🎙️</div>
+                        <div class="detail-label" data-i18n="narration">Narração</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🎬</div>
+                        <div class="detail-label" data-i18n="quality">Qualidade</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🔊</div>
+                        <div class="detail-label" data-i18n="audioFormat">Áudio</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">⏱️</div>
+                        <div class="detail-label" data-i18n="duration">Duração</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">💾</div>
+                        <div class="detail-label" data-i18n="fileSize">Tamanho</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">📊</div>
+                        <div class="detail-label" data-i18n="bitrate">Bitrate</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🗄️</div>
+                        <div class="detail-label" data-i18n="storage">Armazenamento</div>
+                        <div class="detail-value">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="stats">
+                <div class="stats-grid">
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 3em; margin-bottom: 15px;">📊</div>
+                        <div style="font-size: 1.1em; font-weight: 600;">Carregando estatísticas...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="highlights">
+                <div class="highlights-list">
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 3em; margin-bottom: 15px;">⚽</div>
+                        <div style="font-size: 1.1em; font-weight: 600;">Carregando destaques...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="commentary">
+                <div class="commentary-info">
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary); grid-column: 1/-1;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">🎙️</div>
+                        <div style="font-size: 1.1em; font-weight: 600;">Carregando informações...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🏆 Minha Coleção de Esportes</h3>
+                <p data-i18n="footerDescription">Arquivo pessoal de jogos e eventos esportivos</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4 data-i18n="contact">Contato</h4>
+                <p>Telegram: <a href="https://t.me/limaalef" target="_blank" rel="noopener noreferrer">@limaalef</a></p>
+                <p>Discord: <span>@limaalef</span></p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 <span data-i18n="allRightsReserved">Todos os direitos reservados</span></p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/watch.js"></script>
+</body>
+</html>
