@@ -72,6 +72,15 @@ const App = {
         document.getElementById('prevPage').addEventListener('click', () => PaginationManager.goToPrevious());
         document.getElementById('nextPage').addEventListener('click', () => PaginationManager.goToNext());
         document.getElementById('lastPage').addEventListener('click', () => PaginationManager.goToLast());
+        
+        document.getElementById('videoFilterBtn').addEventListener('click', () => {
+            CONFIG.videoFilter = !CONFIG.videoFilter;
+            const btn = document.getElementById('videoFilterBtn');
+            btn.classList.toggle('active', CONFIG.videoFilter);
+            AppState.currentPage = 1;
+            this.loadData();
+        });
+    
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') MatchModal.close();
         });

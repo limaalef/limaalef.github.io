@@ -1,3 +1,6 @@
+/* ========================================
+   RESET E BASE
+   ======================================== */
 * {
     margin: 0;
     padding: 0;
@@ -18,6 +21,9 @@ body {
     margin: 0 auto;
 }
 
+/* ========================================
+   HEADER E NAVEGAÇÃO
+   ======================================== */
 header {
     background: var(--header-color);
     padding: 0;
@@ -47,6 +53,7 @@ header {
     transform: scale(1.05);
 }
 
+/* Seletor de Esportes */
 .sport-selector {
     display: flex;
     gap: 6px;
@@ -87,7 +94,9 @@ header {
     border-color: rgba(255,255,255,0.5);
 }
 
-
+/* ========================================
+   TIPOGRAFIA
+   ======================================== */
 h1 {
     color: var(--text-primary);
     font-size: 2.2em;
@@ -99,6 +108,9 @@ h1 {
     font-size: 1em;
 }
 
+/* ========================================
+   ESTATÍSTICAS
+   ======================================== */
 .stats {
     display: flex;
     gap: 12px;
@@ -129,6 +141,9 @@ h1 {
     color: var(--text-secondary);
 }
 
+/* ========================================
+   CONTROLES E FILTROS
+   ======================================== */
 .controls {
     background: var(--bg-secondary);
     padding: 15px;
@@ -154,7 +169,9 @@ h1 {
     color: var(--text-primary);
 }
 
-select, input[type="text"] {
+/* Inputs */
+select, 
+input[type="text"] {
     padding: 10px 16px;
     border: 2px solid var(--border-color);
     border-radius: 6px;
@@ -164,11 +181,25 @@ select, input[type="text"] {
     transition: border 0.3s;
 }
 
-select:focus, input[type="text"]:focus {
+select:focus, 
+input[type="text"]:focus {
     outline: none;
     border-color: var(--accent-color);
 }
 
+.search-box {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-box input {
+    width: 100%;
+}
+
+/* ========================================
+   BOTÕES
+   ======================================== */
+/* Botões de Paginação */
 .pagination {
     display: flex;
     gap: 8px;
@@ -208,41 +239,14 @@ select:focus, input[type="text"]:focus {
     transition: background 0.3s ease;
 }
 
-.search-box {
-    flex: 1;
-    min-width: 200px;
-}
-
-.search-box input {
-    width: 100%;
-}
-
+/* Botões de Visualização e Filtro */
 .view-toggle {
     display: flex;
     gap: 8px;
 }
 
-.view-btn {
-    padding: 10px 18px;
-    border: 2px solid var(--accent-color);
-    background: var(--bg-secondary);
-    color: var(--accent-color);
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
-    font-size: 0.95em;
-}
-
-.view-btn.active {
-    background: var(--accent-color);
-    color: white;
-}
-
-.view-btn:hover {
-    transform: translateY(-2px);
-}
-
+.video-filter-btn,
+.view-btn,
 .lang-btn {
     padding: 10px 18px;
     border: 2px solid var(--accent-color);
@@ -255,12 +259,26 @@ select:focus, input[type="text"]:focus {
     font-size: 0.95em;
 }
 
-.lang-btn:hover {
-    transform: translateY(-2px);
+.video-filter-btn.active,
+.view-btn.active {
     background: var(--accent-color);
     color: white;
 }
 
+.video-filter-btn:hover,
+.view-btn:hover,
+.lang-btn:hover {
+    transform: translateY(-2px);
+}
+
+.lang-btn:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* ========================================
+   CARDS DE PARTIDAS
+   ======================================== */
 .matches-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -292,6 +310,38 @@ select:focus, input[type="text"]:focus {
     filter: grayscale(1);
 }
 
+/* Cards com Vídeo */
+.match-card.has-video {
+    border: 2px solid #FFD700;
+}
+
+.match-card.has-video::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+    animation: shimmerGold 3s infinite;
+}
+
+@keyframes shimmerGold {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.match-card.has-video:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.35);
+    border-color: #FFA500;
+}
+
+.match-card.has-video .match-status {
+    right: 50px;
+}
+
+/* Cabeçalho do Card */
 .match-header {
     display: flex;
     align-items: center;
@@ -349,6 +399,7 @@ select:focus, input[type="text"]:focus {
     font-weight: 500;
 }
 
+/* Times */
 .match-teams {
     display: flex;
     flex-direction: column;
@@ -395,6 +446,7 @@ select:focus, input[type="text"]:focus {
     color: var(--success-color);
 }
 
+/* Rodapé do Card */
 .match-footer {
     display: flex;
     justify-content: space-between;
@@ -403,16 +455,16 @@ select:focus, input[type="text"]:focus {
     padding-top: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .broadcaster-logo {
-        filter: brightness(0) invert(1);
-    }
-}
-
 .broadcaster-logo {
     height: 24px;
     max-width: 60px;
     object-fit: contain;
+}
+
+@media (prefers-color-scheme: dark) {
+    .broadcaster-logo {
+        filter: brightness(0) invert(1);
+    }
 }
 
 .tech-badges {
@@ -432,6 +484,9 @@ select:focus, input[type="text"]:focus {
     transition: background 0.3s ease;
 }
 
+/* ========================================
+   LISTA DE PARTIDAS
+   ======================================== */
 .matches-list {
     background: var(--bg-secondary);
     border-radius: 10px;
@@ -464,6 +519,9 @@ select:focus, input[type="text"]:focus {
     border-bottom: none;
 }
 
+/* ========================================
+   MODAL
+   ======================================== */
 .modal {
     display: none;
     position: fixed;
@@ -493,6 +551,35 @@ select:focus, input[type="text"]:focus {
     animation: slideIn 0.3s ease-out;
 }
 
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Scrollbar do Modal */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Cabeçalho do Modal */
 .modal-header {
     background: var(--accent-color);
     color: white;
@@ -500,17 +587,6 @@ select:focus, input[type="text"]:focus {
     border-radius: 15px 15px 0 0;
     position: relative;
     transition: background 0.3s ease;
-}
-
-@keyframes slideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-
-@keyframes slideInRight {
-    from { transform: translateX(400px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
 }
 
 .modal-title-competition {
@@ -525,6 +601,27 @@ select:focus, input[type="text"]:focus {
     font-weight: 500;
 }
 
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 1.3em;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+/* Placar no Modal */
 .score-desktop {
     display: flex;
     align-items: center;
@@ -597,20 +694,7 @@ select:focus, input[type="text"]:focus {
     text-align: center;
 }
 
-@media (max-width: 768px) {
-    .score-desktop {
-        display: none !important;
-    }
-    
-    .score-mobile {
-        display: block !important;
-    }
-    
-    .modal-content {
-        max-width: 95%;
-    }
-}
-
+/* Imagem e Vídeo do Modal */
 .modal-image {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -620,26 +704,27 @@ select:focus, input[type="text"]:focus {
     max-height: 475px;
 }
 
-.close-btn {
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+    margin-top: 12px;
+}
+
+.video-container iframe {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    font-size: 1.3em;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
 }
 
-.close-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: rotate(90deg);
-}
-
+/* Corpo do Modal */
 .modal-body {
     padding: 20px;
 }
@@ -683,6 +768,7 @@ select:focus, input[type="text"]:focus {
     font-size: 0.95em;
 }
 
+/* Badges */
 .storage-badges {
     display: flex;
     gap: 8px;
@@ -701,39 +787,35 @@ select:focus, input[type="text"]:focus {
 .badge-info { background: var(--info-color); color: white; }
 .badge-warning { background: var(--warning-color); color: white; }
 
-.empty-state {
+/* Botão Assistir Partida */
+.watch-button-container {
     text-align: center;
-    padding: 50px 20px;
-    color: var(--text-primary);
+    margin-top: 10px;
 }
 
-.empty-state h2 {
-    font-size: 1.8em;
-    margin-bottom: 12px;
+.watch-match-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000;
+    padding: 6px 12px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    font-size: 0.55em;
 }
 
-.empty-state p {
-    font-size: 1em;
-    opacity: 0.9;
+.watch-match-button:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+    background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
 }
 
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--bg-secondary);
-    padding: 12px 18px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-lg);
-    z-index: 2000;
-    animation: slideInRight 0.3s ease-out;
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(400px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
+/* ========================================
+   AUTOMOBILISMO - ACORDEÃO
+   ======================================== */
 .motor-phase-section {
     margin: 12px 0;
 }
@@ -754,7 +836,6 @@ select:focus, input[type="text"]:focus {
     gap: 10px;
 }
 
-
 .motor-event-item {
     margin-bottom: 20px;
 }
@@ -763,7 +844,6 @@ select:focus, input[type="text"]:focus {
     margin-bottom: 0;
 }
 
-/* Accordion para eventos de automobilismo */
 .motor-event-accordion {
     margin-bottom: 12px;
     border: 1px solid var(--border-color);
@@ -832,78 +912,9 @@ select:focus, input[type="text"]:focus {
     }
 }
 
-/* Ajustes para mobile */
-@media (max-width: 768px) {
-    .motor-event-header {
-        padding: 12px;
-    }
-    
-    .motor-event-title {
-        font-size: 1em;
-    }
-    
-    .motor-event-date {
-        font-size: 0.8em;
-    }
-    
-    .motor-event-content {
-        padding: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .motor-event-header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-    
-    .motor-event-title {
-        font-size: 1em;
-    }
-    
-    .motor-event-date {
-        font-size: 0.8em;
-    }
-}
-
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3);
-}
-
-/* Para Firefox */
-.modal-content {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-
-@media (prefers-color-scheme: dark) {
-    .modal-content::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .modal-content::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-    
-    .modal-content {
-        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-    }
-}
-
+/* ========================================
+   FOOTER
+   ======================================== */
 .site-footer {
     background: var(--bg-secondary);
     margin-top: 40px;
@@ -965,8 +976,85 @@ select:focus, input[type="text"]:focus {
     font-size: 0.9em;
 }
 
-/* Responsividade do footer */
+/* ========================================
+   NOTIFICAÇÕES E ESTADOS
+   ======================================== */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-primary);
+}
+
+.empty-state h2 {
+    font-size: 1.8em;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 1em;
+    opacity: 0.9;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-secondary);
+    padding: 12px 18px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* ========================================
+   ANIMAÇÕES GERAIS
+   ======================================== */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ========================================
+   RESPONSIVIDADE - TABLET
+   ======================================== */
 @media (max-width: 768px) {
+    /* Modal */
+    .score-desktop {
+        display: none !important;
+    }
+    
+    .score-mobile {
+        display: block !important;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+    }
+
+    /* Automobilismo */
+    .motor-event-header {
+        padding: 12px;
+    }
+    
+    .motor-event-title {
+        font-size: 1em;
+    }
+    
+    .motor-event-date {
+        font-size: 0.8em;
+    }
+    
+    .motor-event-content {
+        padding: 12px;
+    }
+
+    /* Footer */
     .site-footer {
         padding: 30px 15px 15px;
     }
@@ -983,5 +1071,24 @@ select:focus, input[type="text"]:focus {
     
     .footer-section h4 {
         font-size: 1em;
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE - MOBILE
+   ======================================== */
+@media (max-width: 480px) {
+    .motor-event-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .motor-event-title {
+        font-size: 1em;
+    }
+    
+    .motor-event-date {
+        font-size: 0.8em;
     }
 }
