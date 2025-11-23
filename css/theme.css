@@ -3,7 +3,7 @@
    ======================================== */
 :root {
     /* Backgrounds */
-    --bg-primary: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #96aec7 100%);
     --bg-secondary: #ffffff;
     --bg-tertiary: #f0f4f8;
     
@@ -34,7 +34,7 @@
    TEMA: OUTROS ESPORTES
    ======================================== */
 body.theme-others {
-    --bg-primary: linear-gradient(135deg, #4f5aac 0%, #5f37a0 100%);
+    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #b9adcc 100%);
     --bg-secondary: #ffffff;
     --bg-tertiary: #f5f7fa;
     --border-color: #e5e7eb;
@@ -47,7 +47,7 @@ body.theme-others {
    TEMA: AUTOMOBILISMO
    ======================================== */
 body.theme-motor {
-    --bg-primary: linear-gradient(135deg, #475569 0%, #334155 100%);
+    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #a1a7a7 100%);
     --bg-secondary: #ffffff;
     --bg-tertiary: #f8fafc;
     --border-color: #e2e8f0;
@@ -62,7 +62,7 @@ body.theme-motor {
 @media (prefers-color-scheme: dark) {
     :root {
         /* Backgrounds */
-        --bg-primary: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        --bg-primary: linear-gradient(135deg, #27354b 0%, #0f172a 100%);
         --bg-secondary: #1e293b;
         --bg-tertiary: #28374d;
         
@@ -82,7 +82,7 @@ body.theme-motor {
 
     /* Dark Mode - Outros Esportes */
     body.theme-others {
-        --bg-primary: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+        --bg-primary: linear-gradient(135deg, #2f2f44 0%, #2a2a3e 100%);
         --bg-secondary: #252535;
         --bg-tertiary: #2d2d40;
         --border-color: #3d3d52;
@@ -91,7 +91,7 @@ body.theme-motor {
 
     /* Dark Mode - Automobilismo */
     body.theme-motor {
-        --bg-primary: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        --bg-primary: linear-gradient(135deg, #293444 0%, #0a0f18 100%);
         --bg-secondary: #1e293b;
         --bg-tertiary: #334155;
         --border-color: #475569;

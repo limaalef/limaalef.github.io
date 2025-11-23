@@ -10,8 +10,10 @@
 /* ========================================
    HEADER - INFORMAÇÕES DA PARTIDA
    ======================================== */
+
 .match-info-header {
-    background: var(--bg-tertiary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 20px 30px;
     margin-bottom: 15px;
@@ -66,7 +68,6 @@
 
 .competition-badge {
     display: inline-block;
-    background: var(--bg-tertiary);
     padding: 8px 46px;
     border-radius: 999px;
     font-weight: 700;
@@ -214,9 +215,10 @@
    ESCALAÇÕES
    ======================================== */
 .lineup-column {
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 20px;
+    padding: 12px;
     max-height: 650px;
     overflow-y: auto;
 }
@@ -247,7 +249,7 @@
     align-items: center;
     gap: 10px;
     padding: 6px 10px;
-    background: var(--bg-tertiary);
+    background: var(--bg-secondary);
     border-radius: 10px;
     transition: all 0.3s ease;
     animation: fadeInUp 0.3s ease-out forwards;
@@ -285,7 +287,7 @@
     color: var(--text-secondary);
     font-weight: 700;
     text-transform: uppercase;
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
     padding: 3px 8px;
     border-radius: 4px;
 }
@@ -606,10 +608,21 @@
    ======================================== */
 .header-content {
     justify-content: space-between;
+    max-width: 1600px;
+}
+
+.sport-selector {
+    padding: 12px 0px !important;
+}
+
+.control-group {
+    margin-left: 20px;
 }
 
 .header-options {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .lang-btn {
@@ -619,6 +632,7 @@
 
 .lang-btn:hover {
     background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 /* ========================================
@@ -742,12 +756,18 @@
         font-size: 2em;
     }
 
+    .video-container-watch {
+        border-radius: 0px;
+    }
+
     .watch-container {
         padding: 0px;
     }
     
     .match-info-header {
         padding: 15px 10px;
+        border: 0px;
+        border-radius: 0px;
     }
 
     .match-competition {
