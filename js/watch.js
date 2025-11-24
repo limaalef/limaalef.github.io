@@ -110,6 +110,47 @@ const WatchPage = {
         }
     },
     
+    updateMetaTags(match) {
+        const competition = LanguageManager.translateText(match.competition);
+        const round = LanguageManager.translateText(match.round);
+        
+        // Criar título dinâmico
+        const pageTitle = `${match.home_team.name} vs ${match.away_team.name} - ${competition}`;
+        const description = `Assista ${match.home_team.name} ${match.home_team.goals} x ${match.away_team.goals} ${match.away_team.name} - ${competition} ${round}`;
+        
+        // Atualizar título da página
+        document.title = pageTitle + ' - Minha Coleção de Esportes';
+        
+        // Atualizar Open Graph
+        const ogTitle = document.getElementById('og-title');
+        if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+        
+        const ogDescription = document.getElementById('og-description');
+        if (ogDescription) ogDescription.setAttribute('content', description);
+        
+        const ogImage = document.getElementById('og-image');
+        if (ogImage && match.image) {
+            ogImage.setAttribute('content', match.image);
+        }
+        
+        // Atualizar Twitter Card
+        const twitterTitle = document.getElementById('twitter-title');
+        if (twitterTitle) twitterTitle.setAttribute('content', pageTitle);
+        
+        const twitterDescription = document.getElementById('twitter-description');
+        if (twitterDescription) twitterDescription.setAttribute('content', description);
+        
+        const twitterImage = document.getElementById('twitter-image');
+        if (twitterImage && match.image) {
+            twitterImage.setAttribute('content', match.image);
+        }
+        
+        const twitterUrl = document.getElementById('twitter-url');
+        if (twitterUrl) {
+            twitterUrl.setAttribute('content', window.location.href);
+        }
+    },
+
     mergeWithDefaults(apiData) {
         return {
             stadium:  apiData.championship?.stadium || this.defaultData.stadium,
@@ -219,6 +260,9 @@ const WatchPage = {
                 placeholder.style.display = 'flex';
             }
         }
+
+        // Criar as tags de redes sociais com dados do jogo
+        this.updateMetaTags(match);
         
         // Atualizar escalações
         this.renderLineup('homeLineup', match.home_lineup, match.home_formation);
@@ -461,7 +505,7 @@ const WatchPage = {
             <div class="empty-state" style="padding: 100px 20px; text-align: center;">
                 <h2>❌ Jogo não encontrado</h2>
                 <p style="margin: 20px 0; color: var(--text-secondary); font-size: 1.1em;">O ID do jogo não foi fornecido ou é inválido.</p>
-                <button onclick="window.location.href='index.html'" style="
+                <button onclick="window.location.href='index'" style="
                     background: var(--accent-color);
                     color: white;
                     padding: 14px 28px;

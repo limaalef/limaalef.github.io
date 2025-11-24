@@ -243,7 +243,7 @@ const MatchModal = {
         // ADICIONAR: HTML do vídeo embed (se existir)
         const videoHtml = match['Video Embed'] ? `
             <div class="watch-button-container">
-                <a href="watch.html?id=${match.ID}" class="watch-match-button">
+                <a href="watch?id=${match.ID}" class="watch-match-button">
                     <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir Jogo'}</span>
                 </a>
             </div>
@@ -442,7 +442,7 @@ const MotorModal = {
             <div class="detail-section">
                 <div class="section-title">${videoTitle}</div>
                 <div style="text-align: center; padding: 30px;">
-                    <a href="watch.html?id=${match.ID}" class="watch-button" target="_blank">
+                    <a href="watch?id=${match.ID}" class="watch-button" target="_blank">
                         <span style="font-size: 3em;">▶️</span>
                         <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir Jogo</div>
                     </a>
