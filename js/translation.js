@@ -106,6 +106,7 @@ const translations = {
         'Copa do Mundo de Clubes FIFA EUA 2025': '2025 FIFA Club World Cup',
         'Copa do Mundo de Clubes FIFA EUA 2029': '2029 FIFA Club World Cup',
         'Copa do Mundo FIFA de Futebol de Areia Seychelles 2025': '2025 FIFA Beach Soccer World Cup',
+        'Copa dos Campeões Feminina da FIFA': "FIFA Women's Champions Cup",
         'CONMEBOL Copa América Feminina': "Women's CONMEBOL Copa América",
         'CONCACAF Copa Ouro': 'CONCACAF Gold Cup',
         'CONCACAF Copa Ouro Feminina': 'CONCACAF W Gold Cup',
