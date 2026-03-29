@@ -159,6 +159,7 @@ h1 {
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     transition: all 0.3s ease;
 }
 
@@ -1630,6 +1631,14 @@ input[type="text"]:focus {
     
     .footer-section h4 {
         font-size: 1em;
+    }
+
+    .control-group {
+        width: 100%;
+    }
+
+    select, input[type="text"] {
+        width: 100%;
     }
 }
 
