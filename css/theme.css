@@ -28,6 +28,19 @@
     --warning-color: #f59e0b;
     --error-color: #ef4444;
     --info-color: #3b82f6;
+
+    --bg-success: #d1fae5;
+    --bg-warning: #fef3c7;
+    --bg-error: #fee2e2;
+
+    --text-success: #065f46;
+    --text-warning: #92400e;
+    --text-error: #991b1b;
+
+    /* Cores dos modos */
+    .mode-football  { background: #dbeafe; color: #1d4ed8; }
+    .mode-multisport { background: #ede9fe; color: #6d28d9; }
+    .mode-motorsport { background: #e2e8f0; color: #475569; }
 }
 
 /* ========================================
@@ -78,6 +91,20 @@ body.theme-motor {
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
         --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
         --shadow-lg: 0 12px 32px rgba(0,0,0,0.7);
+
+        /* Cores de Status */
+        --bg-success: #064e3b;
+        --bg-warning: #451a03;
+        --bg-error: #450a0a;
+
+        --text-success: #6ee7b7;
+        --text-warning: #fcd34d;
+        --text-error: #fca5a5;
+
+        /* Cores dos modos */
+        .mode-football   { background: #1e3a5f; color: #93c5fd; }
+        .mode-multisport { background: #2e1a4f; color: #c4b5fd; }
+        .mode-motorsport { background: #1e293b; color: #94a3b8; }
     }
 
     /* Dark Mode - Outros Esportes */
@@ -97,3 +124,6 @@ body.theme-motor {
         --border-color: #475569;
     }
 }
+
+
+

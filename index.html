@@ -4,219 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Coleção de Esportes</title>
- 
-    <!-- Meta Tags Básicas -->
-    <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
+
+    <meta name="description" content="Arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes.">
     <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
     <meta name="author" content="@limaalef">
-    
-    <!-- Open Graph / Facebook -->
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="http://archive.limaalef.com/">
     <meta property="og:title" content="Minha Coleção de Esportes">
-    <meta property="og:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
+    <meta property="og:description" content="Arquivo pessoal de jogos e eventos esportivos.">
     <meta property="og:image" content="http://archive.limaalef.com/banner.png">
-    <meta property="og:image:width" content="763">
-    <meta property="og:image:height" content="241">
     <meta property="og:site_name" content="Minha Coleção de Esportes">
     <meta property="og:locale" content="pt_BR">
-    
-    <!-- Twitter Card -->
+
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="http://archive.limaalef.com/">
-    <meta name="twitter:title" content="Minha Coleção de Esportes">
-    <meta name="twitter:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
-    <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
     <meta name="twitter:creator" content="@limaalef">
-    <meta name="twitter:site" content="@limaalef">
-    
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/icons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-    <link rel="manifest" href="/icons/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
 
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
-<!-- Google tag (gtag.js)
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-JJZTBEGJ91');
-</script> -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877"
-crossorigin="anonymous"></script>
 <body>
     <header>
         <div class="header-content">
             <div class="logo-container">
-                <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="site-logo" style="display: none;">🏆</div>
+                <img src="logo.png" alt="Logo" class="site-logo-img"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="site-logo" style="display:none;">🏆</div>
             </div>
-            
-            <div class="sport-selector">
-                <button class="sport-btn active" data-sport="football" id="footballBtn">
-                    ⚽ <span data-i18n="football">Futebol</span>
-                </button>
-                <button class="sport-btn" data-sport="others" id="othersBtn">
-                    🏀 <span data-i18n="otherSports">Outros Esportes</span>
-                </button>
-                <button class="sport-btn" data-sport="motor" id="motorBtn">
-                    🏎️ <span data-i18n="motorSports">Automobilismo</span>
-                </button>
-            </div>
-        </div>
-    </header>
-    
-    <div class="container">
-        <div class="statsContainer">
-            <div class="stats" id="stats" style="display: none;">
-                <div class="stat">
-                    <div class="stat-value" id="totalGames">0</div>
-                    <div class="stat-label" data-i18n="games">Jogos</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="pendingGames">0</div>
-                    <div class="stat-label" data-i18n="pending">Pendentes</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="futureGames">0</div>
-                    <div class="stat-label" data-i18n="future">Futuros</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalSize">0 GB</div>
-                    <div class="stat-label" data-i18n="totalSize">Tamanho Total</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalDuration">0h</div>
-                    <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="controls">
+            <div style="flex:1"></div>
             <div class="control-group">
-                <label data-i18n="items">Itens:</label>
-                <select id="itemsPerPage">
-                    <option value="50">50</option>
-                    <option value="200" selected>200</option>
-                    <option value="1000">1000</option>
-                </select>
-            </div>
-
-            <div class="pagination">
-                <button id="firstPage">«</button>
-                <button id="prevPage">‹</button>
-                <span class="page-info" id="pageInfo">
-                    <span class="label" data-i18n="page">Página</span>
-                    <span class="value" id="pageNumber">1</span>
-                    <span class="label" data-i18n="pageSeparator">de</span>
-                    <span class="value" id="pageTotal">1</span>
-                </span>
-                <button id="nextPage">›</button>
-                <button id="lastPage">»</button>
-            </div>
-
-            <div class="control-group">
-                <select id="yearFilter">
-                    <option value="" data-i18n="allYears">Todos os anos</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <button id="videoFilterBtn" class="video-filter-btn" title="Filtrar apenas jogos com vídeo disponível">
-                    🎥 <span data-i18n="withVideo">Com Vídeo</span>
-                </button>
-            </div>
-
-            <div class="search-box">
-                <input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="🔍 Buscar...">
-            </div>
-
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="cards" data-i18n="cards">🎴 Cartões</button>
-                <button class="view-btn" data-view="list" data-i18n="list">📋 Lista</button>
-            </div>
-
-            <div class="control-group">
-                <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
+                <button id="langToggle" class="lang-btn" style="padding:10px 14px;"
+                        title="Change language / Mudar idioma">
                     <span id="langFlag">🇧🇷</span>
                 </button>
             </div>
         </div>
+    </header>
 
-        <div id="matchesContainer">
-            <div class="empty-state">
-                <h2 data-i18n="loading">Carregando jogos...</h2>
-                <p data-i18n="loadingMessage">Aguarde enquanto buscamos os dados</p>
+    <div class="container">
+    <div class="home-container">
+
+        <!-- sport navigation -->
+        <div class="sport-nav">
+            <a href="collection.html" class="sport-nav-card">
+                <span class="nav-icon">⚽</span>
+                <span data-i18n="football">Futebol</span>
+            </a>
+            <a href="collection.html?sport=others" class="sport-nav-card">
+                <span class="nav-icon">🏀</span>
+                <span data-i18n="otherSports">Outros Esportes</span>
+            </a>
+            <a href="collection.html?sport=motor" class="sport-nav-card">
+                <span class="nav-icon">🏎️</span>
+                <span data-i18n="motorSports">Automobilismo</span>
+            </a>
+        </div>
+
+        <!-- ── SECTION 1: recent changes ── -->
+        <div class="home-section">
+            <div class="home-section-header">
+                <h2>📋 <span data-i18n="sectionChangesTitle">Últimas Alterações</span></h2>
+                <a href="changelog.html" class="section-link" data-i18n="seeAllLink">Ver tudo →</a>
+            </div>
+            <div class="changelog-list" id="recentChanges">
+                <div class="section-state">
+                    <div class="icon">⏳</div>
+                    <p data-i18n="loadingChanges">Carregando alterações recentes...</p>
+                </div>
             </div>
         </div>
+
+        <!-- ── SECTION 2: HD storage (coming soon) ── -->
+        <div class="home-section">
+            <div class="home-section-header">
+                <h2>💾 <span data-i18n="sectionHDTitle">Espaço em HDs</span></h2>
+            </div>
+            <div class="coming-soon-body">
+                <div class="coming-soon-icon">🔧</div>
+                <p data-i18n="comingSoonHD">Em breve</p>
+            </div>
+        </div>
+
+        <!-- ── SECTION 3: other data (coming soon) ── -->
+        <div class="home-section">
+            <div class="home-section-header">
+                <h2>📊 <span data-i18n="sectionDataTitle">Outros Dados</span></h2>
+            </div>
+            <div class="coming-soon-body">
+                <div class="coming-soon-icon">🔧</div>
+                <p data-i18n="comingSoonData">Em breve</p>
+            </div>
+        </div>
+
+    </div>
     </div>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close-btn" onclick="MatchModal.close()">×</button>
-                <h2 id="modalTitle">Detalhes da Partida</h2>
-                <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close-btn" onclick="MatchModal.close()">×</button>
-                <h2 id="modalTitle">Detalhes da Partida</h2>
-                <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-    
     <!-- Footer -->
-    <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🏆 Minha Coleção de Esportes</h3>
-                <p data-i18n="footerDescription">Arquivo pessoal de jogos e eventos esportivos</p>
-            </div>
-            
-            <div class="footer-section">
-                <h4 data-i18n="contact">Contato</h4>
-                <p>Telegram: <a href="https://t.me/limaalef" target="_blank" rel="noopener noreferrer">@limaalef</a></p>
-                <p>Discord: <span>@limaalef</span></p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2025 <span data-i18n="allRightsReserved">Todos os direitos reservados</span></p>
-        </div>
-    </footer>
-    
+    <div id="footer"></div>
+
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/api.service.js"></script>
-    <script src="js/managers.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>

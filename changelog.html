@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog — Minha Coleção de Esportes</title>
+    <meta name="description" content="Histórico de atualizações do arquivo esportivo.">
+    <meta name="robots" content="noindex">
+
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/watch.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="index.html">
+                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="site-logo" style="display: none;">🏆</div>
+                </a>
+            </div>
+            
+            <div class="header-options">
+                <div class="sport-selector">
+                    <button class="sport-btn" onclick="window.location.href='index.html'">
+                        ⬅️ <span data-i18n="backToCollection">Voltar para Coleção</span>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
+                        <span id="langFlag">🇧🇷</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="changelog-container">
+
+            <div class="changelog-filters">
+                <label id="filterLabel">Modo:</label>
+                <select id="modeFilter">
+                    <option value="">Todos</option>
+                    <option value="football">⚽ Futebol</option>
+                    <option value="multisport">🏀 Multiesporte</option>
+                    <option value="motorsport">🏎️ Automobilismo</option>
+                </select>
+
+                <label id="filterActionLabel">Ação:</label>
+                <select id="actionFilter">
+                    <option value="">Todas as ações</option>
+                    <option value="added">✅ Adicionados</option>
+                    <option value="modified">✏️ Modificados</option>
+                    <option value="removed">🗑️ Removidos</option>
+                </select>
+
+                <label id="filterLimitLabel">Itens:</label>
+                <select id="limitFilter">
+                    <option value="20">20</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <div id="changelogContent">
+                <div class="state-box">
+                    <div class="icon">⏳</div>
+                    <h2 id="loadingTitle">Carregando changelog...</h2>
+                    <p id="loadingMsg">Aguarde enquanto buscamos o histórico</p>
+                </div>
+            </div>
+
+            <div class="cl-pagination" id="pagination" style="display:none;">
+                <button id="firstPage">«</button>
+                <button id="prevPage">‹</button>
+                <span class="page-info" id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage">›</button>
+                <button id="lastPage">»</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/changelog.js"></script>
+</body>
+</html>

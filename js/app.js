@@ -52,8 +52,44 @@ const App = {
         
         this.loadData();
     },
+    readUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+ 
+        // ?sport=football|others|motor
+        const sport = params.get('sport');
+        if (sport && ['football', 'others', 'motor'].includes(sport)) {
+            CONFIG.currentSport = sport;
+            document.body.classList.remove('theme-others', 'theme-motor');
+            if (sport === 'others') document.body.classList.add('theme-others');
+            if (sport === 'motor')  document.body.classList.add('theme-motor');
+            document.querySelectorAll('.sport-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.sport === sport);
+            });
+        }
+ 
+        // ?page=N
+        const page = parseInt(params.get('page'));
+        if (page > 0) AppState.currentPage = page;
+ 
+        // ?view=grid|list
+        const view = params.get('view');
+        if (view && ['grid', 'list'].includes(view)) {
+            AppState.currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+        }
+ 
+        // ?search=texto
+        const search = params.get('search');
+        if (search) {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = search;
+        }
+    },
     init() {
         LanguageManager.init();
+        this.readUrlParams();
         
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
         document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
