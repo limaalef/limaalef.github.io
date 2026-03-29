@@ -44,6 +44,7 @@ const APIService = {
             'Logo emissora': item.station?.logo || '',
             Competição: item.championship?.name || '',
             Fase: item.championship?.phase || '',
+            Estadio: item.championship?.stadium || '',
             Mandante: item.home_team?.name || '',
             'Gols mandante': item.home_team?.goals,
             'Logo mandante': item.home_team?.logo || '',

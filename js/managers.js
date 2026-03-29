@@ -321,6 +321,7 @@ const MatchModal = {
         const videoTitle = LanguageManager.t('video') || 'Vídeo';
         const imageTitle = LanguageManager.t('image') || 'Imagem';
         
+        console.log(match)
         
         body.innerHTML = `
             ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.style.display='none'">` : ''}
@@ -328,10 +329,6 @@ const MatchModal = {
             <div class="detail-section">
                 <div class="section-title">${matchInfoTitle}</div>
                 <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">ID</div>
-                        <div class="detail-value">${match.ID || 'N/A'}</div>
-                    </div>
                     <div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('date')}</div>
                         <div class="detail-value">${Utils.formatDate(match.Data)}</div>
@@ -343,6 +340,10 @@ const MatchModal = {
                     <div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('phase')}</div>
                         <div class="detail-value">${phase || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">${LanguageManager.t('stadium')}</div>
+                        <div class="detail-value">${match.Estadio || 'N/A'}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('type')}</div>
@@ -366,6 +367,10 @@ const MatchModal = {
             <div class="detail-section">
                 <div class="section-title">${technicalInfoTitle}</div>
                 <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">ID</div>
+                        <div class="detail-value">${match.ID || 'N/A'}</div>
+                    </div>
                     <div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('quality')}</div>
                         <div class="detail-value">${match.Qualidade || 'N/A'}</div>
