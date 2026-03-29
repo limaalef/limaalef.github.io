@@ -163,12 +163,6 @@ const State = {
 window.addEventListener('DOMContentLoaded', () => {
     LanguageManager.init();
 
-    document.getElementById('langToggle').addEventListener('click', () => {
-        const newLang = LanguageManager.currentLang === 'pt-BR' ? 'en' : 'pt-BR';
-        LanguageManager.setLanguage(newLang, false);
-        loadChangelog();
-    });
-
     document.getElementById('modeFilter').addEventListener('change', e => {
         State.mode = e.target.value;
         State.page = 1;

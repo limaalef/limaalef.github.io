@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="control-group">
-                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
+                    <button id="langToggle" class="lang-btn" style="display: none">
                         <span id="langFlag">🇧🇷</span>
                     </button>
                 </div>
@@ -40,29 +40,43 @@
     <div class="container">
         <div class="changelog-container">
 
-            <div class="changelog-filters">
-                <label id="filterLabel">Modo:</label>
-                <select id="modeFilter">
-                    <option value="">Todos</option>
-                    <option value="football">⚽ Futebol</option>
-                    <option value="multisport">🏀 Multiesporte</option>
-                    <option value="motorsport">🏎️ Automobilismo</option>
-                </select>
+            <div class="controls">
+                <div class="control-group">
+                    <label data-i18n="items">Itens:</label>
+                    <select id="limitFilter">
+                        <option value="20">20</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
 
-                <label id="filterActionLabel">Ação:</label>
-                <select id="actionFilter">
-                    <option value="">Todas as ações</option>
-                    <option value="added">✅ Adicionados</option>
-                    <option value="modified">✏️ Modificados</option>
-                    <option value="removed">🗑️ Removidos</option>
-                </select>
+                <div class="cl-pagination" id="pagination" style="display:none;">
+                    <button id="firstPage">«</button>
+                     <button id="prevPage">‹</button>
+                    <span class="page-info" id="pageInfo">Página 1 de 1</span>
+                    <button id="nextPage">›</button>
+                    <button id="lastPage">»</button>
+                </div>
 
-                <label id="filterLimitLabel">Itens:</label>
-                <select id="limitFilter">
-                    <option value="20">20</option>
-                    <option value="50" selected>50</option>
-                    <option value="100">100</option>
-                </select>
+                <div class="control-group">
+                    <label data-i18n="mode">Modo:</label>
+                    <select id="modeFilter">
+                        <option value="" data-i18n="allContent">Todos</option>
+                        <option value="football" data-i18n="modeFootball">Futebol</option>
+                        <option value="multisport" data-i18n="modeMultisport">Multiesporte</option>
+                        <option value="motorsport" data-i18n="modeMotorsport">Automobilismo</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label data-i18n="action">Ação:</label>
+                    <select id="actionFilter">
+                        <option value="" data-i18n="allContent">Todas as ações</option>
+                        <option value="added" data-i18n="modeAdded">✅ Adicionados</option>
+                        <option value="modified" data-i18n="modeModified">✏️ Modificados</option>
+                        <option value="removed" data-i18n="modeRemoved">🗑️ Removidos</option>
+                    </select>
+                </div>                
             </div>
 
             <div id="changelogContent">
@@ -71,14 +85,6 @@
                     <h2 id="loadingTitle">Carregando changelog...</h2>
                     <p id="loadingMsg">Aguarde enquanto buscamos o histórico</p>
                 </div>
-            </div>
-
-            <div class="cl-pagination" id="pagination" style="display:none;">
-                <button id="firstPage">«</button>
-                <button id="prevPage">‹</button>
-                <span class="page-info" id="pageInfo">Página 1 de 1</span>
-                <button id="nextPage">›</button>
-                <button id="lastPage">»</button>
             </div>
 
         </div>
