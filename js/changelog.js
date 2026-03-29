@@ -29,13 +29,11 @@ function renderEntry(entry, index) {
     const added     = s.added     || 0;
     const modified  = s.modified  || 0;
     const removed   = s.removed   || 0;
-    const unchanged = s.unchanged || 0;
 
     const pillsHtml = [
         added     ? `<span class="pill pill-added">+${added} ${LanguageManager.t('cl_added')}</span>`         : '',
         modified  ? `<span class="pill pill-modified">✏ ${modified} ${LanguageManager.t('cl_modified')}</span>` : '',
-        removed   ? `<span class="pill pill-removed">−${removed} ${LanguageManager.t('cl_removed')}</span>`   : '',
-        unchanged ? `<span class="pill pill-unchanged">${unchanged} ${LanguageManager.t('cl_unchanged')}</span>` : ''
+        removed   ? `<span class="pill pill-removed">−${removed} ${LanguageManager.t('cl_removed')}</span>`   : ''
     ].filter(Boolean).join('');
 
     // Group changes by action (respecting optional action filter)

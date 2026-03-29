@@ -82,6 +82,8 @@ const translations = {
         yellowCards: 'Cartões Amarelos',
         narrator: 'Narrador',
         commentators: 'Comentaristas',
+        homeTitle: 'Confira a coleção por categoria',
+        dirsoament: 'Coleção do Dirso Ament',
         // ── index.js ──
         sectionChangesTitle: 'Últimas alterações',
         seeAllLink:          'Ver tudo →',
@@ -260,6 +262,8 @@ const translations = {
         yellowCards: 'Yellow Cards',
         narrator: 'Narrator',
         commentators: 'Commentators',
+        homeTitle: 'Select a category',
+        dirsoament: 'Dirso Ament`s Collection',
         // ── index.js ──
         sectionChangesTitle: 'Recent changes',
         seeAllLink:          'See all →',

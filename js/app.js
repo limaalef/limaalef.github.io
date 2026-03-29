@@ -41,10 +41,12 @@ const App = {
         });
         
         // Remove todos os temas
-        document.body.classList.remove('theme-others', 'theme-motor');
+        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
         
         // Adiciona o tema apropriado
-        if (sport === 'others') {
+        if (sport === 'football') {
+            document.body.classList.add('theme-football');
+        } else if (sport === 'others') {
             document.body.classList.add('theme-others');
         } else if (sport === 'motor') {
             document.body.classList.add('theme-motor');
@@ -59,7 +61,8 @@ const App = {
         const sport = params.get('sport');
         if (sport && ['football', 'others', 'motor'].includes(sport)) {
             CONFIG.currentSport = sport;
-            document.body.classList.remove('theme-others', 'theme-motor');
+            document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
+            if (sport === 'football') document.body.classList.add('theme-football');
             if (sport === 'others') document.body.classList.add('theme-others');
             if (sport === 'motor')  document.body.classList.add('theme-motor');
             document.querySelectorAll('.sport-btn').forEach(btn => {

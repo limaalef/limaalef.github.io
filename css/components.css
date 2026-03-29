@@ -1014,9 +1014,9 @@ input[type="text"]:focus {
 
 /* ── page layout ── */
 .home-container {
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px 20px 80px;
+    padding: 1rem 0rem;
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -1041,7 +1041,7 @@ input[type="text"]:focus {
 /* ── nav cards (go to collection) ── */
 .sport-nav {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 2fr);
     gap: 12px;
 }
 .sport-nav-card {
@@ -1285,7 +1285,7 @@ input[type="text"]:focus {
 .changelog-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 24px 16px 60px;
+    padding: 2rem 0rem;
 }
 
 .changelog-header {
@@ -1634,7 +1634,7 @@ input[type="text"]:focus {
 }
 
 @media (max-width: 600px) {
-    .sport-nav { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .sport-nav { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .sport-nav-card { padding: 14px 8px; font-size: 0.82rem; }
     .sport-nav-card .nav-icon { font-size: 1.3rem; }
     .cl-timestamp { display: none; }   
