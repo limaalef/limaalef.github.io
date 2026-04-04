@@ -1461,7 +1461,6 @@ input[type="text"]:focus {
     align-items: flex-start;
     gap: 8px;
     padding: 6px 0;
-    border-bottom: 1px solid var(--border-color);
     font-size: 0.88rem;
     color: var(--text-primary);
 }
@@ -1476,6 +1475,16 @@ input[type="text"]:focus {
     padding-top: 1px;
     font-variant-numeric: tabular-nums;
 }
+
+.change-id-link {
+    cursor: pointer;
+}
+
+.change-item:has(.change-id-link):hover { 
+    background-color: var(--bg-tertiary);
+    border-radius: 0.5rem;
+}
+
 .change-desc { flex: 1; line-height: 1.4; }
 
 .changes-section-title.added    { color: var(--success-color); }
@@ -1572,6 +1581,153 @@ input[type="text"]:focus {
 .fc-modified { color: var(--warning-color) }
 .fc-removed  { color: var(--error-color) }
 
+/* ── Today in History ── */
+.today-history-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px;
+    width: 100%;
+}
+
+.tih-nav-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 50%;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.2s;
+    align-self: center;
+}
+.tih-nav-btn:hover:not(:disabled) { background: var(--hover-bg); }
+.tih-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.today-history-list {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.tih-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 1rem 0 0 0 ;
+}
+
+.tih-grid::-webkit-scrollbar { display: none; }
+
+.tih-card {
+    flex: 0 0 200px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.tih-card:hover {
+    border-color: var(--accent-color);
+    background: var(--hover-bg);
+}
+
+.tih-card-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.tih-card-year {
+    flex-shrink: 0;
+    font-size: 0.78em;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+    border-radius: 4px;
+    padding: 1px 5px;
+}
+
+.tih-card-comp {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tih-card-match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.tih-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.tih-team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.tih-team-name {
+    font-size: 0.78em;
+    text-align: center;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+.tih-team.winner .tih-team-name { font-weight: 700; }
+
+.tih-card-score {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.tih-score {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 16px;
+    text-align: center;
+}
+.tih-score.winner { color: var(--text-primary); }
+
+.tih-score-sep {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.tih-pagination {
+    text-align: center;
+    margin: 0.5rem 0 1rem 0;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
 /* ANIMAÇÕES GERAIS */
 @keyframes slideInRight {
     from { transform: translateX(400px); opacity: 0; }
@@ -1639,6 +1795,24 @@ input[type="text"]:focus {
 
     select, input[type="text"] {
         width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 0px;
+    }
+
+    .modal-header {
+        border-radius: 0px;
+    }
+
+    .modal-content {
+        border-radius: 0px;
+        max-width: 100%;
+        max-height: 100%;
     }
 }
 

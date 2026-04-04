@@ -415,6 +415,36 @@ const MatchModal = {
         
         modal.classList.add('active');
     },
+    async fetchAndShow(id, sport = 'football') {
+        const modal = document.getElementById('modal');
+        const body  = document.getElementById('modalBody');
+        const score = document.getElementById('modalScore');
+        const title = document.getElementById('modalTitle');
+
+        title.innerHTML = '<div class="modal-title-competition"></div>';
+        score.innerHTML = '';
+        body.innerHTML  = `<div style="text-align:center;padding:40px;color:var(--text-secondary)">${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
+        modal.classList.add('active');
+
+        try {
+            const apiResponse = await APIService.fetchById(id, sport);
+            const items = APIService.transformData(apiResponse);
+            if (!items.length) throw new Error('Item não encontrado');
+
+            if (sport === 'motor') {
+                MotorModal.show(items[0]);
+            } else {
+                MatchModal.show(items[0]);
+            }
+        } catch (err) {
+            title.innerHTML = '';
+            body.innerHTML = `
+                <div class="empty-state">
+                    <h2>Erro ao carregar</h2>
+                    <p>${err.message}</p>
+                </div>`;
+        }
+    },
     close() {
         document.getElementById('modal').classList.remove('active');
     }
@@ -543,6 +573,9 @@ const MotorModal = {
         modal.classList.add('active');
     },
     
+    async fetchAndShow(id) {
+        return MatchModal.fetchAndShow(id, 'motor');
+    },
     toggleEvent(index) {
         const content = document.getElementById(`content-${index}`);
         const icon = document.getElementById(`icon-${index}`);
@@ -676,4 +709,3 @@ const FilterManager = {
         Renderer.render();
     }
 };
-

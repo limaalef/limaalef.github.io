@@ -13,10 +13,10 @@
     --text-tertiary: #94a3b8;
     
     /* Cores de Interface */
-    --header-color: #2563eb;
+    --header-color: #3e3d49;
     --border-color: #e2e8f0;
-    --accent-color: #3b82f6;
-    --accent-hover: #2563eb;
+    --accent-color: #6264db;
+    --accent-hover: #7a7cdb;
     
     /* Sombras */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);

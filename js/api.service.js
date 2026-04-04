@@ -19,6 +19,26 @@ const APIService = {
 
         return data;
     },
+    async fetchById(id, sport) {
+        const url = new URL(CONFIG.API_URLS[sport]);
+        url.searchParams.set('id', id);
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data.success) throw new Error('API retornou erro');
+        return data;
+    },
+    async fetchTodayInHistory() {
+        const base = CONFIG.API_URLS['football'].replace(/\?$/, '');
+        const url = new URL(base);
+        url.searchParams.set('today_in_history', 'true');
+
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data.success) throw new Error('API retornou erro');
+        return data;
+    },
     transformData(apiResponse) {
         if (CONFIG.currentSport === 'motor') {
             return (apiResponse.data || []).map(item => ({
@@ -36,7 +56,7 @@ const APIService = {
         }
         
         return (apiResponse.data || []).map(item => ({
-            ID: item.id || '',
+            ID: item.id ?? '',
             Data: item.date || '',
             Emissora: item.station?.name || '',
             Origem: item.station?.origem || '',

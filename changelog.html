@@ -25,7 +25,7 @@ crossorigin="anonymous"></script>
     <header>
         <div class="header-content">
             <div class="logo-container">
-                <a href="index.html"></a>
+                <a href="index.html">
                     <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="site-logo" style="display: none;">🏆</div>
                 </a>
@@ -90,7 +90,17 @@ crossorigin="anonymous"></script>
                     <p id="loadingMsg">Aguarde enquanto buscamos o histórico</p>
                 </div>
             </div>
+        </div>
 
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="MatchModal.close()">×</button>
+                    <h2 id="modalTitle">Detalhes da Partida</h2>
+                    <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+            </div>
         </div>
     </div>
 
@@ -99,6 +109,9 @@ crossorigin="anonymous"></script>
 
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
     <script src="js/changelog.js"></script>
 </body>
 </html>

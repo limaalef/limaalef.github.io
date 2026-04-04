@@ -23,6 +23,12 @@ function modeClass(mode) {
     return { football: 'mode-football', multisport: 'mode-multisport', motorsport: 'mode-motorsport' }[mode] || 'mode-motorsport';
 }
 
+function sportForMode(mode) {
+    if (mode === 'motorsport') return 'motor';
+    if (mode === 'multisport') return 'others';
+    return 'football';
+}
+
 /* ── render ── */
 function renderEntry(entry, index) {
     const s = entry.summary || {};
@@ -52,13 +58,19 @@ function renderEntry(entry, index) {
                     `<li><span class="fc-field">${escapeHtml(f.field)}</span><span class="fc-action fc-${f.action}">${LanguageManager.t(fcKey[f.action] || 'fc_modified')}</span></li>`
                   ).join('')}</ul>`
                 : '';
+            const idBadge = `<span class="change-id">${c.id != null ? '#' + c.id : '—'}</span>`;
+            const descContent = c.id != null && c.action !== 'removed'
+                ? `<span class="change-desc change-id-link"
+                       title="${LanguageManager.t('viewDetails') || 'Ver detalhes'}"
+                       onclick="MatchModal.fetchAndShow(${c.id}, '${sportForMode(entry.mode)}')">
+                       ${escapeHtml(c.description || '')}
+                       ${fieldHtml}
+                   </span>`
+                : `<span class="change-desc">${escapeHtml(c.description || '')}${fieldHtml}</span>`;
             return `
             <div class="change-item">
-                <span class="change-id">#${c.id ?? '—'}</span>
-                <span class="change-desc">
-                    ${escapeHtml(c.description || '')}
-                    ${fieldHtml}
-                </span>
+                ${idBadge}
+                ${descContent}
             </div>`;
         }).join('');
         return `<div class="changes-section">
