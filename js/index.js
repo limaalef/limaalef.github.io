@@ -75,14 +75,9 @@ function renderRecentChanges(entries) {
 async function loadRecentChanges() {
     const container = document.getElementById('recentChanges');
     try {
-        const url = new URL(CONFIG.CHANGELOG_URL);
-        url.searchParams.set('page', '1');
-        url.searchParams.set('limit', '10');
-
-        const resp = await fetch(url.toString());
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        if (!data.success) throw new Error('API error');
+        const page = '1'
+        const limit = '3'
+        const data = await APIService.fetchChangelog(page, limit);
 
         renderRecentChanges(data.data || []);
     } catch (err) {

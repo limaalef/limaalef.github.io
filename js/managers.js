@@ -37,7 +37,7 @@ const CardManager = {
         const status = Utils.getMatchStatus(match);
         const hasVideo = match['Video Embed'] ? 'has-video' : '';
         card.className = `match-card ${status} ${hasVideo}`;
-        card.onclick = () => MatchModal.show(match);
+        card.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
@@ -107,7 +107,7 @@ const MotorCardManager = {
         const card = document.createElement('div');
         const hasVideo = event['Video Embed'] ? 'has-video' : '';
         card.className = `match-card motor-event ${hasVideo}`;
-        card.onclick = () => MotorModal.show(event);
+        card.onclick = () => MatchModal.fetchAndShow(event.ID, 'motor');
         
         const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
         
@@ -157,7 +157,7 @@ const ListManager = {
         const item = document.createElement('div');
         const status = Utils.getMatchStatus(match);
         item.className = `list-item ${status}`;
-        item.onclick = () => MatchModal.show(match);
+        item.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
         
         const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
@@ -190,7 +190,7 @@ const MotorListManager = {
     create(event) {
         const item = document.createElement('div');
         item.className = 'list-item motor-event';
-        item.onclick = () => MotorModal.show(event);
+        item.onclick = () => MatchModal.fetchAndShow(event.ID, 'motor');
         
         const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
         
@@ -225,6 +225,7 @@ const MatchModal = {
         const title = document.getElementById('modalTitle');
         const score = document.getElementById('modalScore');
         const body = document.getElementById('modalBody');
+        if (!title || !score || !body) return;
         const status = Utils.getMatchStatus(match);
         
         const competition = LanguageManager.translateText(match.Competição);
@@ -366,7 +367,7 @@ const MatchModal = {
             
             <div class="detail-section">
                 <div class="section-title">${technicalInfoTitle}</div>
-                <div class="detail-grid">
+                <div class="detail-grid technical">
                     <div class="detail-item">
                         <div class="detail-label">ID</div>
                         <div class="detail-value">${match.ID || 'N/A'}</div>
@@ -413,18 +414,27 @@ const MatchModal = {
             ` : ''}
         `;
         
-        modal.classList.add('active');
+        modal?.classList.add('active');
     },
     async fetchAndShow(id, sport = 'football') {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('id', id);
+        history.pushState({ id, sport }, '', `?${urlParams.toString()}`);
+
         const modal = document.getElementById('modal');
         const body  = document.getElementById('modalBody');
         const score = document.getElementById('modalScore');
         const title = document.getElementById('modalTitle');
 
-        title.innerHTML = '<div class="modal-title-competition"></div>';
+        if (!modal || !body || !score || !title) {
+            console.error('fetchAndShow: elementos do modal não encontrados no DOM.', { modal, body, score, title });
+            return;
+        }
+
+        title.innerHTML = `<div class="modal-title-competition">⏳ ${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
         score.innerHTML = '';
-        body.innerHTML  = `<div style="text-align:center;padding:40px;color:var(--text-secondary)">${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
-        modal.classList.add('active');
+        body.innerHTML  = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">⏳</div>';
+        modal?.classList.add('active');
 
         try {
             const apiResponse = await APIService.fetchById(id, sport);
@@ -447,6 +457,12 @@ const MatchModal = {
     },
     close() {
         document.getElementById('modal').classList.remove('active');
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('id')) {
+            urlParams.delete('id');
+            const newUrl = urlParams.toString() ? `?${urlParams.toString()}` : window.location.pathname;
+            history.pushState({}, '', newUrl);
+        }
     }
 };
 
@@ -456,6 +472,7 @@ const MotorModal = {
         const title = document.getElementById('modalTitle');
         const score = document.getElementById('modalScore');
         const body = document.getElementById('modalBody');
+        if (!title || !score || !body) return;
         
         const competition = LanguageManager.translateText(event.Campeonato);
         const phase = LanguageManager.translateText(event.Fase);
@@ -523,7 +540,7 @@ const MotorModal = {
                     
                     <div class="detail-section">
                         <div class="section-title">${LanguageManager.t('technicalInfo')}</div>
-                        <div class="detail-grid">
+                        <div class="detail-grid technical">
                             <div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('quality')}</div>
                                 <div class="detail-value">${evt.technical_details?.video_quality || 'N/A'}</div>
@@ -570,7 +587,7 @@ const MotorModal = {
     }).join('');
         
         body.innerHTML = eventsHtml;
-        modal.classList.add('active');
+        modal?.classList.add('active');
     },
     
     async fetchAndShow(id) {

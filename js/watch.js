@@ -119,7 +119,7 @@ const WatchPage = {
         const description = `Assista ${match.home_team.name} ${match.home_team.goals} x ${match.away_team.goals} ${match.away_team.name} - ${competition} ${round}`;
         
         // Atualizar título da página
-        document.title = pageTitle + ' - Minha Coleção de Esportes';
+        document.title = pageTitle + ' - Sports Archive';
         
         // Atualizar Open Graph
         const ogTitle = document.getElementById('og-title');
