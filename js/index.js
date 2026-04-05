@@ -75,14 +75,9 @@ function renderRecentChanges(entries) {
 async function loadRecentChanges() {
     const container = document.getElementById('recentChanges');
     try {
-        const url = new URL(CONFIG.CHANGELOG_URL);
-        url.searchParams.set('page', '1');
-        url.searchParams.set('limit', '10');
-
-        const resp = await fetch(url.toString());
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        if (!data.success) throw new Error('API error');
+        const page = '1'
+        const limit = '3'
+        const data = await APIService.fetchChangelog(page, limit);
 
         renderRecentChanges(data.data || []);
     } catch (err) {
@@ -94,21 +89,12 @@ async function loadRecentChanges() {
 /* ── Today in History ── */
 const TodayInHistory = {
     items: [],
-    page: 0,
-    pageSize: 5,
-
-    get totalPages() {
-        return Math.max(1, Math.ceil(this.items.length / this.pageSize));
-    },
 
     async load() {
         const container = document.getElementById('todayHistory');
         try {
             const data = await APIService.fetchTodayInHistory();
-
             this.items = APIService.transformData(data);
-            this._computePageSize();
-            this.page = 0;
             this.render();
         } catch (err) {
             container.innerHTML = `<div class="section-state"><div class="icon">❌</div><p>${LanguageManager.t('errorChanges')}</p></div>`;
@@ -116,108 +102,105 @@ const TodayInHistory = {
         }
     },
 
+    _cardHtml(item) {
+        const id   = item.ID;
+        const year = Utils.parseDate(item.Data)?.getFullYear() || (item.Data || '').slice(0, 4) || '?';
+
+        const gh = item['Gols mandante']  ?? '';
+        const ga = item['Gols visitante'] ?? '';
+        const homeWinner = gh !== '' && ga !== '' && Number(gh) > Number(ga);
+        const awayWinner = gh !== '' && ga !== '' && Number(ga) > Number(gh);
+        const scoreHtml  = gh !== '' && ga !== ''
+            ? `<span class="tih-score ${homeWinner ? 'winner' : ''}">${gh}</span>
+               <span class="tih-score-sep">–</span>
+               <span class="tih-score ${awayWinner ? 'winner' : ''}">${ga}</span>`
+            : `<span class="tih-score-sep">vs</span>`;
+
+        const comp     = escapeHtml(item.Competição || '');
+        const fase     = escapeHtml(item.Fase       || '');
+        const home     = escapeHtml(item.Mandante   || '?');
+        const away     = escapeHtml(item.Visitante  || '?');
+        const homeLogo = item['Logo mandante']  ? `<img src="${item['Logo mandante']}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
+        const awayLogo = item['Logo visitante'] ? `<img src="${item['Logo visitante']}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
+
+        return `
+        <div class="tih-card" onclick="TodayModal.show(${id}, 'football')">
+            <div class="tih-card-top">
+                <span class="tih-card-year">${year}</span>
+                <span class="tih-card-comp">${LanguageManager.translateText(comp)}${fase ? ` · ${LanguageManager.translateText(fase)}` : ''}</span>
+            </div>
+            <div class="tih-card-match">
+                <div class="tih-team ${homeWinner ? 'winner' : ''}">
+                    ${homeLogo}
+                    <span class="tih-team-name">${home}</span>
+                </div>
+                <div class="tih-card-score">${scoreHtml}</div>
+                <div class="tih-team away ${awayWinner ? 'winner' : ''}">
+                    ${awayLogo}
+                    <span class="tih-team-name">${away}</span>
+                </div>
+            </div>
+        </div>`;
+    },
+
     render() {
         const container  = document.getElementById('todayHistory');
         const pagination = document.getElementById('tihPagination');
-        const pageInfo   = document.getElementById('tihPageInfo');
 
         if (this.items.length === 0) {
             container.innerHTML = `<div class="section-state"><div class="icon">📭</div><p>${LanguageManager.t('noChanges')}</p></div>`;
             pagination.style.display = 'none';
-            document.getElementById('tihPrev').disabled = true;
-            document.getElementById('tihNext').disabled = true;
             return;
         }
 
-        container.innerHTML = `<div class="tih-grid" id="tihGrid">${this.items.map(item => {
-            const id   = item.ID;
-            const year = (item.Data || '').slice(0, 4) || '?';
+        // Renderiza todos os cards — o CSS cuida do scroll snap
+        container.innerHTML = `<div class="tih-grid" id="tihGrid">${this.items.map(i => this._cardHtml(i)).join('')}</div>`;
 
-            const gh = item['Gols mandante']  ?? '';
-            const ga = item['Gols visitante'] ?? '';
-            const homeWinner = gh !== '' && ga !== '' && Number(gh) > Number(ga);
-            const awayWinner = gh !== '' && ga !== '' && Number(ga) > Number(gh);
-            const scoreHtml  = gh !== '' && ga !== ''
-                ? `<span class="tih-score ${homeWinner ? 'winner' : ''}">${gh}</span>
-                <span class="tih-score-sep">–</span>
-                <span class="tih-score ${awayWinner ? 'winner' : ''}">${ga}</span>`
-                : `<span class="tih-score-sep">vs</span>`;
-
-            const comp     = escapeHtml(item.Competição || '');
-            const fase     = escapeHtml(item.Fase       || '');
-            const home     = escapeHtml(item.Mandante   || '?');
-            const away     = escapeHtml(item.Visitante  || '?');
-            const homeLogo = item['Logo mandante']  ? `<img src="${item['Logo mandante']}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
-            const awayLogo = item['Logo visitante'] ? `<img src="${item['Logo visitante']}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
-
-            return `
-            <div class="tih-card" onclick="TodayModal.show(${id}, 'football')">
-                <div class="tih-card-top">
-                    <span class="tih-card-year">${year}</span>
-                    <span class="tih-card-comp">${LanguageManager.translateText(comp)} ${fase ? ` · ${LanguageManager.translateText(fase)}` : ''}</span>
-                </div>
-                <div class="tih-card-match">
-                    <div class="tih-team ${homeWinner ? 'winner' : ''}">
-                        ${homeLogo}
-                        <span class="tih-team-name">${home}</span>
-                    </div>
-                    <div class="tih-card-score">${scoreHtml}</div>
-                    <div class="tih-team away ${awayWinner ? 'winner' : ''}">
-                        ${awayLogo}
-                        <span class="tih-team-name">${away}</span>
-                    </div>
-                </div>
-            </div>`;
-        }).join('')}</div>`;
-
+        pagination.style.display = this.items.length > 1 ? 'flex' : 'none';
         this._updateNav();
 
-        if (this.items.length > this.pageSize) {
-            pagination.style.display = 'block';
-            this._updatePageInfo();
-        } else {
-            pagination.style.display = 'none';
-        }
-    },
-
-    _cardWidth() {
+        // Atualiza indicador de página ao scrollar
         const grid = document.getElementById('tihGrid');
-        if (!grid) return 210;
-        const card = grid.querySelector('.tih-card');
-        if (!card) return 210;
-        return card.offsetWidth + 10; // width + gap
+        grid.addEventListener('scroll', () => this._onScroll(), { passive: true });
     },
 
-    _scrollTo(page) {
+    // Seta avança/volta pela largura visível do grid (um "viewport" de cards)
+    prev() {
         const grid = document.getElementById('tihGrid');
         if (!grid) return;
-        this.page = Math.max(0, Math.min(page, this.totalPages - 1));
-        grid.scrollTo({ left: this.page * this.pageSize * this._cardWidth(), behavior: 'smooth' });
+        grid.scrollBy({ left: -grid.clientWidth, behavior: 'smooth' });
+    },
+
+    next() {
+        const grid = document.getElementById('tihGrid');
+        if (!grid) return;
+        grid.scrollBy({ left: grid.clientWidth, behavior: 'smooth' });
+    },
+
+    _onScroll() {
         this._updateNav();
         this._updatePageInfo();
     },
 
     _updateNav() {
-        document.getElementById('tihPrev').disabled = this.page === 0;
-        document.getElementById('tihNext').disabled = this.page >= this.totalPages - 1;
+        const grid = document.getElementById('tihGrid');
+        if (!grid) return;
+        const atStart = grid.scrollLeft <= 4;
+        const atEnd   = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4;
+        document.getElementById('tihPrev').disabled = atStart;
+        document.getElementById('tihNext').disabled = atEnd;
     },
 
     _updatePageInfo() {
-        const el = document.getElementById('tihPageInfo');
-        if (el) el.textContent = `${this.page + 1} / ${this.totalPages}`;
+        const grid = document.getElementById('tihGrid');
+        if (!grid) return;
+        // Estima página atual baseado na posição de scroll
+        const cardW  = grid.querySelector('.tih-card')?.offsetWidth || 1;
+        const gap    = 10;
+        const perPage = Math.max(1, Math.round(grid.clientWidth / (cardW + gap)));
+        const current = Math.round(grid.scrollLeft / (cardW + gap) / perPage) + 1;
+        const total   = Math.ceil(this.items.length / perPage);
     },
-
-    _computePageSize() {
-        const wrapper = document.querySelector('.today-history-wrapper');
-        if (!wrapper) return;
-        // desconta as duas setas (36px cada) + gaps (8px cada)
-        const available = wrapper.offsetWidth - (36 + 8) * 2;
-        const cardW = 210; // largura fixa do card + gap
-        this.pageSize = Math.max(1, Math.floor(available / cardW));
-    },
-
-    prev() { this._scrollTo(this.page - 1); },
-    next() { this._scrollTo(this.page + 1); },
 };
 
 const TodayModal = {

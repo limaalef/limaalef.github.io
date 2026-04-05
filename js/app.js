@@ -56,6 +56,15 @@ const App = {
     },
     readUrlParams() {
         const params = new URLSearchParams(window.location.search);
+
+        // ?id=N — abre em tela cheia via FullView (sem modal, sem lista)
+        const id = parseInt(params.get('id'));
+        const sportParam = params.get('sport') || 'football';
+        if (id > 0) {
+            const validSport = ['football', 'others', 'motor'].includes(sportParam) ? sportParam : 'football';
+            window.location.replace(`match.html?id=${id}&sport=${validSport}`);
+            return true;
+        }
  
         // ?sport=football|others|motor
         const sport = params.get('sport');
@@ -92,7 +101,7 @@ const App = {
     },
     init() {
         LanguageManager.init();
-        this.readUrlParams();
+        if (this.readUrlParams()) return;
         
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
         document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
@@ -123,6 +132,22 @@ const App = {
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') MatchModal.close();
         });
+
+        document.addEventListener('keydown', (e) => {
+            const modalOpen = document.getElementById('modal').classList.contains('active');
+            const searchFocused = document.activeElement === document.getElementById('searchInput');
+
+            if (e.key === 'Escape' && modalOpen) {
+                MatchModal.close();
+                return;
+            }
+
+            if (e.key === 'f' && !modalOpen && !searchFocused) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
         this.loadData();
     }
 };

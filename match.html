@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog — Sports Archive</title>
-    <meta name="description" content="Histórico de atualizações do arquivo pessoal.">
+    <title>Partida — Sports Archive</title>
+    <meta name="description" content="Confira os dados desta incrível partida.">
     <meta name="robots" content="noindex">
- 
+
     <!-- Meta Tags Básicas -->
-    <meta name="description" content="Histórico de atualizações do arquivo pessoal.">
+    <meta name="description" content="Confira os dados desta incrível partida.">
     <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
     <meta name="author" content="@limaalef">
     
@@ -16,7 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="http://archive.limaalef.com/">
     <meta property="og:title" content="Sports Archive">
-    <meta property="og:description" content="Histórico de atualizações do arquivo pessoal.">
+    <meta property="og:description" content="Confira os dados desta incrível partida.">
     <meta property="og:image" content="http://archive.limaalef.com/banner.png">
     <meta property="og:image:width" content="763">
     <meta property="og:image:height" content="241">
@@ -27,7 +27,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="http://archive.limaalef.com/">
     <meta name="twitter:title" content="Sports Archive">
-    <meta name="twitter:description" content="Histórico de atualizações do arquivo pessoal.">
+    <meta name="twitter:description" content="Confira os dados desta incrível partida.">
     <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
     <meta name="twitter:creator" content="@limaalef">
     <meta name="twitter:site" content="@limaalef">
@@ -53,24 +53,19 @@
 
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/match.css">
 </head>
-<style>
-    .cl-pagination {
-        margin-top: 0px;
-    }
-</style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-JJZTBEGJ91');
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877"
 crossorigin="anonymous"></script>
-<body>
+<body class="theme-football">
     <header>
         <div class="header-content">
             <div class="logo-container">
@@ -79,10 +74,10 @@ crossorigin="anonymous"></script>
                     <div class="site-logo" style="display: none;">🏆</div>
                 </a>
             </div>
-            
+
             <div class="header-options">
-                <div class="control-group">
-                    <button id="langToggle" class="lang-btn" style="display: none">
+                <div class="control-group" style="display:none;">
+                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
                         <span id="langFlag">🇧🇷</span>
                     </button>
                 </div>
@@ -91,65 +86,14 @@ crossorigin="anonymous"></script>
     </header>
 
     <div class="container">
-        <div class="changelog-container">
-
-            <div class="controls">
-                <div class="control-group">
-                    <label data-i18n="items">Itens:</label>
-                    <select id="limitFilter">
-                        <option value="10" selected>10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label data-i18n="mode">Modo:</label>
-                    <select id="modeFilter">
-                        <option value="" data-i18n="allContent">Todos</option>
-                        <option value="football" data-i18n="modeFootball">Futebol</option>
-                        <option value="multisport" data-i18n="modeMultisport">Multiesporte</option>
-                        <option value="motorsport" data-i18n="modeMotorsport">Automobilismo</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label data-i18n="action">Ação:</label>
-                    <select id="actionFilter">
-                        <option value="" data-i18n="allContent">Todas as ações</option>
-                        <option value="added" data-i18n="modeAdded">✅ Adicionados</option>
-                        <option value="modified" data-i18n="modeModified">✏️ Modificados</option>
-                        <option value="removed" data-i18n="modeRemoved">🗑️ Removidos</option>
-                    </select>
-                </div>
-
-                <div class="pagination" id="pagination" style="display:none;">
-                    <button id="firstPage">«</button>
-                     <button id="prevPage">‹</button>
-                    <span class="page-info" id="pageInfo">Página 1 de 1</span>
-                    <button id="nextPage">›</button>
-                    <button id="lastPage">»</button>
-                </div>
-            </div>
-
-            <div id="changelogContent">
+        <div class="match-page">
+            <div id="matchPageContent">
                 <div class="state-box">
                     <div class="icon">⏳</div>
-                    <h2 id="loadingTitle">Carregando changelog...</h2>
-                    <p id="loadingMsg">Aguarde enquanto buscamos o histórico</p>
+                    <h2 data-i18n="loading">Carregando...</h2>
                 </div>
             </div>
-        </div>
 
-        <div class="modal" id="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button class="close-btn" onclick="MatchModal.close()">×</button>
-                    <h2 id="modalTitle">Detalhes da Partida</h2>
-                    <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
-                </div>
-                <div class="modal-body" id="modalBody"></div>
-            </div>
         </div>
     </div>
 
@@ -161,6 +105,6 @@ crossorigin="anonymous"></script>
     <script src="js/utils.js"></script>
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>
-    <script src="js/changelog.js"></script>
+    <script src="js/match.js"></script>
 </body>
 </html>

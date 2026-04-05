@@ -13,10 +13,10 @@
     --text-tertiary: #94a3b8;
     
     /* Cores de Interface */
-    --header-color: #3e3d49;
+    --header-color: #224b40;
     --border-color: #e2e8f0;
-    --accent-color: #6264db;
-    --accent-hover: #7a7cdb;
+    --accent-color: #62b9a2;
+    --accent-hover: #6ed8bc;
     
     /* Sombras */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
@@ -44,7 +44,7 @@
 }
 
 /* TEMA: OUTROS FUTEBOL */
-body.theme-others {
+body.theme-football {
     --bg-primary: linear-gradient(135deg, #dce1e7 0%, #96aec7 100%);
     --bg-secondary: #ffffff;
     --bg-tertiary: #f0f4f8;
@@ -61,7 +61,7 @@ body.theme-others {
     --bg-tertiary: #f5f7fa;
     --border-color: #e5e7eb;
     --header-color: #514475;
-    --accent-color: #a78bfa;
+    --accent-color: #7664ac;
     --accent-hover: #8b5cf6;
 }
 
@@ -72,7 +72,7 @@ body.theme-motor {
     --bg-tertiary: #f8fafc;
     --border-color: #e2e8f0;
     --header-color: #607087;
-    --accent-color: #64748b;
+    --accent-color: #8693a7;
     --accent-hover: #475569;
 }
 

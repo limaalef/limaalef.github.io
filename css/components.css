@@ -159,7 +159,6 @@ h1 {
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
     transition: all 0.3s ease;
 }
 
@@ -732,7 +731,13 @@ input[type="text"]:focus {
 
 /* Corpo do Modal */
 .modal-body {
+    margin: 0 auto;
     padding: 20px;
+}
+
+.modal-score {
+    font-size: 1.8em;
+    margin-top: 8px;
 }
 
 .detail-section {
@@ -852,7 +857,7 @@ input[type="text"]:focus {
 
 .motor-event-accordion {
     margin-bottom: 12px;
-    border: 1px solid var(--border-color);
+    /* border: 1px solid var(--border-color); */
     border-radius: 8px;
     overflow: hidden;
     background: var(--bg-secondary);
@@ -903,7 +908,7 @@ input[type="text"]:focus {
 }
 
 .motor-event-content {
-    padding: 16px;
+    padding: 16px 0;
     animation: slideDown 0.3s ease-out;
 }
 
@@ -1501,40 +1506,6 @@ input[type="text"]:focus {
 .state-box h2 { font-size: 1.1rem; margin: 0 0 6px; color: var(--text-primary); }
 .state-box p  { font-size: 0.9rem; margin: 0; }
 
-/* ── pagination ── */
-.cl-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 28px;
-    flex-wrap: wrap;
-}
-.cl-pagination button {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 7px 13px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.cl-pagination button:hover:not(:disabled) {
-    background: var(--accent-color);
-    color: #fff;
-    border-color: var(--accent-color);
-}
-.cl-pagination button:disabled {
-    opacity: 0.4;
-    cursor: default;
-}
-.cl-pagination .page-info {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    padding: 0 4px;
-}
-
 .cl-dot.added    { background: var(--success-color); }
 .cl-dot.modified { background: var(--warning-color); }
 .cl-dot.removed  { background: var(--error-color); }
@@ -1623,10 +1594,21 @@ input[type="text"]:focus {
     padding: 1rem 0 0 0 ;
 }
 
+#tihGrid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* momentum scroll no iOS */
+    scrollbar-width: none;             /* Firefox */
+    padding-bottom: 4px;              /* evita cortar sombra dos cards */
+}
+
 .tih-grid::-webkit-scrollbar { display: none; }
 
 .tih-card {
-    flex: 0 0 200px;
+    scroll-snap-align: start;
+    flex: 0 0 auto;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 10px;
@@ -1767,7 +1749,7 @@ input[type="text"]:focus {
     }
     
     .motor-event-content {
-        padding: 12px;
+        padding: 12px 0;
     }
 
     /* Footer */
@@ -1796,6 +1778,10 @@ input[type="text"]:focus {
     select, input[type="text"] {
         width: 100%;
     }
+
+    .controls {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 640px) {
@@ -1813,6 +1799,10 @@ input[type="text"]:focus {
         border-radius: 0px;
         max-width: 100%;
         max-height: 100%;
+    }
+
+    .detail-grid.technical {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
 }
 

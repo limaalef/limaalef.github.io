@@ -119,16 +119,9 @@ async function loadChangelog() {
     content.innerHTML = `<div class="state-box"><div class="icon">⏳</div><h2>${LanguageManager.t('cl_loading')}</h2><p>${LanguageManager.t('cl_wait')}</p></div>`;
 
     try {
-        const url = new URL(CONFIG.CHANGELOG_URL);
-        url.searchParams.set('page', State.page);
-        url.searchParams.set('limit', State.limit);
-        if (State.mode) url.searchParams.set('mode', State.mode);
-
-        const resp = await fetch(url.toString());
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-
-        if (!data.success) throw new Error('API retornou erro');
+        const page = State.page
+        const limit = State.limit
+        const data = await APIService.fetchChangelog(page, limit);
 
         const items = data.data || [];
         State.totalPages = data.pagination?.total_pages || 1;
@@ -166,7 +159,7 @@ const State = {
     totalPages: 1,
     mode:       '',
     action:     '',
-    limit:      50
+    limit:      10
 };
 
 /* ── init ── */

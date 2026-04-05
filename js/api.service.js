@@ -19,26 +19,49 @@ const APIService = {
 
         return data;
     },
+
     async fetchById(id, sport) {
         const url = new URL(CONFIG.API_URLS[sport]);
         url.searchParams.set('id', id);
+
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const data = await response.json();
         if (!data.success) throw new Error('API retornou erro');
+
         return data;
     },
+
+    async fetchChangelog(page, itemsPerPage) {
+        const url = new URL(CONFIG.CHANGELOG_URL);
+        url.searchParams.set('page', page);
+        url.searchParams.set('limit', itemsPerPage);
+
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        if (!data.success) throw new Error('API retornou erro');
+
+        return data;
+    },
+
     async fetchTodayInHistory() {
         const base = CONFIG.API_URLS['football'].replace(/\?$/, '');
         const url = new URL(base);
         url.searchParams.set('today_in_history', 'true');
+        url.searchParams.set('fields', 'id,date,home_team,away_team,championship');
 
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
         const data = await response.json();
         if (!data.success) throw new Error('API retornou erro');
+        
         return data;
     },
+
     transformData(apiResponse) {
         if (CONFIG.currentSport === 'motor') {
             return (apiResponse.data || []).map(item => ({

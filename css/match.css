@@ -1,0 +1,41 @@
+body {
+    background: var(--bg-secondary);
+}
+
+.container {
+    max-width: 100%;
+    padding: 0rem;
+}
+
+.match-page {
+    margin: 0 auto;
+    padding: 0rem;
+}
+
+.header-content {
+    justify-content: space-between;
+    max-width: 1600px;
+}
+
+.header-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.lang-btn {
+    background: var(--accent-color);
+    color: white;
+}
+
+.modal-header {
+    border-radius: 0rem !important;
+}
+
+.modal-body {
+    max-width: 880px;
+}
+
+.motor-event-accordion {
+    background-color: #ffffff00;
+}
