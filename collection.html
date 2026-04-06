@@ -6,6 +6,7 @@
     <title>Acervo - Sports Archive</title>
     <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
     <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
  
     <!-- Meta Tags Básicas -->
     <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
@@ -67,29 +68,35 @@
 crossorigin="anonymous"></script>
 <body class="theme-football">
     <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="index.html">
-                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="site-logo" style="display: none;">🏆</div>
-                </a>
-            </div>
-            
-            <div class="sport-selector">
-                <button class="sport-btn football active" data-sport="football" id="footballBtn">
-                    ⚽<span data-i18n="football">Futebol</span>
-                </button>
-                <button class="sport-btn others" data-sport="others" id="othersBtn">
-                    🏀<span data-i18n="otherSports">Outros Esportes</span>
-                </button>
-                <button class="sport-btn motor" data-sport="motor" id="motorBtn">
-                    🏎️<span data-i18n="motorSports">Automobilismo</span>
-                </button>
-            </div>
+        <div class="header-frame" id="header"
+            data-title="Coleção"
+            data-back="true"
+            data-actions='
+                <div class="sport-selector">
+                    <button class="sport-btn football active" data-sport="football" id="footballBtn">
+                        ⚽<span data-i18n="football">Futebol</span>
+                    </button>
+                    <button class="sport-btn others" data-sport="others" id="othersBtn">
+                        🏀<span data-i18n="otherSports">Outros Esportes</span>
+                    </button>
+                    <button class="sport-btn motor" data-sport="motor" id="motorBtn">
+                        🏎️<span data-i18n="motorSports">Automobilismo</span>
+                    </button>
+                </div>
+            '>        
+        </div>
+        
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display: none;"
+                    title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
         </div>
     </header>
     
     <div class="container">
+        <div class="section-divider"></div>
+
         <div class="stats-container">
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">
@@ -107,9 +114,11 @@ crossorigin="anonymous"></script>
             </div>
         </div>
 
+        <div class="section-divider"></div>
+
         <div class="controls">
             <div class="filter-options">
-                <div class="filter-sub-group">
+                <div class="filter-sub-group expand">
                     <div class="control-group" style="max-width: 95px;">
                         <div class="dropdown-group">
                             <label data-i18n="items">Itens:</label>
@@ -148,18 +157,14 @@ crossorigin="anonymous"></script>
                             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                             <span data-i18n="list">Lista</span>
                         </div>
-                    </div>
 
-                    <div class="view-toggle">
                         <div class="video-filter-btn" id="videoFilterBtn">
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                                 <polygon points="5,3 19,12 5,21" fill="currentColor"/>
                             </svg>
                             <span data-i18n="withVideo">Com Vídeo</span>
                         </div>
-                    </div>
-                    
-                    <div class="view-toggle">
+
                         <div class="lang-btn" id="langToggle" title="Change language / Mudar idioma">
                             <span id="langFlag">🇧🇷</span>
                         </div>
@@ -197,7 +202,7 @@ crossorigin="anonymous"></script>
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <button class="close-btn" onclick="MatchModal.close()">×</button>
+                <button class="btn close-btn" onclick="MatchModal.close()">×</button>
                 <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
                 <div id="modalScore" class="modal-score"></div>
             </div>

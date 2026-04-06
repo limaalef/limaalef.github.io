@@ -6,6 +6,7 @@
     <title>Partida — Sports Archive</title>
     <meta name="description" content="Confira os dados desta incrível partida.">
     <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!-- Meta Tags Básicas -->
     <meta name="description" content="Confira os dados desta incrível partida.">
@@ -67,21 +68,17 @@
 crossorigin="anonymous"></script>
 <body class="theme-football">
     <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="index.html">
-                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="site-logo" style="display: none;">🏆</div>
-                </a>
-            </div>
-
-            <div class="header-options">
-                <div class="control-group" style="display:none;">
-                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
-                        <span id="langFlag">🇧🇷</span>
-                    </button>
-                </div>
-            </div>
+        <div class="header-frame" id="header"
+            data-title="Match"
+            data-back="true"
+            '>        
+        </div>
+        
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display: none;"
+                    title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
         </div>
     </header>
 

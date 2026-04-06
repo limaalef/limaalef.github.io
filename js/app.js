@@ -40,10 +40,8 @@ const App = {
             btn.classList.toggle('active', btn.dataset.sport === sport);
         });
         
-        // Remove todos os temas
         document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
         
-        // Adiciona o tema apropriado
         if (sport === 'football') {
             document.body.classList.add('theme-football');
         } else if (sport === 'others') {
@@ -57,7 +55,6 @@ const App = {
     readUrlParams() {
         const params = new URLSearchParams(window.location.search);
 
-        // ?id=N — abre em tela cheia via FullView (sem modal, sem lista)
         const id = parseInt(params.get('id'));
         const sportParam = params.get('sport') || 'football';
         if (id > 0) {
@@ -66,7 +63,6 @@ const App = {
             return true;
         }
  
-        // ?sport=football|others|motor
         const sport = params.get('sport');
         if (sport && ['football', 'others', 'motor'].includes(sport)) {
             CONFIG.currentSport = sport;
@@ -79,11 +75,9 @@ const App = {
             });
         }
  
-        // ?page=N
         const page = parseInt(params.get('page'));
         if (page > 0) AppState.currentPage = page;
  
-        // ?view=grid|list
         const view = params.get('view');
         if (view && ['grid', 'list'].includes(view)) {
             AppState.currentView = view;
@@ -92,7 +86,6 @@ const App = {
             });
         }
  
-        // ?search=texto
         const search = params.get('search');
         if (search) {
             const searchInput = document.getElementById('searchInput');
@@ -102,7 +95,7 @@ const App = {
     init() {
         LanguageManager.init();
         if (this.readUrlParams()) return;
-        
+
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
         document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
         document.getElementById('motorBtn').addEventListener('click', () => this.switchSport('motor'));
@@ -152,4 +145,8 @@ const App = {
     }
 };
 
-window.addEventListener('DOMContentLoaded', () => App.init());
+// Aguarda o header estar no DOM antes de inicializar
+window.addEventListener('DOMContentLoaded', async () => {
+    await window._headerPromise;
+    App.init();
+});

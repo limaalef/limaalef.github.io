@@ -18,7 +18,7 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: var(--page-width-size);
     padding: 0px;
     margin: 0 auto;
 }
@@ -34,13 +34,13 @@ header {
 }
 
 .header-content {
-    max-width: 1400px;
+    max-width: var(--page-width-size);
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     padding: 12px 20px;
-    gap: 0;
+    gap: 16px;
 }
 
 .match-container {
@@ -52,7 +52,7 @@ header {
 }
 
 .site-logo-img {
-    max-height: 50px;
+    max-height: var(--logo-size);
     object-fit: contain;
     transition: transform 0.3s ease;
 }
@@ -61,8 +61,18 @@ header {
     .site-logo-img { filter: invert(1); }
 }
 
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .site-logo-img:hover {
     transform: scale(1.05);
+}
+
+.page-title {
+    font-size: var(--font-size-xl);
 }
 
 /* Home */
@@ -122,7 +132,7 @@ header {
 
 .home-section-action:hover {
     padding: 3px 6px;
-    border-radius: 0.35rem;
+    border-radius: var(--border-radius-size-sm);
     background-color: var(--accent-color);
     color: var(--bg-secondary);
 }
@@ -143,7 +153,7 @@ header {
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: var(--border-radius-size-xl);
     padding: 14px;
     box-sizing: border-box;
     min-height: 90px;
@@ -195,7 +205,7 @@ header {
     border: 1px solid var(--border-color);
     background: var(--bg-secondary);
     color: var(--text-primary);
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     cursor: pointer;
     font-weight: 600;
     font-size: var(--font-size-md);
@@ -246,7 +256,6 @@ h1 {
 
 /* ESTATÍSTICAS */
 .stats {
-    border-bottom: 1px solid var(--border-color);
     padding: 1rem;
     display: flex;
     gap: 10px;
@@ -257,7 +266,7 @@ h1 {
     flex: 1;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: var(--border-radius-size-md);
     padding: 7px 14px;
     display: flex;
     align-items: baseline;
@@ -273,7 +282,7 @@ h1 {
 }
 
 .stat-label {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-mds);
     color: var(--text-secondary);
 }
 
@@ -300,7 +309,7 @@ h1 {
     display: flex;
     align-items: center;
     background-color: var(--bg-secondary);
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     color: var(--text-tertiary);
     min-width: 90px;
     gap: 8px;
@@ -314,7 +323,8 @@ h1 {
 
 .dropdown-group {
     flex:1;
-    border: 1px solid var(--border-color)
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-md);
 }
 
 .f-select {
@@ -367,7 +377,7 @@ select,
 input[type="text"] {
     padding: 0.4rem 0.75rem;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--border-radius-size-sm);
     font-size: 0.95em;
     background: var(--bg-secondary);
     color: var(--text-primary);
@@ -408,6 +418,7 @@ input[type="text"]:focus {
     color: var(--text-tertiary);
     font-size: var(--font-size-md);
     font-weight: 500;
+    min-width: 150px;
 }
 
 .pagination .value.contrast {
@@ -423,7 +434,7 @@ input[type="text"]:focus {
 .view-toggle {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: var(--border-radius-size-md);
     padding: 3px;
     display: flex;
     gap: 2px;
@@ -438,7 +449,7 @@ input[type="text"]:focus {
     align-items: center;
     gap: 5px;
     padding: 5px 10px;
-    border-radius: 7px;
+    border-radius: var(--border-radius-size-sm);
     font-size: var(--font-size-sm);
     cursor: pointer;
 }
@@ -475,7 +486,7 @@ input[type="text"]:focus {
 .match-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: var(--border-radius-size-xl);
     padding: 16px;
     cursor: pointer;
     transition: all 0.3s;
@@ -571,7 +582,7 @@ input[type="text"]:focus {
     top: 12px;
     right: 12px;
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: var(--border-radius-size-lg);
     font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
@@ -662,7 +673,7 @@ input[type="text"]:focus {
 .tech-badge {
     padding: 4px 10px;
     border: 1px solid var(--text-primary);
-    border-radius: 4px;
+    border-radius: var(--border-radius-size-xs);
     font-size: var(--font-size-mds);
     font-weight: 600;
     color: var(--text-primary);
@@ -674,7 +685,7 @@ input[type="text"]:focus {
    ======================================== */
 .matches-list {
     background: var(--bg-secondary);
-    border-radius: 10px;
+    border-radius: var(--border-radius-size-md);
     padding: 12px;
     transition: all 0.3s ease;
 }
@@ -727,7 +738,7 @@ input[type="text"]:focus {
 .modal-content {
     background: var(--bg-secondary);
     backdrop-filter: blur(6px);
-    border-radius: 15px;
+    border-radius: var(--border-radius-size-xl);
     max-width: 856px;
     width: 100%;
     max-height: 90vh;
@@ -752,7 +763,7 @@ input[type="text"]:focus {
 
 .modal-content::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    border-radius: var(--border-radius-size-md);
 }
 
 .modal-content::-webkit-scrollbar-thumb:hover {
@@ -769,7 +780,7 @@ input[type="text"]:focus {
     background: var(--accent-color);
     color: var(--text-accent-color);
     padding: 20px;
-    border-radius: 15px 15px 0 0;
+    border-radius: var(--border-radius-size-xl) var(--border-radius-size-xl) 0 0;
     position: relative;
     transition: background 0.3s ease;
 }
@@ -779,19 +790,36 @@ input[type="text"]:focus {
     font-weight: 400;
 }
 
+.btn {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-xxl);
+    width: 35px;
+    height: 35px;
+    border-radius: var(--border-radius-size-circle);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-btn {
+    border: 1px solid var(--border-color);
+}
+
+.back-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
 .close-btn {
+    border: 0px;
     position: absolute;
     top: 15px;
     right: 15px;
     background: rgba(0, 0, 0, 0.3);
-    border: none;
-    color: var(--text-primary);
-    font-size: var(--font-size-xxl);
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s;
 }
 
 .close-btn:hover {
@@ -893,7 +921,7 @@ input[type="text"]:focus {
     padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: var(--border-radius-size-lg);
     background: #000;
     margin-top: 12px;
 }
@@ -904,7 +932,7 @@ input[type="text"]:focus {
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 12px;
+    border-radius: var(--border-radius-size-lg);
 }
 
 /* Corpo do Modal */
@@ -932,7 +960,7 @@ input[type="text"]:focus {
     padding: 12px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     transition: background 0.3s ease;
 }
 
@@ -955,7 +983,7 @@ input[type="text"]:focus {
     flex-direction: column;
     gap: 1px;
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: var(--border-radius-size-xl);
     overflow: hidden;
 }
 
@@ -981,7 +1009,7 @@ input[type="text"]:focus {
 
 .badge {
     padding: 6px 14px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     font-weight: 600;
     font-size: var(--font-size-md);
 }
@@ -1003,7 +1031,7 @@ input[type="text"]:focus {
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     color: #000;
     padding: 6px 12px;
-    border-radius: 14px;
+    border-radius: var(--border-radius-size-xl);
     text-decoration: none;
     transition: all 0.3s ease;
     font-weight: 700;
@@ -1050,7 +1078,7 @@ input[type="text"]:focus {
 .motor-event-accordion {
     margin-bottom: 12px;
     /* border: 1px solid var(--border-color); */
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     overflow: hidden;
     background: var(--bg-secondary);
 }
@@ -1126,7 +1154,7 @@ input[type="text"]:focus {
 }
 
 .footer-content {
-    max-width: 1400px;
+    max-width: var(--page-width-size);
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1167,7 +1195,7 @@ input[type="text"]:focus {
 }
 
 .footer-bottom {
-    max-width: 1400px;
+    max-width: var(--page-width-size);
     margin: 0 auto;
     text-align: center;
     padding-top: 20px;
@@ -1203,10 +1231,17 @@ input[type="text"]:focus {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    
     padding: 14px 20px;
-    border-radius: 16px;
+    border-radius: var(--border-radius-size-xl);
+    font-size: var(--font-size-md);
+    font-weight: 500; 
+    width: max-content;
+    max-width: 90%;
+    z-index: 2000;
+    animation: slideInCenter 0.3s ease-out;
+}
 
+.notification {
     /* Glass effect */
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(12px);
@@ -1221,17 +1256,7 @@ input[type="text"]:focus {
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
     /* Texto */
-    color: #fff;
-    font-size: 14px;
-    font-weight: 500;
-
-    /* Ajuste de largura */
-    width: max-content;
-    max-width: 90%;
-
-    z-index: 2000;
-
-    animation: slideInCenter 0.3s ease-out;
+    color: var(--text-primary);
 }
 
 .notification.hide {
@@ -1305,7 +1330,7 @@ input[type="text"]:focus {
 .cl-dot {
     width: 9px;
     height: 9px;
-    border-radius: 50%;
+    border-radius: var(--border-radius-size-circle);
     flex-shrink: 0;
     margin-top: 6px;
 }
@@ -1332,7 +1357,7 @@ input[type="text"]:focus {
 .cl-action-badge {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 20px;
+    border-radius: var(--border-radius-size-circle);
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1384,7 +1409,7 @@ input[type="text"]:focus {
     font-size: 0.75rem;
     font-weight: 600;
     padding: 2px 8px;
-    border-radius: 20px;
+    border-radius: var(--border-radius-size-circle);
 }
 
 .cl-group-items {
@@ -1405,7 +1430,7 @@ input[type="text"]:focus {
 .cl-dot {
     width: 7px;
     height: 7px;
-    border-radius: 50%;
+    border-radius: var(--border-radius-size-circle);
     flex-shrink: 0;
     margin-top: 2px;
 }
@@ -1423,7 +1448,7 @@ input[type="text"]:focus {
 .cl-item-badge {
     flex-shrink: 0;
     padding: 1px 6px;
-    border-radius: 20px;
+    border-radius: var(--border-radius-size-circle);
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1474,7 +1499,7 @@ input[type="text"]:focus {
     font-weight: 500;
     padding: 6px 12px;
     border: 1px solid var(--accent-color);
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     transition: background 0.2s, color 0.2s;
 }
 .back-link:hover {
@@ -1496,7 +1521,7 @@ input[type="text"]:focus {
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--border-radius-size-md);
     padding: 8px 12px;
     font-size: 0.9rem;
     cursor: pointer;
@@ -1516,7 +1541,7 @@ input[type="text"]:focus {
 .sync-entry {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--border-radius-size-lg);
     margin-bottom: 16px;
     overflow: hidden;
 }
@@ -1544,7 +1569,7 @@ input[type="text"]:focus {
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    border-radius: 20px;
+    border-radius: var(--border-radius-size-circle);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
@@ -1567,7 +1592,7 @@ input[type="text"]:focus {
     align-items: center;
     gap: 4px;
     padding: 3px 9px;
-    border-radius: 20px;
+    border-radius: var(--border-radius-size-circle);
     font-size: var(--font-size-sm);
     font-weight: 600;
 }
@@ -1634,7 +1659,7 @@ input[type="text"]:focus {
 
 .change-item:has(.change-id-link):hover { 
     background-color: var(--bg-tertiary);
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius-size-md);
 }
 
 .change-desc { flex: 1; line-height: 1.4; }
@@ -1680,7 +1705,7 @@ input[type="text"]:focus {
     gap: 4px;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--border-radius-size-sm);
     padding: 2px 8px;
     font-size: 0.75rem;
 }
@@ -1715,7 +1740,7 @@ input[type="text"]:focus {
     height: 32px;
     border: 1px solid var(--border-color);
     background: var(--bg-secondary);
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius-size-md);
     font-size: var(--font-size-xxl);
     cursor: pointer;
     color: var(--accent-color);
@@ -1765,7 +1790,7 @@ input[type="text"]:focus {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    border-radius: 10px;
+    border-radius: var(--border-radius-size-md);
     padding: 10px 12px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
@@ -1790,7 +1815,7 @@ input[type="text"]:focus {
     font-weight: 700;
     color: var(--accent-color);
     background: var(--bg-accent-color);
-    border-radius: 4px;
+    border-radius: var(--border-radius-size-xs);
     padding: 1px 5px;
 }
 
@@ -1886,8 +1911,6 @@ input[type="text"]:focus {
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .site-logo-img { max-height: 45px; }
-
     /* Modal */
     .score-desktop {
         display: none !important;
@@ -1939,8 +1962,6 @@ input[type="text"]:focus {
 }
 
 @media (max-width: 640px) {
-    .site-logo-img { max-height: 40px; }
-
     .modal {
         align-items: flex-start;
         justify-content: flex-start;
@@ -1970,7 +1991,7 @@ input[type="text"]:focus {
     .sync-entry-header { flex-direction: column; align-items: flex-start; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 496px) {
     .motor-event-header-content {
         flex-direction: column;
         align-items: flex-start;
@@ -1983,5 +2004,46 @@ input[type="text"]:focus {
     
     .motor-event-date {
         font-size: var(--font-size-sm);
+    }
+
+    .control-group {
+        max-width: 100% !important;
+    }
+
+    .filter-options{
+        margin-bottom: -10px;
+    }
+
+    .filter-sub-group.expand {
+        width: 100%;
+    }
+
+    .search-box {
+        position: fixed;
+        bottom: 30px;
+        width: 86%;
+        left: 7%;
+        z-index: 1000;
+        height: 40px;
+    }
+
+    .search-box input {
+        border-radius: var(--border-radius-size-circle);
+        
+        /* Glass effect */
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        /* Borda suave estilo iOS */
+        border: 1px solid rgba(255, 255, 255, 0.25);
+
+        /* Sombra leve */
+        box-shadow: 
+            0 8px 30px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+        /* Texto */
+        color: var(--text-primary);
     }
 }
