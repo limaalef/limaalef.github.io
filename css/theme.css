@@ -3,25 +3,23 @@
    ======================================== */
 :root {
     /* Backgrounds */
-    --bg-primary: #ece8e8;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f3f4f6;
+    --bg-primary: #f5f4f0;
+    --bg-secondary: #eeece7;
+    --bg-tertiary: #dadbdd;
     
     /* Textos */
-    --text-primary: #2c3e50;
-    --text-secondary: #64748b;
-    --text-tertiary: #94a3b8;
+    --text-primary: #1a1a18;
+    --text-secondary: #2e2e2c;
+    --text-tertiary: #a0a09a;
     
     /* Cores de Interface */
-    --header-color: #224b40;
-    --border-color: #e2e8f0;
-    --accent-color: #62b9a2;
-    --accent-hover: #6ed8bc;
-    
-    /* Sombras */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
+    --header-color: var(--bg-primary);
+    --border-color: #d8d6d0;
+
+    --accent-color: #3b82f6;
+    --accent-hover: #629bf8;
+    --bg-accent-color: #ccdcf5;
+    --text-accent-color: #ffffff;
     
     /* Cores de Status */
     --success-color: #10b981;
@@ -37,65 +35,96 @@
     --text-warning: #92400e;
     --text-error: #991b1b;
 
+    /* Cores dAs categorias */
+    --mode-football: #3b82f6;
+    --mode-others: #f59e0b;
+    --mode-motor: #ef4444;
+
+    /* Font-sizes */
+    --font-size-xs: 10.5px;
+    --font-size-mds: 11.5px;
+    --font-size-sm: 12.5px;
+    --font-size-mdm: 13.5px;
+    --font-size-md: 14.5px;
+    --font-size-lg: 16.5px;
+    --font-size-xl: 18.5px;
+    --font-size-xxl: 18.5px;
+    --font-size-mxxl: 29px;
+    --font-size-xxxl: 33px;
+
+    @media (max-width: 720px) {
+        --font-size-xs: 10px;
+        --font-size-mds: 11px;
+        --font-size-sm: 12px;
+        --font-size-mdm: 13px;
+        --font-size-md: 14px;
+        --font-size-lg: 16px;
+        --font-size-xl: 18px;
+        --font-size-xxl: 18px;
+        --font-size-mxxl: 28px;
+        --font-size-xxxl: 32px;
+    }
+
+    @media (max-width: 480px) {
+        --font-size-xs: 9px;
+        --font-size-mds: 10px;
+        --font-size-sm: 11px;
+        --font-size-mdm: 12px;
+        --font-size-md: 13px;
+        --font-size-lg: 15px;
+        --font-size-xl: 17px;
+        --font-size-xxl: 19px;
+        --font-size-mxxl: 26px;
+        --font-size-xxxl: 30px;
+    }
+
     /* Cores dos modos */
-    .mode-football  { background: #dbeafe; color: #1d4ed8; }
-    .mode-multisport { background: #ede9fe; color: #6d28d9; }
-    .mode-motorsport { background: #e2e8f0; color: #475569; }
+    .mode-football  { color: #fff; background-color: var(--mode-football); }
+    .mode-multisport { color: #000; background-color: var(--mode-others); }
+    .mode-motorsport { color: #fff; background-color: var(--mode-motor); }
 }
 
 /* TEMA: OUTROS FUTEBOL */
 body.theme-football {
-    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #96aec7 100%);
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f0f4f8;
-    --header-color: #2563eb;
-    --border-color: #e2e8f0;
     --accent-color: #3b82f6;
-    --accent-hover: #2563eb;
+    --accent-hover: #5795f8;
+    --text-accent-color: #ffffff;
 }
 
 /* TEMA: OUTROS ESPORTES */
 body.theme-others {
-    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #b9adcc 100%);
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f5f7fa;
-    --border-color: #e5e7eb;
-    --header-color: #514475;
-    --accent-color: #7664ac;
-    --accent-hover: #8b5cf6;
+    --accent-color: #f59e0b;
+    --accent-hover: #f7ad2e;
+    --text-accent-color: #000000;
 }
 
 /* TEMA: AUTOMOBILISMO */
 body.theme-motor {
-    --bg-primary: linear-gradient(135deg, #dce1e7 0%, #a1a7a7 100%);
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f8fafc;
-    --border-color: #e2e8f0;
-    --header-color: #607087;
-    --accent-color: #8693a7;
-    --accent-hover: #475569;
+    --accent-color: #ef4444;
+    --accent-hover: #f76767;
+    --text-accent-color: #ffffff;
 }
 
 /* DARK MODE - TEMA PADRÃO */
 @media (prefers-color-scheme: dark) {
     :root {
         /* Backgrounds */
-        --bg-primary: #292929;
-        --bg-secondary: #383838;
-        --bg-tertiary: #515152;
+        --bg-primary: #0f0f0f;
+        --bg-secondary: #161616;
+        --bg-tertiary: #525252;
         
         /* Textos */
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --text-tertiary: #94a3b8;
+        --text-primary: #e8e8e8;
+        --text-secondary: #aaaaaa;
+        --text-tertiary: #555555;
         
         /* Interface */
-        --border-color: #5f5f5f;
-        
-        /* Sombras */
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
-        --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
-        --shadow-lg: 0 12px 32px rgba(0,0,0,0.7);
+        --border-color: #333333;
+
+        --accent-color: #e8ff4a;
+        --accent-hover: #bdda07;
+        --bg-accent-color: #1e2200;
+        --text-accent-color: #000000;
 
         /* Cores de Status */
         --bg-success: #064e3b;
@@ -105,37 +134,6 @@ body.theme-motor {
         --text-success: #6ee7b7;
         --text-warning: #fcd34d;
         --text-error: #fca5a5;
-
-        /* Cores dos modos */
-        .mode-football   { background: #1e3a5f; color: #93c5fd; }
-        .mode-multisport { background: #2e1a4f; color: #c4b5fd; }
-        .mode-motorsport { background: #1e293b; color: #94a3b8; }
-    }
-
-    /* Dark Mode - Futebol */
-    body.theme-football {
-        --bg-primary: linear-gradient(135deg, #27354b 0%, #0f172a 100%);
-        --bg-secondary: #1e293b;
-        --bg-tertiary: #28374d;
-        --border-color: #475569;
-        --header-color: #2563eb;
-    }
-
-    /* Dark Mode - Outros Esportes */
-    body.theme-others {
-        --bg-primary: linear-gradient(135deg, #2f2f44 0%, #2a2a3e 100%);
-        --bg-secondary: #252535;
-        --bg-tertiary: #2d2d40;
-        --border-color: #3d3d52;
-        --header-color: #514475;
-    }
-
-    /* Dark Mode - Automobilismo */
-    body.theme-motor {
-        --bg-primary: linear-gradient(135deg, #293444 0%, #0a0f18 100%);
-        --bg-secondary: #1e293b;
-        --bg-tertiary: #334155;
-        --border-color: #475569;
     }
 }
 

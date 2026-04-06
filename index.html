@@ -85,69 +85,82 @@ crossorigin="anonymous"></script>
 
     <div class="container">
         <div class="home-container">
-            <h2 data-i18n="homeTitle">Confira a coleção por categoria</h2>
-
-            <!-- sport navigation -->
-            <div class="sport-nav">
-                <a href="collection.html?sport=football" class="sport-nav-card">
-                    <span class="nav-icon">⚽</span>
-                    <span data-i18n="football">Futebol</span>
-                </a>
-                <a href="collection.html?sport=others" class="sport-nav-card">
-                    <span class="nav-icon">🏀</span>
-                    <span data-i18n="otherSports">Outros Esportes</span>
-                </a>
-                <a href="collection.html?sport=motor" class="sport-nav-card">
-                    <span class="nav-icon">🏎️</span>
-                    <span data-i18n="motorSports">Automobilismo</span>
-                </a>
-                <a href="https://acervo.dirsoament.com" class="sport-nav-card">
-                    <span class="nav-icon">🔗</span>
-                    <span data-i18n="dirsoament">Coleção do Dirso Ament</span>
-                </a>
+            
+            <div class="home-section">
+                <div class="home-section-header">
+                    <div class="home-section-header-title">
+                        <p class="home-section-title" data-i18n="homeTitle">Confira a coleção por categoria</p>
+                    </div>
+                </div>
+                <!-- sport navigation -->
+                <div class="sport-nav">
+                    <a href="collection.html?sport=football" class="sport-nav-card football">
+                        <div class="nav-icon">⚽</div>
+                        <p class="nav-text" data-i18n="football">Futebol</p>
+                    </a>
+                    <a href="collection.html?sport=others" class="sport-nav-card others">
+                        <div class="nav-icon">🏀</div>
+                        <p class="nav-text" data-i18n="otherSports">Outros Esportes</p>
+                    </a>
+                    <a href="collection.html?sport=motor" class="sport-nav-card motor">
+                        <div class="nav-icon">🏎️</div>
+                        <p class="nav-text" data-i18n="motorSports">Automobilismo</p>
+                    </a>
+                    <a href="https://acervo.dirsoament.com" class="sport-nav-card">
+                        <div class="nav-icon">🔗</div>
+                        <p class="nav-text" data-i18n="dirsoament">Coleção do Dirso Ament</p>
+                    </a>
+                </div>
             </div>
+
+            <div class="section-divider"></div>
 
             <!-- ── SECTION: today in history ── -->
             <div class="home-section">
                 <div class="home-section-header">
-                    <h2>📅 <span data-i18n="sectionTodayTitle">Hoje na história</span></h2>
+                    <div class="home-section-header-title">
+                        <p class="home-section-title" data-i18n="sectionTodayTitle">Hoje na história</p>
+                        <p class="home-section-detail" id="today-date">hoje</p>
+                    </div>
+
+                    <div class="home-section-header-action">
+                        <button class="nav-btn" id="tihPrev" aria-label="Anterior">‹</button>
+                        <button class="nav-btn" id="tihNext" aria-label="Próximo">›</button>
+                    </div>
                 </div>
+
                 <div class="today-history-wrapper">
-                    <button class="tih-nav-btn" id="tihPrev" aria-label="Anterior">‹</button>
                     <div class="today-history-list" id="todayHistory">
                         <div class="section-state">
                             <p data-i18n="loading">Carregando jogos...</p>
                         </div>
                     </div>
-                    <button class="tih-nav-btn" id="tihNext" aria-label="Próximo">›</button>
+                    
                 </div>
                 <div class="tih-pagination" id="tihPagination" style="display:none;">
                     <span id="tihPageInfo"></span>
                 </div>
             </div>
 
+            <div class="section-divider"></div>
+
             <!-- ── SECTION 1: recent changes ── -->
             <div class="home-section">
                 <div class="home-section-header">
-                    <h2>📋 <span data-i18n="sectionChangesTitle">Últimas alterações</span></h2>
-                    <a href="changelog.html" class="section-link" data-i18n="seeAllLink">Ver tudo →</a>
+                    <div class="home-section-header-title">
+                        <p class="home-section-title" data-i18n="sectionChangesTitle">Últimas alterações</p>
+                    </div>
+
+                    <div class="home-section-header-action">
+                        <a href="changelog.html" class="home-section-action" data-i18n="seeAllLink">Ver tudo →</a>
+                    </div>
                 </div>
+
                 <div class="changelog-list" id="recentChanges">
                     <div class="section-state">
                         <div class="icon">⏳</div>
                         <p data-i18n="loadingChanges">Carregando alterações recentes...</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- ── SECTION 2: HD storage (coming soon) ── -->
-            <div class="home-section">
-                <div class="home-section-header">
-                    <h2>💾 <span data-i18n="sectionHDTitle">Espaço em HDs</span></h2>
-                </div>
-                <div class="coming-soon-body">
-                    <div class="coming-soon-icon">🔧</div>
-                    <p data-i18n="comingSoonHD">Em breve</p>
                 </div>
             </div>
         </div>
@@ -156,8 +169,8 @@ crossorigin="anonymous"></script>
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close-btn" onclick="MatchModal.close()">×</button>
-                    <h2 id="modalTitle">Detalhes da Partida</h2>
-                    <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
+                    <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
+                    <div id="modalScore"></div>
                 </div>
                 <div class="modal-body" id="modalBody"></div>
             </div>

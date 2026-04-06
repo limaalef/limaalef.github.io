@@ -54,11 +54,6 @@
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
-<style>
-    .cl-pagination {
-        margin-top: 0px;
-    }
-</style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
 <script>
@@ -75,64 +70,82 @@ crossorigin="anonymous"></script>
         <div class="header-content">
             <div class="logo-container">
                 <a href="index.html">
-                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="site-logo" style="display: none;">🏆</div>
+                    <img src="logo.png" alt="Logo" class="site-logo-img"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="site-logo" style="display:none;">🏆</div>
                 </a>
             </div>
-            
-            <div class="header-options">
-                <div class="control-group">
-                    <button id="langToggle" class="lang-btn" style="display: none">
-                        <span id="langFlag">🇧🇷</span>
-                    </button>
-                </div>
+            <div style="flex:1"></div>
+            <div class="control-group">
+                <button id="langToggle" class="lang-btn" style="display: none;"
+                        title="Change language / Mudar idioma">
+                    <span id="langFlag">🇧🇷</span>
+                </button>
             </div>
         </div>
     </header>
 
     <div class="container">
-        <div class="changelog-container">
+        <div class="home-container">
 
             <div class="controls">
-                <div class="control-group">
-                    <label data-i18n="items">Itens:</label>
-                    <select id="limitFilter">
-                        <option value="10" selected>10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
+                <div class="filter-options">
+                    <div class="filter-sub-group">
+                        <div class="control-group">
+                            <div class="dropdown-group">
+                                <label data-i18n="items">Itens:</label>
+                                <select class="f-select highlighted" id="limitFilter">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="control-group">
-                    <label data-i18n="mode">Modo:</label>
-                    <select id="modeFilter">
-                        <option value="" data-i18n="allContent">Todos</option>
-                        <option value="football" data-i18n="modeFootball">Futebol</option>
-                        <option value="multisport" data-i18n="modeMultisport">Multiesporte</option>
-                        <option value="motorsport" data-i18n="modeMotorsport">Automobilismo</option>
-                    </select>
-                </div>
+                        <div class="control-group">
+                            <div class="dropdown-group">
+                                <label data-i18n="mode">Modo:</label>
+                                <select class="f-select" id="modeFilter">
+                                    <option value="" data-i18n="allContent">Todos</option>
+                                    <option value="football" data-i18n="modeFootball">Futebol</option>
+                                    <option value="multisport" data-i18n="modeMultisport">Multiesporte</option>
+                                    <option value="motorsport" data-i18n="modeMotorsport">Automobilismo</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="control-group">
-                    <label data-i18n="action">Ação:</label>
-                    <select id="actionFilter">
-                        <option value="" data-i18n="allContent">Todas as ações</option>
-                        <option value="added" data-i18n="modeAdded">✅ Adicionados</option>
-                        <option value="modified" data-i18n="modeModified">✏️ Modificados</option>
-                        <option value="removed" data-i18n="modeRemoved">🗑️ Removidos</option>
-                    </select>
+                        <div class="control-group">
+                            <div class="dropdown-group">
+                                <label data-i18n="action">Ação:</label>
+                                <select class="f-select" id="actionFilter">
+                                    <option value="" data-i18n="allContent">Todas as ações</option>
+                                    <option value="added" data-i18n="modeAdded">✅ Adicionados</option>
+                                    <option value="modified" data-i18n="modeModified">✏️ Modificados</option>
+                                    <option value="removed" data-i18n="modeRemoved">🗑️ Removidos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="pagination" id="pagination" style="display:none;">
-                    <button id="firstPage">«</button>
-                     <button id="prevPage">‹</button>
-                    <span class="page-info" id="pageInfo">Página 1 de 1</span>
-                    <button id="nextPage">›</button>
-                    <button id="lastPage">»</button>
+                <div class="pagination" id="pagination">
+                    <div class="back-btn-group">
+                        <button id="firstPage">«</button>
+                        <button id="prevPage">‹</button>
+                    </div>
+                    <div class="pages-info-group">
+                        <span class="label" data-i18n="page">Página</span>
+                        <span class="value contrast" id="pageNumber">1</span>
+                        <span class="label" data-i18n="pageSeparator">de</span>
+                        <span class="value" id="pageTotal">1</span>
+                    </div>
+                    <div class="back-btn-group">
+                        <button id="nextPage">›</button>
+                        <button id="lastPage">»</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="changelogContent">
+            <div class="changelog-group" id="changelogContent">
                 <div class="state-box">
                     <div class="icon">⏳</div>
                     <h2 id="loadingTitle">Carregando changelog...</h2>
@@ -145,8 +158,8 @@ crossorigin="anonymous"></script>
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close-btn" onclick="MatchModal.close()">×</button>
-                    <h2 id="modalTitle">Detalhes da Partida</h2>
-                    <div id="modalScore" style="font-size: 1.8em; margin-top: 8px;"></div>
+                    <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
+                    <div id="modalScore"></div>
                 </div>
                 <div class="modal-body" id="modalBody"></div>
             </div>

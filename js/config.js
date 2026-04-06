@@ -1,19 +1,23 @@
 const CONFIG = {
     API_URLS: {
-        football: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/matches?',
-        others: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/matches?type=multi',
-        motor: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/matches?type=motor'
+        football: 'https://api.limaalef.com/archive/matches?',
+        others: 'https://api.limaalef.com/archive/matches?type=multi',
+        motor: 'https://api.limaalef.com/archive/matches?type=motor'
     },
-    CHANGELOG_URL: 'https://n12o72kc41.execute-api.sa-east-1.amazonaws.com/v1/changelog',
+    CHANGELOG_URL: 'https://api.limaalef.com/archive/changelog',
     DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football',
     videoFilter: false
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/components/footer.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('footer').innerHTML = html;
-        });
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+
+    if (!isMobile) {
+        fetch('/components/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer').innerHTML = html;
+            });
+    }
 });

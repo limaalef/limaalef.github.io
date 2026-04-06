@@ -6,7 +6,7 @@ const APIService = {
         const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
-
+        
         if (CONFIG.videoFilter) {
             url.searchParams.append('embed', 'true');
         }

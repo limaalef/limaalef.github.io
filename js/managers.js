@@ -232,7 +232,7 @@ const MatchModal = {
         const phase = LanguageManager.translateText(match.Fase);
         
         title.innerHTML = `
-            <div class="modal-title-competition">${competition}</div>
+            <div class="section-title modal-title-competition">${competition}</div>
             <div class="modal-title-phase">${phase}</div>
         `;
         
@@ -257,7 +257,7 @@ const MatchModal = {
                 <div class="score-desktop">
                     <span class="score-team-name">${match.Mandante}</span>
                     ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-value">${homeGoals} x ${awayGoals}</span>
+                    <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
                     ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-team-name">${match.Visitante}</span>
                     <span class="badge badge-warning score-status-badge">⏳ ${pendingText}</span>
@@ -287,7 +287,7 @@ const MatchModal = {
                 <div class="score-desktop">
                     <span class="score-team-name">${match.Mandante}</span>
                     ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-value">${homeGoals} x ${awayGoals}</span>
+                    <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
                     ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-team-name">${match.Visitante}</span>
                 </div>
@@ -316,6 +316,7 @@ const MatchModal = {
         const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
 
         const matchInfoTitle = LanguageManager.t('matchInfo');
+        const tvInfoTitle = LanguageManager.t('tvInfo');
         const technicalInfoTitle = LanguageManager.t('technicalInfo');
         const storageTitle = LanguageManager.t('storageInfo');
         const observationsTitle = LanguageManager.t('observations');
@@ -325,48 +326,56 @@ const MatchModal = {
         console.log(match)
         
         body.innerHTML = `
-            ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.style.display='none'">` : ''}
+            ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.onerror=null; this.remove();">` : ''}
             
+            <div class="modal-division">
             <div class="detail-section">
-                <div class="section-title">${matchInfoTitle}</div>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('date')}</div>
-                        <div class="detail-value">${Utils.formatDate(match.Data)}</div>
+                <div class="section-title modal-style">${matchInfoTitle}</div>
+                <div class="detail-list">
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('date')}</span>
+                        <span class="detail-list-value">${Utils.formatDate(match.Data)}</span>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('competition')}</div>
-                        <div class="detail-value">${competition || 'N/A'}</div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('competition')}</span>
+                        <span class="detail-list-value">${competition || 'N/A'}</span>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('phase')}</div>
-                        <div class="detail-value">${phase || 'N/A'}</div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('phase')}</span>
+                        <span class="detail-list-value">${phase || 'N/A'}</span>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('stadium')}</div>
-                        <div class="detail-value">${match.Estadio || 'N/A'}</div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('stadium')}</span>
+                        <span class="detail-list-value">${match.Estadio || 'N/A'}</span>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('type')}</div>
-                        <div class="detail-value">${match.Tipo || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('broadcaster')}</div>
-                        <div class="detail-value">${match.Emissora || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('origin')}</div>
-                        <div class="detail-value">${match.Origem || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('narration')}</div>
-                        <div class="detail-value">${match.Narração || 'N/A'}</div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('type')}</span>
+                        <span class="detail-list-value">${match.Tipo || 'N/A'}</span>
                     </div>
                 </div>
             </div>
+
+            <div class="detail-section">
+                <div class="section-title modal-style">${tvInfoTitle}</div>
+                <div class="detail-list">
+                    
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('broadcaster')}</span>
+                        <span class="detail-list-value">${match.Emissora || 'N/A'}</span>
+                    </div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('origin')}</span>
+                        <span class="detail-list-value">${match.Origem || 'N/A'}</span>
+                    </div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">${LanguageManager.t('narration')}</span>
+                        <span class="detail-list-value">${match.Narração || 'N/A'}</span>
+                    </div>
+                </div>                
+            </div>
             
             <div class="detail-section">
-                <div class="section-title">${technicalInfoTitle}</div>
+                <div class="section-title modal-style">${technicalInfoTitle}</div>
                 <div class="detail-grid technical">
                     <div class="detail-item">
                         <div class="detail-label">ID</div>
@@ -396,7 +405,7 @@ const MatchModal = {
             </div>
             
             <div class="detail-section">
-                <div class="section-title">${storageTitle}</div>
+                <div class="section-title modal-style">${storageTitle}</div>
                 <div class="storage-badges">
                     ${match.Local ? `<span class="badge badge-success">💾 ${match.Local}</span>` : ''}
                     ${match.Nuvem && match.Nuvem.toLowerCase() === 'nuvem' ? `<span class="badge badge-info">☁️ ${LanguageManager.t('cloud')}</span>` : ''}
@@ -406,10 +415,11 @@ const MatchModal = {
             
             ${match.Obs ? `
                 <div class="detail-section">
-                    <div class="section-title">${observationsTitle}</div>
+                    <div class="section-title modal-style">${observationsTitle}</div>
                     <div class="detail-item" style="grid-column: 1/-1;">
                         <div class="detail-value">${match.Obs}</div>
                     </div>
+                </div>
                 </div>
             ` : ''}
         `;
@@ -431,7 +441,7 @@ const MatchModal = {
             return;
         }
 
-        title.innerHTML = `<div class="modal-title-competition">⏳ ${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
+        title.innerHTML = `<div class="section-title modal-title-competition">⏳ ${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
         score.innerHTML = '';
         body.innerHTML  = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">⏳</div>';
         modal?.classList.add('active');
@@ -478,7 +488,7 @@ const MotorModal = {
         const phase = LanguageManager.translateText(event.Fase);
         
         title.innerHTML = `
-            <div class="modal-title-competition">${competition}</div>
+            <div class="section-title modal-title-competition">${competition}</div>
             <div class="modal-title-phase">${phase}</div>
         `;
         
@@ -673,10 +683,7 @@ const Renderer = {
         const totalMinutes = apiResponse?.total_duration;
         
         document.getElementById('totalGames').textContent = totalGames;
-        document.getElementById('pendingGames').textContent = pendingCount;
-        document.getElementById('futureGames').textContent = futureCount;
         document.getElementById('totalSize').textContent = pendingCount;
-        document.getElementById('futureGames').textContent = futureCount;
 
         if (totalFileSize < 1099511627776) {
             document.getElementById('totalSize').textContent = (totalFileSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB';

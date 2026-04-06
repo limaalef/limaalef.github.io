@@ -86,6 +86,18 @@ async function loadRecentChanges() {
     }
 }
 
+async function todayDate(data) {
+    const [year, month, day] = (data.filters.search).split('-');
+    const date = new Date(year, month - 1, day); // mês começa em 0
+
+    const result = date.toLocaleDateString(navigator.language, {
+        day: 'numeric',
+        month: 'long'
+    });
+
+    document.getElementById('today-date').textContent = `${result}`;
+}
+
 /* ── Today in History ── */
 const TodayInHistory = {
     items: [],
@@ -94,8 +106,10 @@ const TodayInHistory = {
         const container = document.getElementById('todayHistory');
         try {
             const data = await APIService.fetchTodayInHistory();
+            todayDate(data)
             this.items = APIService.transformData(data);
             this.render();
+            
         } catch (err) {
             container.innerHTML = `<div class="section-state"><div class="icon">❌</div><p>${LanguageManager.t('errorChanges')}</p></div>`;
             console.error('TodayInHistory error:', err);

@@ -80,8 +80,8 @@ const Utils = {
         const notification = document.createElement('div');
         notification.className = 'notification';
         const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
-        const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-        notification.style.borderLeft = `4px solid ${colors[type]}`;
+        const icons = { success: '', error: '', warning: '⚠', info: 'ℹ' };
+        notification.style.border = `1px solid ${colors[type]}`;
         
         // Tentar traduzir a mensagem se o LanguageManager estiver disponível
         const translatedMsg = window.LanguageManager ? (LanguageManager.t(message) || message) : message;
@@ -93,8 +93,12 @@ const Utils = {
         
         document.body.appendChild(notification);
         setTimeout(() => {
-            notification.style.animation = 'slideInRight 0.3s ease-out reverse';
-            setTimeout(() => notification.remove(), 300);
+            notification.style.animation = 'slideOutCenter 0.25s ease forwards';
+
+            setTimeout(() => {
+                notification.remove();
+            }, 250);
+
         }, 3000);
     },
 

@@ -1,9 +1,9 @@
 /* ── helpers ── */
 function modeLabel(mode) {
     const map = {
-        football:   { icon: '⚽', key: 'modeFootball' },
-        multisport: { icon: '🏀', key: 'modeMultisport' },
-        motorsport: { icon: '🏎️', key: 'modeMotorsport' }
+        football:   { icon: '', key: 'modeFootball' },
+        multisport: { icon: '', key: 'modeMultisport' },
+        motorsport: { icon: '', key: 'modeMotorsport' }
     };
     const m = map[mode];
     if (m) return LanguageManager.t(m.key);
@@ -81,19 +81,22 @@ function renderEntry(entry, index) {
 
     const bodyContent = (added + modified + removed) === 0
         ? `<div class="no-changes-msg">${LanguageManager.t('cl_noChanges')}</div>`
-        : sectionHtml('added',    `✅ ${LanguageManager.t('cl_sectionAdded')}`,    'added')
-        + sectionHtml('modified', `✏️ ${LanguageManager.t('cl_sectionModified')}`, 'modified')
-        + sectionHtml('removed',  `🗑️ ${LanguageManager.t('cl_sectionRemoved')}`,  'removed');
+        : sectionHtml('added',    `${LanguageManager.t('cl_sectionAdded')}`,    'added')
+        + sectionHtml('modified', `${LanguageManager.t('cl_sectionModified')}`, 'modified')
+        + sectionHtml('removed',  `${LanguageManager.t('cl_sectionRemoved')}`,  'removed');
 
     return `
     <div class="sync-entry" id="entry-${index}">
         <div class="sync-entry-header" onclick="toggleEntry(${index})">
             <div class="sync-entry-left">
                 <span class="sync-mode-badge ${modeClass(entry.mode)}">${modeLabel(entry.mode)}</span>
-                <span class="sync-timestamp">${formatTimestamp(entry.timestamp)}</span>
+                
                 <div class="sync-summary-pills">${pillsHtml || `<span class="pill pill-unchanged">0</span>`}</div>
             </div>
-            <span class="expand-icon">▼</span>
+            <div class="sync-entry-right">
+                <span class="sync-timestamp">${formatTimestamp(entry.timestamp)}</span>
+                <span class="expand-icon">▼</span>
+            </div>
         </div>
         <div class="sync-entry-body">${bodyContent}</div>
     </div>`;
@@ -128,7 +131,6 @@ async function loadChangelog() {
 
         if (items.length === 0) {
             content.innerHTML = `<div class="state-box"><div class="icon">📭</div><h2>${LanguageManager.t('cl_empty')}</h2><p>${LanguageManager.t('cl_emptyMsg')}</p></div>`;
-            document.getElementById('pagination').style.display = 'none';
             return;
         }
 
@@ -137,16 +139,14 @@ async function loadChangelog() {
 
     } catch (err) {
         content.innerHTML = `<div class="state-box"><div class="icon">❌</div><h2>${LanguageManager.t('cl_error')}</h2><p>${LanguageManager.t('cl_checkUrl')}</p><p style="font-size:.85em;margin-top:8px;color:var(--error-color)">${escapeHtml(err.message)}</p></div>`;
-        document.getElementById('pagination').style.display = 'none';
     }
 }
 
 function updatePagination() {
     const pag = document.getElementById('pagination');
-    pag.style.display = State.totalPages > 1 ? 'flex' : 'none';
 
-    document.getElementById('pageInfo').textContent =
-        `${LanguageManager.t('cl_pageWord')} ${State.page} ${LanguageManager.t('cl_ofWord')} ${State.totalPages}`;
+    document.getElementById('pageNumber').textContent = State.page;
+    document.getElementById('pageTotal').textContent = State.totalPages;
     document.getElementById('firstPage').disabled = State.page === 1;
     document.getElementById('prevPage').disabled  = State.page === 1;
     document.getElementById('nextPage').disabled  = State.page === State.totalPages;
