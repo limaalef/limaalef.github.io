@@ -5,6 +5,7 @@ const CONFIG = {
         motor: 'https://api.limaalef.com/archive/matches?type=motor'
     },
     CHANGELOG_URL: 'https://api.limaalef.com/archive/changelog',
+    CONTEXT_API_URL: 'https://api.limaalef.com/archive/matches?', 
     DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football',
     videoFilter: false
@@ -32,6 +33,8 @@ window._headerPromise = new Promise(resolve => {
 
         if (isMobile && container.dataset.back === 'true') {
             document.getElementById('page-title').textContent = container.dataset.title || '';
+            
+            document.getElementById('headerTitle').style.display = 'flex';
             logo.style.display = 'none';
         }
 

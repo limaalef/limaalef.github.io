@@ -43,6 +43,10 @@ const CardManager = {
         const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
         const homeWinner = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
         const awayWinner = homeGoals !== '' && awayGoals !== '' && awayGoals > homeGoals;
+
+        const hasWinner = homeWinner || awayWinner;
+        const homeLoser = hasWinner && !homeWinner;
+        const awayLoser = hasWinner && !awayWinner;
         
         const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
         const statusBadge = status === 'pending' ? `<span class="match-status">⏳ ${statusText}</span>` : '';
@@ -81,13 +85,13 @@ const CardManager = {
             <div class="match-teams">
                 <div class="team">
                     ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${homeWinner ? 'winner' : ''}">${match.Mandante || 'Time 1'}</span>
-                    <span class="score ${homeWinner ? 'winner' : ''}">${homeGoals}</span>
+                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${match.Mandante || 'Time 1'}</span>
+                    <span class="score ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${homeGoals}</span>
                 </div>
                 <div class="team">
                     ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${awayWinner ? 'winner' : ''}">${match.Visitante || 'Time 2'}</span>
-                    <span class="score ${awayWinner ? 'winner' : ''}">${awayGoals}</span>
+                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${match.Visitante || 'Time 2'}</span>
+                    <span class="score ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${awayGoals}</span>
                 </div>
             </div>
             <div class="match-footer">

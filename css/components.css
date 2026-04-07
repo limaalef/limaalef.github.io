@@ -72,7 +72,9 @@ header {
 }
 
 .page-title {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-mxxl);
+    font-weight: 500;
+    letter-spacing: -0.04em;
 }
 
 /* Home */
@@ -601,7 +603,7 @@ input[type="text"]:focus {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin: 12px 0;
+    margin: 12px 0 0 0;
     flex: 1;
 }
 
@@ -619,7 +621,7 @@ input[type="text"]:focus {
 }
 
 .team-name {
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--font-size-lg);
     color: var(--text-primary);
     flex: 1;
@@ -630,9 +632,13 @@ input[type="text"]:focus {
     color: var(--accent-color);
 }
 
+.team-name.loser {
+    color: var(--text-secondary);
+}
+
 .score {
     font-size: var(--font-size-xl);
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-primary);
     min-width: 35px;
     text-align: center;
@@ -641,6 +647,11 @@ input[type="text"]:focus {
 
 .score.winner {
     color: var(--accent-color);
+    font-weight: 700;
+}
+
+.score.loser {
+    color: var(--text-secondary);
 }
 
 /* Rodapé do Card */
@@ -649,7 +660,7 @@ input[type="text"]:focus {
     justify-content: space-between;
     align-items: flex-end;
     margin-top: auto;
-    padding-top: 10px;
+    margin-top: 12px;
 }
 
 .broadcaster-logo {
@@ -672,11 +683,12 @@ input[type="text"]:focus {
 
 .tech-badge {
     padding: 4px 10px;
-    border: 1px solid var(--text-primary);
+    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-size-xs);
     font-size: var(--font-size-mds);
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary);
     transition: background 0.3s ease;
 }
 
@@ -1850,13 +1862,18 @@ input[type="text"]:focus {
 
 .tih-team-name {
     font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 80px;
 }
-.tih-team.winner .tih-team-name { font-weight: 700; }
+.tih-team.winner .tih-team-name {
+    color: var(--accent-color);
+    font-weight: 700;
+}
 
 .tih-card-score {
     display: flex;
@@ -1867,12 +1884,15 @@ input[type="text"]:focus {
 
 .tih-score {
     font-size: var(--font-size-xl);
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-secondary);
     min-width: 16px;
     text-align: center;
 }
-.tih-score.winner { color: var(--text-primary); }
+.tih-score.winner { 
+    color: var(--accent-color);
+    font-weight: 700;
+}
 
 .tih-score-sep {
     font-size: var(--font-size-md);
@@ -2010,8 +2030,12 @@ input[type="text"]:focus {
         max-width: 100% !important;
     }
 
-    .filter-options{
+    .expand {
         margin-bottom: -10px;
+    }
+
+    .expand2 {
+        margin-bottom: -20px;
     }
 
     .filter-sub-group.expand {

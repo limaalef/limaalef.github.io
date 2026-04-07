@@ -1,0 +1,336 @@
+/* ========================================
+   COLLECTION PAGE — sidebar + main (35/65)
+   Adicionar ao final de components.css
+   ======================================== */
+
+/* ── Layout wrapper ── */
+.collection-layout {
+    display: flex;
+}
+
+/* ── SIDEBAR ── */
+.collection-sidebar {
+    width: 35%;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    scrollbar-width: none;
+}
+.collection-sidebar::-webkit-scrollbar { display: none; }
+
+/* Skeleton loader */
+.sidebar-loading {
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sidebar-skeleton-emblem {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-size-md);
+    background: var(--border-color);
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.sidebar-skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: var(--border-color);
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.sidebar-skeleton-line.wide   { width: 70%; }
+.sidebar-skeleton-line.medium { width: 45%; }
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+/* Header do sidebar */
+.sidebar-sport-header {
+    padding: 1.25rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.sidebar-emblem-wrap {
+    margin-bottom: 6px;
+}
+.sidebar-logo {
+    max-height: 56px;
+    max-width: 80px;
+    object-fit: contain;
+}
+.sidebar-emoji {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.sidebar-sport-name {
+    font-size: var(--font-size-mxxl);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+}
+
+.sidebar-sport-meta {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Stats em coluna dentro da sidebar */
+.stats.sidebar-stats {
+    flex-direction: column;
+    gap: 6px;
+    padding: 1rem;
+}
+.stats.sidebar-stats .stat {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    align-items: baseline;
+}
+
+/* Detalhes (pares chave/valor) */
+.sidebar-details {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sidebar-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sidebar-detail-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.sidebar-detail-value {
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Descrição */
+.sidebar-description {
+    padding: 1rem;
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ── MAIN CONTENT ── */
+.collection-main {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.collection-main .controls {
+    padding: 1rem;
+    margin-bottom: 0;
+}
+
+.collection-main .match-container {
+    padding: 0 1rem 1rem;
+}
+
+/* ── YEAR FILTER BAR ── */
+.year-filter-bar {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+}
+.year-filter-bar::-webkit-scrollbar { display: none; }
+
+.year-btn {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 5px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-md);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.year-btn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+.year-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+/* ── CARD NOVO: linha única "Casa 0 x 0 Visitante" ── */
+.match-card {
+    min-height: 0px;
+}
+
+/* Remove logo da competição do header */
+.match-card .match-header .competition-logo {
+    display: none;
+}
+
+/* Linha fase + data nos lados opostos */
+.match-card .match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0px;
+}
+.match-card .match-header .competition-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Coloca fase e data na mesma linha, em lados opostos */
+.match-card .match-phase-date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+.match-card .match-phase {
+    font-size: var(--font-size-mdm);
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.match-card .match-date-inline {
+    font-size: var(--font-size-mdm);
+    color: var(--accent-color);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Oculta o match-date antigo (linha separada) */
+.match-card > .match-date {
+    display: none;
+}
+
+/* Linha única de times: Casa  0 x 0  Visitante */
+.match-card .match-teams {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    margin: 8px 0;
+}
+
+/* Lado casa (alinhado à esquerda) */
+.match-card .match-teams .team:first-child {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-start;
+    min-width: 0;
+}
+.match-card .match-teams .team:first-child .team-name {
+    order: 2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.match-card .match-teams .team:first-child .team-logo {
+    order: 1;
+    flex-shrink: 0;
+}
+/* Esconde placar individual dos times (será no centro) */
+.match-card .match-teams .team:first-child .score,
+.match-card .match-teams .team:last-child  .score {
+    display: none;
+}
+
+/* Placar central */
+.match-card .match-score-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    padding: 0 6px;
+    white-space: nowrap;
+}
+.match-card .match-score-center .score-sep {
+    color: var(--text-tertiary);
+    font-weight: 400;
+    font-size: var(--font-size-md);
+}
+.match-card .match-score-center .score-val.winner { color: var(--accent-color); }
+.match-card .match-score-center .score-val.loser  { color: var(--text-tertiary); font-weight: 400; }
+
+/* Lado visitante (alinhado à direita) */
+.match-card .match-teams .team:last-child {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+    min-width: 0;
+}
+.match-card .match-teams .team:last-child .team-name {
+    order: 1;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.match-card .match-teams .team:last-child .team-logo {
+    order: 2;
+    flex-shrink: 0;
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 640px) {
+    .collection-layout {
+        flex-direction: column;
+    }
+
+    .collection-sidebar {
+        width: 100%;
+        position: static;
+        height: auto;
+        max-height: none;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .stats.sidebar-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .stats.sidebar-stats .stat {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

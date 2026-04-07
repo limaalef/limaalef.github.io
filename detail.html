@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Sports Archive</title>
+    <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos.">
+    <meta name="robots" content="noindex">
+
+    <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
+    <meta name="author" content="@limaalef">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://archive.limaalef.com/">
+    <meta property="og:title" content="Sports Archive">
+    <meta property="og:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos.">
+    <meta property="og:image" content="http://archive.limaalef.com/banner.png">
+    <meta property="og:image:width" content="763">
+    <meta property="og:image:height" content="241">
+    <meta property="og:site_name" content="Sports Archive">
+    <meta property="og:locale" content="pt_BR">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="http://archive.limaalef.com/">
+    <meta name="twitter:title" content="Sports Archive">
+    <meta name="twitter:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos.">
+    <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
+    <meta name="twitter:creator" content="@limaalef">
+    <meta name="twitter:site" content="@limaalef">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="manifest" href="/icons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/detail.css">
+</head>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JJZTBEGJ91');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877" crossorigin="anonymous"></script>
+
+<body class="theme-football">
+    <header>
+        <div class="header-frame" id="header"
+            data-title="Collection"
+            data-back="true">
+        </div>
+        
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display: none;"
+                    title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section-divider"></div>
+
+        <div class="collection-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="collection-sidebar" id="collectionSidebar">
+
+                <div class="sidebar-loading" id="sidebarLoading">
+                    <div class="sidebar-skeleton-emblem"></div>
+                    <div class="sidebar-skeleton-line wide"></div>
+                    <div class="sidebar-skeleton-line medium"></div>
+                </div>
+
+                <div class="sidebar-content" id="sidebarContent" style="display:none;">
+                    <div class="sidebar-sport-header">
+                        <div class="sidebar-emblem-wrap">
+                            <img id="sidebarLogo" src="" alt="" class="sidebar-logo" onerror="this.style.display='none'">
+                            <span id="sidebarEmoji" class="sidebar-emoji" style="display:none;"></span>
+                        </div>
+                        <div class="sidebar-sport-name" id="sidebarName"></div>
+                        <div class="sidebar-sport-meta" id="sidebarMeta"></div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="stats sidebar-stats" id="stats" style="display:none;">
+                        <div class="stat">
+                            <div class="stat-value highlighted" id="totalGames">0</div>
+                            <div class="stat-label" data-i18n="games">Jogos</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value highlighted" id="totalSize">0 GB</div>
+                            <div class="stat-label" data-i18n="totalSize">Tamanho Total</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="totalDuration">0h</div>
+                            <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider" id="statsDivider" style="display:none;"></div>
+
+                    <div class="sidebar-details" id="sidebarDetails"></div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="sidebar-description" id="sidebarDescription"></div>
+                </div>
+            </aside>
+
+            <!-- CONTEÚDO PRINCIPAL -->
+            <div class="collection-main">
+
+                <div class="empty-state" id="noQueryState" style="display:none;">
+                    <h2>Nenhuma busca definida</h2>
+                    <p>Acesse esta página com um parâmetro <code>?q=</code> na URL.</p>
+                </div>
+
+                <div class="controls" id="mainControls" style="display:none;">
+                    <div class="filter-options">
+                        <div class="filter-sub-group expand">
+                            <div class="search-box">
+                                <input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="🔍 Buscar...">
+                            </div>
+                        </div>
+
+                        <div class="filter-sub-group">
+                            <div class="pagination" id="pagination">
+                                <div class="back-btn-group">
+                                    <button id="firstPage">«</button>
+                                    <button id="prevPage">‹</button>
+                                </div>
+                                <div class="pages-info-group">
+                                    <span class="label hidden" data-i18n="page">Página</span>
+                                    <span class="value contrast" id="pageNumber">1</span>
+                                    <span class="label" data-i18n="pageSeparator">de</span>
+                                    <span class="value" id="pageTotal">1</span>
+                                </div>
+                                <div class="back-btn-group">
+                                    <button id="nextPage">›</button>
+                                    <button id="lastPage">»</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="year-filter-bar" id="yearFilterBar"></div>
+                </div>
+
+                <div class="match-container" id="matchesContainer">
+                    <div class="empty-state">
+                        <h2 data-i18n="loading">Carregando jogos...</h2>
+                        <p data-i18n="loadingMessage">Aguarde enquanto buscamos os dados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn close-btn" onclick="MatchModal.close()">×</button>
+                <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
+                <div id="modalScore" class="modal-score"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
+    <script src="js/detail.js"></script>
+</body>
+</html>
