@@ -175,6 +175,7 @@ const translations = {
         'Copa do Mundo FIFA Catar 2022': '2022 FIFA World Cup',
         'Copa do Mundo Feminina FiFA Austrália/Nova Zelândia 2023': "2023 FIFA Women's World Cup",
         'Copa do Mundo Feminina FiFA Brasil 2027': "2027 FIFA Women's World Cup",
+        'FIFA Series Feminina': "Women's  FIFA Series",
         'Liga das Nações de Vôlei': 'FIVB Volleyball Nations League',
         'Pré-Olímpico de Vôlei': ' FIVB Volleyball Olympic Qualification Tournaments',
         'Amistoso Futebol Americano': 'US Football Friendly',
