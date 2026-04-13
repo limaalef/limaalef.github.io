@@ -1,0 +1,21 @@
+{
+  "name": "Sports Archive - limaalef.com",
+  "short_name": "Sports Archive",
+  "icons": [
+    {
+      "src": "/icons/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#131313",
+  "background_color": "#E8FF4A",
+  "display": "standalone"
+}
