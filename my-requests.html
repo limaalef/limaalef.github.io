@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Pedidos | Sports Archive</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/request.css">
+<style>
+.rq-wrap { max-width: 860px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
+
+/* Auth */
+#rq-auth { display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
+    padding: var(--sp-9) var(--sp-5); text-align:center; }
+#rq-auth h2 { color:var(--text-primary); margin:0; font-size:var(--font-size-xxl); }
+#rq-auth p  { color:var(--text-secondary); margin:0; font-size:var(--font-size-mdm); }
+
+/* User chip */
+.rq-header { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:var(--sp-6); flex-wrap:wrap; gap:var(--sp-3); }
+.rq-user-chip { display:flex; align-items:center; gap:var(--sp-3);
+    padding:var(--sp-2) var(--sp-4); background:var(--bg-secondary);
+    border:1px solid var(--border-color); border-radius:var(--border-radius-size-circle); }
+.rq-avatar { width:26px; height:26px; border-radius:var(--border-radius-size-circle);
+    object-fit:cover; flex-shrink:0; }
+.rq-user-chip span { font-size:var(--font-size-sm); color:var(--text-secondary); }
+
+/* Empty / Loading */
+.rq-loading { text-align:center; padding:var(--sp-9) var(--sp-5);
+    color:var(--text-secondary); font-size:var(--font-size-mdm); }
+
+/* Order list */
+.rq-orders-list { display:flex; flex-direction:column; gap:var(--sp-5); }
+
+/* Order card */
+.rq-order-card { background:var(--bg-secondary); border:1px solid var(--border-color);
+    border-radius:var(--border-radius-size-xl); overflow:hidden; transition:border-color .2s; }
+.rq-order-card:hover { border-color:var(--accent-color); }
+
+/* Card head — clicável */
+.rq-order-head { display:flex; align-items:center; justify-content:space-between;
+    padding:var(--sp-4) var(--sp-5); gap:var(--sp-3); flex-wrap:wrap;
+    cursor:pointer; user-select:none; }
+.rq-order-head:hover { background:var(--bg-primary); }
+
+.rq-order-id-wrap { display:flex; flex-direction:column; gap:var(--sp-1); }
+.rq-order-id   { font-size:var(--font-size-xs); color:var(--text-secondary); font-family:monospace; }
+.rq-order-date { font-size:var(--font-size-mds); color:var(--text-tertiary); }
+
+.rq-order-meta { display:flex; align-items:center; gap:var(--sp-3); flex-wrap:wrap; }
+.rq-items-count { font-size:var(--font-size-sm); color:var(--text-secondary); }
+.rq-links-badge { font-size:var(--font-size-mds); font-weight:700; color:var(--text-success); }
+
+.rq-chevron { font-size:var(--font-size-md); color:var(--text-secondary);
+    transition:transform .25s; flex-shrink:0; }
+.rq-order-card.expanded .rq-chevron { transform:rotate(180deg); }
+
+/* Card body */
+.rq-order-body { display:none; border-top:1px solid var(--border-color); }
+.rq-order-card.expanded .rq-order-body { display:block; }
+
+/* Progress bar */
+.rq-progress { display:flex; border-radius:var(--border-radius-size-md);
+    overflow:hidden; border:1px solid var(--border-color); margin:var(--sp-5) var(--sp-5) 0; }
+.rq-progress-step { flex:1; text-align:center; padding:var(--sp-2) var(--sp-1);
+    font-size:var(--font-size-xs); font-weight:600; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary);
+    transition:all .2s; }
+.rq-progress-step + .rq-progress-step { border-left:1px solid var(--border-color); }
+.rq-progress-step.done    { background:var(--bg-success); color:var(--text-success); }
+.rq-progress-step.current { background:var(--accent-color); color:var(--text-accent-color); }
+
+/* Sections inside body */
+.rq-section { padding:var(--sp-5); }
+.rq-section + .rq-section { border-top:1px solid var(--border-color); }
+.rq-section-title { font-size:var(--font-size-xs); text-transform:uppercase;
+    letter-spacing:.07em; color:var(--accent-color); margin-bottom:var(--sp-3); }
+
+/* Item rows */
+.rq-item-list { display:flex; flex-direction:column; gap:1px;
+    border:1px solid var(--border-color); border-radius:var(--border-radius-size-mlg); overflow:hidden; }
+.rq-item { background:var(--bg-secondary); padding:var(--sp-3) var(--sp-4); }
+.rq-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
+.rq-item-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
+.rq-item-meta  { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:var(--sp-1); }
+
+/* Download cards */
+.rq-dl-list { display:flex; flex-direction:column; gap:var(--sp-3); }
+.rq-dl-card { display:flex; align-items:center; gap:var(--sp-4);
+    padding:var(--sp-4); border-radius:var(--border-radius-size-mlg);
+    border:1px solid var(--border-color); background:var(--bg-primary);
+    transition:border-color .15s; }
+.rq-dl-card.available { border-color:var(--success-color); background:var(--bg-success); }
+.rq-dl-card.available:hover { filter:brightness(.97); }
+.rq-dl-card.blocked { opacity:.55; }
+
+.rq-dl-icon { font-size:1.4rem; flex-shrink:0; }
+.rq-dl-info { flex:1; min-width:0; }
+.rq-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
+.rq-dl-meta  { font-size:var(--font-size-mds); margin-top:var(--sp-1); }
+.rq-dl-meta.valid     { color:var(--text-success); }
+.rq-dl-meta.expired   { color:var(--error-color); }
+.rq-dl-meta.indefinite { color:var(--text-secondary); }
+.rq-dl-meta.disabled  { color:var(--text-tertiary); }
+
+.rq-no-links { padding:var(--sp-5); background:var(--bg-primary);
+    border-radius:var(--border-radius-size-mlg); border:1px dashed var(--border-color);
+    text-align:center; color:var(--text-secondary); font-size:var(--font-size-mdm); }
+
+/* Contact chip */
+.rq-contact-chip { display:inline-flex; align-items:center; gap:var(--sp-3);
+    padding:var(--sp-2) var(--sp-4); background:var(--bg-secondary);
+    border:1px solid var(--border-color); border-radius:var(--border-radius-size-circle);
+    font-size:var(--font-size-mdm); color:var(--text-primary); }
+
+/* Notes */
+.rq-notes { padding:var(--sp-3) var(--sp-4); background:var(--bg-primary);
+    border-radius:var(--border-radius-size-md); border-left:3px solid var(--accent-color);
+    font-size:var(--font-size-sm); color:var(--text-secondary); }
+
+/* View all link */
+.rq-view-link { display:inline-flex; align-items:center; gap:var(--sp-2);
+    font-size:var(--font-size-sm); color:var(--accent-color);
+    text-decoration:none; transition:opacity .15s; }
+.rq-view-link:hover { opacity:.75; text-decoration:underline; }
+</style>
+</head>
+<body>
+<header>
+    <div class="header-frame" id="header"
+        data-title=""
+        data-back="true"></div>
+    <div class="control-group">
+        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+            <span id="langFlag">🇧🇷</span>
+        </button>
+    </div>
+</header>
+
+<div class="rq-wrap">
+
+    <!-- Auth -->
+    <div id="rq-auth">
+        <div style="font-size:3rem">📦</div>
+        <h2 data-i18n="requestMyRequests">Meus Pedidos</h2>
+        <p data-i18n="requestMyRequestsDesc">Faça login para acompanhar seus pedidos e acessar os links de download.</p>
+        <button class="om-oauth-btn om-google" id="rq-login-google" style="margin-top:var(--sp-3)">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <span data-i18n="requestLoginGoogle">Entrar com Google</span>
+        </button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="rq-dashboard" style="display:none">
+        <div class="rq-header">
+            <div class="rq-user-chip">
+                <img id="rq-avatar" class="rq-avatar" src="" onerror="this.style.display='none'" alt="">
+                <span id="rq-user-name"></span>
+            </div>
+            <div style="display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap">
+                <button class="action-btn btn-ghost" id="rq-refresh">↺ <span data-i18n="requestRefresh">Atualizar</span></button>
+                <button class="action-btn btn-ghost" id="rq-logout" style="color:var(--error-color)">
+                    <span data-i18n="requestLogout">Sair</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
+        <div id="rq-content" style="display:none"></div>
+    </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="js/config.js"></script>
+<script src="js/translation.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.service.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+const RQ_CFG = {
+    apiBase:        CONFIG.REQUEST_API_BASE,
+    googleClientId: CONFIG.GOOGLE_CLIENT_ID,
+};
+
+let rqToken = null;
+let rqUser  = null;
+
+function t(key) {
+    return (LanguageManager ? LanguageManager.t(key) : null) || key;
+}
+
+// ── Sessão ────────────────────────────────────────────────────
+function saveRqSession(token, user) {
+    rqToken = token; rqUser = user;
+    localStorage.setItem('rq_token', token);
+    localStorage.setItem('rq_user',  JSON.stringify(user));
+}
+function clearRqSession() {
+    rqToken = null; rqUser = null;
+    localStorage.removeItem('rq_token');
+    localStorage.removeItem('rq_user');
+}
+function restoreRqSession() {
+    const token = localStorage.getItem('rq_token');
+    const user  = localStorage.getItem('rq_user');
+    if (!token) return false;
+    try {
+        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (p.exp && p.exp < Math.floor(Date.now()/1000)) { clearRqSession(); return false; }
+        rqToken = token;
+        rqUser  = user ? JSON.parse(user) : { name: p.name || p.email, email: p.email, picture: p.picture || '' };
+        return true;
+    } catch { clearRqSession(); return false; }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+document.getElementById('rq-login-google').addEventListener('click', () => {
+    if (!window.google?.accounts?.id) { alert(t('requestGSINotLoaded')); return; }
+    google.accounts.id.initialize({
+        client_id: RQ_CFG.googleClientId,
+        cancel_on_tap_outside: false,
+        callback: async (response) => {
+            try {
+                const res = await fetch(`${RQ_CFG.apiBase}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential }),
+                });
+                if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.error || t('requestLoginError')); return; }
+                const data = await res.json();
+                const p    = decodeJwt(response.credential);
+                const user = { name: p.name || p.email, email: p.email, picture: p.picture || '' };
+                saveRqSession(data.token, user);
+                showDashboard();
+            } catch { alert(t('requestLoginError')); }
+        },
+    });
+    google.accounts.id.prompt();
+});
+
+document.getElementById('rq-logout').addEventListener('click', () => {
+    clearRqSession();
+    document.getElementById('rq-auth').style.display = 'flex';
+    document.getElementById('rq-dashboard').style.display = 'none';
+});
+document.getElementById('rq-refresh').addEventListener('click', loadOrders);
+
+function showDashboard() {
+    document.getElementById('rq-auth').style.display      = 'none';
+    document.getElementById('rq-dashboard').style.display = 'block';
+    document.getElementById('rq-user-name').textContent   = rqUser?.name || '';
+    const av = document.getElementById('rq-avatar');
+    if (rqUser?.picture) av.src = rqUser.picture; else av.style.display = 'none';
+
+    // Header title
+    const hdr = document.getElementById('header');
+    if (hdr) hdr.dataset.title = t('requestMyRequests');
+
+    loadOrders();
+}
+
+if (restoreRqSession()) showDashboard();
+
+// ── Carregar pedidos ──────────────────────────────────────────
+async function loadOrders() {
+    document.getElementById('rq-loading').style.display  = 'block';
+    document.getElementById('rq-content').style.display  = 'none';
+    try {
+        const res = await fetch(`${RQ_CFG.apiBase}/orders`, {
+            headers: { Authorization: `Bearer ${rqToken}` },
+        });
+        if (res.status === 401) { clearRqSession(); location.reload(); return; }
+        const data = await res.json();
+        renderOrders(data.orders || []);
+    } catch(e) {
+        document.getElementById('rq-loading').textContent = '⚠ ' + e.message;
+    }
+}
+
+// ── Render lista ──────────────────────────────────────────────
+function renderOrders(orders) {
+    document.getElementById('rq-loading').style.display = 'none';
+    const content = document.getElementById('rq-content');
+    content.style.display = 'block';
+
+    if (!orders.length) {
+        content.innerHTML = `
+            <div class="empty-state">
+                <h2>📦</h2>
+                <h2 data-i18n="requestNoOrders">${t('requestNoOrders')}</h2>
+                <p data-i18n="requestNoOrdersHint">${t('requestNoOrdersHint')}</p>
+                <a href="collection.html" class="action-btn btn-primary" style="display:inline-block;margin-top:var(--sp-5);text-decoration:none">
+                    <span data-i18n="backToCollection">${t('backToCollection')}</span>
+                </a>
+            </div>`;
+        return;
+    }
+
+    const sorted = [...orders].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    content.innerHTML = `<div class="rq-orders-list">${sorted.map(buildOrderCard).join('')}</div>`;
+
+    // Accordion
+    content.querySelectorAll('.rq-order-head').forEach(head => {
+        head.addEventListener('click', () => {
+            head.closest('.rq-order-card').classList.toggle('expanded');
+        });
+    });
+}
+
+const SPORT_ICON = { football:'⚽', others:'🏀', motor:'🏎️' };
+const CONTACT_ICON = { email:'📧', whatsapp:'💬', telegram:'✈️', bluesky:'🦋', x:'𝕏' };
+
+function buildOrderCard(o) {
+    const now   = new Date();
+    const dt    = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
+    const items = o.items || [];
+
+    // Links disponíveis = itens com link ativo e não expirado
+    const activeLinks = items.filter(it =>
+        it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
+    ).length;
+    const hasAnyLink = items.some(it => it.link);
+
+    // Progress bar
+    const steps = [
+        { key:'pending',    label: t('requestProgressReceived') },
+        { key:'processing', label: t('requestProgressAnalysis') },
+        { key:'ready',      label: t('requestProgressReady')    },
+    ];
+    const stepIdx = { pending:0, processing:1, ready:2, expired:2, cancelled:2 };
+    const curIdx  = stepIdx[o.status] ?? 0;
+
+    const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
+        <div class="rq-progress">
+            ${steps.map((s, i) => {
+                let cls = '';
+                if (i < curIdx)  cls = 'done';
+                if (i === curIdx) cls = 'current';
+                return `<div class="rq-progress-step ${cls}">${i < curIdx ? '✓ ' : ''}${s.label}</div>`;
+            }).join('')}
+        </div>` : '';
+
+    // Items com link
+    const itemsHtml = items.map(item => {
+        const link    = item.link;
+        const expired = link && link.expiresAt && new Date(link.expiresAt) < now;
+        const blocked = !link || link.disabled || expired;
+        const url     = link ? (link.proxyUrl || link.url || '#') : null;
+
+        let dlMeta = '', dlMetaCls = '';
+        if (!link) {
+            dlMeta = t('requestLinkPending'); dlMetaCls = 'disabled';
+        } else if (link.disabled) {
+            dlMeta = t('requestLinkDisabled'); dlMetaCls = 'disabled';
+        } else if (expired) {
+            dlMeta = t('requestLinkExpired'); dlMetaCls = 'expired';
+        } else if (!link.expiresAt) {
+            dlMeta = t('requestLinkNoExpiry'); dlMetaCls = 'indefinite';
+        } else {
+            const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
+            dlMeta = `${t('requestLinkValidDays').replace('{n}', days)}`; dlMetaCls = 'valid';
+        }
+
+        return `
+        <div class="rq-dl-card ${!blocked ? 'available' : 'blocked'}">
+            <div class="rq-dl-icon">${blocked ? '🔒' : '📥'}</div>
+            <div class="rq-dl-info">
+                <div class="rq-dl-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
+                <div class="rq-dl-meta ${dlMetaCls}">${dlMeta}</div>
+            </div>
+            ${!blocked && url ? `<a href="${url}" class="action-btn btn-primary" target="_blank" rel="noopener" download
+                style="text-decoration:none;flex-shrink:0">⬇ ${t('requestDownload')}</a>` : ''}
+        </div>`;
+    }).join('');
+
+    // Nenhum link ainda
+    const noLinks = !hasAnyLink ? `
+        <div class="rq-no-links">
+            ${{ pending: t('requestNoLinkPending'), processing: t('requestNoLinkProcessing'),
+                ready: t('requestNoLinkReady'), expired: t('requestNoLinkExpired'),
+                cancelled: t('requestNoLinkCancelled') }[o.status] || t('requestNoLinkPending')}
+        </div>` : '';
+
+    return `
+    <div class="rq-order-card" id="order-${esc(o.id)}">
+        <div class="rq-order-head">
+            <div class="rq-order-id-wrap">
+                <span class="rq-order-id">${esc(o.id)}</span>
+                <span class="rq-order-date">${dt}</span>
+            </div>
+            <div class="rq-order-meta">
+                <span class="rq-items-count">${items.length} ${t('requestItemsUnit')}</span>
+                ${activeLinks > 0
+                    ? `<span class="rq-links-badge">📥 ${activeLinks} ${t('requestLinksAvailable')}</span>`
+                    : ''}
+                <span class="pill st-${o.status}">${statusPtBR(o.status)}</span>
+            </div>
+            <span class="rq-chevron">▼</span>
+        </div>
+
+        <div class="rq-order-body">
+            ${progressHtml}
+
+            <div class="rq-section">
+                <div class="rq-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
+                ${hasAnyLink ? `<div class="rq-dl-list">${itemsHtml}</div>` : noLinks}
+            </div>
+
+            <div class="rq-section">
+                <div class="rq-section-title" data-i18n="requestContactInfo">${t('requestContactInfo')}</div>
+                <span class="rq-contact-chip">
+                    ${CONTACT_ICON[o.contact?.channel] || '📬'}
+                    ${esc(o.contact?.channel || '—')}: ${esc(o.contact?.value || '')}
+                </span>
+                ${o.notes ? `<div class="rq-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}
+            </div>
+
+            <div class="rq-section" style="text-align:right">
+                <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rq-view-link">
+                    ${t('requestViewDetail')} →
+                </a>
+            </div>
+        </div>
+    </div>`;
+}
+
+function statusPtBR(s) {
+    return { pending:t('requestStatusPending'), processing:t('requestStatusProcessing'),
+             ready:t('requestStatusReady'), expired:t('requestStatusExpired'),
+             cancelled:t('requestStatusCancelled') }[s] || s;
+}
+
+function decodeJwt(token) {
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(
+        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

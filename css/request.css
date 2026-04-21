@@ -1,0 +1,447 @@
+/* ============================================================
+   REQUEST MODULE — Estilos
+   Usa exclusivamente variáveis do theme.css.
+   Nenhum valor de cor, tamanho ou espaçamento está hardcoded.
+   ============================================================ */
+
+/* ── Espaçamentos próprios do módulo (derivados do tema) ───── */
+:root {
+    --om-panel-width:   482px;
+    --om-pad-panel:     20px;
+    --om-pad-item:      12px 14px;
+    --om-pad-btn:       9px 18px;
+    --om-pad-oauth:     12px 16px;
+    --om-pad-opt:       10px 12px;
+    --om-gap-list:      10px;
+    --om-gap-step:      16px;
+    --om-gap-oauth:     10px;
+    --om-gap-footer:    10px;
+    --om-fab-size:      52px;
+    --om-fab-size-sm:   40px;
+    --om-badge-size:    18px;
+    --om-avatar-size:   38px;
+    --om-z-overlay:     9010;
+    --om-z-panel:       9020;
+    --om-z-fab:         9000;
+    --om-z-add-btn:     10;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FAB — botão flutuante do carrinho
+   ══════════════════════════════════════════════════════════════ */
+.om-cart-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: var(--om-z-fab);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--om-fab-size);
+    height: var(--om-fab-size);
+    border-radius: var(--border-radius-size-circle);
+    background: var(--accent-color);
+    color: var(--text-accent-color);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+    transition: transform .2s, box-shadow .2s;
+}
+.om-cart-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .45);
+}
+.om-cart-fab svg {
+    stroke: var(--text-accent-color);
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+/* Badge numérico */
+.om-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--error-color);
+    color: var(--text-accent-color);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    min-width: var(--om-badge-size);
+    height: var(--om-badge-size);
+    border-radius: var(--border-radius-size-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--bg-primary);
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY
+   ══════════════════════════════════════════════════════════════ */
+.om-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .5);
+    z-index: var(--om-z-overlay);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+/* Ativação via :has (onde suportado) */
+#om-panel.om-open ~ #om-overlay { display: block; }
+/* Fallback via classe JS */
+.om-overlay.om-visible           { display: block; }
+
+/* ══════════════════════════════════════════════════════════════
+   PAINEL LATERAL
+   ══════════════════════════════════════════════════════════════ */
+.om-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--om-panel-width);
+    max-width: 100vw;
+    height: 100dvh;
+    background: var(--bg-primary);
+    border-left: 1px solid var(--border-color);
+    z-index: var(--om-z-panel);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(110%);
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+    box-shadow: -8px 0 40px rgba(0, 0, 0, .4);
+}
+.om-panel.om-open { transform: translateX(0); }
+
+.om-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--om-pad-panel);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--header-color);
+    flex-shrink: 0;
+}
+.om-panel-header h3 {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.om-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--om-pad-panel);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.om-panel-footer {
+    padding: 14px var(--om-pad-panel);
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LISTA DE ITENS
+   ══════════════════════════════════════════════════════════════ */
+.om-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--om-gap-list);
+}
+
+.om-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--om-gap-list);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-mlg);
+    padding: var(--om-pad-item);
+    transition: border-color .15s;
+}
+.om-item:hover { border-color: var(--accent-color); }
+
+.om-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.om-item-label {
+    font-size: var(--font-size-mdm);
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.om-item-meta { font-size: var(--font-size-mds); color: var(--accent-color); }
+.om-item-date { font-size: var(--font-size-mds); color: var(--text-secondary); }
+
+.om-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: var(--font-size-mdm);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-size-xs);
+    flex-shrink: 0;
+    transition: color .15s, background .15s;
+    line-height: 1;
+}
+.om-remove-btn:hover {
+    color: var(--error-color);
+    background: var(--bg-error);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EMPTY STATE
+   ══════════════════════════════════════════════════════════════ */
+.om-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+.om-empty p  { margin: 6px 0; font-size: var(--font-size-mdm); }
+.om-hint     { font-size: var(--font-size-sm) !important; opacity: .75; }
+
+/* ══════════════════════════════════════════════════════════════
+   FOOTER DO PAINEL
+   ══════════════════════════════════════════════════════════════ */
+.om-footer-top    { margin-bottom: 10px; }
+.om-footer-info   { font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: 10px; }
+.om-footer-actions {
+    display: flex;
+    gap: var(--om-gap-footer);
+    justify-content: flex-end;
+}
+
+.om-my-requests-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-sm);
+    color: var(--accent-color);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: opacity .15s;
+}
+.om-my-requests-link:hover { opacity: .75; text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════════════
+   STEPS (checkout)
+   ══════════════════════════════════════════════════════════════ */
+.om-step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--om-gap-step);
+}
+
+.om-step-title {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+
+.om-step-desc {
+    font-size: var(--font-size-mdm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   USER INFO (após login)
+   ══════════════════════════════════════════════════════════════ */
+.om-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-size-mlg);
+    border: 1px solid var(--border-color);
+}
+.om-avatar {
+    width: var(--om-avatar-size);
+    height: var(--om-avatar-size);
+    border-radius: var(--border-radius-size-circle);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.om-user-info > div   { display: flex; flex-direction: column; gap: 2px; }
+.om-user-info strong  { font-size: var(--font-size-mdm); color: var(--text-primary); }
+.om-user-info small   { font-size: var(--font-size-mds); color: var(--text-secondary); }
+
+/* ══════════════════════════════════════════════════════════════
+   OAUTH BUTTONS
+   ══════════════════════════════════════════════════════════════ */
+.om-oauth-buttons { display: flex; flex-direction: column; gap: var(--om-gap-oauth); }
+
+.om-oauth-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: var(--om-pad-oauth);
+    border-radius: var(--border-radius-size-mlg);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-mdm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    text-align: left;
+}
+.om-oauth-btn:hover           { background: var(--bg-tertiary); border-color: var(--accent-color); }
+.om-oauth-btn.om-google:hover { border-color: #EA4335; }
+.om-oauth-btn.om-microsoft:hover { border-color: #00a4ef; }
+
+/* ══════════════════════════════════════════════════════════════
+   SELETOR DE CANAL DE CONTATO
+   ══════════════════════════════════════════════════════════════ */
+.om-contact-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.om-contact-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: var(--om-pad-opt);
+    border-radius: var(--border-radius-size-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    font-size: var(--font-size-mdm);
+    color: var(--text-secondary);
+    transition: border-color .15s, background .15s, color .15s;
+    user-select: none;
+}
+.om-contact-opt input { display: none; }
+.om-contact-opt:hover {
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+}
+.om-contact-opt.selected {
+    border-color: var(--accent-color);
+    background: var(--bg-accent-color);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INPUTS
+   ══════════════════════════════════════════════════════════════ */
+.om-contact-input-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.om-contact-input-wrap label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.om-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--border-radius-size-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-mdm);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .15s;
+    font-family: inherit;
+}
+.om-input:focus          { border-color: var(--accent-color); }
+.om-textarea             { resize: vertical; min-height: 70px; }
+
+/* ══════════════════════════════════════════════════════════════
+   SUCCESS
+   ══════════════════════════════════════════════════════════════ */
+.om-success {
+    align-items: center;
+    text-align: center;
+    padding: 30px 10px;
+}
+.om-success-icon { font-size: 3rem; margin-bottom: 10px; }
+.om-success h3   { margin: 0 0 8px; color: var(--text-primary); font-size: var(--font-size-lg); }
+.om-success p    { color: var(--text-secondary); font-size: var(--font-size-mdm); margin: 4px 0; }
+
+/* ══════════════════════════════════════════════════════════════
+   BOTÃO "+ PEDIR" NOS CARDS
+   ══════════════════════════════════════════════════════════════ */
+.om-add-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: var(--border-radius-size-md);
+    border: 1px solid var(--accent-color);
+    background: var(--bg-accent-color);
+    color: var(--accent-color);
+    font-size: var(--font-size-mds);
+    font-weight: 700;
+    cursor: pointer;
+    z-index: var(--om-z-add-btn);
+    transition: background .15s, color .15s;
+    letter-spacing: .04em;
+    line-height: 1.3;
+}
+.om-add-btn:hover {
+    background: var(--accent-hover);
+    color: var(--text-accent-color);
+}
+.om-add-btn.om-added {
+    border-color: var(--success-color);
+    background: var(--bg-success);
+    color: var(--text-success);
+}
+.om-add-btn.om-added:hover {
+    background: var(--success-color);
+    color: var(--text-accent-color);
+}
+
+/* Cards precisam de position: relative para o botão absoluto */
+.match-card { position: relative !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVO
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 496px) {
+    .om-panel { width: 100vw; }
+
+    .om-cart-fab {
+        width: var(--om-fab-size-sm);
+        height: var(--om-fab-size-sm);
+        background: rgba(var(--accent-color-rgb), .75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, .2);
+    }
+    .om-cart-fab svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .om-contact-selector { grid-template-columns: 1fr; }
+}

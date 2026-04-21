@@ -134,11 +134,6 @@ const App = {
                 MatchModal.close();
                 return;
             }
-
-            if (e.key === 'f' && !modalOpen && !searchFocused) {
-                e.preventDefault();
-                document.getElementById('searchInput').focus();
-            }
         });
 
         this.loadData();

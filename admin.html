@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Pedidos | Sports Archive</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+.access-info {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    justify-content: flex-end; position: absolute; right: 1rem; top: 1.2rem;
+}
+.adm-wrap   { max-width: 1400px; margin: 0 auto; padding: 0; }
+.adm-header { display:flex; align-items:center; justify-content:flex-end; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+#adm-auth   { display:flex; flex-direction:column; align-items:center; gap:20px; padding:80px 20px; }
+#adm-auth h2 { color:var(--text-primary); margin:0; }
+.adm-login-btn { display:flex; align-items:center; gap:10px; padding:12px 24px;
+    border-radius:var(--border-radius-size-mlg); border:1px solid var(--border-color);
+    background:var(--bg-secondary); color:var(--text-primary); font-size:var(--font-size-md);
+    font-weight:600; cursor:pointer; transition:all .15s; }
+.adm-login-btn:hover { border-color:var(--accent-color); }
+.stats-container { display:none; }
+
+/* Tabela */
+.adm-table-wrap { overflow-x:auto; border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); }
+.adm-table { width:100%; border-collapse:collapse; }
+.adm-table th { text-align:left; font-size:var(--font-size-xs); text-transform:uppercase;
+    letter-spacing:.06em; color:var(--text-secondary); padding:10px 14px;
+    border-bottom:1px solid var(--border-color); background:var(--bg-secondary); white-space:nowrap; }
+.adm-table td { padding:12px 14px; border-bottom:1px solid var(--border-color);
+    font-size:var(--font-size-mdm); color:var(--text-primary); vertical-align:middle; }
+.adm-table tr:last-child td { border-bottom:none; }
+.adm-table tr:hover td { background:var(--bg-tertiary); }
+
+/* Botões adicionais */
+.adm-btn-success { background:var(--bg-success); color:var(--text-success); border:1px solid var(--success-color); }
+.adm-btn-success:hover { filter:brightness(1.1); }
+.adm-btn-warning { background:var(--bg-warning); color:var(--text-warning); border:1px solid var(--warning-color); }
+.adm-btn-warning:hover { filter:brightness(1.1); }
+
+/* Modal title */
+.adm-modal-title { font-size:var(--font-size-mxxl); font-weight:700; color:var(--text-accent-color); }
+
+/* Items list */
+.adm-items-list { display:flex; flex-direction:column; gap:1px;
+    border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
+.adm-item { background:var(--bg-secondary); padding:11px 14px; }
+.adm-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
+.adm-item-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
+.adm-item-meta  { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:2px; }
+
+/* Link por item */
+.adm-item-link-row { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.adm-item-link-url { font-size:var(--font-size-mds); color:var(--accent-color);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px; flex:1; }
+.adm-item-link-exp { font-size:var(--font-size-xs); color:var(--text-secondary); white-space:nowrap; }
+.adm-item-link-exp.expired { color:var(--error-color); }
+.adm-item-no-link { font-size:var(--font-size-xs); color:var(--text-tertiary); margin-top:6px; }
+
+/* Bulk controls */
+.adm-links-bulk { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;
+    padding:12px 14px; background:var(--bg-primary); border-radius:var(--border-radius-size-mlg);
+    border:1px solid var(--border-color); }
+.adm-links-bulk-info { font-size:var(--font-size-mdm); color:var(--text-secondary); flex:1; }
+.adm-bulk-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+/* Activate panel */
+.adm-expiry-inline { display:none; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:10px 12px; background:var(--bg-success); border:1px solid var(--success-color);
+    border-radius:var(--border-radius-size-md); margin-top:8px; }
+.adm-expiry-inline.open { display:flex; }
+.adm-expiry-inline label { font-size:var(--font-size-sm); color:var(--text-success); font-weight:600; white-space:nowrap; }
+.adm-expiry-sel { padding:6px 10px; border-radius:var(--border-radius-size-md);
+    border:1px solid var(--success-color); background:var(--bg-secondary);
+    color:var(--text-primary); font-size:var(--font-size-mdm); outline:none; cursor:pointer; }
+
+/* Inputs */
+.adm-input { width:100%; border:0; background:var(--bg-secondary); color:var(--text-primary);
+    font-size:var(--font-size-mdm); outline:none; box-sizing:border-box; font-family:inherit; }
+.adm-input-text { font-weight:600; text-align:right; }
+.adm-input-select { font-weight:600; text-align:right; max-width:200px; }
+.adm-input:focus { border-bottom:1px solid var(--accent-color); }
+.adm-input-select:focus { border:0; }
+
+.adm-empty   { text-align:center; padding:48px; color:var(--text-secondary); }
+.adm-loading { text-align:center; padding:60px; color:var(--text-secondary); }
+@media (max-width:600px) { .adm-item-link-url { max-width:160px; } }
+</style>
+</head>
+<body>
+<header>
+    <div class="header-frame" id="header" data-title="Gerenciar pedidos" data-back="true"></div>
+    <div class="control-group">
+        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+            <span id="langFlag">🇧🇷</span>
+        </button>
+    </div>
+</header>
+
+<div class="adm-wrap">
+    <div id="adm-auth">
+        <h2>Área Administrativa</h2>
+        <p style="color:var(--text-secondary);margin:0">Acesso restrito ao administrador</p>
+        <button class="adm-login-btn" id="adm-login-google">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Entrar com Google
+        </button>
+    </div>
+
+    <div class="stats-container" id="stats-container">
+        <div class="section-divider"></div>
+        <div class="stats" style="display:flex">
+            <div class="stat"><div class="stat-value" id="st-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
+            <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
+            <div class="stat"><div class="stat-value" id="st-ready">—</div><div class="stat-label">Prontos</div></div>
+            <div class="stat"><div class="stat-value" id="st-expired">—</div><div class="stat-label">Expirados</div></div>
+        </div>
+    </div>
+
+    <div id="adm-dashboard" style="display:none">
+        <div class="access-info">
+            <span id="adm-user-name" style="font-size:var(--font-size-sm);color:var(--text-secondary)"></span>
+            <button class="action-btn btn-ghost" id="adm-logout">Sair</button>
+            <button class="action-btn btn-primary" id="adm-refresh">↺ Atualizar</button>
+        </div>
+
+        <div class="controls">
+            <div class="filter-options">
+                <div class="filter-sub-group">
+                    <div class="view-toggle">
+                        <div class="adm-filter-btn active" data-status="">Todos</div>
+                        <div class="adm-filter-btn" data-status="pending">Pendentes</div>
+                        <div class="adm-filter-btn" data-status="processing">Em análise</div>
+                        <div class="adm-filter-btn" data-status="ready">Prontos</div>
+                        <div class="adm-filter-btn" data-status="expired">Expirados</div>
+                        <div class="adm-filter-btn" data-status="cancelled">Cancelados</div>
+                    </div>
+                </div>
+                <div class="filter-sub-group">
+                    <div class="search-box">
+                        <input type="text" id="adm-search" placeholder="Buscar...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="adm-table-wrap">
+            <table class="adm-table">
+                <thead><tr>
+                    <th>ID</th><th>Usuário</th><th>Status</th>
+                    <th style="text-align:center">Itens</th>
+                    <th style="text-align:center">Links</th>
+                    <th>Data</th><th>Ações</th>
+                </tr></thead>
+                <tbody id="adm-tbody"></tbody>
+            </table>
+            <div class="adm-loading" id="adm-loading">Carregando pedidos...</div>
+            <div class="adm-empty" id="adm-empty" style="display:none">Nenhum pedido encontrado.</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="adm-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="btn close-btn" onclick="closeModal()">×</button>
+            <div class="section-title modal-title-competition">Pedido</div>
+            <h3 class="adm-modal-title" id="adm-modal-title"></h3>
+        </div>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="js/config.js"></script>
+<script src="js/translation.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.service.js"></script>
+<script src="js/managers.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+const ADM_CFG = {
+    apiBase:        CONFIG.REQUEST_API_BASE,
+    googleClientId: '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
+};
+
+let admToken     = null;
+let admUser      = null;
+let allOrders    = [];
+let filterStatus = '';
+let filterQuery  = '';
+
+// ── Sessão ────────────────────────────────────────────────────
+function saveSession(token) { admToken = token; localStorage.setItem('adm_token', token); }
+function clearSession() { admToken = null; admUser = null; localStorage.removeItem('adm_token'); }
+function restoreSession() {
+    const token = localStorage.getItem('adm_token');
+    if (!token) return false;
+    try {
+        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (p.exp && p.exp < Math.floor(Date.now()/1000)) { clearSession(); return false; }
+        admToken = token;
+        admUser  = { name: p.name || p.email, email: p.email };
+        return true;
+    } catch { clearSession(); return false; }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+document.getElementById('adm-login-google').addEventListener('click', () => {
+    if (!window.google?.accounts?.id) { alert('Google GSI não carregou.'); return; }
+    google.accounts.id.initialize({
+        client_id: ADM_CFG.googleClientId,
+        callback: async (res) => {
+            let r, d;
+            try {
+                r = await fetch(`${ADM_CFG.apiBase}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: res.credential }),
+                });
+                d = await r.json();
+            } catch { alert('Erro ao conectar com o servidor.'); return; }
+            if (!r.ok || !d.isAdmin) { alert(d?.error || 'Acesso negado.'); return; }
+            const p = JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+            admUser = { name: p.name || p.email, email: p.email };
+            saveSession(d.token);
+            showDashboard();
+        },
+        auto_select: false,
+    });
+    google.accounts.id.prompt();
+});
+
+document.getElementById('adm-logout').addEventListener('click', () => {
+    clearSession();
+    document.getElementById('adm-auth').style.display = 'flex';
+    document.getElementById('adm-dashboard').style.display = 'none';
+    document.getElementById('stats-container').style.display = 'none';
+});
+
+function showDashboard() {
+    document.getElementById('adm-auth').style.display = 'none';
+    document.getElementById('adm-dashboard').style.display = 'block';
+    document.getElementById('adm-user-name').textContent = admUser?.name || '';
+    document.getElementById('stats-container').style.display = 'block';
+    loadOrders();
+}
+if (restoreSession()) showDashboard();
+
+// ── Carregar pedidos ──────────────────────────────────────────
+async function loadOrders() {
+    document.getElementById('adm-loading').style.display = 'block';
+    document.getElementById('adm-empty').style.display   = 'none';
+    document.getElementById('adm-tbody').innerHTML       = '';
+    try {
+        const res = await fetch(`${ADM_CFG.apiBase}/orders`, { headers: { Authorization: `Bearer ${admToken}` } });
+        if (res.status === 401 || res.status === 403) { alert('Sessão expirada.'); location.reload(); return; }
+        const d = await res.json();
+        allOrders = d.orders || [];
+        renderTable(); updateStats();
+    } catch(e) { document.getElementById('adm-loading').textContent = '⚠ Erro: ' + e.message; }
+}
+document.getElementById('adm-refresh').addEventListener('click', loadOrders);
+
+// ── Filtros ───────────────────────────────────────────────────
+document.querySelectorAll('.adm-filter-btn').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.adm-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); filterStatus = btn.dataset.status; renderTable();
+}));
+document.getElementById('adm-search').addEventListener('input', e => {
+    filterQuery = e.target.value.toLowerCase(); renderTable();
+});
+
+// ── Render tabela ─────────────────────────────────────────────
+function renderTable() {
+    const tbody = document.getElementById('adm-tbody');
+    document.getElementById('adm-loading').style.display = 'none';
+    let orders = allOrders;
+    if (filterStatus) orders = orders.filter(o => o.status === filterStatus);
+    if (filterQuery)  orders = orders.filter(o =>
+        o.id.toLowerCase().includes(filterQuery) ||
+        (o.user?.name||'').toLowerCase().includes(filterQuery) ||
+        (o.user?.email||'').toLowerCase().includes(filterQuery));
+    if (!orders.length) {
+        tbody.innerHTML = '';
+        document.getElementById('adm-empty').style.display = 'block';
+        return;
+    }
+    document.getElementById('adm-empty').style.display = 'none';
+    const now = new Date();
+    tbody.innerHTML = orders.map(o => {
+        const dt     = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
+        const total  = (o.items||[]).length;
+        // Conta itens com link ativo
+        const active = (o.items||[]).filter(it =>
+            it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
+        ).length;
+        const hasAny = (o.items||[]).some(it => it.link);
+        const linksCell = hasAny
+            ? `<span style="font-weight:700;color:${active>0?'var(--success-color)':'var(--error-color)'}">${active}</span><span style="color:var(--text-secondary);font-size:var(--font-size-xs)">/${total}</span>`
+            : `<span style="color:var(--text-secondary)">—</span>`;
+        return `<tr>
+            <td style="width:1px"><code style="font-size:var(--font-size-xs);color:var(--text-secondary);white-space:nowrap">${o.id.replace('ORD-','')}</code></td>
+            <td><div style="font-weight:600;white-space:nowrap">${esc(o.user?.name||'—')}</div></td>
+            <td style="width:1px;white-space:nowrap"><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td>
+            <td style="text-align:center;font-weight:700;color:var(--accent-color);width:1px;white-space:nowrap">${total}</td>
+            <td style="text-align:center;width:1px;white-space:nowrap">${linksCell}</td>
+            <td style="font-size:var(--font-size-sm);white-space:nowrap;color:var(--text-secondary);width:1px">${dt}</td>
+            <td style="width:1px;white-space:nowrap">
+                <button class="action-btn btn-primary btn-xs" onclick="openOrder('${o.id}')">Abrir</button>
+                <button class="action-btn btn-danger btn-xs"  onclick="deleteOrder('${o.id}')">✕</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function statusLabel(s) {
+    return {pending:'Pendente',processing:'Em análise',ready:'Pronto',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
+}
+function updateStats() {
+    const c = s => allOrders.filter(o => o.status === s).length;
+    document.getElementById('st-total').textContent      = allOrders.length;
+    document.getElementById('st-pending').textContent    = c('pending');
+    document.getElementById('st-processing').textContent = c('processing');
+    document.getElementById('st-ready').textContent      = c('ready');
+    document.getElementById('st-expired').textContent    = c('expired');
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+async function openOrder(id) {
+    document.getElementById('adm-modal-title').textContent = 'Carregando...';
+    document.getElementById('modal-body').innerHTML = '<div class="adm-loading">Buscando pedido...</div>';
+    document.getElementById('adm-modal').classList.add('active');
+    const res   = await fetch(`${ADM_CFG.apiBase}/orders/${id}`, { headers: { Authorization: `Bearer ${admToken}` } });
+    const order = await res.json();
+    document.getElementById('adm-modal-title').textContent = order.id;
+    document.getElementById('modal-body').innerHTML = buildOrderDetail(order);
+}
+function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
+document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
+
+// ── Render detalhe do pedido ──────────────────────────────────
+function buildOrderDetail(o) {
+    const now    = new Date();
+    const items  = o.items || [];
+    const total  = items.length;
+    const active = items.filter(it =>
+        it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
+    ).length;
+
+    // Lista de itens com seus links inline
+    const itemsHtml = items.map((item, idx) => {
+        const link     = item.link;
+        const expired  = link && link.expiresAt && new Date(link.expiresAt) < now;
+        const disabled = link?.disabled;
+        const url      = link ? (link.proxyUrl || link.url || '#') : null;
+        const expText  = !link ? '' : (link.expiresAt
+            ? (expired ? '⛔ Expirado' : '✓') + ' ' + new Date(link.expiresAt).toLocaleString('pt-BR')
+            : '∞ Sem expiração');
+
+        const linkRow = link
+            ? `<div class="adm-item-link-row">
+                ${url ? `<a class="adm-item-link-url" href="${url}" target="_blank" rel="noopener">${url}</a>` : '<span class="adm-item-link-url" style="color:var(--text-tertiary)">sem URL</span>'}
+                <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
+                ${disabled ? '<span class="pill st-expired" style="font-size:var(--font-size-xs)">OFF</span>' : ''}
+                <button class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
+                    onclick="toggleItemLink('${o.id}',${idx},${!disabled})">
+                    ${disabled ? '▶ Ligar' : '⏸ Pausar'}
+                </button>
+                <button class="action-btn btn-danger btn-xs" onclick="removeItemLink('${o.id}',${idx})">✕</button>
+               </div>`
+            : `<div class="adm-item-no-link">Sem link — preencha abaixo e clique em Salvar</div>`;
+
+        return `
+        <div class="adm-item" id="adm-item-${idx}">
+            <div class="adm-item-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
+            <div class="adm-item-meta">${esc(item.meta||'')}${item.date?' · '+esc(item.date):''}</div>
+            ${linkRow}
+            <!-- Form inline para este item -->
+            <div class="detail-list" style="margin-top:var(--sp-3)">
+                <div class="detail-list-item">
+                    <span class="detail-list-label">URL</span>
+                    <span class="detail-list-value"><input class="adm-input adm-input-text" id="lnk-url-${idx}" placeholder="https://..." value="${esc(link?.url||'')}"></span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">Drive File ID</span>
+                    <span class="detail-list-value"><input class="adm-input adm-input-text" id="lnk-gdrive-${idx}" placeholder="1BxiMV..." value="${esc(link?.gdrive_id||'')}"></span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">Expiração</span>
+                    <span class="detail-list-value">
+                        <select class="adm-input adm-input-select" id="lnk-expiry-${idx}">
+                            <option value="168">7 dias</option>
+                            <option value="360">15 dias</option>
+                            <option value="720" selected>30 dias</option>
+                            <option value="1440">60 dias</option>
+                            <option value="2160">90 dias</option>
+                            <option value="0">Indefinidamente</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label"></span>
+                    <span class="detail-list-value">
+                        <button class="action-btn btn-primary btn-xs" onclick="saveItemLink('${o.id}',${idx})">Salvar link</button>
+                    </span>
+                </div>
+            </div>
+        </div>`;
+    }).join('') || `<div style="color:var(--text-secondary);font-size:var(--font-size-mdm)">Nenhum item.</div>`;
+
+    const bulkHtml = total > 0 ? `
+        <div class="adm-links-bulk">
+            <div class="adm-links-bulk-info">
+                <strong style="color:${active>0?'var(--success-color)':'var(--error-color)'}">${active}</strong>
+                de ${total} link(s) ativo(s)
+            </div>
+            <div class="adm-bulk-actions">
+                <button class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">⏸ Desativar todos</button>
+                <button class="action-btn adm-btn-success" onclick="toggleActivatePanel()">▶ Ativar todos...</button>
+            </div>
+        </div>
+        <div class="adm-expiry-inline" id="activate-panel">
+            <label>Novo prazo:</label>
+            <select class="adm-expiry-sel" id="activate-expiry">
+                <option value="168">7 dias</option>
+                <option value="360">15 dias</option>
+                <option value="720" selected>30 dias</option>
+                <option value="1440">60 dias</option>
+                <option value="2160">90 dias</option>
+                <option value="0">Indefinidamente</option>
+            </select>
+            <button class="action-btn adm-btn-success" onclick="activateAllLinks('${o.id}')">Confirmar</button>
+            <button class="action-btn btn-ghost"       onclick="toggleActivatePanel()">Cancelar</button>
+        </div>` : '';
+
+    return `
+    <div class="modal-division">
+        <div class="detail-section">
+            <div class="section-title modal-style">Usuário e status</div>
+            <div class="detail-list">
+                <div class="detail-list-item">
+                    <span class="detail-list-label">Nome</span>
+                    <span class="detail-list-value">${esc(o.user?.name||'—')}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">E-mail</span>
+                    <span class="detail-list-value">${esc(o.user?.email||'—')}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">Contato</span>
+                    <span class="detail-list-value">${esc(o.contact?.channel||'—')}: ${esc(o.contact?.value||'')}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">Status</span>
+                    <span class="detail-list-value">
+                        <select id="order-status-sel" class="adm-input adm-input-select">
+                            ${['pending','processing','ready','expired','cancelled'].map(s =>
+                                `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}
+                        </select>
+                    </span>
+                </div>
+                ${o.notes ? `<div class="detail-list-item">
+                    <span class="detail-list-label">Obs</span>
+                    <span class="detail-list-value">${esc(o.notes)}</span>
+                </div>` : ''}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-division">
+        <div class="detail-section">
+            <div class="section-title modal-style">Itens e links (${total})</div>
+            ${bulkHtml}
+            <div class="adm-items-list">${itemsHtml}</div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="action-btn btn-ghost"   onclick="closeModal()">Fechar</button>
+        <button class="action-btn btn-primary"  onclick="saveStatus('${o.id}')">Salvar status</button>
+    </div>`;
+}
+
+// ── Operações de link por item ────────────────────────────────
+async function saveItemLink(orderId, itemIdx) {
+    const url    = document.getElementById(`lnk-url-${itemIdx}`)?.value.trim();
+    const gdrive = document.getElementById(`lnk-gdrive-${itemIdx}`)?.value.trim();
+    const hours  = parseInt(document.getElementById(`lnk-expiry-${itemIdx}`)?.value || '720');
+    if (!url && !gdrive) { alert('Informe URL ou Google Drive File ID'); return; }
+
+    const btn = event.target; btn.disabled = true; btn.textContent = 'Salvando...';
+    const res = await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ url: url||null, gdrive_id: gdrive||null, expiry_hours: hours||null }),
+    });
+    const data = await res.json();
+    if (data.success) { openOrder(orderId); loadOrders(); }
+    else { alert('Erro: ' + JSON.stringify(data)); btn.disabled = false; btn.textContent = 'Salvar link'; }
+}
+
+async function toggleItemLink(orderId, itemIdx, enable) {
+    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ disabled: !enable }),
+    });
+    openOrder(orderId); loadOrders();
+}
+
+async function removeItemLink(orderId, itemIdx) {
+    if (!confirm('Remover o link deste item?')) return;
+    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ remove: true }),
+    });
+    openOrder(orderId); loadOrders();
+}
+
+// ── Bulk ops ──────────────────────────────────────────────────
+function toggleActivatePanel() {
+    document.getElementById('activate-panel').classList.toggle('open');
+}
+
+async function disableAllLinks(orderId) {
+    if (!confirm('Desativar todos os links?')) return;
+    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/disable-all`, {
+        method: 'PUT', headers: { Authorization: `Bearer ${admToken}` },
+    });
+    openOrder(orderId); loadOrders();
+}
+
+async function activateAllLinks(orderId) {
+    const hours = parseInt(document.getElementById('activate-expiry').value);
+    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/activate-all`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ expiry_hours: hours || null }),
+    });
+    openOrder(orderId); loadOrders();
+}
+
+// ── Salvar status ─────────────────────────────────────────────
+async function saveStatus(id) {
+    const status = document.getElementById('order-status-sel').value;
+    await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ status }),
+    });
+    closeModal(); loadOrders();
+}
+
+async function deleteOrder(id) {
+    if (!confirm(`Apagar permanentemente o pedido ${id}?`)) return;
+    await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${admToken}` },
+    });
+    loadOrders();
+}
+
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

@@ -87,6 +87,7 @@ const translations = {
         commentators: 'Comentaristas',
         homeTitle: 'Confira a coleção por categoria',
         dirsoament: 'Coleção do Dirso Ament',
+        adminCard: 'Administração',
         // ── index.js ──
         sectionChangesTitle: 'Últimas alterações',
         seeAllLink:          'Ver tudo →',
@@ -127,6 +128,97 @@ const translations = {
         fc_added:            'adicionado',
         fc_modified:         'alterado',
         fc_removed:          'removido',
+
+        // ── request.js ──
+        requestCart:               'Lista de escolhidos',
+        requestCartTitle:          'Lista de escolhidos',
+        requestListEmpty:          'Sua lista está vazia.',
+        requestListHint:           'Clique em "+" em qualquer jogo para adicioná-lo.',
+        requestAdded:              'Adicionado',
+        requestAddBtn:             '+',
+        requestAlreadyAdded:       'Já está na lista',
+        requestAlreadyInCart:      'Item já está na lista',
+        requestRemove:             'Remover',
+        requestMyRequests:         'Meus pedidos',
+        requestItemsSelected:      'item(s) selecionado(s)',
+        requestItemsUnit:          'item(s)',
+        requestClear:              'Limpar',
+        requestSubmit:             'Solicitar',
+        requestCartEmpty:          'Lista vazia!',
+        requestClose:              'Fechar',
+        requestBack:               'Voltar',
+        requestRefresh:            'Atualizar',
+        requestLogout:             'Sair',
+        requestEvents:             'evento(s)',
+ 
+        requestStepLogin:          'Identificação',
+        requestLoginDesc:          'Faça login para enviar o seu pedido. Seu e-mail ficará vinculado ao orçamento.',
+        requestLoginGoogle:        'Continuar com Google',
+        requestLoginError:         'Erro ao autenticar',
+        requestLoginCancelled:     'Login cancelado',
+        requestGSINotLoaded:       'Google GSI não carregou. Recarregue a página.',
+ 
+        requestStepContact:        'Meio de contato',
+        requestContactDesc:        'Como prefere ser contactado após a análise?',
+        requestContactChannel:     'Canal de contato',
+        requestContactLabel:       'Informe:',
+        requestContactEmail:       'E-mail:',
+        requestContactWhatsApp:    'WhatsApp (com DDD):',
+        requestContactTelegram:    'Usuário Telegram:',
+        requestContactBluesky:     'Handle Bluesky:',
+        requestContactX:           'Usuário X:',
+        requestNotesLabel:         'Observações (opcional):',
+        requestNotesPlaceholder:   'Algum detalhe especial sobre o pedido...',
+        requestFillContact:        'Preencha o meio de contato!',
+ 
+        requestSend:               'Enviar pedido',
+        requestSending:            'Enviando...',
+        requestError:              'Erro ao enviar pedido',
+ 
+        requestSuccessTitle:       'Pedido enviado!',
+        requestSuccessId:          'Seu pedido:',
+        requestSuccessHint:        'Eu vou entrar em contato contigo pelo meio de contato em até 48 horas para confirmar essa requisição.',
+        
+        requestMyRequestsDesc:     'Faça login para acompanhar seus pedidos e acessar os links de download.',
+        requestLoadingOrders:      'Carregando pedidos...',
+        requestNoOrders:           'Nenhum pedido ainda',
+        requestNoOrdersHint:       'Navegue pelo acervo e adicione itens ao carrinho para fazer um pedido.',
+        requestLinksAvailable:     'link(s) disponível(is)',
+        requestViewDetail:         'Ver detalhes completos',
+        requestDownloads:          'Links de download',
+        requestContactInfo:        'Contato informado',
+ 
+        requestProgressReceived:   'Recebido',
+        requestProgressAnalysis:   'Em análise',
+        requestProgressReady:      'Pronto',
+ 
+        requestStatusPending:      'Pendente',
+        requestStatusProcessing:   'Em análise',
+        requestStatusReady:        'Pronto',
+        requestStatusExpired:      'Expirado',
+        requestStatusCancelled:    'Cancelado',
+        requestStatusLabel:        'Status',
+ 
+        requestLinkPending:        'Aguardando link...',
+        requestLinkDisabled:       'Link temporariamente indisponível',
+        requestLinkExpired:        'Link expirado',
+        requestLinkNoExpiry:       'Sem expiração',
+        requestLinkValidDays:      'Válido por mais {n} dia(s)',
+        requestDownload:           'Baixar',
+ 
+        requestNoLinkPending:      'Seu pedido foi recebido! Em breve será analisado.',
+        requestNoLinkProcessing:   'Pedido em análise. Os links serão disponibilizados em breve.',
+        requestNoLinkReady:        'Pedido pronto — links chegando em instantes!',
+        requestNoLinkExpired:      'Os links deste pedido expiraram.',
+        requestNoLinkCancelled:    'Este pedido foi cancelado.',
+ 
+        requestLoginRequired:      'Identificação necessária',
+        requestLoginRequiredDesc:  'Faça login para visualizar os detalhes do pedido.',
+        requestLoadingOrder:       'Carregando pedido...',
+        requestNoOrderId:          'ID do pedido não informado.',
+        requestOrderForbidden:     'Você não tem permissão para ver este pedido.',
+        requestOrderNotFound:      'Pedido não encontrado.',
+        requestOrderInfo:          'Informações do pedido',
     },
     'en': {
         'Copa São Paulo de Futebol Júnior': 'Under-20 Sao Paulo Cup',
@@ -278,6 +370,7 @@ const translations = {
         commentators: 'Commentators',
         homeTitle: 'Select a category',
         dirsoament: 'Dirso Ament`s Collection',
+        adminCard: 'Admin',
         // ── index.js ──
         sectionChangesTitle: 'Recent changes',
         seeAllLink:          'See all →',
@@ -318,6 +411,97 @@ const translations = {
         fc_added:            'added',
         fc_modified:         'modified',
         fc_removed:          'removed',
+
+        // ── request.js ──
+        requestCart:               'Request list',
+        requestCartTitle:          'Request list',
+        requestListEmpty:          'Your list is empty.',
+        requestListHint:           'Click "+" on any game to add it.',
+        requestAdded:              'Added',
+        requestAddBtn:             '+',
+        requestAlreadyAdded:       'Already in list',
+        requestAlreadyInCart:      'Item already in list',
+        requestRemove:             'Remove',
+        requestMyRequests:           'My requests',
+        requestItemsSelected:      'item(s) selected',
+        requestItemsUnit:          'item(s)',
+        requestClear:              'Clear',
+        requestSubmit:             'Request',
+        requestCartEmpty:          'Empty list!',
+        requestClose:              'Close',
+        requestBack:               'Back',
+        requestRefresh:            'Refresh',
+        requestLogout:             'Sign out',
+        requestEvents:             'event(s)',
+ 
+        requestStepLogin:          'Identification',
+        requestLoginDesc:          'Sign in to submit your request. Your email will be linked to the order.',
+        requestLoginGoogle:        'Continue with Google',
+        requestLoginError:         'Authentication error',
+        requestLoginCancelled:     'Login cancelled',
+        requestGSINotLoaded:       'Google GSI not loaded. Please reload the page.',
+ 
+        requestStepContact:        'Contact method',
+        requestContactDesc:        'How would you like to be contacted once the request is reviewed?',
+        requestContactChannel:     'Contact channel',
+        requestContactLabel:       'Enter:',
+        requestContactEmail:       'E-mail:',
+        requestContactWhatsApp:    'WhatsApp (with country code):',
+        requestContactTelegram:    'Telegram username:',
+        requestContactBluesky:     'Bluesky handle:',
+        requestContactX:           'X username:',
+        requestNotesLabel:         'Notes (optional):',
+        requestNotesPlaceholder:   'Any special details about the request...',
+        requestFillContact:        'Please fill in the contact method!',
+ 
+        requestSend:               'Send request',
+        requestSending:            'Sending...',
+        requestError:              'Error sending request',
+ 
+        requestSuccessTitle:       'Request sent!',
+        requestSuccessId:          'Your request:',
+        requestSuccessHint:        'I will contact you using your chosen method of contact within 48 hours to confirm this request.',
+ 
+        requestMyRequestsDesc:     'Sign in to track your requests and access download links.',
+        requestLoadingOrders:      'Loading orders...',
+        requestNoOrders:           'No orders yet',
+        requestNoOrdersHint:       'Browse the archive and add items to your cart to place a request.',
+        requestLinksAvailable:     'link(s) available',
+        requestViewDetail:         'View full details',
+        requestDownloads:          'Download links',
+        requestContactInfo:        'Contact provided',
+ 
+        requestProgressReceived:   'Received',
+        requestProgressAnalysis:   'In review',
+        requestProgressReady:      'Ready',
+ 
+        requestStatusPending:      'Pending',
+        requestStatusProcessing:   'In review',
+        requestStatusReady:        'Ready',
+        requestStatusExpired:      'Expired',
+        requestStatusCancelled:    'Cancelled',
+        requestStatusLabel:        'Status',
+ 
+        requestLinkPending:        'Awaiting link...',
+        requestLinkDisabled:       'Link temporarily unavailable',
+        requestLinkExpired:        'Link expired',
+        requestLinkNoExpiry:       'No expiry',
+        requestLinkValidDays:      'Valid for {n} more day(s)',
+        requestDownload:           'Download',
+ 
+        requestNoLinkPending:      'Your request was received! It will be reviewed soon.',
+        requestNoLinkProcessing:   'Request under review. Links will be shared soon.',
+        requestNoLinkReady:        'Request ready — links coming shortly!',
+        requestNoLinkExpired:      'The links for this request have expired.',
+        requestNoLinkCancelled:    'This request was cancelled.',
+ 
+        requestLoginRequired:      'Login required',
+        requestLoginRequiredDesc:  'Please sign in to view the order details.',
+        requestLoadingOrder:       'Loading order...',
+        requestNoOrderId:          'No order ID provided.',
+        requestOrderForbidden:     'You do not have permission to view this order.',
+        requestOrderNotFound:      'Order not found.',
+        requestOrderInfo:          'Order information',
     }
 };
 
@@ -409,7 +593,6 @@ const LanguageManager = {
         if (translation !== text) return translation;
         
         // Se não encontrar tradução exata, tenta traduzir partes conhecidas
-        // Exemplo: "28ª Rodada" -> "28th Round"
         if (this.currentLang === 'en') {
             // Traduz padrões de rodadas
             if (text.includes('Disputa 3º Lugar')) {
@@ -438,6 +621,13 @@ const LanguageManager = {
                 const number = roundMatch[1];
                 const suffix = this.getOrdinalSuffix(number);
                 return `Round ${number}`;
+            }
+
+            const phaseMatch = text.match(/(\d+)ª Fase/);
+            if (roundMatch) {
+                const number = roundMatch[1];
+                const suffix = this.getOrdinalSuffix(number);
+                return `Phase ${number}`;
             }
         }
         

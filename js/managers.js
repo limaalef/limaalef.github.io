@@ -34,6 +34,7 @@ const PaginationManager = {
 const CardManager = {
     create(match) {
         const card = document.createElement('div');
+        card.dataset.matchId = match.ID;
         const status = Utils.getMatchStatus(match);
         const hasVideo = match['Video Embed'] ? 'has-video' : '';
         card.className = `match-card ${status} ${hasVideo}`;
@@ -661,6 +662,8 @@ const Renderer = {
                 list.appendChild(item);
             });
         }
+
+        document.dispatchEvent(new CustomEvent('matchesRendered'));
     },
     updateStats(apiResponse) {
         if (AppState.matches.length === 0) return;

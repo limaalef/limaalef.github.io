@@ -4,6 +4,8 @@ const CONFIG = {
         others: 'https://api.limaalef.com/archive/matches?type=multi',
         motor: 'https://api.limaalef.com/archive/matches?type=motor'
     },
+    REQUEST_API_BASE: 'https://api-archive.limaalef.com',
+    GOOGLE_CLIENT_ID: '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
     CHANGELOG_URL: 'https://api.limaalef.com/archive/changelog',
     CONTEXT_API_URL: 'https://api.limaalef.com/archive/matches?', 
     DEFAULT_ITEMS_PER_PAGE: 200,

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido | Sports Archive</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/request.css">
+<style>
+.rd-wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
+
+/* Auth (reúsa estilos de my-requests) */
+#rd-auth { display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
+    padding:var(--sp-9) var(--sp-5); text-align:center; }
+#rd-auth h2 { color:var(--text-primary); margin:0; font-size:var(--font-size-xxl); }
+#rd-auth p  { color:var(--text-secondary); margin:0; font-size:var(--font-size-mdm); }
+
+.rd-loading { text-align:center; padding:var(--sp-9) var(--sp-5);
+    color:var(--text-secondary); font-size:var(--font-size-mdm); }
+
+/* Header do pedido */
+.rd-order-header { margin-bottom:var(--sp-6); }
+.rd-order-id   { font-size:var(--font-size-xs); color:var(--text-secondary); font-family:monospace; margin-bottom:var(--sp-1); }
+.rd-order-date { font-size:var(--font-size-mds); color:var(--text-tertiary); margin-bottom:var(--sp-3); }
+
+/* Progress bar */
+.rd-progress { display:flex; border-radius:var(--border-radius-size-md);
+    overflow:hidden; border:1px solid var(--border-color); margin-bottom:var(--sp-6); }
+.rd-progress-step { flex:1; text-align:center; padding:var(--sp-3) var(--sp-2);
+    font-size:var(--font-size-xs); font-weight:600; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary);
+    transition:all .2s; }
+.rd-progress-step + .rd-progress-step { border-left:1px solid var(--border-color); }
+.rd-progress-step.done    { background:var(--bg-success); color:var(--text-success); }
+.rd-progress-step.current { background:var(--accent-color); color:var(--text-accent-color); }
+
+/* Sections */
+.rd-section { margin-bottom:var(--sp-6); }
+.rd-section-title { font-size:var(--font-size-xs); text-transform:uppercase;
+    letter-spacing:.07em; color:var(--accent-color); margin-bottom:var(--sp-3); }
+
+/* Download cards — um por item */
+.rd-dl-list { display:flex; flex-direction:column; gap:var(--sp-4); }
+
+.rd-dl-card { border-radius:var(--border-radius-size-xl);
+    border:1px solid var(--border-color); overflow:hidden; }
+.rd-dl-card.available { border-color:var(--success-color); }
+
+.rd-dl-card-head { display:flex; align-items:center; gap:var(--sp-4);
+    padding:var(--sp-4) var(--sp-5); background:var(--bg-secondary); }
+.rd-dl-card.available .rd-dl-card-head { background:var(--bg-success); }
+
+.rd-dl-icon { font-size:1.5rem; flex-shrink:0; }
+
+.rd-dl-info { flex:1; min-width:0; }
+.rd-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
+.rd-dl-sub   { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:var(--sp-1); }
+
+.rd-dl-card-body { padding:var(--sp-4) var(--sp-5);
+    border-top:1px solid var(--border-color); background:var(--bg-primary); }
+.rd-dl-status-row { display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:var(--sp-3); }
+.rd-dl-exp { font-size:var(--font-size-sm); }
+.rd-dl-exp.valid     { color:var(--text-success); }
+.rd-dl-exp.expired   { color:var(--error-color); }
+.rd-dl-exp.indefinite { color:var(--text-secondary); }
+.rd-dl-exp.disabled  { color:var(--text-tertiary); }
+
+.rd-dl-pending { padding:var(--sp-4) var(--sp-5); background:var(--bg-primary);
+    color:var(--text-tertiary); font-size:var(--font-size-sm);
+    border-top:1px solid var(--border-color); text-align:center; }
+
+/* Info list */
+.rd-info-list { display:flex; flex-direction:column; gap:1px;
+    border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
+.rd-info-item { background:var(--bg-secondary); padding:var(--sp-3) var(--sp-4);
+    display:flex; align-items:center; justify-content:space-between; }
+.rd-info-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
+.rd-info-label { font-size:var(--font-size-sm); color:var(--text-secondary); width:35%; }
+.rd-info-value { font-size:var(--font-size-mdm); font-weight:600;
+    color:var(--text-primary); text-align:right; width:65%; }
+
+.rd-notes { padding:var(--sp-3) var(--sp-4); background:var(--bg-secondary);
+    border-radius:var(--border-radius-size-md); border-left:3px solid var(--accent-color);
+    font-size:var(--font-size-sm); color:var(--text-secondary); }
+
+/* Back link */
+.rd-back { display:inline-flex; align-items:center; gap:var(--sp-2);
+    font-size:var(--font-size-sm); color:var(--accent-color);
+    text-decoration:none; margin-bottom:var(--sp-5); transition:opacity .15s; }
+.rd-back:hover { opacity:.75; text-decoration:underline; }
+</style>
+</head>
+<body>
+<header>
+    <div class="header-frame" id="header" data-title="" data-back="true"></div>
+    <div class="control-group">
+        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+            <span id="langFlag">🇧🇷</span>
+        </button>
+    </div>
+</header>
+
+<div class="rd-wrap">
+
+    <!-- Auth -->
+    <div id="rd-auth">
+        <div style="font-size:3rem">🔒</div>
+        <h2 data-i18n="requestLoginRequired">Identificação necessária</h2>
+        <p data-i18n="requestLoginRequiredDesc">Faça login para visualizar os detalhes do pedido.</p>
+        <button class="om-oauth-btn om-google" id="rd-login-google" style="margin-top:var(--sp-3)">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <span data-i18n="requestLoginGoogle">Entrar com Google</span>
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div id="rd-content" style="display:none">
+        <a href="my-requests.html" class="rd-back">← <span data-i18n="requestMyRequests">Meus Pedidos</span></a>
+        <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
+        <div id="rd-order-body"></div>
+    </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="js/config.js"></script>
+<script src="js/translation.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.service.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+const RD_CFG = {
+    apiBase:        CONFIG.REQUEST_API_BASE,
+    googleClientId: CONFIG.GOOGLE_CLIENT_ID,
+};
+
+let rdToken = null;
+let rdUser  = null;
+
+function t(key) {
+    return (LanguageManager ? LanguageManager.t(key) : null) || key;
+}
+
+const orderId = new URLSearchParams(window.location.search).get('id');
+
+// ── Sessão ────────────────────────────────────────────────────
+function saveRdSession(token, user) {
+    rdToken = token; rdUser = user;
+    localStorage.setItem('rq_token', token);
+    localStorage.setItem('rq_user',  JSON.stringify(user));
+}
+function restoreRdSession() {
+    const token = localStorage.getItem('rq_token');
+    const user  = localStorage.getItem('rq_user');
+    if (!token) return false;
+    try {
+        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (p.exp && p.exp < Math.floor(Date.now()/1000)) {
+            localStorage.removeItem('rq_token'); localStorage.removeItem('rq_user'); return false;
+        }
+        rdToken = token;
+        rdUser  = user ? JSON.parse(user) : { name: p.name || p.email, email: p.email, picture: p.picture || '' };
+        return true;
+    } catch { return false; }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+document.getElementById('rd-login-google').addEventListener('click', () => {
+    if (!window.google?.accounts?.id) { alert(t('requestGSINotLoaded')); return; }
+    google.accounts.id.initialize({
+        client_id: RD_CFG.googleClientId,
+        cancel_on_tap_outside: false,
+        callback: async (response) => {
+            try {
+                const res = await fetch(`${RD_CFG.apiBase}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential }),
+                });
+                if (!res.ok) { alert(t('requestLoginError')); return; }
+                const data = await res.json();
+                const p    = decodeJwt(response.credential);
+                saveRdSession(data.token, { name: p.name || p.email, email: p.email, picture: p.picture || '' });
+                showContent();
+            } catch { alert(t('requestLoginError')); }
+        },
+    });
+    google.accounts.id.prompt();
+});
+
+function showContent() {
+    document.getElementById('rd-auth').style.display    = 'none';
+    document.getElementById('rd-content').style.display = 'block';
+
+    if (!orderId) {
+        document.getElementById('rd-loading').textContent = t('requestNoOrderId');
+        return;
+    }
+    loadOrder();
+}
+
+if (restoreRdSession()) showContent();
+
+// ── Carregar pedido ───────────────────────────────────────────
+async function loadOrder() {
+    document.getElementById('rd-loading').style.display    = 'block';
+    document.getElementById('rd-order-body').innerHTML      = '';
+    try {
+        const res = await fetch(`${RD_CFG.apiBase}/orders/${encodeURIComponent(orderId)}`, {
+            headers: { Authorization: `Bearer ${rdToken}` },
+        });
+        if (res.status === 401) { localStorage.removeItem('rq_token'); location.reload(); return; }
+        if (res.status === 403) {
+            document.getElementById('rd-loading').textContent = t('requestOrderForbidden');
+            return;
+        }
+        if (res.status === 404) {
+            document.getElementById('rd-loading').textContent = t('requestOrderNotFound');
+            return;
+        }
+        const order = await res.json();
+        document.getElementById('rd-loading').style.display = 'none';
+
+        // Atualiza título do header
+        const hdr = document.getElementById('header');
+        if (hdr) hdr.dataset.title = order.id;
+        document.title = `${order.id} | Sports Archive`;
+
+        document.getElementById('rd-order-body').innerHTML = buildOrderDetail(order);
+    } catch(e) {
+        document.getElementById('rd-loading').textContent = '⚠ ' + e.message;
+    }
+}
+
+// ── Render detalhe ────────────────────────────────────────────
+function buildOrderDetail(o) {
+    const now   = new Date();
+    const dt    = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
+    const items = o.items || [];
+
+    // Progress bar
+    const steps = [
+        { label: t('requestProgressReceived') },
+        { label: t('requestProgressAnalysis')  },
+        { label: t('requestProgressReady')     },
+    ];
+    const stepIdx = { pending:0, processing:1, ready:2, expired:2, cancelled:2 };
+    const curIdx  = stepIdx[o.status] ?? 0;
+
+    const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
+        <div class="rd-progress">
+            ${steps.map((s, i) => {
+                let cls = '';
+                if (i < curIdx)  cls = 'done';
+                if (i === curIdx) cls = 'current';
+                return `<div class="rd-progress-step ${cls}">${i < curIdx ? '✓ ' : ''}${s.label}</div>`;
+            }).join('')}
+        </div>` : '';
+
+    // Cards de download — um por item
+    const dlCardsHtml = items.map(item => {
+        const link    = item.link;
+        const expired = link && link.expiresAt && new Date(link.expiresAt) < now;
+        const blocked = !link || link.disabled || expired;
+        const url     = link ? (link.proxyUrl || link.url || '#') : null;
+
+        let expText = '', expCls = '';
+        if (!link) {
+            expText = t('requestLinkPending'); expCls = 'disabled';
+        } else if (link.disabled) {
+            expText = t('requestLinkDisabled'); expCls = 'disabled';
+        } else if (expired) {
+            expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString('pt-BR');
+            expCls  = 'expired';
+        } else if (!link.expiresAt) {
+            expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
+        } else {
+            const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
+            expText    = '✓ ' + t('requestLinkValidDays').replace('{n}', days);
+            expCls     = 'valid';
+        }
+
+        return `
+        <div class="rd-dl-card ${!blocked ? 'available' : ''}">
+            <div class="rd-dl-card-head">
+                <div class="rd-dl-icon">${blocked ? '🔒' : '📥'}</div>
+                <div class="rd-dl-info">
+                    <div class="rd-dl-label">${esc(item.label)}</div>
+                    <div class="rd-dl-sub">${esc(item.meta||'')}${item.date ? ' · ' + esc(item.date) : ''}${item.station ? ' · ' + esc(item.station) : ''}</div>
+                </div>
+            </div>
+            ${link
+                ? `<div class="rd-dl-card-body">
+                    <div class="rd-dl-status-row">
+                        <span class="rd-dl-exp ${expCls}">${expText}</span>
+                        ${!blocked && url
+                            ? `<a href="${url}" class="action-btn btn-primary" target="_blank" rel="noopener" download
+                                style="text-decoration:none">⬇ ${t('requestDownload')}</a>`
+                            : ''}
+                    </div>
+                   </div>`
+                : `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`
+            }
+        </div>`;
+    }).join('');
+
+    // Info do pedido
+    const CONTACT_ICON = { email:'📧', whatsapp:'💬', telegram:'✈️', bluesky:'🦋', x:'𝕏' };
+    const infoHtml = `
+        <div class="rd-info-list">
+            <div class="rd-info-item">
+                <span class="rd-info-label" data-i18n="requestStatusLabel">${t('requestStatusLabel')}</span>
+                <span class="rd-info-value"><span class="pill st-${o.status}">${statusPtBR(o.status)}</span></span>
+            </div>
+            <div class="rd-info-item">
+                <span class="rd-info-label" data-i18n="requestContactInfo">${t('requestContactInfo')}</span>
+                <span class="rd-info-value">
+                    ${CONTACT_ICON[o.contact?.channel]||'📬'} ${esc(o.contact?.channel||'—')}: ${esc(o.contact?.value||'')}
+                </span>
+            </div>
+            <div class="rd-info-item">
+                <span class="rd-info-label" data-i18n="date">${t('date')}</span>
+                <span class="rd-info-value">${dt}</span>
+            </div>
+        </div>
+        ${o.notes ? `<div class="rd-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}`;
+
+    return `
+    <div class="rd-order-header">
+        <div class="rd-order-id">${esc(o.id)}</div>
+        <div class="rd-order-date">${dt}</div>
+        <span class="pill st-${o.status}">${statusPtBR(o.status)}</span>
+    </div>
+
+    ${progressHtml}
+
+    <div class="rd-section">
+        <div class="rd-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
+        <div class="rd-dl-list">${dlCardsHtml}</div>
+    </div>
+
+    <div class="rd-section">
+        <div class="rd-section-title" data-i18n="requestOrderInfo">${t('requestOrderInfo')}</div>
+        ${infoHtml}
+    </div>`;
+}
+
+function statusPtBR(s) {
+    return { pending:t('requestStatusPending'), processing:t('requestStatusProcessing'),
+             ready:t('requestStatusReady'), expired:t('requestStatusExpired'),
+             cancelled:t('requestStatusCancelled') }[s] || s;
+}
+
+function decodeJwt(token) {
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(
+        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
