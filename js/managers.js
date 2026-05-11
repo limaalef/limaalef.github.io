@@ -370,7 +370,7 @@ const MatchModal = {
                     </div>
                     <div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('origin')}</span>
-                        <span class="detail-list-value">${match.Origem || 'N/A'}</span>
+                        <span class="detail-list-value">${LanguageManager.translateText(match.Origem) || 'N/A'}</span>
                     </div>
                     <div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('narration')}</span>
