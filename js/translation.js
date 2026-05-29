@@ -127,8 +127,13 @@ const translations = {
 
         'sectioncompetition-worldcup': 'Copa do Mundo FIFA',
         'sectioncompetition-brazilianleague': 'Brasileirão',
+        'sectioncompetition-brazilianleague': 'Brasileirão Feminino',
         'sectioncompetition-brazilcup': 'Copa do Brasil',
+        'sectioncompetition-brazilcupfem': 'Copa do Brasil Feminina',
         'sectioncompetition-libertadores': 'Libertadores',
+        'sectioncompetition-libertadoresfem': 'Libertadores Feminina',
+        'sectioncompetition-paulistao': 'Paulistão',
+        'sectioncompetition-paulistaofem': 'Paulistão F',
         'sectioncompetition-sudamericana': 'Sul-Americana',
 
         // ── changelog.js ──
@@ -437,8 +442,13 @@ const translations = {
 
         'sectioncompetition-worldcup': 'FIFA World Cup',
         'sectioncompetition-brazilianleague': 'Brazilian League',
+        'sectioncompetition-brazilianleaguefem': "Women's Brazilian League",
         'sectioncompetition-brazilcup': 'Brazil Cup',
+        'sectioncompetition-brazilcupfem': "Women's Brazil Cup",
         'sectioncompetition-libertadores': 'Libertadores',
+        'sectioncompetition-libertadoresfem': "Women's Libertadores",
+        'sectioncompetition-paulistao': 'Paulistão',
+        'sectioncompetition-paulistaofem': 'Paulistão F',
         'sectioncompetition-sudamericana': 'Sudamericana',
 
         // ── changelog.js ──

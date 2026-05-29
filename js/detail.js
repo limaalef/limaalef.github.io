@@ -9,6 +9,7 @@
 ───────────────────────────────────────── */
 const CollectionState = {
     query: null,          // valor de ?q= na URL
+    type: null,
     yearFilter: null,     // ano selecionado (null = todos)
 };
 
@@ -39,7 +40,7 @@ const SidebarManager = {
             const data = await response.json();
             if (!data.success) throw new Error('API retornou erro');
 
-            this.render(data.data || data);
+            this.render(data.data, query || data, query);
         } catch (err) {
             // Falha silenciosa: sidebar fica em loading (não quebra a lista)
             console.warn('SidebarManager: erro ao carregar contexto:', err.message);
@@ -47,7 +48,7 @@ const SidebarManager = {
         }
     },
 
-    render(info) {
+    render(info, query) {
         // Aplica tema conforme esporte retornado
         if (info.sport) {
             CollectionApp.applyTheme(info.sport);
@@ -62,10 +63,11 @@ const SidebarManager = {
             logoEl.style.display = '';
             emojiEl.style.display = 'none';
         } else {
-            logoEl.style.display = 'none';
+            logoEl.src = `teams_logos/${query}.svg`
+            logoEl.style.display = '';
             // Emoji fallback por esporte
             const emojis = { football: '⚽', others: '🏀', motor: '🏎️' };
-            emojiEl.textContent = emojis[info.sport] || '🏆';
+            emojiEl.textContent = emojis[info.sport] || query;
             emojiEl.style.display = '';
         }
 
@@ -125,6 +127,7 @@ Object.assign(APIService, {
         const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         url.searchParams.append('max_items', 1500);
         url.searchParams.append('page', page);
+        url.searchParams.append('search_type', CollectionState.type);
         url.searchParams.append('search', CollectionState.query);
 
         if (CollectionState.yearFilter) {
@@ -297,6 +300,7 @@ const CollectionApp = {
 
         // Lê query obrigatória
         const q = params.get('q');
+        const s_type = params.get('type');
         if (!q) {
             document.getElementById('matchesContainer').innerHTML = '';
             document.getElementById('noQueryState').style.display = '';
@@ -304,6 +308,7 @@ const CollectionApp = {
             return false;
         }
         CollectionState.query = q;
+        CollectionState.type = s_type;
 
         // Página inicial
         const page = parseInt(params.get('page'));
