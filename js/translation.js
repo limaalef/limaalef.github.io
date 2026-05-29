@@ -122,6 +122,14 @@ const translations = {
         modeAdded:           '✅ Adicionados',
         modeModified:        '✏️ Modificados',
         modeRemoved:         '🗑️ Removidos',
+        sectionClubsTitle:   'Pesquisa por clubes',
+        sectionCompetitionsTitle: 'Pesquisa por campeonato',
+
+        'sectioncompetition-worldcup': 'Copa do Mundo FIFA',
+        'sectioncompetition-brazilianleague': 'Brasileirão',
+        'sectioncompetition-brazilcup': 'Copa do Brasil',
+        'sectioncompetition-libertadores': 'Libertadores',
+        'sectioncompetition-sudamericana': 'Sul-Americana',
 
         // ── changelog.js ──
         cl_added:            'adicionados',
@@ -424,6 +432,14 @@ const translations = {
         modeAdded:           '✅ Added',
         modeModified:        '✏️ Modified',
         modeRemoved:         '🗑️ Removed',
+        sectionClubsTitle:   'Football clubs',
+        sectionCompetitionsTitle: 'Competitions',
+
+        'sectioncompetition-worldcup': 'FIFA World Cup',
+        'sectioncompetition-brazilianleague': 'Brazilian League',
+        'sectioncompetition-brazilcup': 'Brazil Cup',
+        'sectioncompetition-libertadores': 'Libertadores',
+        'sectioncompetition-sudamericana': 'Sudamericana',
 
         // ── changelog.js ──
         cl_added:            'added',

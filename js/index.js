@@ -226,6 +226,68 @@ const TodayModal = {
     }
 };
 
+/* ── Clubs Browser ── */
+const ClubsBrowser = {
+    render() {
+        const grid = document.getElementById('clubsList');
+        if (!grid) return;
+        this._updateNav();
+        grid.addEventListener('scroll', () => this._updateNav(), { passive: true });
+    },
+
+    prev() {
+        const grid = document.getElementById('clubsList');
+        if (!grid) return;
+        grid.scrollBy({ left: -grid.clientWidth, behavior: 'smooth' });
+    },
+
+    next() {
+        const grid = document.getElementById('clubsList');
+        if (!grid) return;
+        grid.scrollBy({ left: grid.clientWidth, behavior: 'smooth' });
+    },
+
+    _updateNav() {
+        const grid = document.getElementById('clubsList');
+        if (!grid) return;
+        const atStart = grid.scrollLeft <= 4;
+        const atEnd   = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4;
+        document.getElementById('clubsPrev').disabled = atStart;
+        document.getElementById('clubsNext').disabled = atEnd;
+    },
+};
+
+/* ── Competitions Browser ── */
+const CompetitionsBrowser = {
+    render() {
+        const grid = document.getElementById('compList');
+        if (!grid) return;
+        this._updateNav();
+        grid.addEventListener('scroll', () => this._updateNav(), { passive: true });
+    },
+
+    prev() {
+        const grid = document.getElementById('compList');
+        if (!grid) return;
+        grid.scrollBy({ left: -grid.clientWidth, behavior: 'smooth' });
+    },
+
+    next() {
+        const grid = document.getElementById('compList');
+        if (!grid) return;
+        grid.scrollBy({ left: grid.clientWidth, behavior: 'smooth' });
+    },
+
+    _updateNav() {
+        const grid = document.getElementById('compList');
+        if (!grid) return;
+        const atStart = grid.scrollLeft <= 4;
+        const atEnd   = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4;
+        document.getElementById('compPrev').disabled = atStart;
+        document.getElementById('compNext').disabled = atEnd;
+    },
+};
+
 /* ── apply i18n to static elements ── */
 function applyI18n() {
     const ids = [
@@ -256,7 +318,15 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tihPrev').addEventListener('click', () => TodayInHistory.prev());
     document.getElementById('tihNext').addEventListener('click', () => TodayInHistory.next());
 
+    document.getElementById('clubsPrev').addEventListener('click', () => ClubsBrowser.prev());
+    document.getElementById('clubsNext').addEventListener('click', () => ClubsBrowser.next());
+
+    document.getElementById('compPrev').addEventListener('click', () => CompetitionsBrowser.prev());
+    document.getElementById('compNext').addEventListener('click', () => CompetitionsBrowser.next());
+
     applyI18n();
     loadRecentChanges();
     TodayInHistory.load();
+    ClubsBrowser.render();
+    CompetitionsBrowser.render();
 });

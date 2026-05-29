@@ -131,23 +131,217 @@ crossorigin="anonymous"></script>
 
             <div class="section-divider"></div>
 
-            <!-- ── SECTION 1: recent changes ── -->
-            <div class="home-section">
-                <div class="home-section-header">
-                    <div class="home-section-header-title">
-                        <p class="home-section-title" data-i18n="sectionChangesTitle">Últimas alterações</p>
+            <!-- ── SECTION 2: browse grid (clubs + competitions | changelog) ── -->
+            <div class="home-section browse-grid-section">
+                <div class="browse-grid">
+
+                    <!-- ── LEFT 60%: clubs + competitions ── -->
+                    <div class="browse-col-main">
+
+                        <!-- Clubs -->
+                        <div class="browse-sub-section">
+                            <div class="home-section-header">
+                                <div class="home-section-header-title">
+                                    <p class="home-section-title" data-i18n="sectionClubsTitle"></p>
+                                </div>
+                                <div class="home-section-header-action">
+                                    <button class="nav-btn" id="clubsPrev" aria-label="Anterior">‹</button>
+                                    <button class="nav-btn" id="clubsNext" aria-label="Próximo">›</button>
+                                </div>
+                            </div>
+                            <div class="browse-scroll-wrapper">
+                                <div class="browse-scroll-list" id="clubsList">
+                                    <a href="/detail.html?type=team&q=Atlético+Mineiro" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/atlético-mg.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Atlético-MG</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Athletico" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/athletico.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Athletico</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Botafogo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/botafogo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Botafogo</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Bahia" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/bahia.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Bahia</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Chapecoense" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/chapecoense.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Chapecoense</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Corinthians" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/corinthians.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Corinthians</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Coritiba" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/coritiba.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Coritiba</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Cruzeiro" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/cruzeiro.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Cruzeiro</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Flamengo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/flamengo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Flamengo</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Fluminense" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/fluminense.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Fluminense</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Grêmio" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/grêmio.svg" class="browse-team-logo" onerror="this.style.display='none'"></div>
+                                        <span class="browse-badge-name">Grêmio</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Internacional" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/internacional.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Internacional</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Mirassol" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/mirassol.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Mirassol</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Palmeiras" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/palmeiras.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Palmeiras</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Bragantino" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/red_bull_bragantino.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Red Bull Bragantino</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Remo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/remo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Remo</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=São+Paulo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/são_paulo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">São Paulo</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Santos" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/santos.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Santos</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Vasco" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/vasco.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Vasco</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Vitória" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/vitória.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Vitória</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="browse-sub-divider"></div>
+
+                        <!-- Competitions -->
+                        <div class="browse-sub-section">
+                            <div class="home-section-header">
+                                <div class="home-section-header-title">
+                                    <p class="home-section-title" data-i18n="sectionCompetitionsTitle"></p>
+                                </div>
+                                <div class="home-section-header-action">
+                                    <button class="nav-btn" id="compPrev" aria-label="Anterior">‹</button>
+                                    <button class="nav-btn" id="compNext" aria-label="Próximo">›</button>
+                                </div>
+                            </div>
+                            <div class="browse-scroll-wrapper">
+                                <div class="browse-scroll-list" id="compList">
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup">Copa do Mundo</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Campeonato Brasileiro" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/campeonato_brasileiro_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-brazilianleague">Brasileirão</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Copa+do+Brasil" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_brasil_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-brazilcup">Copa do Brasil</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=CONMEBOL+Libertadores" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/conmebol_libertadores_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-libertadores">Libertadores</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=CONMEBOL+Sul-Americana" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/conmebol_sul-americana_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-sudamericana">Sul-Americana</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="home-section-header-action">
-                        <a href="changelog.html" class="home-section-action" data-i18n="seeAllLink">Ver tudo →</a>
+                    <!-- ── RIGHT 40%: changelog ── -->
+                    <div class="browse-col-aside">
+                        <div class="home-section-header">
+                            <div class="home-section-header-title">
+                                <p class="home-section-title" data-i18n="sectionChangesTitle">Últimas alterações</p>
+                            </div>
+                            <div class="home-section-header-action">
+                                <a href="changelog.html" class="home-section-action" data-i18n="seeAllLink">Ver tudo →</a>
+                            </div>
+                        </div>
+                        <div class="changelog-list" id="recentChanges">
+                            <div class="section-state">
+                                <div class="icon">⏳</div>
+                                <p data-i18n="loadingChanges">Carregando alterações recentes...</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="changelog-list" id="recentChanges">
-                    <div class="section-state">
-                        <div class="icon">⏳</div>
-                        <p data-i18n="loadingChanges">Carregando alterações recentes...</p>
-                    </div>
                 </div>
             </div>
         </div>
