@@ -1049,6 +1049,9 @@ input[type="text"]:focus {
 .detail-list-label {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
+}
+
+.detail-list-label {
     width: 30%;
 }
 
@@ -1057,9 +1060,12 @@ input[type="text"]:focus {
     font-size: var(--font-size-mdm);
     color: var(--text-primary);
     font-weight: 600;
-    width: 70%;
     justify-content: flex-end;
     text-align: right;
+}
+
+.detail-list-value {
+    width: 70%;
 }
 
 .detail-list {

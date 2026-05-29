@@ -81,11 +81,20 @@
                     <div class="sidebar-sport-header">
                         <div class="sidebar-emblem-wrap">
                             <img id="sidebarLogo" src="" alt="" class="sidebar-logo" onerror="this.style.display='none'">
-                            <span id="sidebarEmoji" class="sidebar-emoji" style="display:none;"></span>
                         </div>
-                        <div class="sidebar-sport-name" id="sidebarName"></div>
-                        <div class="sidebar-sport-meta" id="sidebarMeta"></div>
+                        <div class="sidebar-header-text-group">
+                            <div class="sidebar-sport-name" id="sidebarName"></div>
+                            <div class="sidebar-sport-meta" id="sidebarMeta"></div>
+                        </div>
                     </div>
+
+                    <div class="section-divider" id="statsDivider" style="display:none;"></div>
+
+                    <div class="sidebar-details" id="sidebarDetails"></div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="sidebar-description" id="sidebarDescription"></div>
 
                     <div class="section-divider"></div>
 
@@ -103,14 +112,6 @@
                             <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
                         </div>
                     </div>
-
-                    <div class="section-divider" id="statsDivider" style="display:none;"></div>
-
-                    <div class="sidebar-details" id="sidebarDetails"></div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="sidebar-description" id="sidebarDescription"></div>
                 </div>
             </aside>
 
@@ -182,6 +183,7 @@
     <script src="js/utils.js"></script>
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>
+    <script src="js/collections.js"></script>
     <script src="js/detail.js"></script>
 </body>
 </html>

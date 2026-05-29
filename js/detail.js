@@ -18,8 +18,14 @@ const CollectionState = {
 ───────────────────────────────────────── */
 const SidebarManager = {
     /**
-     * Busca dados da API de contexto (time ou competição) e popula o sidebar.
-     * A API deve retornar um objeto com:
+     * Carrega os dados da sidebar para o contexto (time ou competição).
+     *
+     * Estratégia em duas etapas:
+     *   1. Consulta o CollectionsDB local (collections.js) — resposta instantânea.
+     *   2. Se não encontrar localmente E CONFIG.CONTEXT_API_URL estiver definida,
+     *      tenta a API remota como fallback.
+     *
+     * Estrutura esperada (local ou API):
      *   Para clube:       { type: 'club',        name, full_name, logo, founded_year, country, description, sport }
      *   Para competição:  { type: 'competition', name, logo, organizer, format, scope, description, sport }
      *   sport deve ser 'football' | 'others' | 'motor'
@@ -31,8 +37,27 @@ const SidebarManager = {
         loading.style.display = 'flex';
         content.style.display = 'none';
 
+        // ── 1. Fonte local (CollectionsDB + collections.json) ───────────────
+        if (typeof CollectionsDB !== 'undefined') {
+            await CollectionsDB.ready();         // garante que o JSON foi carregado
+            const localData = CollectionsDB.find(query);
+            if (localData) {
+                this.render(localData, query);
+                return;
+            }
+        }
+
+        // ── 2. Fallback: API remota ─────────────────────────────────────
+        const apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.CONTEXT_API_URL : null;
+        if (!apiUrl) {
+            // Sem dado local e sem API configurada: limpa skeleton silenciosamente
+            console.warn(`SidebarManager: "${query}" não encontrado no CollectionsDB e CONTEXT_API_URL não configurada.`);
+            loading.innerHTML = '';
+            return;
+        }
+
         try {
-            const url = new URL(CONFIG.CONTEXT_API_URL);   // defina CONFIG.CONTEXT_API_URL no config.js
+            const url = new URL(apiUrl);
             url.searchParams.set('q', query);
 
             const response = await fetch(url.toString());
@@ -40,11 +65,15 @@ const SidebarManager = {
             const data = await response.json();
             if (!data.success) throw new Error('API retornou erro');
 
-            this.render(data.data, query || data, query);
+            // Opcional: persiste no CollectionsDB para evitar re-fetch nesta sessão
+            if (typeof CollectionsDB !== 'undefined') {
+                CollectionsDB.upsert({ key: query, ...data.data });
+            }
+
+            this.render(data.data, query);
         } catch (err) {
-            // Falha silenciosa: sidebar fica em loading (não quebra a lista)
-            console.warn('SidebarManager: erro ao carregar contexto:', err.message);
-            loading.innerHTML = ''; // limpa skeleton sem mostrar erro
+            console.warn('SidebarManager: erro ao carregar contexto via API:', err.message);
+            loading.innerHTML = '';
         }
     },
 
@@ -56,23 +85,12 @@ const SidebarManager = {
 
         // Escudo / logo
         const logoEl  = document.getElementById('sidebarLogo');
-        const emojiEl = document.getElementById('sidebarEmoji');
-        if (info.logo) {
-            logoEl.src = info.logo;
-            logoEl.alt = info.name || '';
-            logoEl.style.display = '';
-            emojiEl.style.display = 'none';
-        } else {
-            logoEl.src = `teams_logos/${query}.svg`
-            logoEl.style.display = '';
-            // Emoji fallback por esporte
-            const emojis = { football: '⚽', others: '🏀', motor: '🏎️' };
-            emojiEl.textContent = emojis[info.sport] || query;
-            emojiEl.style.display = '';
-        }
+        logoEl.src = info.logo || `teams_logos/${query}.svg`;
+        logoEl.alt = info.name || query;
+        logoEl.style.display = '';
 
         // Nome e meta
-        document.getElementById('sidebarName').textContent = info.name || '';
+        document.getElementById('sidebarName').textContent = info.name || query;
 
         const metaEl = document.getElementById('sidebarMeta');
         if (info.type === 'club') {
@@ -81,6 +99,7 @@ const SidebarManager = {
             metaEl.textContent = info.scope || '';
         } else {
             metaEl.textContent = '';
+            
         }
 
         // Detalhes específicos
@@ -94,18 +113,31 @@ const SidebarManager = {
             if (info.organizer) pairs.push(['Organização',   info.organizer]);
             if (info.format)    pairs.push(['Sistema',       info.format]);
             if (info.scope)     pairs.push(['Âmbito',        info.scope]);
+        } else {
+            detailsEl.style.display = 'none';
+        }
+
+        // Pares extras opcionais vindos do CollectionsDB (campo details[])
+        if (Array.isArray(info.details)) {
+            info.details.forEach(([label, value]) => {
+                if (label && value != null) pairs.push([label, value]);
+            });
         }
 
         detailsEl.innerHTML = pairs.map(([label, value]) => `
             <div class="sidebar-detail-item">
-                <span class="sidebar-detail-label">${label}</span>
+                <span class="sidebar-detail-label">${LanguageManager.t(label)}</span>
                 <span class="sidebar-detail-value">${value}</span>
             </div>
         `).join('');
 
         // Descrição
         const descEl = document.getElementById('sidebarDescription');
-        descEl.innerHTML = info.description ? `<p>${info.description}</p>` : '';
+        if (info.description ==! '') {
+            descEl.innerHTML = info.description ? `<p>${info.description}</p>` : '';
+        } else {
+            descEl.style.display = 'none';
+        }
 
         // Mostra conteúdo
         document.getElementById('sidebarLoading').style.display = 'none';

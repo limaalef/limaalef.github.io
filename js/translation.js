@@ -127,7 +127,7 @@ const translations = {
 
         'sectioncompetition-worldcup': 'Copa do Mundo FIFA',
         'sectioncompetition-brazilianleague': 'Brasileirão',
-        'sectioncompetition-brazilianleague': 'Brasileirão Feminino',
+        'sectioncompetition-brazilianleaguefem': 'Brasileirão Feminino',
         'sectioncompetition-brazilcup': 'Copa do Brasil',
         'sectioncompetition-brazilcupfem': 'Copa do Brasil Feminina',
         'sectioncompetition-libertadores': 'Libertadores',
@@ -406,6 +406,11 @@ const translations = {
         homeTitle: 'Select a category',
         dirsoament: 'Dirso Ament`s Collection',
         adminCard: 'Admin',
+        País: 'Country',
+        Fundação: 'Est.',
+        Apelido: 'Nickname',
+        Estádio: 'Stadium',
+        Cidade: 'City',
 
         Cabo: 'Cable TV',
         Download: 'Download',

@@ -1,0 +1,375 @@
+[
+  {
+    "key": "flamengo",
+    "type": "club",
+    "sport": "football",
+    "name": "Flamengo",
+    "full_name": "Clube de Regatas do Flamengo",
+    "logo": "teams_logos/flamengo.svg",
+    "country": "Brasil",
+    "founded_year": 1895,
+    "description": "O clube mais popular do Brasil, com sede no Rio de Janeiro. Campeão mundial em 2022.",
+    "details": [
+      [
+        "Apelido",
+        "Mengão / Urubu"
+      ],
+      [
+        "Estádio",
+        "Maracanã"
+      ],
+      [
+        "Cidade",
+        "Rio de Janeiro"
+      ]
+    ]
+  },
+  {
+    "key": "palmeiras",
+    "type": "club",
+    "sport": "football",
+    "name": "Palmeiras",
+    "full_name": "Sociedade Esportiva Palmeiras",
+    "logo": "teams_logos/palmeiras.svg",
+    "country": "Brasil",
+    "founded_year": 1914,
+    "description": "Um dos maiores clubes do Brasil, sediado em São Paulo. Bicampeão da Libertadores em 2020 e 2021.",
+    "details": [
+      [
+        "Apelido",
+        "Verdão / Porco"
+      ],
+      [
+        "Estádio",
+        "Allianz Parque"
+      ],
+      [
+        "Cidade",
+        "São Paulo"
+      ]
+    ]
+  },
+  {
+    "key": "santos",
+    "type": "club",
+    "sport": "football",
+    "name": "Santos",
+    "full_name": "Santos Futebol Clube",
+    "logo": "teams_logos/santos.svg",
+    "country": "Brasil",
+    "founded_year": 1912,
+    "description": "Clube histórico do litoral paulista, casa de Pelé por mais de uma década.",
+    "details": [
+      [
+        "Apelido",
+        "Peixe"
+      ],
+      [
+        "Estádio",
+        "Vila Belmiro"
+      ],
+      [
+        "Cidade",
+        "Santos"
+      ]
+    ]
+  },
+  {
+    "key": "sao-paulo",
+    "type": "club",
+    "sport": "football",
+    "name": "São Paulo",
+    "full_name": "São Paulo Futebol Clube",
+    "logo": "teams_logos/sao-paulo.svg",
+    "country": "Brasil",
+    "founded_year": 1930,
+    "description": "Tricampeão mundial (1992, 1993, 2005), um dos maiores clubes da América do Sul.",
+    "details": [
+      [
+        "Apelido",
+        "Tricolor"
+      ],
+      [
+        "Estádio",
+        "MorumBIS"
+      ],
+      [
+        "Cidade",
+        "São Paulo"
+      ]
+    ]
+  },
+  {
+    "key": "corinthians",
+    "type": "club",
+    "sport": "football",
+    "name": "Corinthians",
+    "full_name": "Sport Club Corinthians Paulista",
+    "logo": "teams_logos/corinthians.svg",
+    "country": "Brasil",
+    "founded_year": 1910,
+    "description": "Um dos clubes com maior torcida do Brasil. Campeão mundial em 2000 e 2012.",
+    "details": [
+      [
+        "Apelido",
+        "Timão"
+      ],
+      [
+        "Estádio",
+        "Neo Química Arena"
+      ],
+      [
+        "Cidade",
+        "São Paulo"
+      ]
+    ]
+  },
+  {
+    "key": "gremio",
+    "type": "club",
+    "sport": "football",
+    "name": "Grêmio",
+    "full_name": "Grêmio Foot-Ball Porto Alegrense",
+    "logo": "teams_logos/gremio.svg",
+    "country": "Brasil",
+    "founded_year": 1903,
+    "description": "Tricampeão da Libertadores (1983, 1995, 2017), referência no futebol gaúcho.",
+    "details": [
+      [
+        "Apelido",
+        "Tricolor Gaúcho"
+      ],
+      [
+        "Estádio",
+        "Arena do Grêmio"
+      ],
+      [
+        "Cidade",
+        "Porto Alegre"
+      ]
+    ]
+  },
+  {
+    "key": "internacional",
+    "type": "club",
+    "sport": "football",
+    "name": "Internacional",
+    "full_name": "Sport Club Internacional",
+    "logo": "teams_logos/internacional.svg",
+    "country": "Brasil",
+    "founded_year": 1909,
+    "description": "Bicampeão da Libertadores (2006, 2010) e campeão mundial em 2006.",
+    "details": [
+      [
+        "Apelido",
+        "Colorado"
+      ],
+      [
+        "Estádio",
+        "Beira-Rio"
+      ],
+      [
+        "Cidade",
+        "Porto Alegre"
+      ]
+    ]
+  },
+  {
+    "key": "campeonato brasileiro",
+    "type": "competition",
+    "sport": "football",
+    "name": "Brasileirão",
+    "logo": "competition_logos/campeonato_brasileiro_2026.png",
+    "scope": "Nacional",
+    "organizer": "CBF",
+    "format": "Pontos corridos (38 rodadas)",
+    "description": "Campeonato Brasileiro Série A — a elite do futebol nacional, disputado anualmente por 20 clubes.",
+    "details": [
+      [
+        "Edições",
+        "desde 1959"
+      ],
+      [
+        "Rebaixados",
+        "4 por temporada"
+      ]
+    ]
+  },
+  {
+    "key": "libertadores",
+    "type": "competition",
+    "sport": "football",
+    "name": "Libertadores",
+    "logo": "competitions_logos/libertadores.svg",
+    "scope": "Internacional",
+    "organizer": "CONMEBOL",
+    "format": "Fase de grupos + Mata-mata",
+    "description": "Copa CONMEBOL Libertadores — o torneio de clubes mais importante da América do Sul.",
+    "details": [
+      [
+        "Edições",
+        "desde 1960"
+      ],
+      [
+        "Participantes",
+        "47 clubes"
+      ]
+    ]
+  },
+  {
+    "key": "copa-brasil",
+    "type": "competition",
+    "sport": "football",
+    "name": "Copa do Brasil",
+    "logo": "competitions_logos/copa-brasil.svg",
+    "scope": "Nacional",
+    "organizer": "CBF",
+    "format": "Mata-mata (ida e volta)",
+    "description": "Maior premiação do futebol brasileiro, com vagas para a Libertadores ao vencedor.",
+    "details": [
+      [
+        "Edições",
+        "desde 1989"
+      ],
+      [
+        "Participantes",
+        "92 clubes"
+      ]
+    ]
+  },
+  {
+    "key": "paulistao",
+    "type": "competition",
+    "sport": "football",
+    "name": "Paulistão",
+    "logo": "competitions_logos/paulistao.svg",
+    "scope": "Estadual",
+    "organizer": "FPF",
+    "format": "Fase de grupos + Quartas + Semi + Final",
+    "description": "Campeonato Paulista — o estadual mais antigo e mais assistido do Brasil.",
+    "details": [
+      [
+        "Edições",
+        "desde 1902"
+      ]
+    ]
+  },
+  {
+    "key": "copa-mundo",
+    "type": "competition",
+    "sport": "football",
+    "name": "Copa do Mundo",
+    "logo": "competitions_logos/copa-mundo.svg",
+    "scope": "Mundial",
+    "organizer": "FIFA",
+    "format": "Fase de grupos + Mata-mata",
+    "description": "O maior torneio de seleções do planeta, realizado a cada quatro anos.",
+    "details": [
+      [
+        "Edições",
+        "desde 1930"
+      ],
+      [
+        "Participantes",
+        "32–48 seleções"
+      ]
+    ]
+  },
+  {
+    "key": "champions",
+    "type": "competition",
+    "sport": "football",
+    "name": "Champions League",
+    "logo": "competitions_logos/champions.svg",
+    "scope": "Internacional",
+    "organizer": "UEFA",
+    "format": "Liga + Mata-mata",
+    "description": "UEFA Champions League — principal torneio de clubes da Europa e do mundo.",
+    "details": [
+      [
+        "Edições",
+        "desde 1955"
+      ],
+      [
+        "Participantes",
+        "36 clubes"
+      ]
+    ]
+  },
+  {
+    "key": "sulamericana",
+    "type": "competition",
+    "sport": "football",
+    "name": "Sul-Americana",
+    "logo": "competitions_logos/sulamericana.svg",
+    "scope": "Internacional",
+    "organizer": "CONMEBOL",
+    "format": "Fase de grupos + Mata-mata",
+    "description": "Copa CONMEBOL Sudamericana — segundo maior torneio de clubes da América do Sul.",
+    "details": [
+      [
+        "Edições",
+        "desde 2002"
+      ]
+    ]
+  },
+  {
+    "key": "formula1",
+    "type": "competition",
+    "sport": "motor",
+    "name": "Fórmula 1",
+    "logo": "competitions_logos/f1.svg",
+    "scope": "Mundial",
+    "organizer": "FIA / Formula One Group",
+    "format": "Calendário de corridas (pontos)",
+    "description": "O ápice do automobilismo mundial. Temporadas disputadas em circuitos ao redor do globo.",
+    "details": [
+      [
+        "Edições",
+        "desde 1950"
+      ],
+      [
+        "Equipes",
+        "10 construtores"
+      ]
+    ]
+  },
+  {
+    "key": "stock-car",
+    "type": "competition",
+    "sport": "motor",
+    "name": "Stock Car Pro Series",
+    "logo": "competitions_logos/stockcar.svg",
+    "scope": "Nacional",
+    "organizer": "Stock Car Brasil",
+    "format": "Calendário de corridas (pontos)",
+    "description": "A principal categoria do automobilismo brasileiro, com disputas em circuitos nacionais.",
+    "details": [
+      [
+        "Edições",
+        "desde 1979"
+      ]
+    ]
+  },
+  {
+    "key": "nba",
+    "type": "competition",
+    "sport": "others",
+    "name": "NBA",
+    "logo": "competitions_logos/nba.svg",
+    "scope": "Nacional (EUA/Canadá)",
+    "organizer": "NBA",
+    "format": "Temporada regular + Playoffs",
+    "description": "National Basketball Association — a principal liga de basquete do mundo.",
+    "details": [
+      [
+        "Edições",
+        "desde 1946"
+      ],
+      [
+        "Times",
+        "30 franquias"
+      ]
+    ]
+  }
+]
