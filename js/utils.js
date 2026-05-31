@@ -70,7 +70,7 @@ const Utils = {
             today.setHours(0, 0, 0, 0);
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
-            if (matchDate > today) return 'future';
+            if (matchDate > today && !hasScores) return 'future';
             if (hasData && !hasScores && (matchDate >= yesterday && matchDate <= today)) return 'pending';
         }
         return 'completed';

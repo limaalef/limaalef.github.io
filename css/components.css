@@ -629,6 +629,12 @@ input[type="text"]:focus {
     object-fit: contain;
 }
 
+.country-flag {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
 .team-name {
     font-weight: 500;
     font-size: var(--font-size-lg);
@@ -763,9 +769,12 @@ input[type="text"]:focus {
     max-width: 856px;
     width: 100%;
     max-height: 90vh;
+    min-height: 80vh;
     overflow-y: auto;
     position: relative;
     animation: slideIn 0.3s ease-out;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 @keyframes slideIn {
@@ -789,11 +798,6 @@ input[type="text"]:focus {
 
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3);
-}
-
-.modal-content {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 /* Cabeçalho do Modal */
@@ -978,7 +982,6 @@ input[type="text"]:focus {
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    margin-bottom: 8px;
     max-height: 475px;
 }
 
@@ -1061,11 +1064,11 @@ input[type="text"]:focus {
     color: var(--text-primary);
     font-weight: 600;
     justify-content: flex-end;
-    text-align: right;
 }
 
 .detail-list-value {
     width: 70%;
+    text-align: right;
 }
 
 .detail-list {
@@ -1139,6 +1142,8 @@ input[type="text"]:focus {
    ======================================== */
 .motor-phase-section {
     margin: 12px 0;
+    display: flex;
+    gap: var(--sp-3);
 }
 
 .motor-phase-name {
@@ -1166,8 +1171,6 @@ input[type="text"]:focus {
 }
 
 .motor-event-accordion {
-    margin-bottom: 12px;
-    /* border: 1px solid var(--border-color); */
     border-radius: var(--border-radius-size-md);
     overflow: hidden;
     background: var(--bg-secondary);
@@ -1179,7 +1182,6 @@ input[type="text"]:focus {
     align-items: center;
     padding: 12px;
     cursor: pointer;
-    background: var(--bg-tertiary);
     transition: all 0.3s ease;
     user-select: none;
 }

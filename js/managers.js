@@ -146,6 +146,7 @@ const MotorCardManager = {
             </div>
             <div class="match-date">${dateRange}</div>
             <div class="motor-phase-section">
+                ${event.Pais ? `<img src="${event.Bandeira}" alt="${event.Pais}" class="country-flag" onerror="this.style.display='none'">` : ''}
                 <div class="motor-phase-name">${phase || 'N/A'}</div>
             </div>
             <div class="motor-footer">
@@ -250,7 +251,7 @@ const MatchModal = {
         const videoHtml = match['Video Embed'] ? `
             <div class="watch-button-container">
                 <a href="watch?id=${match.ID}" class="watch-match-button">
-                    <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir Jogo'}</span>
+                    <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
                 </a>
             </div>
         ` : '';
@@ -511,7 +512,7 @@ const MotorModal = {
                 <div style="text-align: center; padding: 30px;">
                     <a href="watch?id=${match.ID}" class="watch-button" target="_blank">
                         <span style="font-size: 3em;">▶️</span>
-                        <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir Jogo</div>
+                        <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir evento</div>
                     </a>
                 </div>
             </div>
@@ -532,21 +533,21 @@ const MotorModal = {
                     ${evt.image ? `<img src="${evt.image}" alt="${evt.event_type}" class="modal-image" onerror="this.style.display='none'">` : ''}
                     
                    <div class="detail-section">
-                        <div class="section-title">${LanguageManager.t('matchInfo')}</div>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('date')}</div>
-                                <div class="detail-value">${Utils.formatDate(evt.date)}</div>
+                        <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
+                        <div class="detail-list">
+                            <div class="detail-list-item">
+                                <div class="detail-list-label">${LanguageManager.t('date')}</div>
+                                <div class="detail-list-value">${Utils.formatDate(evt.date)}</div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('broadcaster')}</div>
-                                <div class="detail-value">${evt.station?.name || 'N/A'}</div>
+                            <div class="detail-list-item">
+                                <div class="detail-list-label">${LanguageManager.t('broadcaster')}</div>
+                                <div class="detail-list-value">${evt.station?.name || 'N/A'}</div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('origin')}</div>
-                                <div class="detail-value">${evt.station?.origem || 'N/A'}</div>
+                            <div class="detail-list-item">
+                                <div class="detail-list-label">${LanguageManager.t('origin')}</div>
+                                <div class="detail-list-value">${evt.station?.origem || 'N/A'}</div>
                             </div>
-                            <div class="detail-item">
+                            <div class="detail-list-item">
                                 <div class="detail-label">${LanguageManager.t('narration')}</div>
                                 <div class="detail-value">${evt.station?.narracao || 'N/A'}</div>
                             </div>
@@ -554,7 +555,7 @@ const MotorModal = {
                     </div>
                     
                     <div class="detail-section">
-                        <div class="section-title">${LanguageManager.t('technicalInfo')}</div>
+                        <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
                         <div class="detail-grid technical">
                             <div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('quality')}</div>
@@ -580,7 +581,7 @@ const MotorModal = {
                     </div>
                     
                     <div class="detail-section">
-                        <div class="section-title">${LanguageManager.t('storageInfo')}</div>
+                        <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
                         <div class="storage-badges">
                             ${evt.technical_details?.local ? `<span class="badge badge-success">💾 ${evt.technical_details.local}</span>` : ''}
                             ${evt.technical_details?.cloud ? `<span class="badge badge-info">☁️ ${LanguageManager.t('cloud')}</span>` : ''}
@@ -589,7 +590,7 @@ const MotorModal = {
                     </div>
                     
                     ${evt.additional_info ? `
-                        <div class="detail-section">
+                        <div class="section-title modal-style">
                             <div class="section-title">${LanguageManager.t('observations')}</div>
                             <div class="detail-item" style="grid-column: 1/-1;">
                                 <div class="detail-value">${evt.additional_info}</div>

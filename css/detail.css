@@ -77,7 +77,7 @@
 
 .sidebar-sport-meta {
     font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
@@ -159,6 +159,7 @@
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
+    flex-wrap: wrap;
 }
 .year-filter-bar::-webkit-scrollbar { display: none; }
 

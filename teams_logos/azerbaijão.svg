@@ -1,0 +1,33 @@
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 895 600">
+    <defs>
+        <style>
+            .cls-1{fill:none;}
+            .cls-2{clip-path:url(#clip-path);}
+            .cls-3{fill:#fff;}
+            .cls-4{fill:#3f9c35;}
+            .cls-5{fill:#ed2939;}
+            .cls-6{fill:#00b9e4;}
+            .cls-7{fill:#939598;}
+        </style>
+        
+        <clipPath id="clip-path">
+            <path class="cls-1" d="M34.72,0H859.28A30.82,30.82,0,0,1,890,30.93V569.07A30.82,30.82,0,0,1,859.28,600H34.72A30.82,30.82,0,0,1,4,569.07V30.93A30.82,30.82,0,0,1,34.72,0Z"/>
+        </clipPath>
+    </defs>
+    
+    <title>Azerbaijão</title>
+    <g class="cls-2">
+        <path class="cls-3" d="M0,14.33H0V583H0L390.86,293.65Z"/>
+        <rect class="cls-3" x="1" y="-0.05" width="133.04" height="598.67"/>
+        <rect class="cls-4" y="-0.05" width="895" height="600"/>
+        <rect class="cls-5" x="4" y="-0.05" width="891" height="400"/>
+        <rect class="cls-6" y="-0.05" width="895" height="200"/>
+        <circle class="cls-3" cx="427.07" cy="299.95" r="90"/>
+        <circle class="cls-5" cx="447.07" cy="299.95" r="75"/>
+        <path class="cls-3" d="M527.07,250l9.56,26.9,25.79-12.25-12.26,25.78L577.07,300l-26.91,9.57,12.26,25.79-25.79-12.26L527.07,350l-9.57-26.9-25.79,12.26L504,309.52,477.07,300l26.9-9.57L491.71,264.6l25.79,12.25Z"/>
+    </g>
+    
+    <g id="Layer_1" data-name="Layer 1">
+        <path class="cls-7" d="M863.1,6A25,25,0,0,1,888,30.9V569a24.9,24.9,0,0,1-24.9,24.9H32.9A24.82,24.82,0,0,1,8,569.1V30.9A25,25,0,0,1,32.9,6H863.1m0-6H32.9A30.86,30.86,0,0,0,2,30.9H2V569a30.88,30.88,0,0,0,30.9,31H863a30.86,30.86,0,0,0,30.9-30.9V30.9A30.71,30.71,0,0,0,863.1,0Z"/>
+    </g>
+</svg>

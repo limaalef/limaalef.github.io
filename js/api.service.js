@@ -69,6 +69,8 @@ const APIService = {
                 Tipo: 'motor',
                 Campeonato: item.championship?.name || '',
                 Fase: item.championship?.phase || '',
+                Pais: item.championship?.country_name || '',
+                Bandeira: item.championship?.country_flag || '',
                 DataInicio: item.start_date || '',
                 DataFim: item.end_date || '',
                 Eventos: item.events || [],
