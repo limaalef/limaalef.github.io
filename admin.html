@@ -1,109 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Pedidos | Sports Archive</title>
-<meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="css/theme.css">
-<link rel="stylesheet" href="css/components.css">
-<style>
-.access-info {
-    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-    justify-content: flex-end; position: absolute; right: 1rem; top: 1.2rem;
-}
-.adm-wrap   { max-width: 1400px; margin: 0 auto; padding: 0; }
-.adm-header { display:flex; align-items:center; justify-content:flex-end; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
-#adm-auth   { display:flex; flex-direction:column; align-items:center; gap:20px; padding:80px 20px; }
-#adm-auth h2 { color:var(--text-primary); margin:0; }
-.adm-login-btn { display:flex; align-items:center; gap:10px; padding:12px 24px;
-    border-radius:var(--border-radius-size-mlg); border:1px solid var(--border-color);
-    background:var(--bg-secondary); color:var(--text-primary); font-size:var(--font-size-md);
-    font-weight:600; cursor:pointer; transition:all .15s; }
-.adm-login-btn:hover { border-color:var(--accent-color); }
-.stats-container { display:none; }
-
-/* Tabela */
-.adm-table-wrap { overflow-x:auto; border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); }
-.adm-table { width:100%; border-collapse:collapse; }
-.adm-table th { text-align:left; font-size:var(--font-size-xs); text-transform:uppercase;
-    letter-spacing:.06em; color:var(--text-secondary); padding:10px 14px;
-    border-bottom:1px solid var(--border-color); background:var(--bg-secondary); white-space:nowrap; }
-.adm-table td { padding:12px 14px; border-bottom:1px solid var(--border-color);
-    font-size:var(--font-size-mdm); color:var(--text-primary); vertical-align:middle; }
-.adm-table tr:last-child td { border-bottom:none; }
-.adm-table tr:hover td { background:var(--bg-tertiary); }
-
-/* Botões adicionais */
-.adm-btn-success { background:var(--bg-success); color:var(--text-success); border:1px solid var(--success-color); }
-.adm-btn-success:hover { filter:brightness(1.1); }
-.adm-btn-warning { background:var(--bg-warning); color:var(--text-warning); border:1px solid var(--warning-color); }
-.adm-btn-warning:hover { filter:brightness(1.1); }
-
-/* Modal title */
-.adm-modal-title { font-size:var(--font-size-mxxl); font-weight:700; color:var(--text-accent-color); }
-
-/* Items list */
-.adm-items-list { display:flex; flex-direction:column; gap:1px;
-    border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
-.adm-item { background:var(--bg-secondary); padding:11px 14px; }
-.adm-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
-.adm-item-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
-.adm-item-meta  { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:2px; }
-
-/* Link por item */
-.adm-item-link-row { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
-.adm-item-link-url { font-size:var(--font-size-mds); color:var(--accent-color);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px; flex:1; }
-.adm-item-link-exp { font-size:var(--font-size-xs); color:var(--text-secondary); white-space:nowrap; }
-.adm-item-link-exp.expired { color:var(--error-color); }
-.adm-item-no-link { font-size:var(--font-size-xs); color:var(--text-tertiary); margin-top:6px; }
-
-/* Bulk controls */
-.adm-links-bulk { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;
-    padding:12px 14px; background:var(--bg-primary); border-radius:var(--border-radius-size-mlg);
-    border:1px solid var(--border-color); }
-.adm-links-bulk-info { font-size:var(--font-size-mdm); color:var(--text-secondary); flex:1; }
-.adm-bulk-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
-/* Activate panel */
-.adm-expiry-inline { display:none; align-items:center; gap:8px; flex-wrap:wrap;
-    padding:10px 12px; background:var(--bg-success); border:1px solid var(--success-color);
-    border-radius:var(--border-radius-size-md); margin-top:8px; }
-.adm-expiry-inline.open { display:flex; }
-.adm-expiry-inline label { font-size:var(--font-size-sm); color:var(--text-success); font-weight:600; white-space:nowrap; }
-.adm-expiry-sel { padding:6px 10px; border-radius:var(--border-radius-size-md);
-    border:1px solid var(--success-color); background:var(--bg-secondary);
-    color:var(--text-primary); font-size:var(--font-size-mdm); outline:none; cursor:pointer; }
-
-/* Inputs */
-.adm-input { width:100%; border:0; background:var(--bg-secondary); color:var(--text-primary);
-    font-size:var(--font-size-mdm); outline:none; box-sizing:border-box; font-family:inherit; }
-.adm-input-text { font-weight:600; text-align:right; }
-.adm-input-select { font-weight:600; text-align:right; max-width:200px; }
-.adm-input:focus { border-bottom:1px solid var(--accent-color); }
-.adm-input-select:focus { border:0; }
-
-.adm-empty   { text-align:center; padding:48px; color:var(--text-secondary); }
-.adm-loading { text-align:center; padding:60px; color:var(--text-secondary); }
-@media (max-width:600px) { .adm-item-link-url { max-width:160px; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Pedidos | Sports Archive</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/detail.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-<header>
-    <div class="header-frame" id="header" data-title="Gerenciar pedidos" data-back="true"></div>
-    <div class="control-group">
-        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
-            <span id="langFlag">🇧🇷</span>
-        </button>
-    </div>
-</header>
+    <header>
+        <div class="header-frame" id="header" data-title="Administração" data-back="true"></div>
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
+        </div>
+    </header>
 
-<div class="adm-wrap">
-    <div id="adm-auth">
-        <h2>Área Administrativa</h2>
+    <!-- Auth -->
+    <div id="adm-auth" style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:80px 20px">
+        <h2 style="color:var(--text-primary);margin:0">Área Administrativa</h2>
         <p style="color:var(--text-secondary);margin:0">Acesso restrito ao administrador</p>
-        <button class="adm-login-btn" id="adm-login-google">
+        <button style="display:flex;align-items:center;gap:10px;padding:12px 24px;
+            border-radius:var(--border-radius-size-mlg);border:1px solid var(--border-color);
+            background:var(--bg-secondary);color:var(--text-primary);font-size:var(--font-size-md);
+            font-weight:600;cursor:pointer;transition:all .15s" id="adm-login-google">
             <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -114,82 +38,221 @@
         </button>
     </div>
 
-    <div class="stats-container" id="stats-container">
-        <div class="section-divider"></div>
-        <div class="stats" style="display:flex">
-            <div class="stat"><div class="stat-value" id="st-total">—</div><div class="stat-label">Total</div></div>
-            <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
-            <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
-            <div class="stat"><div class="stat-value" id="st-ready">—</div><div class="stat-label">Prontos</div></div>
-            <div class="stat"><div class="stat-value" id="st-expired">—</div><div class="stat-label">Expirados</div></div>
-        </div>
-    </div>
-
+    <!-- Dashboard -->
     <div id="adm-dashboard" style="display:none">
-        <div class="access-info">
-            <span id="adm-user-name" style="font-size:var(--font-size-sm);color:var(--text-secondary)"></span>
-            <button class="action-btn btn-ghost" id="adm-logout">Sair</button>
-            <button class="action-btn btn-primary" id="adm-refresh">↺ Atualizar</button>
-        </div>
+        <div class="adm-layout">
+            <!-- Sidebar -->
+            <aside class="adm-sidebar">
+                <div class="profile-box">
+                    <div class="profile-avatar" id="adm-avatar-initials"></div>
+                    <img id="adm-avatar" class="adm-avatar" src="" onerror="this.style.display='none'" alt="">
+                    <div>
+                        <div class="profile-user-name" id="adm-user-name"></div>
+                        <button class="action-btn btn-ghost btn-xs" id="adm-refresh">↺ Atualizar</button>
+                    </div>
+                </div>
 
-        <div class="controls">
-            <div class="filter-options">
-                <div class="filter-sub-group">
-                    <div class="view-toggle">
-                        <div class="adm-filter-btn active" data-status="">Todos</div>
-                        <div class="adm-filter-btn" data-status="pending">Pendentes</div>
-                        <div class="adm-filter-btn" data-status="processing">Em análise</div>
-                        <div class="adm-filter-btn" data-status="ready">Prontos</div>
-                        <div class="adm-filter-btn" data-status="expired">Expirados</div>
-                        <div class="adm-filter-btn" data-status="cancelled">Cancelados</div>
+                <div class="adm-sidebar-nav">
+                    <a class="adm-nav-item active" data-panel="orders" onclick="switchPanel('orders')">
+                        <span class="adm-nav-icon">
+                            <svg viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4" height="4" rx="1"></rect><rect x="7" y="1" width="4" height="4" rx="1"></rect><rect x="1" y="7" width="4" height="4" rx="1"></rect><rect x="7" y="7" width="4" height="4" rx="1"></rect></svg>
+                        </span> 
+                        Pedidos
+                    </a>
+                    <a class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
+                        <span class="adm-nav-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
+                        </span> Mercado Pago
+                    </a>
+
+                    <div class="adm-nav-divider"></div>
+                    <a class="adm-nav-item" onclick="admLogout()" style="margin-top:auto">
+                        <span class="adm-nav-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M288 64l64 0 0 416c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-384c0-35.3-28.7-64-64-64l-96 0 0 0-160 0C60.7 0 32 28.7 32 64l0 384c-17.7 0-32 14.3-32 32s14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-416zM160 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+                        </span> Sair
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Conteúdo -->
+            <div class="adm-main">
+                <!-- PAINEL: PEDIDOS -->
+                <div class="adm-panel active" id="panel-orders">
+                    <!-- Stats -->
+                    <div class="stats" style="display:flex;margin-bottom:var(--sp-5)">
+                        <div class="stat"><div class="stat-value" id="st-total">—</div><div class="stat-label">Total</div></div>
+                        <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
+                        <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
+                        <div class="stat"><div class="stat-value" id="st-ready">—</div><div class="stat-label">Prontos</div></div>
+                        <div class="stat"><div class="stat-value" id="st-completed">—</div><div class="stat-label">Finalizados</div></div>
+                        <div class="stat"><div class="stat-value" id="st-expired">—</div><div class="stat-label">Expirados</div></div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="controls" style="margin-bottom:var(--sp-4)">
+                        <div class="filter-options">
+                            <div class="filter-sub-group">
+                                <div class="view-toggle">
+                                    <div class="adm-filter-btn active" data-status="">Todos</div>
+                                    <div class="adm-filter-btn" data-status="pending">Pendentes</div>
+                                    <div class="adm-filter-btn" data-status="processing">Em análise</div>
+                                    <div class="adm-filter-btn" data-status="ready">Prontos</div>
+                                    <div class="adm-filter-btn" data-status="completed">Finalizados</div>
+                                    <div class="adm-filter-btn" data-status="expired">Expirados</div>
+                                    <div class="adm-filter-btn" data-status="cancelled">Cancelados</div>
+                                </div>
+                            </div>
+                            <div class="filter-sub-group">
+                                <div class="search-box">
+                                    <input type="text" id="adm-search" placeholder="Buscar...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="adm-table-box">
+                    <div class="adm-table-wrap">
+                        <table class="adm-table">
+                            <thead><tr>
+                                <th>ID</th><th>Usuário</th><th>Status</th>
+                                <th style="text-align:center">Itens</th>
+                                <th style="text-align:center">Links</th>
+                                <th style="text-align:center">Pagamento</th>
+                                <th>Data</th><th>Ações</th>
+                            </tr></thead>
+                            <tbody id="adm-tbody"></tbody>
+                        </table>
+                        <div class="adm-loading" id="adm-loading">Carregando pedidos...</div>
+                        <div class="adm-empty" id="adm-empty" style="display:none">Nenhum pedido encontrado.</div>
+                    </div>
                     </div>
                 </div>
-                <div class="filter-sub-group">
-                    <div class="search-box">
-                        <input type="text" id="adm-search" placeholder="Buscar...">
+
+                <!-- PAINEL: CONFIGURAÇÕES MERCADO PAGO -->
+                <div class="adm-panel" id="panel-mp-settings">
+                    <!-- Credenciais -->
+                    <div class="mp-settings-card">
+                        <div class="detail-list">
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">
+                                    <div class="mp-settings-head-title">Credenciais</div>
+                                </span>
+                                <span class="detail-list-value" id="mp-status-dot" title="Não configurado"></span>
+                            </div>
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">Access token</span>
+                                <span class="detail-list-value">
+                                    <input class="adm-input adm-input-text" id="mp-access-token"
+                                        type="password" placeholder="APP_USR-..." autocomplete="off">
+                                </span>
+                            </div>
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">Public key</span>
+                                <span class="detail-list-value">
+                                    <input class="adm-input adm-input-text" id="mp-public-key"
+                                        placeholder="APP_USR-..." autocomplete="off">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores -->
+                    <div class="mp-settings-card">
+                        <div class="detail-list">
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">
+                                    <div class="mp-settings-head-title">Valor e taxa</div>
+                                </span>
+                            </div>
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">Valor base (R$)</span>
+                                <span class="detail-list-value">
+                                    <div class="adm-amount-wrap">
+                                        <span class="adm-amount-prefix">R$</span>
+                                        <input class="adm-amount-input" id="mp-base-amount"
+                                            type="number" min="0" step="0.01" placeholder="0,00"
+                                            oninput="recalcTotal()">
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="detail-list-item">
+                                <span class="detail-list-label">Taxa de processamento (%)</span>
+                                <span class="detail-list-value">
+                                    <div class="adm-amount-wrap">
+                                        <input class="adm-amount-input" id="mp-fee-percent"
+                                            type="number" min="0" max="99" step="0.01" placeholder="0,00"
+                                            oninput="recalcTotal()">
+                                        <span class="adm-amount-prefix">%</span>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="detail-list-item mp-total-preview">
+                                <span class="detail-list-label mp-total-label">Valor total (R$)</span>
+                                <span class="detail-list-value mp-total-value" id="mp-total-preview"></span>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="action-btn btn-ghost" onclick="loadMpSettings()">↺ Recarregar</button>
+                            <button class="action-btn btn-primary" onclick="saveMpSettings()">Salvar configurações</button>
+                        </div>
+                    </div>
+
+                    <div class="adm-nav-divider"></div>
+
+                    <!-- Health do worker -->
+                    <div class="mp-settings-card">   
+                        <div class="detail-list" id="mp-health-card">
+                            <div class="detail-list-item">
+                                <span class="detail-list-label all-wide">
+                                    <div class="mp-settings-head-title">Health check do Worker de pagamentos</div>
+                                </span>
+                                <span class="detail-list-value">
+                                    <div id="mp-save-msg" style="display:none"></div>
+                                </span>
+                            </div>
+                            <div class="detail-list-item">
+                                <span class="detail-list-label"id="mp-health-status">Verificando...</span>
+                                <span class="detail-list-value"id="mp-health-sub"></span>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="action-btn btn-primary" onclick="checkHealth()" style="margin-left:auto">Verificar</button>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
+    </div>
 
-        <div class="adm-table-wrap">
-            <table class="adm-table">
-                <thead><tr>
-                    <th>ID</th><th>Usuário</th><th>Status</th>
-                    <th style="text-align:center">Itens</th>
-                    <th style="text-align:center">Links</th>
-                    <th>Data</th><th>Ações</th>
-                </tr></thead>
-                <tbody id="adm-tbody"></tbody>
-            </table>
-            <div class="adm-loading" id="adm-loading">Carregando pedidos...</div>
-            <div class="adm-empty" id="adm-empty" style="display:none">Nenhum pedido encontrado.</div>
+    <!-- ── Modal de pedido ─────────────────────────────────────────────────────── -->
+    <div class="modal" id="adm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn close-btn" onclick="closeModal()">×</button>
+                <div class="section-title modal-title-competition">Pedido</div>
+                <h3 class="adm-modal-title" id="adm-modal-title"></h3>
+            </div>
+            <div id="modal-body"></div>
         </div>
     </div>
-</div>
 
-<div class="modal" id="adm-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button class="btn close-btn" onclick="closeModal()">×</button>
-            <div class="section-title modal-title-competition">Pedido</div>
-            <h3 class="adm-modal-title" id="adm-modal-title"></h3>
-        </div>
-        <div id="modal-body"></div>
-    </div>
-</div>
+    <div id="footer"></div>
 
-<div id="footer"></div>
-
-<script src="js/config.js"></script>
-<script src="js/translation.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/api.service.js"></script>
-<script src="js/managers.js"></script>
-<script src="https://accounts.google.com/gsi/client" async></script>
-<script>
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script>
+// ── Configuração ───────────────────────────────────────────────────────────
 const ADM_CFG = {
     apiBase:        CONFIG.REQUEST_API_BASE,
+    paymentsBase:   CONFIG.PAYMENTS_API_BASE || 'https://payments.limaalef.com',
     googleClientId: '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
 };
 
@@ -199,7 +262,20 @@ let allOrders    = [];
 let filterStatus = '';
 let filterQuery  = '';
 
-// ── Sessão ────────────────────────────────────────────────────
+// ── Navegação da sidebar ───────────────────────────────────────────────────
+function switchPanel(name) {
+    document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.adm-nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(`panel-${name}`)?.classList.add('active');
+    document.querySelector(`.adm-nav-item[data-panel="${name}"]`)?.classList.add('active');
+
+    if (name === 'mp-settings') {
+        loadMpSettings();
+        checkHealth();
+    }
+}
+
+// ── Sessão ─────────────────────────────────────────────────────────────────
 function saveSession(token) { admToken = token; localStorage.setItem('adm_token', token); }
 function clearSession() { admToken = null; admUser = null; localStorage.removeItem('adm_token'); }
 function restoreSession() {
@@ -214,7 +290,7 @@ function restoreSession() {
     } catch { clearSession(); return false; }
 }
 
-// ── Auth ──────────────────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────────────────
 document.getElementById('adm-login-google').addEventListener('click', () => {
     if (!window.google?.accounts?.id) { alert('Google GSI não carregou.'); return; }
     google.accounts.id.initialize({
@@ -240,23 +316,41 @@ document.getElementById('adm-login-google').addEventListener('click', () => {
     google.accounts.id.prompt();
 });
 
-document.getElementById('adm-logout').addEventListener('click', () => {
+function admLogout() {
     clearSession();
     document.getElementById('adm-auth').style.display = 'flex';
     document.getElementById('adm-dashboard').style.display = 'none';
-    document.getElementById('stats-container').style.display = 'none';
-});
+}
 
 function showDashboard() {
+    const name = admUser?.name || '';
+
     document.getElementById('adm-auth').style.display = 'none';
     document.getElementById('adm-dashboard').style.display = 'block';
-    document.getElementById('adm-user-name').textContent = admUser?.name || '';
-    document.getElementById('stats-container').style.display = 'block';
+    document.getElementById('adm-user-name').textContent = name;
+
+    const initials = name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    const avatarText = initials.length
+        ? (initials[0][0] + initials[initials.length - 1][0]).toUpperCase()
+        : '';
+
+    const av = document.getElementById('adm-avatar');
+    if (admUser?.picture) {
+        av.src = admUser.picture;
+    } else {
+        av.style.display = 'none';
+        document.getElementById('adm-avatar-initials').textContent = avatarText;
+    }
+
     loadOrders();
 }
 if (restoreSession()) showDashboard();
 
-// ── Carregar pedidos ──────────────────────────────────────────
+// ── Carregar pedidos ───────────────────────────────────────────────────────
 async function loadOrders() {
     document.getElementById('adm-loading').style.display = 'block';
     document.getElementById('adm-empty').style.display   = 'none';
@@ -271,7 +365,7 @@ async function loadOrders() {
 }
 document.getElementById('adm-refresh').addEventListener('click', loadOrders);
 
-// ── Filtros ───────────────────────────────────────────────────
+// ── Filtros ────────────────────────────────────────────────────────────────
 document.querySelectorAll('.adm-filter-btn').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('.adm-filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); filterStatus = btn.dataset.status; renderTable();
@@ -280,7 +374,7 @@ document.getElementById('adm-search').addEventListener('input', e => {
     filterQuery = e.target.value.toLowerCase(); renderTable();
 });
 
-// ── Render tabela ─────────────────────────────────────────────
+// ── Render tabela ──────────────────────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('adm-tbody');
     document.getElementById('adm-loading').style.display = 'none';
@@ -300,7 +394,6 @@ function renderTable() {
     tbody.innerHTML = orders.map(o => {
         const dt     = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
         const total  = (o.items||[]).length;
-        // Conta itens com link ativo
         const active = (o.items||[]).filter(it =>
             it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
         ).length;
@@ -308,12 +401,23 @@ function renderTable() {
         const linksCell = hasAny
             ? `<span style="font-weight:700;color:${active>0?'var(--success-color)':'var(--error-color)'}">${active}</span><span style="color:var(--text-secondary);font-size:var(--font-size-xs)">/${total}</span>`
             : `<span style="color:var(--text-secondary)">—</span>`;
+
+        // Pagamento
+        const pay = o.payment;
+        let payCell = `<span style="color:var(--text-tertiary)">—</span>`;
+        if (pay) {
+            const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
+            const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
+            payCell = `<span class="pill ${cls}">${lbl}</span>`;
+        }
+
         return `<tr>
             <td style="width:1px"><code style="font-size:var(--font-size-xs);color:var(--text-secondary);white-space:nowrap">${o.id.replace('ORD-','')}</code></td>
             <td><div style="font-weight:600;white-space:nowrap">${esc(o.user?.name||'—')}</div></td>
             <td style="width:1px;white-space:nowrap"><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td>
             <td style="text-align:center;font-weight:700;color:var(--accent-color);width:1px;white-space:nowrap">${total}</td>
             <td style="text-align:center;width:1px;white-space:nowrap">${linksCell}</td>
+            <td style="text-align:center;width:1px;white-space:nowrap">${payCell}</td>
             <td style="font-size:var(--font-size-sm);white-space:nowrap;color:var(--text-secondary);width:1px">${dt}</td>
             <td style="width:1px;white-space:nowrap">
                 <button class="action-btn btn-primary btn-xs" onclick="openOrder('${o.id}')">Abrir</button>
@@ -324,7 +428,7 @@ function renderTable() {
 }
 
 function statusLabel(s) {
-    return {pending:'Pendente',processing:'Em análise',ready:'Pronto',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
+    return {pending:'Pendente',processing:'Em análise',ready:'Pronto',completed:'Finalizado',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
 }
 function updateStats() {
     const c = s => allOrders.filter(o => o.status === s).length;
@@ -332,10 +436,11 @@ function updateStats() {
     document.getElementById('st-pending').textContent    = c('pending');
     document.getElementById('st-processing').textContent = c('processing');
     document.getElementById('st-ready').textContent      = c('ready');
+    document.getElementById('st-completed').textContent  = c('completed');
     document.getElementById('st-expired').textContent    = c('expired');
 }
 
-// ── Modal ─────────────────────────────────────────────────────
+// ── Modal do pedido ────────────────────────────────────────────────────────
 async function openOrder(id) {
     document.getElementById('adm-modal-title').textContent = 'Carregando...';
     document.getElementById('modal-body').innerHTML = '<div class="adm-loading">Buscando pedido...</div>';
@@ -348,7 +453,7 @@ async function openOrder(id) {
 function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
 document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
 
-// ── Render detalhe do pedido ──────────────────────────────────
+// ── Render detalhe do pedido ───────────────────────────────────────────────
 function buildOrderDetail(o) {
     const now    = new Date();
     const items  = o.items || [];
@@ -357,7 +462,6 @@ function buildOrderDetail(o) {
         it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
     ).length;
 
-    // Lista de itens com seus links inline
     const itemsHtml = items.map((item, idx) => {
         const link     = item.link;
         const expired  = link && link.expiresAt && new Date(link.expiresAt) < now;
@@ -385,7 +489,6 @@ function buildOrderDetail(o) {
             <div class="adm-item-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
             <div class="adm-item-meta">${esc(item.meta||'')}${item.date?' · '+esc(item.date):''}</div>
             ${linkRow}
-            <!-- Form inline para este item -->
             <div class="detail-list" style="margin-top:var(--sp-3)">
                 <div class="detail-list-item">
                     <span class="detail-list-label">URL</span>
@@ -443,6 +546,81 @@ function buildOrderDetail(o) {
             <button class="action-btn btn-ghost"       onclick="toggleActivatePanel()">Cancelar</button>
         </div>` : '';
 
+    // Seção de pagamento
+    const pay = o.payment;
+    const payStatus = pay?.status;
+    const payLabels = { approved: 'Pago', pending: 'Aguardando pagamento', cancelled: 'Cancelado' };
+    const payCls    = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' };
+
+    const paymentHtml = `
+    <div class="modal-division">
+        <div class="detail-section">
+            <div class="section-title modal-style">Pagamento</div>
+            <div class="adm-payment-section">
+                <div class="detail-list" style="margin-bottom:var(--sp-4)">
+                    <div class="detail-list-item">
+                        <span class="detail-list-label" style="font-size:var(--font-size-sm);color:var(--text-secondary)">
+                            Acesso manual
+                        </span>
+                        <span class="detail-list-value">
+                            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;justify-content:flex-end">
+                                <span style="font-size:var(--font-size-sm);color:var(--text-secondary)" id="access-grant-label-${o.id}">
+                                    ${o.paymentAccessGranted ? 'Liberado' : 'Requer pagamento'}
+                                </span>
+                                <div class="adm-toggle ${o.paymentAccessGranted ? 'on' : ''}"
+                                    id="access-grant-toggle-${o.id}"
+                                    onclick="toggleAccessGrant('${o.id}', this)"
+                                    title="Liberar acesso sem exigir pagamento">
+                                    <div class="adm-toggle-knob"></div>
+                                </div>
+                            </label>
+                        </span>
+                    </div>
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Valor do pedido (R$)</span>
+                        <span class="detail-list-value">
+                            <div class="adm-amount-wrap">
+                                <span class="adm-amount-prefix">R$</span>
+                                <input class="adm-amount-input" id="order-amount-input"
+                                    type="number" min="0" step="0.01" placeholder="0,00"
+                                    value="${esc(String(o.paymentAmount || ''))}"
+                                    title="Valor que será cobrado do usuário via Pix">
+                            </div>
+                        </span>
+                    </div>
+                    ${pay ? `
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Status do pagamento</span>
+                        <span class="detail-list-value">
+                            <span class="pill ${payCls[payStatus]||''}">${payLabels[payStatus]||payStatus}</span>
+                        </span>
+                    </div>
+                    ${pay.paidAt ? `
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Pago em</span>
+                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString('pt-BR')}</span>
+                    </div>` : ''}
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">ID MP</span>
+                        <span class="detail-list-value" style="font-family:monospace;font-size:var(--font-size-xs)">${esc(pay.mpPaymentId||'—')}</span>
+                    </div>` : `
+                    <div class="detail-list-item">
+                        <span class="detail-list-label" style="color:var(--text-tertiary)">Nenhum pagamento gerado ainda</span>
+                        <span class="detail-list-value"></span>
+                    </div>`}
+                    <div class="detail-list-item">
+                        <span class="detail-list-label"></span>
+                        <span class="detail-list-value">
+                            <button class="action-btn btn-primary btn-xs" onclick="saveOrderAmount('${o.id}')">
+                                Salvar valor
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
     return `
     <div class="modal-division">
         <div class="detail-section">
@@ -464,7 +642,7 @@ function buildOrderDetail(o) {
                     <span class="detail-list-label">Status</span>
                     <span class="detail-list-value">
                         <select id="order-status-sel" class="adm-input adm-input-select">
-                            ${['pending','processing','ready','expired','cancelled'].map(s =>
+                            ${['pending','processing','ready','completed','expired','cancelled'].map(s =>
                                 `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}
                         </select>
                     </span>
@@ -477,6 +655,8 @@ function buildOrderDetail(o) {
         </div>
     </div>
 
+    ${paymentHtml}
+
     <div class="modal-division">
         <div class="detail-section">
             <div class="section-title modal-style">Itens e links (${total})</div>
@@ -486,18 +666,34 @@ function buildOrderDetail(o) {
     </div>
 
     <div class="modal-footer">
-        <button class="action-btn btn-ghost"   onclick="closeModal()">Fechar</button>
-        <button class="action-btn btn-primary"  onclick="saveStatus('${o.id}')">Salvar status</button>
+        <button class="action-btn btn-ghost"  onclick="closeModal()">Fechar</button>
+        <button class="action-btn btn-primary" onclick="saveStatus('${o.id}')">Salvar status</button>
     </div>`;
 }
 
-// ── Operações de link por item ────────────────────────────────
+// ── Salvar valor do pedido ────────────────────────────────────────────────
+async function saveOrderAmount(id) {
+    const amount = parseFloat(document.getElementById('order-amount-input')?.value);
+    if (isNaN(amount) || amount < 0) { alert('Valor inválido'); return; }
+    const res = await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        body: JSON.stringify({ paymentAmount: amount }),
+    });
+    const d = await res.json();
+    if (d.success || res.ok) {
+        const btn = event.target;
+        btn.textContent = '✓ Salvo'; setTimeout(() => { btn.textContent = 'Salvar valor'; }, 1800);
+        loadOrders();
+    } else { alert('Erro: ' + JSON.stringify(d)); }
+}
+
+// ── Operações de link ─────────────────────────────────────────────────────
 async function saveItemLink(orderId, itemIdx) {
     const url    = document.getElementById(`lnk-url-${itemIdx}`)?.value.trim();
     const gdrive = document.getElementById(`lnk-gdrive-${itemIdx}`)?.value.trim();
     const hours  = parseInt(document.getElementById(`lnk-expiry-${itemIdx}`)?.value || '720');
     if (!url && !gdrive) { alert('Informe URL ou Google Drive File ID'); return; }
-
     const btn = event.target; btn.disabled = true; btn.textContent = 'Salvando...';
     const res = await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
@@ -528,10 +724,7 @@ async function removeItemLink(orderId, itemIdx) {
     openOrder(orderId); loadOrders();
 }
 
-// ── Bulk ops ──────────────────────────────────────────────────
-function toggleActivatePanel() {
-    document.getElementById('activate-panel').classList.toggle('open');
-}
+function toggleActivatePanel() { document.getElementById('activate-panel').classList.toggle('open'); }
 
 async function disableAllLinks(orderId) {
     if (!confirm('Desativar todos os links?')) return;
@@ -551,7 +744,6 @@ async function activateAllLinks(orderId) {
     openOrder(orderId); loadOrders();
 }
 
-// ── Salvar status ─────────────────────────────────────────────
 async function saveStatus(id) {
     const status = document.getElementById('order-status-sel').value;
     await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
@@ -570,6 +762,130 @@ async function deleteOrder(id) {
     loadOrders();
 }
 
+// ── Configurações do Mercado Pago ─────────────────────────────────────────
+async function loadMpSettings() {
+    try {
+        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
+            headers: { Authorization: `Bearer ${admToken}` },
+        });
+        const data = await res.json();
+
+        document.getElementById('mp-base-amount').value  = data.base_amount || '';
+        document.getElementById('mp-fee-percent').value  = data.fee_percent || '';
+        document.getElementById('mp-public-key').value   = data.mp_public_key || '';
+        // Access token não retorna (segredo); deixa placeholder indicativo
+        document.getElementById('mp-access-token').placeholder = data.mp_configured ? '••••••• (configurado)' : 'APP_USR-...';
+
+        const dot = document.getElementById('mp-status-dot');
+        dot.className = 'mp-status-dot ' + (data.mp_configured ? 'ok' : 'err');
+        dot.title     = data.mp_configured ? 'Configurado' : 'Não configurado';
+
+        recalcTotal();
+    } catch(e) {
+        console.error('[loadMpSettings]', e);
+    }
+}
+
+async function saveMpSettings() {
+    const body = {};
+    const at = document.getElementById('mp-access-token').value.trim();
+    const pk = document.getElementById('mp-public-key').value.trim();
+    const ba = document.getElementById('mp-base-amount').value;
+    const fp = document.getElementById('mp-fee-percent').value;
+
+    if (at) body.mp_access_token = at;
+    if (pk) body.mp_public_key   = pk;
+    if (ba !== '') body.base_amount = parseFloat(ba);
+    if (fp !== '') body.fee_percent = parseFloat(fp);
+
+    const msg = document.getElementById('mp-save-msg');
+    msg.style.display = 'none';
+
+    try {
+        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            msg.style.display = 'block';
+            msg.innerHTML = `<span class="pill st-ready">✓ Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
+            document.getElementById('mp-access-token').value = '';
+            loadMpSettings();
+        } else {
+            msg.style.display = 'block';
+            msg.innerHTML = `<span class="pill st-cancelled">⚠ Erro: ${esc(data.error||'desconhecido')}</span>`;
+        }
+    } catch(e) {
+        msg.style.display = 'block';
+        msg.innerHTML = `<span class="pill st-cancelled">⚠ ${esc(e.message)}</span>`;
+    }
+}
+
+function recalcTotal() {
+    const base = parseFloat(document.getElementById('mp-base-amount')?.value) || 0;
+    const fee  = parseFloat(document.getElementById('mp-fee-percent')?.value) || 0;
+    const el   = document.getElementById('mp-total-preview');
+    if (!el) return;
+    if (base <= 0) { el.textContent = 'R$ —'; return; }
+    const r     = fee / 100;
+    const total = r >= 1 ? base : base / (1 - r);
+    el.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+}
+
+// ── Health check ──────────────────────────────────────────────────────────
+async function checkHealth() {
+    const statusEl = document.getElementById('mp-health-status');
+    const subEl    = document.getElementById('mp-health-sub');
+    statusEl.textContent = 'Verificando...';
+    subEl.textContent    = '';
+    try {
+        const res  = await fetch(`${ADM_CFG.paymentsBase}/health`);
+        const data = await res.json();
+        statusEl.textContent = res.ok ? '✓ Worker online' : '⚠ Worker com erro';
+        subEl.textContent    = `MP: ${data.mercadopago} · ${data.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : ''}`;
+        document.getElementById('mp-health-card').style.borderColor = res.ok ? 'var(--success-color)' : 'var(--error-color)';
+    } catch(e) {
+        statusEl.textContent = '✕ Worker inacessível';
+        subEl.textContent    = e.message;
+        document.getElementById('mp-health-card').style.borderColor = 'var(--error-color)';
+    }
+}
+
+// ── Toggle de acesso manual ───────────────────────────────────────────────
+async function toggleAccessGrant(orderId, toggleEl) {
+    const isOn    = toggleEl.classList.contains('on');
+    const newVal  = !isOn;
+    const labelEl = document.getElementById(`access-grant-label-${orderId}`);
+
+    // Feedback imediato
+    toggleEl.classList.toggle('on', newVal);
+    if (labelEl) labelEl.textContent = newVal ? 'Liberado' : 'Requer pagamento';
+
+    try {
+        const res = await fetch(`${ADM_CFG.apiBase}/orders/${orderId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+            body: JSON.stringify({ paymentAccessGranted: newVal }),
+        });
+        const d = await res.json();
+        if (!res.ok) {
+            // Reverte em caso de erro
+            toggleEl.classList.toggle('on', isOn);
+            if (labelEl) labelEl.textContent = isOn ? '✓ Liberado sem pagamento' : 'Requer pagamento';
+            alert('Erro ao salvar: ' + (d.error || res.status));
+        } else {
+            loadOrders();
+        }
+    } catch(e) {
+        toggleEl.classList.toggle('on', isOn);
+        if (labelEl) labelEl.textContent = isOn ? '✓ Liberado sem pagamento' : 'Requer pagamento';
+        alert('Erro: ' + e.message);
+    }
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────
 function esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }

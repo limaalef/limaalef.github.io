@@ -1,37 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido | Sports Archive</title>
-<meta name="robots" content="noindex">
-<link rel="stylesheet" href="css/theme.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/request.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido | Sports Archive</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/request.css">
+    <link rel="stylesheet" href="css/admin.css">
 <style>
 .rd-wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
 
-/* Auth (reúsa estilos de my-requests) */
+/* Auth */
 #rd-auth { display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
     padding:var(--sp-9) var(--sp-5); text-align:center; }
 #rd-auth h2 { color:var(--text-primary); margin:0; font-size:var(--font-size-xxl); }
 #rd-auth p  { color:var(--text-secondary); margin:0; font-size:var(--font-size-mdm); }
-
 .rd-loading { text-align:center; padding:var(--sp-9) var(--sp-5);
     color:var(--text-secondary); font-size:var(--font-size-mdm); }
 
-/* Header do pedido */
-.rd-order-header { margin-bottom:var(--sp-6); }
-.rd-order-id   { font-size:var(--font-size-xs); color:var(--text-secondary); font-family:monospace; margin-bottom:var(--sp-1); }
-.rd-order-date { font-size:var(--font-size-mds); color:var(--text-tertiary); margin-bottom:var(--sp-3); }
-
-/* Progress bar */
+    /* Progress bar */
 .rd-progress { display:flex; border-radius:var(--border-radius-size-md);
     overflow:hidden; border:1px solid var(--border-color); margin-bottom:var(--sp-6); }
 .rd-progress-step { flex:1; text-align:center; padding:var(--sp-3) var(--sp-2);
     font-size:var(--font-size-xs); font-weight:600; text-transform:uppercase;
-    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary);
-    transition:all .2s; }
+    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary); transition:all .2s; }
 .rd-progress-step + .rd-progress-step { border-left:1px solid var(--border-color); }
 .rd-progress-step.done    { background:var(--bg-success); color:var(--text-success); }
 .rd-progress-step.current { background:var(--accent-color); color:var(--text-accent-color); }
@@ -41,33 +35,24 @@
 .rd-section-title { font-size:var(--font-size-xs); text-transform:uppercase;
     letter-spacing:.07em; color:var(--accent-color); margin-bottom:var(--sp-3); }
 
-/* Download cards — um por item */
+/* Download cards */
 .rd-dl-list { display:flex; flex-direction:column; gap:var(--sp-4); }
-
-.rd-dl-card { border-radius:var(--border-radius-size-xl);
-    border:1px solid var(--border-color); overflow:hidden; }
+.rd-dl-card { border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); overflow:hidden; }
 .rd-dl-card.available { border-color:var(--success-color); }
-
 .rd-dl-card-head { display:flex; align-items:center; gap:var(--sp-4);
     padding:var(--sp-4) var(--sp-5); background:var(--bg-secondary); }
 .rd-dl-card.available .rd-dl-card-head { background:var(--bg-success); }
-
 .rd-dl-icon { font-size:1.5rem; flex-shrink:0; }
-
 .rd-dl-info { flex:1; min-width:0; }
 .rd-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
 .rd-dl-sub   { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:var(--sp-1); }
-
-.rd-dl-card-body { padding:var(--sp-4) var(--sp-5);
-    border-top:1px solid var(--border-color); background:var(--bg-primary); }
-.rd-dl-status-row { display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:var(--sp-3); }
+.rd-dl-card-body { padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-color); background:var(--bg-primary); }
+.rd-dl-status-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-3); }
 .rd-dl-exp { font-size:var(--font-size-sm); }
 .rd-dl-exp.valid     { color:var(--text-success); }
 .rd-dl-exp.expired   { color:var(--error-color); }
 .rd-dl-exp.indefinite { color:var(--text-secondary); }
 .rd-dl-exp.disabled  { color:var(--text-tertiary); }
-
 .rd-dl-pending { padding:var(--sp-4) var(--sp-5); background:var(--bg-primary);
     color:var(--text-tertiary); font-size:var(--font-size-sm);
     border-top:1px solid var(--border-color); text-align:center; }
@@ -79,31 +64,85 @@
     display:flex; align-items:center; justify-content:space-between; }
 .rd-info-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
 .rd-info-label { font-size:var(--font-size-sm); color:var(--text-secondary); width:35%; }
-.rd-info-value { font-size:var(--font-size-mdm); font-weight:600;
-    color:var(--text-primary); text-align:right; width:65%; }
-
+.rd-info-value { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); text-align:right; width:65%; }
 .rd-notes { padding:var(--sp-3) var(--sp-4); background:var(--bg-secondary);
     border-radius:var(--border-radius-size-md); border-left:3px solid var(--accent-color);
     font-size:var(--font-size-sm); color:var(--text-secondary); }
 
-/* Back link */
-.rd-back { display:inline-flex; align-items:center; gap:var(--sp-2);
-    font-size:var(--font-size-sm); color:var(--accent-color);
-    text-decoration:none; margin-bottom:var(--sp-5); transition:opacity .15s; }
-.rd-back:hover { opacity:.75; text-decoration:underline; }
+/* ═══════════════════════════════════════════════
+   PAGAMENTO — card Pix
+═══════════════════════════════════════════════ */
+.rd-pay-card { border: 1px solid var(--border-color); border-radius: var(--border-radius-size-xl);
+    overflow: hidden; margin-bottom: var(--sp-6); }
+.rd-pay-card.pay-required { border-color: var(--warning-color); }
+.rd-pay-card.pay-pending  { border-color: var(--accent-color); }
+.rd-pay-card.pay-done     { border-color: var(--success-color); }
+
+.rd-pay-head { display: flex; align-items: center; gap: var(--sp-4);
+    padding: var(--sp-4) var(--sp-5); }
+.rd-pay-card.pay-required .rd-pay-head { background: var(--bg-warning); }
+.rd-pay-card.pay-pending  .rd-pay-head { background: var(--bg-info); }
+.rd-pay-card.pay-done     .rd-pay-head { background: var(--bg-success); }
+.rd-pay-icon  { font-size: 1.6rem; flex-shrink: 0; }
+.rd-pay-title { font-size: var(--font-size-mdm); font-weight: 700; color: var(--text-primary); }
+.rd-pay-sub   { font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px; }
+.rd-pay-amount { font-size: var(--font-size-mxxl); font-weight: 700;
+    color: var(--accent-color); margin-left: auto; flex-shrink: 0; }
+
+.rd-pay-body  { padding: var(--sp-5); background: var(--bg-primary);
+    border-top: 1px solid var(--border-color); }
+
+/* CPF step */
+.rd-cpf-field { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.rd-cpf-label { font-size: var(--font-size-sm); color: var(--text-secondary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em; }
+.rd-cpf-input { width: 100%; padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--border-color); border-radius: var(--border-radius-size-md);
+    background: var(--bg-secondary); color: var(--text-primary); font-size: var(--font-size-mdm);
+    font-family: inherit; outline: none; transition: border-color .15s; }
+.rd-cpf-input:focus { border-color: var(--accent-color); }
+.rd-cpf-hint { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+.rd-cpf-err  { font-size: var(--font-size-sm); color: var(--error-color); display: none; margin-top: var(--sp-2); }
+
+/* QR Code */
+.rd-qr-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.rd-qr-img  { width: 200px; height: 200px; border-radius: var(--border-radius-size-md);
+    border: 1px solid var(--border-color); background: #fff; padding: 8px; }
+.rd-qr-copy-wrap { width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); }
+.rd-qr-code-text { font-size: var(--font-size-xs); font-family: monospace; word-break: break-all;
+    background: var(--bg-secondary); border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-md); padding: var(--sp-3); color: var(--text-secondary);
+    max-height: 80px; overflow-y: auto; line-height: 1.5; }
+.rd-qr-timer { font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; }
+.rd-qr-timer span { color: var(--accent-color); font-weight: 700; }
+.rd-poll-status { text-align: center; font-size: var(--font-size-sm); color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: var(--sp-3); }
+.rd-poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color);
+    animation: rd-blink 1.2s ease-in-out infinite; }
+@keyframes rd-blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* Spinner inline */
+.rd-spinner { display: inline-block; width: 18px; height: 18px;
+    border: 2px solid var(--border-color); border-top-color: var(--accent-color);
+    border-radius: 50%; animation: rd-spin .7s linear infinite; }
+@keyframes rd-spin { to { transform: rotate(360deg); } }
+
+/* Locks on items when payment is required */
+.rd-locked-notice { display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-5); background: var(--bg-warning);
+    border-top: 1px solid var(--border-color); font-size: var(--font-size-sm);
+    color: var(--text-warning); }
 </style>
 </head>
 <body>
-<header>
-    <div class="header-frame" id="header" data-title="" data-back="true"></div>
-    <div class="control-group">
-        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
-            <span id="langFlag">🇧🇷</span>
-        </button>
-    </div>
-</header>
-
-<div class="rd-wrap">
+    <header>
+        <div class="header-frame" id="header" data-title="" data-back="true"></div>
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
+        </div>
+    </header>
 
     <!-- Auth -->
     <div id="rd-auth">
@@ -120,38 +159,55 @@
             <span data-i18n="requestLoginGoogle">Entrar com Google</span>
         </button>
     </div>
-
-    <!-- Content -->
+        
     <div id="rd-content" style="display:none">
-        <a href="my-requests.html" class="rd-back">← <span data-i18n="requestMyRequests">Meus Pedidos</span></a>
-        <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
-        <div id="rd-order-body"></div>
+        <div class="adm-layout">
+            <!-- Sidebar -->
+            <aside class="adm-sidebar sidebar-wide">
+                <div id="rd-order-sidebar" style="padding:0 var(--sp-5)"></div>
+            </aside>
+
+            <!-- Conteúdo -->
+            <div class="adm-main" style="padding:0 var(--sp-5)">
+                <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
+                <div id="rd-order-body"></div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div id="footer"></div>
+    <div id="footer"></div>
 
-<script src="js/config.js"></script>
-<script src="js/translation.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/api.service.js"></script>
-<script src="https://accounts.google.com/gsi/client" async></script>
-<script>
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script>
 const RD_CFG = {
-    apiBase:        CONFIG.REQUEST_API_BASE,
+    apiBase:      CONFIG.REQUEST_API_BASE,
+    paymentsBase: CONFIG.PAYMENTS_API_BASE || 'https://payments.limaalef.com',
     googleClientId: CONFIG.GOOGLE_CLIENT_ID,
 };
 
 let rdToken = null;
 let rdUser  = null;
 
-function t(key) {
-    return (LanguageManager ? LanguageManager.t(key) : null) || key;
-}
+// Estado de pagamento (preservado durante polling)
+let _payState = {
+    mpPaymentId:  null,
+    pixCopyPaste: null,
+    pixQrBase64:  null,
+    amount:       null,
+    expiresAt:    null,
+    pollingTimer: null,
+    countdownTimer: null,
+};
+
+function t(key) { return (LanguageManager ? LanguageManager.t(key) : null) || key; }
 
 const orderId = new URLSearchParams(window.location.search).get('id');
 
-// ── Sessão ────────────────────────────────────────────────────
+// ── Sessão ─────────────────────────────────────────────────────────────────
 function saveRdSession(token, user) {
     rdToken = token; rdUser = user;
     localStorage.setItem('rq_token', token);
@@ -172,7 +228,7 @@ function restoreRdSession() {
     } catch { return false; }
 }
 
-// ── Auth ──────────────────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────────────────
 document.getElementById('rd-login-google').addEventListener('click', () => {
     if (!window.google?.accounts?.id) { alert(t('requestGSINotLoaded')); return; }
     google.accounts.id.initialize({
@@ -199,17 +255,12 @@ document.getElementById('rd-login-google').addEventListener('click', () => {
 function showContent() {
     document.getElementById('rd-auth').style.display    = 'none';
     document.getElementById('rd-content').style.display = 'block';
-
-    if (!orderId) {
-        document.getElementById('rd-loading').textContent = t('requestNoOrderId');
-        return;
-    }
+    if (!orderId) { document.getElementById('rd-loading').textContent = t('requestNoOrderId'); return; }
     loadOrder();
 }
-
 if (restoreRdSession()) showContent();
 
-// ── Carregar pedido ───────────────────────────────────────────
+// ── Carregar pedido ────────────────────────────────────────────────────────
 async function loadOrder() {
     document.getElementById('rd-loading').style.display    = 'block';
     document.getElementById('rd-order-body').innerHTML      = '';
@@ -218,35 +269,35 @@ async function loadOrder() {
             headers: { Authorization: `Bearer ${rdToken}` },
         });
         if (res.status === 401) { localStorage.removeItem('rq_token'); location.reload(); return; }
-        if (res.status === 403) {
-            document.getElementById('rd-loading').textContent = t('requestOrderForbidden');
-            return;
-        }
-        if (res.status === 404) {
-            document.getElementById('rd-loading').textContent = t('requestOrderNotFound');
-            return;
-        }
+        if (res.status === 403) { document.getElementById('rd-loading').textContent = t('requestOrderForbidden'); return; }
+        if (res.status === 404) { document.getElementById('rd-loading').textContent = t('requestOrderNotFound'); return; }
+
         const order = await res.json();
         document.getElementById('rd-loading').style.display = 'none';
 
-        // Atualiza título do header
         const hdr = document.getElementById('header');
         if (hdr) hdr.dataset.title = order.id;
         document.title = `${order.id} | Sports Archive`;
 
-        document.getElementById('rd-order-body').innerHTML = buildOrderDetail(order);
+        const detail = buildOrderDetail(order);
+        document.getElementById('rd-order-body').innerHTML = detail.body;
+        document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
+
+        // Se já tinha QR ativo (reused), iniciar polling automaticamente
+        if (_payState.mpPaymentId) startPolling(_payState.mpPaymentId);
+
     } catch(e) {
         document.getElementById('rd-loading').textContent = '⚠ ' + e.message;
     }
 }
 
-// ── Render detalhe ────────────────────────────────────────────
+// ── Render detalhe ─────────────────────────────────────────────────────────
 function buildOrderDetail(o) {
     const now   = new Date();
     const dt    = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
 
-    // Progress bar
+    // Progress bar (inclui passo "Pagamento" quando o pedido está pronto)
     const steps = [
         { label: t('requestProgressReceived') },
         { label: t('requestProgressAnalysis')  },
@@ -255,29 +306,60 @@ function buildOrderDetail(o) {
     const stepIdx = { pending:0, processing:1, ready:2, expired:2, cancelled:2 };
     const curIdx  = stepIdx[o.status] ?? 0;
 
+    const teste = `<div class="prog" style="gap:0;">
+            <div class="prog-step"><div class="prog-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span class="prog-lbl done">Recebido</span></div>
+            <div class="prog-conn done" style="min-width:30px;"></div>
+            <div class="prog-step"><div class="prog-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span class="prog-lbl done">Em análise</span></div>
+            <div class="prog-conn done" style="min-width:30px;"></div>
+            <div class="prog-step"><div class="prog-dot active"></div></div><span class="prog-lbl active" style="color:#e8ff4a;">Pronto</span></div>
+        </div>`
+
     const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
-        <div class="rd-progress">
+        <div class="prog">
             ${steps.map((s, i) => {
                 let cls = '';
                 if (i < curIdx)  cls = 'done';
-                if (i === curIdx) cls = 'current';
-                return `<div class="rd-progress-step ${cls}">${i < curIdx ? '✓ ' : ''}${s.label}</div>`;
+                if (i === curIdx) cls = 'active';
+                return `<div class="prog-conn ${cls}" style="min-width:30px;"></div><div class="prog-step">
+                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls}" style="width:6px;height:6px;border-radius:50%;"></div>`}</div>
+                            <span class="prog-lbl ${cls}">${s.label}</span>
+                        </div>`;
             }).join('')}
-        </div>` : '';
+        </div>` : 
+        ` <div class="prog">
+            ${steps.map((s, i) => {
+                const cls = 'done';
+                return `<div class="prog-conn done" style="min-width:30px;"></div><div class="prog-step">
+                            <div class="prog-dot done"><svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg done" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                            <span class="prog-lbl done">${s.label}</span>
+                        </div>`;
+            }).join('')}
+        </div>`;
 
-    // Cards de download — um por item
+    // ── Seção de pagamento Pix ─────────────────────────────────────────────
+    const paymentHtml = buildPaymentSection(o);
+
+    // ── Cards de download ──────────────────────────────────────────────────
+    // Trava os downloads se pagamento for obrigatório e não estiver pago
+    const pay     = o.payment;
+    const payDone = pay?.status === 'approved' || o.paymentAccessGranted === true;
+    const payRequired = o.paymentAmount > 0 && !payDone;
+
     const dlCardsHtml = items.map(item => {
         const link    = item.link;
-        const expired = link && link.expiresAt && new Date(link.expiresAt) < now;
-        const blocked = !link || link.disabled || expired;
-        const url     = link ? (link.proxyUrl || link.url || '#') : null;
+        // Se pagamento obrigatório e não pago, bloqueia mesmo com link ativo
+        const blocked = payRequired || !link || link.disabled ||
+            (link.expiresAt && new Date(link.expiresAt) < now);
+        const url     = (!payRequired && link) ? (link.proxyUrl || link.url || '#') : null;
 
         let expText = '', expCls = '';
-        if (!link) {
+        if (payRequired && !payDone) {
+            expText = '🔒 Aguardando confirmação do pagamento'; expCls = 'disabled';
+        } else if (!link) {
             expText = t('requestLinkPending'); expCls = 'disabled';
         } else if (link.disabled) {
             expText = t('requestLinkDisabled'); expCls = 'disabled';
-        } else if (expired) {
+        } else if (link.expiresAt && new Date(link.expiresAt) < now) {
             expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString('pt-BR');
             expCls  = 'expired';
         } else if (!link.expiresAt) {
@@ -289,7 +371,7 @@ function buildOrderDetail(o) {
         }
 
         return `
-        <div class="rd-dl-card ${!blocked ? 'available' : ''}">
+        <div class="rd-dl-card ${(!blocked && link) ? 'available' : ''}">
             <div class="rd-dl-card-head">
                 <div class="rd-dl-icon">${blocked ? '🔒' : '📥'}</div>
                 <div class="rd-dl-info">
@@ -297,66 +379,324 @@ function buildOrderDetail(o) {
                     <div class="rd-dl-sub">${esc(item.meta||'')}${item.date ? ' · ' + esc(item.date) : ''}${item.station ? ' · ' + esc(item.station) : ''}</div>
                 </div>
             </div>
-            ${link
-                ? `<div class="rd-dl-card-body">
-                    <div class="rd-dl-status-row">
-                        <span class="rd-dl-exp ${expCls}">${expText}</span>
-                        ${!blocked && url
-                            ? `<a href="${url}" class="action-btn btn-primary" target="_blank" rel="noopener" download
-                                style="text-decoration:none">⬇ ${t('requestDownload')}</a>`
-                            : ''}
-                    </div>
-                   </div>`
-                : `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`
+            ${(payRequired && !payDone)
+                ? `<div class="rd-locked-notice">⚠ Realize o pagamento acima para liberar este conteúdo.</div>`
+                : link
+                    ? `<div class="rd-dl-card-body">
+                        <div class="rd-dl-status-row">
+                            <span class="rd-dl-exp ${expCls}">${expText}</span>
+                            ${(!blocked && url)
+                                ? `<a href="${url}" class="action-btn btn-primary" target="_blank" rel="noopener" download
+                                    style="text-decoration:none">⬇ ${t('requestDownload')}</a>`
+                                : ''}
+                        </div>
+                       </div>`
+                    : `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`
             }
         </div>`;
     }).join('');
 
-    // Info do pedido
+    // Info
     const CONTACT_ICON = { email:'📧', whatsapp:'💬', telegram:'✈️', bluesky:'🦋', x:'𝕏' };
     const infoHtml = `
-        <div class="rd-info-list">
-            <div class="rd-info-item">
-                <span class="rd-info-label" data-i18n="requestStatusLabel">${t('requestStatusLabel')}</span>
-                <span class="rd-info-value"><span class="pill st-${o.status}">${statusPtBR(o.status)}</span></span>
+        <div class="detail-list">
+            <div class="detail-list-item">
+                <span class="detail-list-label" data-i18n="order">${t('order')}</span>
+                <span class="detail-list-value">${esc(o.id)}</span>
             </div>
-            <div class="rd-info-item">
-                <span class="rd-info-label" data-i18n="requestContactInfo">${t('requestContactInfo')}</span>
-                <span class="rd-info-value">
+            <div class="detail-list-item">
+                <span class="detail-list-label" data-i18n="date">${t('date')}</span>
+                <span class="detail-list-value">${dt}</span>
+            </div>
+            <div class="detail-list-item">
+                <span class="detail-list-label" data-i18n="requestContactInfo">${t('requestContactInfo')}</span>
+                <span class="detail-list-value">
                     ${CONTACT_ICON[o.contact?.channel]||'📬'} ${esc(o.contact?.channel||'—')}: ${esc(o.contact?.value||'')}
                 </span>
             </div>
-            <div class="rd-info-item">
-                <span class="rd-info-label" data-i18n="date">${t('date')}</span>
-                <span class="rd-info-value">${dt}</span>
+            <div class="detail-list-item">
+                <span class="detail-list-label" data-i18n="requestStatusLabel">${t('requestStatusLabel')}</span>
+                <span class="detail-list-value"><span class="pill st-${o.status}">${statusPtBR(o.status)}</span></span>
             </div>
         </div>
-        ${o.notes ? `<div class="rd-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}`;
+        ${o.notes ? `<div class="rd-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}
+        
+        <div class="section-divider"></div>
+
+        ${progressHtml}`;
+
+    return {
+        body: `
+            ${paymentHtml}
+
+            <div class="rd-section">
+                <div class="rd-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
+                <div class="rd-dl-list">${dlCardsHtml}</div>
+            </div>
+        `,
+        sidebar: `
+            <div class="rd-section">
+                <div class="rd-section-title" data-i18n="requestOrderInfo">${t('requestOrderInfo')}</div>
+                ${infoHtml}
+            </div>
+        `
+    };
+}
+
+// ── Seção de pagamento Pix ─────────────────────────────────────────────────
+function buildPaymentSection(o) {
+    // Só exibe se o pedido estiver "ready" e tiver valor configurado
+    if (o.status !== 'ready') return '';
+    if (!o.paymentAmount || o.paymentAmount <= 0) return '';
+    // Acesso liberado manualmente pelo admin — não exibe seção de pagamento
+    if (o.paymentAccessGranted === true) return '';
+
+    const pay    = o.payment;
+    const amount = 'R$ ' + parseFloat(o.paymentAmount).toLocaleString('pt-BR', { minimumFractionDigits:2 });
+
+    // Pago
+    if (pay?.status === 'approved') {
+        return `
+        <div class="rd-section">
+            <div class="rd-section-title">Pagamento</div>
+            <div class="rd-pay-card pay-done">
+                <div class="rd-pay-head">
+                    <span class="rd-pay-icon">✅</span>
+                    <div>
+                        <div class="rd-pay-title">Pagamento confirmado!</div>
+                        <div class="rd-pay-sub">Pago em ${pay.paidAt ? new Date(pay.paidAt).toLocaleString('pt-BR') : '—'}</div>
+                    </div>
+                    <div class="rd-pay-amount">${amount}</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // Cancelado/expirado
+    if (pay?.status === 'cancelled') {
+        return `
+        <div class="rd-section">
+            <div class="rd-section-title">Pagamento</div>
+            <div class="rd-pay-card" style="border-color:var(--error-color)">
+                <div class="rd-pay-head" style="background:var(--bg-error)">
+                    <span class="rd-pay-icon">❌</span>
+                    <div>
+                        <div class="rd-pay-title">Pagamento cancelado</div>
+                        <div class="rd-pay-sub">O tempo para pagamento expirou. Entre em contato para reativar.</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // Aguardando pagamento — QR pendente ou ainda não criado
+    const hasPendingQr = pay?.status === 'pending' && _payState.mpPaymentId;
 
     return `
-    <div class="rd-order-header">
-        <div class="rd-order-id">${esc(o.id)}</div>
-        <div class="rd-order-date">${dt}</div>
-        <span class="pill st-${o.status}">${statusPtBR(o.status)}</span>
-    </div>
-
-    ${progressHtml}
-
     <div class="rd-section">
-        <div class="rd-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
-        <div class="rd-dl-list">${dlCardsHtml}</div>
-    </div>
-
-    <div class="rd-section">
-        <div class="rd-section-title" data-i18n="requestOrderInfo">${t('requestOrderInfo')}</div>
-        ${infoHtml}
+        <div class="rd-section-title">Pagamento</div>
+        <div class="rd-pay-card ${hasPendingQr ? 'pay-pending' : 'pay-required'}" id="rd-pay-card">
+            <div class="rd-pay-head">
+                <span class="rd-pay-icon">${hasPendingQr ? '⏳' : '💳'}</span>
+                <div>
+                    <div class="rd-pay-title">${hasPendingQr ? 'Aguardando pagamento' : 'Pagamento necessário'}</div>
+                    <div class="rd-pay-sub">${hasPendingQr ? 'Escaneie o QR Code ou copie o código Pix' : 'Realize o pagamento via Pix para receber seus conteúdos'}</div>
+                </div>
+                <div class="rd-pay-amount">${amount}</div>
+            </div>
+            <div class="rd-pay-body" id="rd-pay-body">
+                ${hasPendingQr ? renderQrStep() : renderCpfStep()}
+            </div>
+        </div>
     </div>`;
 }
 
+function renderCpfStep() {
+    return `
+    <div class="rd-cpf-field">
+        <label class="rd-cpf-label">CPF do pagador</label>
+        <input id="rd-cpf-input" class="rd-cpf-input" type="text" maxlength="14"
+            inputmode="numeric" placeholder="000.000.000-00"
+            oninput="maskCpf(this)"
+            onkeydown="if(event.key==='Enter') submitCpf()">
+        <div class="rd-cpf-hint">Exigência fiscal do Mercado Pago para pagamentos via Pix.</div>
+        <div class="rd-cpf-err" id="rd-cpf-err"></div>
+    </div>
+    <button class="action-btn btn-primary" style="width:100%;justify-content:center"
+        onclick="submitCpf()">
+        Gerar QR Code Pix →
+    </button>`;
+}
+
+function renderQrStep() {
+    const ps = _payState;
+    return `
+    <div class="rd-qr-wrap">
+        ${ps.pixQrBase64
+            ? `<img class="rd-qr-img" src="data:image/png;base64,${ps.pixQrBase64}" alt="QR Code Pix">`
+            : `<div class="rd-qr-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-tertiary)">QR Code indisponível</div>`
+        }
+        <div class="rd-qr-copy-wrap">
+            ${ps.pixCopyPaste ? `
+            <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
+            <button class="action-btn btn-ghost" style="width:100%;justify-content:center"
+                onclick="copyCodigo()">
+                📋 Copiar código Pix
+            </button>` : ''}
+        </div>
+        <div class="rd-qr-timer" id="rd-qr-timer">⏱ Válido por <span id="rd-countdown">—</span></div>
+        <div class="rd-poll-status">
+            <div class="rd-poll-dot"></div>
+            Verificando pagamento automaticamente...
+        </div>
+    </div>`;
+}
+
+// ── CPF / Geração do QR ────────────────────────────────────────────────────
+function maskCpf(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 9)      v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+    else if (v.length > 6) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+    else if (v.length > 3) v = v.slice(0,3)+'.'+v.slice(3);
+    input.value = v;
+}
+
+function cpfValid(cpf) {
+    const d = cpf.replace(/\D/g, '');
+    if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
+    let s = 0;
+    for (let i = 0; i < 9; i++) s += parseInt(d[i]) * (10 - i);
+    let r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+    if (r !== parseInt(d[9])) return false;
+    s = 0;
+    for (let i = 0; i < 10; i++) s += parseInt(d[i]) * (11 - i);
+    r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+    return r === parseInt(d[10]);
+}
+
+async function submitCpf() {
+    const input  = document.getElementById('rd-cpf-input');
+    const errEl  = document.getElementById('rd-cpf-err');
+    const cpf    = input?.value || '';
+
+    if (!cpfValid(cpf)) {
+        errEl.textContent    = 'CPF inválido. Verifique e tente novamente.';
+        errEl.style.display  = 'block';
+        input?.focus();
+        return;
+    }
+    errEl.style.display = 'none';
+
+    const body = document.getElementById('rd-pay-body');
+    body.innerHTML = `<div style="text-align:center;padding:var(--sp-5)"><div class="rd-spinner"></div><div style="margin-top:var(--sp-3);color:var(--text-secondary);font-size:var(--font-size-sm)">Gerando Pix...</div></div>`;
+
+    try {
+        const res  = await fetch(`${RD_CFG.paymentsBase}/payments/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${rdToken}` },
+            body: JSON.stringify({ orderId, cpf: cpf.replace(/\D/g, '') }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            body.innerHTML = `
+                <div style="color:var(--error-color);margin-bottom:var(--sp-4)">
+                    ⚠ ${esc(data.error || 'Erro ao gerar pagamento')}
+                </div>
+                ${renderCpfStep()}`;
+            return;
+        }
+
+        _payState.mpPaymentId  = String(data.paymentId);
+        _payState.pixCopyPaste = data.pixCopyPaste;
+        _payState.pixQrBase64  = data.pixQrBase64;
+        _payState.amount       = data.amount;
+        _payState.expiresAt    = data.expiresAt;
+
+        body.innerHTML = renderQrStep();
+        startCountdown(data.expiresAt);
+        startPolling(_payState.mpPaymentId);
+
+    } catch(e) {
+        body.innerHTML = `
+            <div style="color:var(--error-color);margin-bottom:var(--sp-4)">⚠ ${esc(e.message)}</div>
+            ${renderCpfStep()}`;
+    }
+}
+
+function copyCodigo() {
+    const code = _payState.pixCopyPaste;
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = event.target;
+        btn.textContent = '✓ Copiado!';
+        setTimeout(() => { btn.textContent = '📋 Copiar código Pix'; }, 2000);
+    });
+}
+
+// ── Countdown ──────────────────────────────────────────────────────────────
+function startCountdown(expiresAt) {
+    if (_payState.countdownTimer) clearInterval(_payState.countdownTimer);
+    if (!expiresAt) return;
+
+    function tick() {
+        const el  = document.getElementById('rd-countdown');
+        if (!el) { clearInterval(_payState.countdownTimer); return; }
+        const ms  = new Date(expiresAt) - Date.now();
+        if (ms <= 0) {
+            el.textContent = 'expirado';
+            clearInterval(_payState.countdownTimer);
+            return;
+        }
+        const h = Math.floor(ms / 3_600_000);
+        const m = Math.floor((ms % 3_600_000) / 60_000);
+        const s = Math.floor((ms % 60_000) / 1_000);
+        el.textContent = h > 0
+            ? `${h}h ${m.toString().padStart(2,'0')}m`
+            : `${m}m ${s.toString().padStart(2,'0')}s`;
+    }
+    tick();
+    _payState.countdownTimer = setInterval(tick, 1000);
+}
+
+// ── Polling de status ──────────────────────────────────────────────────────
+function startPolling(mpPaymentId) {
+    if (_payState.pollingTimer) clearInterval(_payState.pollingTimer);
+
+    async function poll() {
+        try {
+            const res  = await fetch(`${RD_CFG.paymentsBase}/payments/${mpPaymentId}/status`, {
+                headers: { Authorization: `Bearer ${rdToken}` },
+            });
+            const data = await res.json();
+
+            if (data.paid || data.status === 'approved') {
+                clearInterval(_payState.pollingTimer);
+                clearInterval(_payState.countdownTimer);
+                // Recarrega o pedido para exibir os links
+                loadOrder();
+            } else if (data.status === 'cancelled') {
+                clearInterval(_payState.pollingTimer);
+                loadOrder();
+            }
+        } catch(e) {
+            console.warn('[poll]', e.message);
+        }
+    }
+
+    _payState.pollingTimer = setInterval(poll, 5000);
+    poll(); // imediato
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────
 function statusPtBR(s) {
-    return { pending:t('requestStatusPending'), processing:t('requestStatusProcessing'),
-             ready:t('requestStatusReady'), expired:t('requestStatusExpired'),
-             cancelled:t('requestStatusCancelled') }[s] || s;
+    return {
+        pending:   t('requestStatusPending'),
+        processing: t('requestStatusProcessing'),
+        ready:     t('requestStatusReady'),
+        expired:   t('requestStatusExpired'),
+        cancelled: t('requestStatusCancelled'),
+    }[s] || s;
 }
 
 function decodeJwt(token) {
@@ -364,9 +704,10 @@ function decodeJwt(token) {
     return JSON.parse(decodeURIComponent(
         atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
 }
+
 function esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-</script>
+    </script>
 </body>
 </html>

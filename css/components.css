@@ -741,6 +741,38 @@ input[type="text"]:focus {
     border-bottom: none;
 }
 
+/* Perfil */
+.profile-box {
+    margin: 5px 5px ;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-lg);
+    padding: var(--sp-2) var(--sp-3);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius-size-lg);
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    color: var(--text-accent-color);
+    flex-shrink: 0;
+}
+
+.profile-user-name {
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
 /* ========================================
    MODAL
    ======================================== */
