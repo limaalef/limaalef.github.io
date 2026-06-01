@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <div class="header-frame" id="header" data-title="Administração" data-back="true"></div>
+        <div class="header-frame" id="header" data-title="Administração" data-back="true" data-admin="true" data-forced="true"></div>
         <div class="control-group">
             <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
                 <span id="langFlag">🇧🇷</span>
@@ -130,75 +130,77 @@
                 </div>
 
                 <!-- PAINEL: CONFIGURAÇÕES MERCADO PAGO -->
-                <div class="adm-panel" id="panel-mp-settings">
-                    <!-- Credenciais -->
-                    <div class="mp-settings-card">
-                        <div class="detail-list">
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">
-                                    <div class="mp-settings-head-title">Credenciais</div>
-                                </span>
-                                <span class="detail-list-value" id="mp-status-dot" title="Não configurado"></span>
+                <div class="adm-panel 3-colums" id="panel-mp-settings">
+                    <div class="two-columns">
+                        <!-- Credenciais -->
+                        <div class="mp-settings-card">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Credenciais</div>
+                                    </span>
+                                    <span class="detail-list-value" id="mp-status-dot" title="Não configurado"></span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Access token</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="mp-access-token"
+                                            type="password" placeholder="APP_USR-..." autocomplete="off">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Public key</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="mp-public-key"
+                                            placeholder="APP_USR-..." autocomplete="off">
+                                    </span>
+                                </div>
                             </div>
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">Access token</span>
-                                <span class="detail-list-value">
-                                    <input class="adm-input adm-input-text" id="mp-access-token"
-                                        type="password" placeholder="APP_USR-..." autocomplete="off">
-                                </span>
+                        </div>
+
+                        <!-- Valores -->
+                        <div class="mp-settings-card">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Valor e taxa</div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Valor base (R$)</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <span class="adm-amount-prefix">R$</span>
+                                            <input class="adm-amount-input" id="mp-base-amount"
+                                                type="number" min="0" step="0.01" placeholder="0,00"
+                                                oninput="recalcTotal()">
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Taxa de processamento (%)</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <input class="adm-amount-input" id="mp-fee-percent"
+                                                type="number" min="0" max="99" step="0.01" placeholder="0,00"
+                                                oninput="recalcTotal()">
+                                            <span class="adm-amount-prefix">%</span>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item mp-total-preview">
+                                    <span class="detail-list-label mp-total-label">Valor total (R$)</span>
+                                    <span class="detail-list-value mp-total-value" id="mp-total-preview"></span>
+                                </div>
                             </div>
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">Public key</span>
-                                <span class="detail-list-value">
-                                    <input class="adm-input adm-input-text" id="mp-public-key"
-                                        placeholder="APP_USR-..." autocomplete="off">
-                                </span>
+
+                            <div class="button-group">
+                                <button class="action-btn btn-ghost" onclick="loadMpSettings()">↺ Recarregar</button>
+                                <button class="action-btn btn-primary" onclick="saveMpSettings()">Salvar configurações</button>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Valores -->
-                    <div class="mp-settings-card">
-                        <div class="detail-list">
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">
-                                    <div class="mp-settings-head-title">Valor e taxa</div>
-                                </span>
-                            </div>
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">Valor base (R$)</span>
-                                <span class="detail-list-value">
-                                    <div class="adm-amount-wrap">
-                                        <span class="adm-amount-prefix">R$</span>
-                                        <input class="adm-amount-input" id="mp-base-amount"
-                                            type="number" min="0" step="0.01" placeholder="0,00"
-                                            oninput="recalcTotal()">
-                                    </div>
-                                </span>
-                            </div>
-                            <div class="detail-list-item">
-                                <span class="detail-list-label">Taxa de processamento (%)</span>
-                                <span class="detail-list-value">
-                                    <div class="adm-amount-wrap">
-                                        <input class="adm-amount-input" id="mp-fee-percent"
-                                            type="number" min="0" max="99" step="0.01" placeholder="0,00"
-                                            oninput="recalcTotal()">
-                                        <span class="adm-amount-prefix">%</span>
-                                    </div>
-                                </span>
-                            </div>
-                            <div class="detail-list-item mp-total-preview">
-                                <span class="detail-list-label mp-total-label">Valor total (R$)</span>
-                                <span class="detail-list-value mp-total-value" id="mp-total-preview"></span>
-                            </div>
-                        </div>
-
-                        <div class="button-group">
-                            <button class="action-btn btn-ghost" onclick="loadMpSettings()">↺ Recarregar</button>
-                            <button class="action-btn btn-primary" onclick="saveMpSettings()">Salvar configurações</button>
-                        </div>
-                    </div>
-
+                    
                     <div class="adm-nav-divider"></div>
 
                     <!-- Health do worker -->
@@ -206,7 +208,7 @@
                         <div class="detail-list" id="mp-health-card">
                             <div class="detail-list-item">
                                 <span class="detail-list-label all-wide">
-                                    <div class="mp-settings-head-title">Health check do Worker de pagamentos</div>
+                                    <div class="mp-settings-head-title">Health check</div>
                                 </span>
                                 <span class="detail-list-value">
                                     <div id="mp-save-msg" style="display:none"></div>

@@ -23,6 +23,12 @@ body {
     margin: 0 auto;
 }
 
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-5);
+}
+
 /* HEADER E NAVEGAÇÃO */
 header {
     padding: 0;
@@ -97,12 +103,18 @@ header {
 }
 
 .home-section-title,
+.home-section-title-admin,
 .changes-section-title,
 .section-title {
     font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
     letter-spacing: 0.06em;
+    font-weight: 600;
     text-transform: uppercase;
+}
+
+.home-section-title-admin {
+    color: var(--accent-color);
 }
 
 .section-title.modal-style {

@@ -34,10 +34,13 @@ window._headerPromise = new Promise(resolve => {
         // Logo e título
         const logo = document.getElementById('logo-header-svg');
 
-        if (isMobile && container.dataset.back === 'true') {
+        if ((isMobile || container.dataset.forced === 'true') && container.dataset.back === 'true') {
             document.getElementById('page-title').textContent = container.dataset.title || '';
             
-            document.getElementById('headerTitle').style.display = 'flex';
+            document.getElementById('headerTitle').style.display = 'block';
+            if (container.dataset.admin === 'true') {
+                document.getElementById('headerTitleAdmin').style.display = 'block';
+            }
             logo.style.display = 'none';
         }
 
