@@ -192,7 +192,7 @@ const RD_CFG = {
 let rdToken = null;
 let rdUser  = null;
 
-// Estado de pagamento (preservado durante polling)
+// Estado de pagamento (preservado durante polling e entre sessões via KV)
 let _payState = {
     mpPaymentId:  null,
     pixCopyPaste: null,
@@ -201,6 +201,7 @@ let _payState = {
     expiresAt:    null,
     pollingTimer: null,
     countdownTimer: null,
+    restored:     false,  // true = QR veio do servidor (não gerado nesta sessão)
 };
 
 function t(key) { return (LanguageManager ? LanguageManager.t(key) : null) || key; }
@@ -279,12 +280,26 @@ async function loadOrder() {
         if (hdr) hdr.dataset.title = order.id;
         document.title = `${order.id} | Sports Archive`;
 
+        // Restaura QR do servidor se o pagamento estiver pendente e houver dados salvos
+        const pendingPay = order.payment;
+        if (pendingPay?.status === 'pending' && pendingPay.mpPaymentId
+            && pendingPay.pixQrBase64 && !_payState.mpPaymentId) {
+            _payState.mpPaymentId  = String(pendingPay.mpPaymentId);
+            _payState.pixCopyPaste = pendingPay.pixCopyPaste;
+            _payState.pixQrBase64  = pendingPay.pixQrBase64;
+            _payState.expiresAt    = pendingPay.expiresAt;
+            _payState.restored     = true;
+        }
+
         const detail = buildOrderDetail(order);
         document.getElementById('rd-order-body').innerHTML = detail.body;
         document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
 
-        // Se já tinha QR ativo (reused), iniciar polling automaticamente
-        if (_payState.mpPaymentId) startPolling(_payState.mpPaymentId);
+        // Inicia polling e countdown se houver QR ativo (gerado agora ou restaurado)
+        if (_payState.mpPaymentId) {
+            startPolling(_payState.mpPaymentId);
+            if (_payState.expiresAt) startCountdown(_payState.expiresAt);
+        }
 
     } catch(e) {
         document.getElementById('rd-loading').textContent = '⚠ ' + e.message;
@@ -482,7 +497,7 @@ function buildPaymentSection(o) {
         </div>`;
     }
 
-    // Aguardando pagamento — QR pendente ou ainda não criado
+    // Aguardando pagamento — QR pendente (gerado nesta sessão ou restaurado do servidor)
     const hasPendingQr = pay?.status === 'pending' && _payState.mpPaymentId;
 
     return `

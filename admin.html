@@ -451,6 +451,28 @@ async function openOrder(id) {
     const order = await res.json();
     document.getElementById('adm-modal-title').textContent = order.id;
     document.getElementById('modal-body').innerHTML = buildOrderDetail(order);
+
+    // Calcula e exibe o valor padrão (base × itens) na linha informativa
+    calcAndShowDefaultAmount(order);
+}
+
+async function calcAndShowDefaultAmount(order) {
+    const el = document.getElementById(`order-default-amount-val-${order.id}`);
+    if (!el) return;
+    try {
+        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
+            headers: { Authorization: `Bearer ${admToken}` },
+        });
+        const data = await res.json();
+        const base     = parseFloat(data.base_amount) || 0;
+        const fee      = parseFloat(data.fee_percent)  || 0;
+        const itemCount = (order.items || []).length || 1;
+        if (base <= 0) { el.textContent = 'não configurado'; return; }
+        const baseTotal = base * itemCount;
+        const r = fee / 100;
+        const total = r >= 1 ? baseTotal : baseTotal / (1 - r);
+        el.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+    } catch { el.textContent = '—'; }
 }
 function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
 document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
@@ -579,16 +601,23 @@ function buildOrderDetail(o) {
                         </span>
                     </div>
                     <div class="detail-list-item">
-                        <span class="detail-list-label">Valor do pedido (R$)</span>
+                        <span class="detail-list-label">Valor personalizado (R$)</span>
                         <span class="detail-list-value">
                             <div class="adm-amount-wrap">
                                 <span class="adm-amount-prefix">R$</span>
                                 <input class="adm-amount-input" id="order-amount-input"
-                                    type="number" min="0" step="0.01" placeholder="0,00"
+                                    type="number" min="0" step="0.01" placeholder="padrão"
                                     value="${esc(String(o.paymentAmount || ''))}"
-                                    title="Valor que será cobrado do usuário via Pix">
+                                    title="Deixe vazio para usar o valor padrão (base × itens)">
                             </div>
                         </span>
+                    </div>
+                    <div class="detail-list-item" id="order-default-amount-row-${o.id}">
+                        <span class="detail-list-label" style="color:var(--text-tertiary);font-size:var(--font-size-sm)">
+                            ${o.paymentAmount ? 'Valor padrão seria' : 'Valor padrão (base × ${(o.items||[]).length} itens)'}
+                        </span>
+                        <span class="detail-list-value" style="color:var(--text-tertiary);font-size:var(--font-size-sm)"
+                            id="order-default-amount-val-${o.id}">calculando...</span>
                     </div>
                     ${pay ? `
                     <div class="detail-list-item">
@@ -612,7 +641,12 @@ function buildOrderDetail(o) {
                     </div>`}
                     <div class="detail-list-item">
                         <span class="detail-list-label"></span>
-                        <span class="detail-list-value">
+                        <span class="detail-list-value" style="display:flex;gap:var(--sp-2);justify-content:flex-end;flex-wrap:wrap">
+                            ${pay?.status === 'pending' ? `
+                            <button class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
+                                onclick="cancelPayment('${o.id}')">
+                                ✕ Cancelar Pix
+                            </button>` : ''}
                             <button class="action-btn btn-primary btn-xs" onclick="saveOrderAmount('${o.id}')">
                                 Salvar valor
                             </button>
@@ -883,6 +917,30 @@ async function toggleAccessGrant(orderId, toggleEl) {
     } catch(e) {
         toggleEl.classList.toggle('on', isOn);
         if (labelEl) labelEl.textContent = isOn ? '✓ Liberado sem pagamento' : 'Requer pagamento';
+        alert('Erro: ' + e.message);
+    }
+}
+
+// ── Cancelar pagamento pendente ───────────────────────────────────────────
+async function cancelPayment(orderId) {
+    if (!confirm('Cancelar o Pix pendente deste pedido?\nO usuário precisará gerar um novo QR Code.')) return;
+    const btn = document.getElementById(`cancel-pay-btn-${orderId}`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Cancelando...'; }
+    try {
+        const res = await fetch(`${ADM_CFG.paymentsBase}/payments/${orderId}/cancel`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${admToken}` },
+        });
+        const d = await res.json();
+        if (res.ok && d.success) {
+            openOrder(orderId);
+            loadOrders();
+        } else {
+            if (btn) { btn.disabled = false; btn.textContent = '✕ Cancelar Pix'; }
+            alert('Erro: ' + (d.error || res.status));
+        }
+    } catch(e) {
+        if (btn) { btn.disabled = false; btn.textContent = '✕ Cancelar Pix'; }
         alert('Erro: ' + e.message);
     }
 }
