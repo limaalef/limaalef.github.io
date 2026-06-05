@@ -104,6 +104,8 @@ const translations = {
         Satélite: 'TV via satélite',
         Streaming: 'Streaming',
         YouTube: 'YouTube',
+        'Partida completa': 'Jogo completo',
+        Compacto: 'Compacto',
 
         // ── index.js ──
         sectionChangesTitle: 'Últimas alterações',
@@ -427,6 +429,8 @@ const translations = {
         Satélite: 'Satellite TV',
         Streaming: 'Streaming',
         YouTube: 'YouTube',
+        'Partida completa': 'Full match',
+        Compacto: 'Extended highlights',
         // ── index.js ──
         sectionChangesTitle: 'Recent changes',
         seeAllLink:          'See all →',

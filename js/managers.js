@@ -356,7 +356,7 @@ const MatchModal = {
                     </div>
                     <div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('type')}</span>
-                        <span class="detail-list-value">${match.Tipo || 'N/A'}</span>
+                        <span class="detail-list-value">${LanguageManager.translateText(match.Tipo) || 'N/A'}</span>
                     </div>
                 </div>
             </div>
