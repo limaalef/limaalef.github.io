@@ -253,11 +253,16 @@ document.getElementById('rd-login-google').addEventListener('click', () => {
     google.accounts.id.prompt();
 });
 
-function showContent() {
+async function showContent() {
     document.getElementById('rd-auth').style.display    = 'none';
     document.getElementById('rd-content').style.display = 'block';
     if (!orderId) { document.getElementById('rd-loading').textContent = t('requestNoOrderId'); return; }
-    loadOrder();
+    await loadOrder();
+    // Inicia polling e countdown uma única vez, após o primeiro carregamento
+    if (_payState.mpPaymentId) {
+        startPolling(_payState.mpPaymentId);
+        if (_payState.expiresAt) startCountdown(_payState.expiresAt);
+    }
 }
 if (restoreRdSession()) showContent();
 
@@ -280,7 +285,8 @@ async function loadOrder() {
         if (hdr) hdr.dataset.title = order.id;
         document.title = `${order.id} | Sports Archive`;
 
-        // Restaura QR do servidor se o pagamento estiver pendente e houver dados salvos
+        // Restaura QR do servidor se o pagamento estiver pendente e houver dados salvos.
+        // Só popula _payState — NÃO inicia polling aqui para evitar múltiplos setInterval.
         const pendingPay = order.payment;
         if (pendingPay?.status === 'pending' && pendingPay.mpPaymentId
             && pendingPay.pixQrBase64 && !_payState.mpPaymentId) {
@@ -294,12 +300,6 @@ async function loadOrder() {
         const detail = buildOrderDetail(order);
         document.getElementById('rd-order-body').innerHTML = detail.body;
         document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
-
-        // Inicia polling e countdown se houver QR ativo (gerado agora ou restaurado)
-        if (_payState.mpPaymentId) {
-            startPolling(_payState.mpPaymentId);
-            if (_payState.expiresAt) startCountdown(_payState.expiresAt);
-        }
 
     } catch(e) {
         document.getElementById('rd-loading').textContent = '⚠ ' + e.message;
@@ -348,7 +348,7 @@ function buildOrderDetail(o) {
     // ── Cards de download ──────────────────────────────────────────────────
     // Trava os downloads se pagamento for obrigatório e não estiver pago
     const pay     = o.payment;
-    const payDone = pay?.status === 'approved' || o.paymentAccessGranted === true;
+    const payDone = pay?.status === 'approved' || o.status === 'completed' || o.paymentAccessGranted === true;
     const payRequired = o.paymentAmount > 0 && !payDone;
 
     const dlCardsHtml = items.map(item => {
@@ -462,8 +462,8 @@ function buildPaymentSection(o) {
     const pay    = o.payment;
     const amount = 'R$ ' + parseFloat(o.paymentAmount).toLocaleString('pt-BR', { minimumFractionDigits:2 });
 
-    // Pago
-    if (pay?.status === 'approved') {
+    // Pago / pedido concluído
+    if (pay?.status === 'approved' || o.status === 'completed') {
         return `
         <div class="rd-section">
             <div class="rd-section-title">Pagamento</div>
@@ -472,7 +472,7 @@ function buildPaymentSection(o) {
                     <span class="rd-pay-icon">✅</span>
                     <div>
                         <div class="rd-pay-title">Pagamento confirmado!</div>
-                        <div class="rd-pay-sub">Pago em ${pay.paidAt ? new Date(pay.paidAt).toLocaleString('pt-BR') : '—'}</div>
+                        <div class="rd-pay-sub">Pago em ${pay?.paidAt ? new Date(pay.paidAt).toLocaleString('pt-BR') : '—'}</div>
                     </div>
                     <div class="rd-pay-amount">${amount}</div>
                 </div>
@@ -678,13 +678,19 @@ function startPolling(mpPaymentId) {
             });
             const data = await res.json();
 
-            if (data.paid || data.status === 'approved') {
+            if (data.paid || data.status === 'approved' || data.status === 'completed') {
                 clearInterval(_payState.pollingTimer);
                 clearInterval(_payState.countdownTimer);
-                // Recarrega o pedido para exibir os links
-                loadOrder();
+                _payState.pollingTimer   = null;
+                _payState.countdownTimer = null;
+                _payState.mpPaymentId    = null;
+                _payState.pixQrBase64    = null;
+                _payState.pixCopyPaste   = null;
+                loadOrder(); // recarrega para exibir links — não reinicia polling
             } else if (data.status === 'cancelled') {
                 clearInterval(_payState.pollingTimer);
+                _payState.pollingTimer = null;
+                _payState.mpPaymentId  = null;
                 loadOrder();
             }
         } catch(e) {

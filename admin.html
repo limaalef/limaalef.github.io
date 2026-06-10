@@ -84,7 +84,7 @@
                         <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
                         <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
                         <div class="stat"><div class="stat-value" id="st-ready">—</div><div class="stat-label">Prontos</div></div>
-                        <div class="stat"><div class="stat-value" id="st-completed">—</div><div class="stat-label">Finalizados</div></div>
+                        <div class="stat"><div class="stat-value" id="st-completed">—</div><div class="stat-label">Concluídos</div></div>
                         <div class="stat"><div class="stat-value" id="st-expired">—</div><div class="stat-label">Expirados</div></div>
                     </div>
 
@@ -408,9 +408,11 @@ function renderTable() {
         const pay = o.payment;
         let payCell = `<span style="color:var(--text-tertiary)">—</span>`;
         if (pay) {
-            const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
+            const lbl = { approved: '✓ Pago', pending: '⏳ Aguardando', cancelled: '✕ Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
             payCell = `<span class="pill ${cls}">${lbl}</span>`;
+        } else if (o.status === 'completed') {
+            payCell = `<span class="pill st-paid">✓ Liberado</span>`;
         }
 
         return `<tr>
@@ -430,7 +432,7 @@ function renderTable() {
 }
 
 function statusLabel(s) {
-    return {pending:'Pendente',processing:'Em análise',ready:'Pronto',completed:'Finalizado',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
+    return {pending:'Pendente',processing:'Em análise',ready:'Pronto',completed:'Concluído',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
 }
 function updateStats() {
     const c = s => allOrders.filter(o => o.status === s).length;
