@@ -7,7 +7,7 @@ const CONFIG = {
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
     GOOGLE_CLIENT_ID:  '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
-    CHANGELOG_URL:     'https://api.limaalef.com/archive/changelog',
+    CHANGELOG_URL:     'https://api-archive.limaalef.com/changelog',
     CONTEXT_API_URL:   'https://api.limaalef.com/archive/matches?', 
     DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football',
