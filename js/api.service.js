@@ -21,16 +21,22 @@ const APIService = {
     },
 
     async fetchById(id, sport) {
-        const url = new URL(CONFIG.API_URLS[sport]);
-        url.searchParams.set('id', id);
+        const url = `${CONFIG.CF_API_URLS[sport]}/${encodeURIComponent(id)}`;
 
-        const response = await fetch(url.toString());
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
         if (!data.success) throw new Error('API retornou erro');
 
-        return data;
+        return {
+            ...data,
+            data: Array.isArray(data.data)
+                ? data.data
+                : data.data
+                    ? [data.data]
+                    : []
+        };
     },
 
     async fetchChangelog(page, itemsPerPage) {
@@ -63,6 +69,7 @@ const APIService = {
     },
 
     transformData(apiResponse) {
+        console.log(apiResponse)
         if (CONFIG.currentSport === 'motor') {
             return (apiResponse.data || []).map(item => ({
                 ID: item.id || '',

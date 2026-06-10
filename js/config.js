@@ -4,6 +4,11 @@ const CONFIG = {
         others: 'https://api.limaalef.com/archive/matches?type=multi',
         motor: 'https://api.limaalef.com/archive/matches?type=motor'
     },
+    CF_API_URLS: {
+        football: 'https://api-archive.limaalef.com/matches/football',
+        others: 'https://api-archive.limaalef.com/matches/multisport',
+        motor: 'https://api-archive.limaalef.com/matches/motorsport'
+    },
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
     GOOGLE_CLIENT_ID:  '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
