@@ -93,9 +93,9 @@ crossorigin="anonymous"></script>
                         <div class="nav-icon">🏎️</div>
                         <p class="nav-text" data-i18n="motorSports">Automobilismo</p>
                     </a>
-                    <a href="https://acervo.dirsoament.com" class="sport-nav-card">
-                        <div class="nav-icon">🔗</div>
-                        <p class="nav-text" data-i18n="dirsoament">Coleção do Dirso Ament</p>
+                    <a href="my-requests.html" class="sport-nav-card">
+                        <div class="nav-icon">🧾</div>
+                        <p class="nav-text" data-i18n="myrequests">Meus pedidos</p>
                     </a>
                 </div>
             </div>
@@ -137,6 +137,55 @@ crossorigin="anonymous"></script>
 
                     <!-- ── LEFT 60%: clubs + competitions ── -->
                     <div class="browse-col-main">
+
+                        <!-- World Cup -->
+                        <div class="browse-sub-section">
+                            <div class="home-section-header">
+                                <div class="home-section-header-title">
+                                    <p class="home-section-title" data-i18n="sectionWorldCupTitle"></p>
+                                </div>
+                                <div class="home-section-header-action">
+                                    <button class="nav-btn" id="cupPrev" aria-label="Anterior">‹</button>
+                                    <button class="nav-btn" id="cupNext" aria-label="Próximo">›</button>
+                                </div>
+                            </div>
+                            <div class="browse-scroll-wrapper">
+                                <div class="browse-scroll-list" id="cupList">
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+2026" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup26">América 2026</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+Catar+2022" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_catar_2022_2022.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup22">Catar 2022</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+Rússia+2018" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_russia_2018_2018.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup18">Rússia 2018</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+Brasil+2014" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_brasil_2014_2014.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup14">Brasil 2014</span>
+                                    </a>
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+África+do+Sul+2010" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="competition_logos/copa_do_mundo_fifa_áfrica_do_sul_2010_2010.png" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup10">África do Sul 2010</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="browse-sub-divider"></div>
 
                         <!-- Clubs -->
                         <div class="browse-sub-section">
@@ -295,12 +344,6 @@ crossorigin="anonymous"></script>
                             </div>
                             <div class="browse-scroll-wrapper">
                                 <div class="browse-scroll-list" id="compList">
-                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+2026" class="browse-badge-card">
-                                        <div class="browse-badge-circle">
-                                            <img src="competition_logos/copa_do_mundo_fifa_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
-                                        </div>
-                                        <span class="browse-badge-name" data-i18n="sectioncompetition-worldcup">Copa do Mundo</span>
-                                    </a>
                                     <a href="/detail.html?type=competition&q=Campeonato+Paulista+Feminino" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="competition_logos/campeonato_paulista_feminino_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
@@ -354,6 +397,85 @@ crossorigin="anonymous"></script>
                                             <img src="competition_logos/conmebol_sul-americana_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
                                         <span class="browse-badge-name" data-i18n="sectioncompetition-sudamericana">Sul-Americana</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="browse-sub-divider"></div>
+
+                        <!-- Commentors -->
+                        <div class="browse-sub-section">
+                            <div class="home-section-header">
+                                <div class="home-section-header-title">
+                                    <p class="home-section-title" data-i18n="sectionCommentorsTitle"></p>
+                                </div>
+                                <div class="home-section-header-action">
+                                    <button class="nav-btn" id="commentPrev" aria-label="Anterior">‹</button>
+                                    <button class="nav-btn" id="commentNext" aria-label="Próximo">›</button>
+                                </div>
+                            </div>
+                            <div class="browse-scroll-wrapper">
+                                <div class="browse-scroll-list list-overflow" id="commentList">
+                                    <a href="/detail.html?type=commentor&q=Cléber+Machado" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/cleber_machado.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Cléber Machado</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Everaldo+Marques" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/everaldo_marques.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Everaldo Marques</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Galvão+Bueno" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/galvao_bueno.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Galvão Bueno</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Gustavo+Villani" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/gustavo_villani.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Gustavo Villani</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Luís+Roberto" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/luis_roberto.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Luís Roberto</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Luiz+Carlos+Jr." class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/luiz_carlos_jr.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Luiz Carlos Jr</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Milton+Leite" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/milton_leite.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Milton Leite</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Natália+Lara" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/natalia_lara.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Natália Lara</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Renata+Silveira" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/renata_silveira.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Renata Silveira</span>
+                                    </a>
+                                    <a href="/detail.html?type=commentor&q=Tiago+Leifert" class="browse-badge-card">
+                                        <div class="browse-badge-circle circle-overflow">
+                                            <img src="people_icon/tiago_leifert.png" class="browse-team-logo image-overflow" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Tiago Leifert</span>
                                     </a>
                                 </div>
                             </div>

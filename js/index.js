@@ -288,6 +288,68 @@ const CompetitionsBrowser = {
     },
 };
 
+/* ── World Cuo Browser ── */
+const WorldCuoBrowser = {
+    render() {
+        const grid = document.getElementById('cupList');
+        if (!grid) return;
+        this._updateNav();
+        grid.addEventListener('scroll', () => this._updateNav(), { passive: true });
+    },
+
+    prev() {
+        const grid = document.getElementById('cupList');
+        if (!grid) return;
+        grid.scrollBy({ left: -grid.clientWidth, behavior: 'smooth' });
+    },
+
+    next() {
+        const grid = document.getElementById('cupList');
+        if (!grid) return;
+        grid.scrollBy({ left: grid.clientWidth, behavior: 'smooth' });
+    },
+
+    _updateNav() {
+        const grid = document.getElementById('cupList');
+        if (!grid) return;
+        const atStart = grid.scrollLeft <= 4;
+        const atEnd   = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4;
+        document.getElementById('cupPrev').disabled = atStart;
+        document.getElementById('cupNext').disabled = atEnd;
+    },
+};
+
+/* ── Commentors Browser ── */
+const CommentorBrowser = {
+    render() {
+        const grid = document.getElementById('commentList');
+        if (!grid) return;
+        this._updateNav();
+        grid.addEventListener('scroll', () => this._updateNav(), { passive: true });
+    },
+
+    prev() {
+        const grid = document.getElementById('commentList');
+        if (!grid) return;
+        grid.scrollBy({ left: -grid.clientWidth, behavior: 'smooth' });
+    },
+
+    next() {
+        const grid = document.getElementById('commentList');
+        if (!grid) return;
+        grid.scrollBy({ left: grid.clientWidth, behavior: 'smooth' });
+    },
+
+    _updateNav() {
+        const grid = document.getElementById('commentList');
+        if (!grid) return;
+        const atStart = grid.scrollLeft <= 4;
+        const atEnd   = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4;
+        document.getElementById('commentPrev').disabled = atStart;
+        document.getElementById('commentNext').disabled = atEnd;
+    },
+};
+
 /* ── apply i18n to static elements ── */
 function applyI18n() {
     const ids = [
@@ -324,9 +386,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('compPrev').addEventListener('click', () => CompetitionsBrowser.prev());
     document.getElementById('compNext').addEventListener('click', () => CompetitionsBrowser.next());
 
+    document.getElementById('cupPrev').addEventListener('click', () => WorldCuoBrowser.prev());
+    document.getElementById('cupNext').addEventListener('click', () => WorldCuoBrowser.next());
+
+    document.getElementById('commentPrev').addEventListener('click', () => CommentorBrowser.prev());
+    document.getElementById('commentNext').addEventListener('click', () => CommentorBrowser.next());
+
     applyI18n();
     loadRecentChanges();
     TodayInHistory.load();
     ClubsBrowser.render();
     CompetitionsBrowser.render();
+    WorldCuoBrowser.render();
+    CommentorBrowser.render();
 });

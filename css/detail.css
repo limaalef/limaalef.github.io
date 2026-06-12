@@ -136,7 +136,7 @@
 
 /* ── MAIN CONTENT ── */
 .collection-main {
-    min-width: 0;
+    width: 65%;
     overflow: hidden;
 }
 
@@ -319,6 +319,10 @@
 @media (max-width: 640px) {
     .collection-layout {
         flex-direction: column;
+    }
+
+    .collection-main {
+        width: 100%;
     }
 
     .collection-sidebar {

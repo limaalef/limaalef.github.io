@@ -107,7 +107,7 @@ header {
 .changes-section-title,
 .section-title {
     font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     letter-spacing: 0.06em;
     font-weight: 600;
     text-transform: uppercase;
@@ -2255,6 +2255,10 @@ input[type="text"]:focus {
     min-width: 0;
 }
 
+.list-overflow {
+    padding-top: 30px;
+}
+
 .browse-scroll-list::-webkit-scrollbar { display: none; }
 
 .browse-badge-card {
@@ -2290,10 +2294,25 @@ input[type="text"]:focus {
     flex-shrink: 0;
 }
 
+.circle-overflow {
+    align-items: flex-end;
+    overflow: visible;
+    position: relative;
+    padding: 0;
+    width: calc(60px + var(--sp-8));
+    height: calc(60px + var(--sp-8));
+}
+
 .browse-team-logo {
     width: 60px;
     height: 60px;
     object-fit: contain;
+}
+
+.image-overflow {
+    width: calc(58px + var(--sp-8));
+    height: auto;
+    object-position: bottom;
 }
 
 .browse-badge-card:hover .browse-badge-circle {
