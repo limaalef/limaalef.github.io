@@ -329,8 +329,6 @@ const MatchModal = {
         const videoTitle = LanguageManager.t('video') || 'Vídeo';
         const imageTitle = LanguageManager.t('image') || 'Imagem';
         
-        console.log(match)
-        
         body.innerHTML = `
             ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.onerror=null; this.remove();">` : ''}
             
@@ -433,10 +431,6 @@ const MatchModal = {
         modal?.classList.add('active');
     },
     async fetchAndShow(id, sport = 'football') {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('id', id);
-        history.pushState({ id, sport }, '', `?${urlParams.toString()}`);
-
         const modal = document.getElementById('modal');
         const body  = document.getElementById('modalBody');
         const score = document.getElementById('modalScore');
@@ -447,6 +441,27 @@ const MatchModal = {
             return;
         }
 
+        // Botão de compartilhamento
+        const existingShareBtn = document.getElementById('modalShareBtn');
+        if (existingShareBtn) existingShareBtn.remove();
+        const shareBtn = document.createElement('button');
+        shareBtn.id = 'modalShareBtn';
+        shareBtn.className = 'btn share-btn';
+        shareBtn.title = 'Compartilhar';
+        shareBtn.innerHTML = '🔗';
+        shareBtn.onclick = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('id', id);
+            urlParams.set('sport', sport);
+            const shareUrl = `${window.location.origin}/match.html?${urlParams.toString()}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                Utils.showNotification('Link copiado!', 'success');
+            }).catch(() => {
+                Utils.showNotification('Erro ao copiar link', 'error');
+            });
+        };
+        document.querySelector('.modal-header .close-btn').insertAdjacentElement('afterend', shareBtn);
+        
         title.innerHTML = `<div class="section-title modal-title-competition">⏳ ${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
         score.innerHTML = '';
         body.innerHTML  = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">⏳</div>';
@@ -454,7 +469,7 @@ const MatchModal = {
 
         try {
             const apiResponse = await APIService.fetchById(id, sport);
-            const items = APIService.transformData(apiResponse);
+            const items = APIService.transformData(apiResponse, sport);
             if (!items.length) throw new Error('Item não encontrado');
 
             if (sport === 'motor') {
@@ -471,14 +486,18 @@ const MatchModal = {
                 </div>`;
         }
     },
+    copyShareLink(id) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('id', id);
+        const shareUrl = `${window.location.origin}/match.html?${urlParams.toString()}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            Utils.showNotification('Link copiado!', 'success');
+        }).catch(() => {
+            Utils.showNotification('Erro ao copiar link', 'error');
+        });
+    },
     close() {
         document.getElementById('modal').classList.remove('active');
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('id')) {
-            urlParams.delete('id');
-            const newUrl = urlParams.toString() ? `?${urlParams.toString()}` : window.location.pathname;
-            history.pushState({}, '', newUrl);
-        }
     }
 };
 
@@ -590,10 +609,11 @@ const MotorModal = {
                     </div>
                     
                     ${evt.additional_info ? `
-                        <div class="section-title modal-style">
-                            <div class="section-title">${LanguageManager.t('observations')}</div>
-                            <div class="detail-item" style="grid-column: 1/-1;">
-                                <div class="detail-value">${evt.additional_info}</div>
+                        <div class="detail-section">
+                            <div class="section-title modal-style">${LanguageManager.t('observations')}</div>
+                                <div class="detail-item" style="grid-column: 1/-1;">
+                                    <div class="detail-value">${evt.additional_info}</div>
+                                </div>
                             </div>
                         </div>
                     ` : ''}

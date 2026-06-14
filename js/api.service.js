@@ -68,9 +68,8 @@ const APIService = {
         return data;
     },
 
-    transformData(apiResponse) {
-        console.log(apiResponse)
-        if (CONFIG.currentSport === 'motor') {
+    transformData(apiResponse, sport = CONFIG.currentSport) {
+        if (sport === 'motor') {
             return (apiResponse.data || []).map(item => ({
                 ID: item.id || '',
                 Tipo: 'motor',

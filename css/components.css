@@ -289,8 +289,9 @@ h1 {
     padding: 7px 14px;
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .stat-value {
@@ -933,13 +934,31 @@ input[type="text"]:focus {
     position: absolute;
     top: 15px;
     right: 15px;
+    color: #ffffff;
     background: rgba(0, 0, 0, 0.3);
 }
 
 .close-btn:hover {
     background: rgba(0,0,0,0.45);
     transform: rotate(90deg);
-    border: 1px solid var(--accent-color);
+    border: 1px solid #000;
+    color: var(--accent-color);
+}
+
+.share-btn {
+    border: 0px;
+    position: absolute;
+    top: 15px;
+    right: 60px;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.share-btn:hover {
+    background: rgba(0,0,0,0.45);
+    transform: rotate(90deg);
+    border: 1px solid #000;
+    color: var(--accent-color);
 }
 
 /* Placar no Modal */
