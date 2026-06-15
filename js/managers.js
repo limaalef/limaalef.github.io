@@ -50,7 +50,7 @@ const CardManager = {
         const awayLoser = hasWinner && !awayWinner;
         
         const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
-        const statusBadge = status === 'pending' ? `<span class="match-status">⏳ ${statusText}</span>` : '';
+        const statusBadge = status === 'pending' ? `<span class="match-status">${statusText}</span>` : '';
 
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
@@ -227,6 +227,7 @@ const MotorListManager = {
 
 const MatchModal = {
     show(match) {
+        document.body.style.overflow = 'hidden';
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const score = document.getElementById('modalScore');
@@ -266,7 +267,7 @@ const MatchModal = {
                     <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
                     ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-team-name">${match.Visitante}</span>
-                    <span class="badge badge-warning score-status-badge">⏳ ${pendingText}</span>
+                    <span class="badge badge-warning score-status-badge">${pendingText}</span>
                 </div>
                 <div class="score-mobile">
                     <div class="score-mobile-row">
@@ -284,7 +285,7 @@ const MatchModal = {
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
                     <div class="score-mobile-status">
-                        <span class="badge badge-warning">⏳ ${pendingText}</span>
+                        <span class="badge badge-warning">${pendingText}</span>
                     </div>
                 </div>
             `;
@@ -462,9 +463,9 @@ const MatchModal = {
         };
         document.querySelector('.modal-header .close-btn').insertAdjacentElement('afterend', shareBtn);
         
-        title.innerHTML = `<div class="section-title modal-title-competition">⏳ ${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
+        title.innerHTML = `<div class="section-title modal-title-competition">${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
         score.innerHTML = '';
-        body.innerHTML  = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">⏳</div>';
+        body.innerHTML  = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">Loading...</div>';
         modal?.classList.add('active');
 
         try {
@@ -497,12 +498,14 @@ const MatchModal = {
         });
     },
     close() {
+        document.body.style.overflow = '';
         document.getElementById('modal').classList.remove('active');
     }
 };
 
 const MotorModal = {
     show(event) {
+        document.body.style.overflow = 'hidden';
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const score = document.getElementById('modalScore');
@@ -645,6 +648,7 @@ const MotorModal = {
     },
     
     close() {
+        document.body.style.overflow = '';
         document.getElementById('modal').classList.remove('active');
     }
 };

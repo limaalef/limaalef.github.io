@@ -408,11 +408,11 @@ function renderTable() {
         const pay = o.payment;
         let payCell = `<span style="color:var(--text-tertiary)">—</span>`;
         if (pay) {
-            const lbl = { approved: '✓ Pago', pending: '⏳ Aguardando', cancelled: '✕ Cancelado' }[pay.status] || pay.status;
+            const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
             payCell = `<span class="pill ${cls}">${lbl}</span>`;
         } else if (o.status === 'completed') {
-            payCell = `<span class="pill st-paid">✓ Liberado</span>`;
+            payCell = `<span class="pill st-paid">Liberado</span>`;
         }
 
         return `<tr>
@@ -474,8 +474,15 @@ async function calcAndShowDefaultAmount(order) {
         const r = fee / 100;
         const total = r >= 1 ? baseTotal : baseTotal / (1 - r);
         el.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+
+        // Preenche o input com o valor padrão se o pedido ainda não tem valor definido
+        if (!order.paymentAmount) {
+            const input = document.getElementById('order-amount-input');
+            if (input) input.value = total.toFixed(2);
+        }
     } catch { el.textContent = '—'; }
 }
+
 function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
 document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
 
@@ -494,7 +501,7 @@ function buildOrderDetail(o) {
         const disabled = link?.disabled;
         const url      = link ? (link.proxyUrl || link.url || '#') : null;
         const expText  = !link ? '' : (link.expiresAt
-            ? (expired ? '⛔ Expirado' : '✓') + ' ' + new Date(link.expiresAt).toLocaleString('pt-BR')
+            ? (expired ? 'Expirado' : '') + ' ' + new Date(link.expiresAt).toLocaleString('pt-BR')
             : '∞ Sem expiração');
 
         const linkRow = link
@@ -602,8 +609,14 @@ function buildOrderDetail(o) {
                             </label>
                         </span>
                     </div>
+                    <div class="detail-list-item" id="order-default-amount-row-${o.id}">
+                        <span class="detail-list-label">
+                            ${o.paymentAmount ? 'Valor padrão' : `Valor padrão (base × ${(o.items||[]).length} itens)`}
+                        </span>
+                        <span class="detail-list-value" id="order-default-amount-val-${o.id}">calculando...</span>
+                    </div>
                     <div class="detail-list-item">
-                        <span class="detail-list-label">Valor personalizado (R$)</span>
+                        <span class="detail-list-label">Valor personalizado</span>
                         <span class="detail-list-value">
                             <div class="adm-amount-wrap">
                                 <span class="adm-amount-prefix">R$</span>
@@ -613,13 +626,6 @@ function buildOrderDetail(o) {
                                     title="Deixe vazio para usar o valor padrão (base × itens)">
                             </div>
                         </span>
-                    </div>
-                    <div class="detail-list-item" id="order-default-amount-row-${o.id}">
-                        <span class="detail-list-label" style="color:var(--text-tertiary);font-size:var(--font-size-sm)">
-                            ${o.paymentAmount ? 'Valor padrão seria' : 'Valor padrão (base × ${(o.items||[]).length} itens)'}
-                        </span>
-                        <span class="detail-list-value" style="color:var(--text-tertiary);font-size:var(--font-size-sm)"
-                            id="order-default-amount-val-${o.id}">calculando...</span>
                     </div>
                     ${pay ? `
                     <div class="detail-list-item">
@@ -721,7 +727,7 @@ async function saveOrderAmount(id) {
     const d = await res.json();
     if (d.success || res.ok) {
         const btn = event.target;
-        btn.textContent = '✓ Salvo'; setTimeout(() => { btn.textContent = 'Salvar valor'; }, 1800);
+        btn.textContent = 'Salvo'; setTimeout(() => { btn.textContent = 'Salvar valor'; }, 1800);
         loadOrders();
     } else { alert('Erro: ' + JSON.stringify(d)); }
 }
@@ -848,7 +854,7 @@ async function saveMpSettings() {
         const data = await res.json();
         if (res.ok && data.success) {
             msg.style.display = 'block';
-            msg.innerHTML = `<span class="pill st-ready">✓ Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
+            msg.innerHTML = `<span class="pill st-ready">Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
             document.getElementById('mp-access-token').value = '';
             loadMpSettings();
         } else {
@@ -881,11 +887,11 @@ async function checkHealth() {
     try {
         const res  = await fetch(`${ADM_CFG.paymentsBase}/health`);
         const data = await res.json();
-        statusEl.textContent = res.ok ? '✓ Worker online' : '⚠ Worker com erro';
+        statusEl.textContent = res.ok ? 'Worker online' : '⚠ Worker com erro';
         subEl.textContent    = `MP: ${data.mercadopago} · ${data.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : ''}`;
         document.getElementById('mp-health-card').style.borderColor = res.ok ? 'var(--success-color)' : 'var(--error-color)';
     } catch(e) {
-        statusEl.textContent = '✕ Worker inacessível';
+        statusEl.textContent = 'Worker inacessível';
         subEl.textContent    = e.message;
         document.getElementById('mp-health-card').style.borderColor = 'var(--error-color)';
     }
@@ -911,14 +917,14 @@ async function toggleAccessGrant(orderId, toggleEl) {
         if (!res.ok) {
             // Reverte em caso de erro
             toggleEl.classList.toggle('on', isOn);
-            if (labelEl) labelEl.textContent = isOn ? '✓ Liberado sem pagamento' : 'Requer pagamento';
+            if (labelEl) labelEl.textContent = isOn ? 'Liberado sem pagamento' : 'Requer pagamento';
             alert('Erro ao salvar: ' + (d.error || res.status));
         } else {
             loadOrders();
         }
     } catch(e) {
         toggleEl.classList.toggle('on', isOn);
-        if (labelEl) labelEl.textContent = isOn ? '✓ Liberado sem pagamento' : 'Requer pagamento';
+        if (labelEl) labelEl.textContent = isOn ? 'Liberado sem pagamento' : 'Requer pagamento';
         alert('Erro: ' + e.message);
     }
 }

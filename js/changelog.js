@@ -119,7 +119,7 @@ function escapeHtml(str) {
 async function loadChangelog() {
     const content = document.getElementById('changelogContent');
 
-    content.innerHTML = `<div class="state-box"><div class="icon">⏳</div><h2>${LanguageManager.t('cl_loading')}</h2><p>${LanguageManager.t('cl_wait')}</p></div>`;
+    content.innerHTML = `<div class="state-box"><h2>${LanguageManager.t('cl_loading')}</h2><p>${LanguageManager.t('cl_wait')}</p></div>`;
 
     try {
         const page = State.page

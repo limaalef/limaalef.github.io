@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/request.css">
+<link rel="stylesheet" href="css/admin.css">
 <style>
 .rq-wrap { max-width: 860px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
 
@@ -41,15 +42,14 @@
 
 /* Card head — clicável */
 .rq-order-head { display:flex; align-items:center; justify-content:space-between;
-    padding:var(--sp-4) var(--sp-5); gap:var(--sp-3); flex-wrap:wrap;
-    cursor:pointer; user-select:none; }
+    padding:var(--sp-4) var(--sp-5); gap:var(--sp-3); cursor:pointer; user-select:none; }
 .rq-order-head:hover { background:var(--bg-primary); }
 
-.rq-order-id-wrap { display:flex; flex-direction:column; gap:var(--sp-1); }
-.rq-order-id   { font-size:var(--font-size-xs); color:var(--text-secondary); font-family:monospace; }
-.rq-order-date { font-size:var(--font-size-mds); color:var(--text-tertiary); }
+.rq-order-id-wrap { display:flex; flex-direction:column; gap:var(--sp-2); width: 99%; }
+.rq-order-id   { font-size:var(--font-size-md); color:var(--text-primary); font-family:monospace; }
+.rq-order-date { font-size:var(--font-size-mds); color:var(--text-secondary); }
 
-.rq-order-meta { display:flex; align-items:center; gap:var(--sp-3); flex-wrap:wrap; }
+.rq-order-meta { display:flex; align-items:flex-end; gap:var(--sp-1); flex-wrap:wrap; text-wrap: nowrap; flex-direction: column-reverse; }
 .rq-items-count { font-size:var(--font-size-sm); color:var(--text-secondary); }
 .rq-links-badge { font-size:var(--font-size-mds); font-weight:700; color:var(--text-success); }
 
@@ -128,18 +128,16 @@
 </style>
 </head>
 <body>
-<header>
-    <div class="header-frame" id="header"
-        data-title=""
-        data-back="true"></div>
-    <div class="control-group">
-        <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
-            <span id="langFlag">🇧🇷</span>
-        </button>
-    </div>
-</header>
-
-<div class="rq-wrap">
+    <header>
+        <div class="header-frame" id="header"
+            data-title=""
+            data-back="true"></div>
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
+        </div>
+    </header>
 
     <!-- Auth -->
     <div id="rq-auth">
@@ -159,23 +157,28 @@
 
     <!-- Dashboard -->
     <div id="rq-dashboard" style="display:none">
-        <div class="rq-header">
-            <div class="rq-user-chip">
-                <img id="rq-avatar" class="rq-avatar" src="" onerror="this.style.display='none'" alt="">
-                <span id="rq-user-name"></span>
-            </div>
-            <div style="display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap">
-                <button class="action-btn btn-ghost" id="rq-refresh">↺ <span data-i18n="requestRefresh">Atualizar</span></button>
-                <button class="action-btn btn-ghost" id="rq-logout" style="color:var(--error-color)">
-                    <span data-i18n="requestLogout">Sair</span>
-                </button>
+        <div class="adm-layout narrow-width">
+            <!-- Sidebar -->
+            <aside class="adm-sidebar">
+                <div class="profile-box">
+                    <img id="rq-avatar" class="profile-avatar" src="" onerror="this.style.display='none'" alt="">
+                    <div>
+                        <div class="profile-user-name" id="rq-user-name"></div>
+                        <button class="action-btn btn-ghost btn-xs" id="rq-refresh">↺ <span data-i18n="requestRefresh">Atualizar</span></button>
+                        <button class="action-btn btn-ghost btn-xs" id="rq-logout" style="color:var(--error-color)">
+                            <span data-i18n="requestLogout">Sair</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Sidebar -->
+            <div class="adm-main" style="padding:0 var(--sp-5)">
+                <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
+                <div id="rq-content" style="display:none"></div>
             </div>
         </div>
-
-        <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
-        <div id="rq-content" style="display:none"></div>
     </div>
-</div>
 
 <div id="footer"></div>
 
@@ -192,6 +195,8 @@ const RQ_CFG = {
 
 let rqToken = null;
 let rqUser  = null;
+
+LanguageManager.init();
 
 function t(key) {
     return (LanguageManager ? LanguageManager.t(key) : null) || key;
@@ -340,18 +345,21 @@ function buildOrderCard(o) {
         { key:'processing', label: t('requestProgressAnalysis') },
         { key:'ready',      label: t('requestProgressReady')    },
     ];
-    const stepIdx = { pending:0, processing:1, ready:2, expired:2, cancelled:2 };
+    const stepIdx = { pending:0, processing:1, ready:2, completed:3, expired:2, cancelled:2 };
     const curIdx  = stepIdx[o.status] ?? 0;
 
     const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
-        <div class="rq-progress">
+        <div class="prog" style="padding: var(--sp-5) var(--sp-5) 0 var(--sp-5);">
             ${steps.map((s, i) => {
                 let cls = '';
                 if (i < curIdx)  cls = 'done';
-                if (i === curIdx) cls = 'current';
-                return `<div class="rq-progress-step ${cls}">${i < curIdx ? '✓ ' : ''}${s.label}</div>`;
+                if (i === curIdx) cls = 'active';
+                return `<div class="prog-conn ${cls}" style="min-width:30px;"></div><div class="prog-step">
+                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls}" style="width:6px;height:6px;border-radius:50%;"></div>`}</div>
+                            <span class="prog-lbl ${cls}">${s.label}</span>
+                        </div>`;
             }).join('')}
-        </div>` : '';
+        </div>` : ``;
 
     // Items com link
     const itemsHtml = items.map(item => {
@@ -388,30 +396,31 @@ function buildOrderCard(o) {
 
     // Aviso de pagamento pendente (sobrepõe seção de downloads)
     const payNoticeHtml = payPending ? `
+            <div class="rq-section">    
         <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4);
-            background:var(--bg-warning);border-radius:var(--border-radius-size-mlg);
-            border:1px solid var(--warning-color)">
-            <span style="font-size:1.3rem;flex-shrink:0">💳</span>
-            <div style="flex:1;min-width:0">
-                <div style="font-size:var(--font-size-mdm);font-weight:600;color:var(--text-primary)">
-                    Pagamento necessário
+                background:var(--bg-warning);border-radius:var(--border-radius-size-mlg);
+                border:1px solid var(--warning-color)">
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:var(--font-size-mdm);font-weight:600;color:var(--text-primary)">
+                        Pagamento necessário
+                    </div>
+                    <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">
+                        Valor: <strong>R$ ${parseFloat(o.paymentAmount).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>
+                        &nbsp;· Os links serão liberados após a confirmação.
+                    </div>
                 </div>
-                <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">
-                    Valor: <strong>R$ ${parseFloat(o.paymentAmount).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>
-                    &nbsp;· Os links serão liberados após a confirmação.
-                </div>
+                <a href="request-detail.html?id=${encodeURIComponent(o.id)}"
+                    class="action-btn btn-primary" style="text-decoration:none;flex-shrink:0;white-space:nowrap">
+                    Pagar →
+                </a>
             </div>
-            <a href="request-detail.html?id=${encodeURIComponent(o.id)}"
-                class="action-btn btn-primary" style="text-decoration:none;flex-shrink:0;white-space:nowrap">
-                Pagar →
-            </a>
         </div>` : '';
 
     // Nenhum link ainda
     const noLinks = !hasAnyLink ? `
         <div class="rq-no-links">
             ${{ pending: t('requestNoLinkPending'), processing: t('requestNoLinkProcessing'),
-                ready: t('requestNoLinkReady'), expired: t('requestNoLinkExpired'),
+                ready: t('requestNoLinkReady'), completed:t('requestStatusCompleted'), expired: t('requestNoLinkExpired'),
                 cancelled: t('requestNoLinkCancelled') }[o.status] || t('requestNoLinkPending')}
         </div>` : '';
 
@@ -423,10 +432,12 @@ function buildOrderCard(o) {
                 <span class="rq-order-date">${dt}</span>
             </div>
             <div class="rq-order-meta">
-                <span class="rq-items-count">${items.length} ${t('requestItemsUnit')}</span>
-                ${activeLinks > 0
-                    ? `<span class="rq-links-badge">📥 ${activeLinks} ${t('requestLinksAvailable')}</span>`
-                    : ''}
+                <div>
+                    <span class="rq-items-count">${items.length} ${items.length === 1 ? t('requestItemUnit') : t('requestItemsUnit')}</span>
+                    ${activeLinks > 0
+                        ? `<span class="rq-items-count">/ </span><span class="rq-links-badge">${activeLinks} ${activeLinks === 1 ? t('requestLinkAvailable') : t('requestLinksAvailable')}</span>`
+                        : ''}
+                </div>
                 <span class="pill st-${o.status}">${statusPtBR(o.status)}</span>
             </div>
             <span class="rq-chevron">▼</span>
@@ -435,21 +446,7 @@ function buildOrderCard(o) {
         <div class="rq-order-body">
             ${progressHtml}
 
-            <div class="rq-section">
-                <div class="rq-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
-                ${payPending
-                    ? payNoticeHtml
-                    : hasAnyLink ? `<div class="rq-dl-list">${itemsHtml}</div>` : noLinks}
-            </div>
-
-            <div class="rq-section">
-                <div class="rq-section-title" data-i18n="requestContactInfo">${t('requestContactInfo')}</div>
-                <span class="rq-contact-chip">
-                    ${CONTACT_ICON[o.contact?.channel] || '📬'}
-                    ${esc(o.contact?.channel || '—')}: ${esc(o.contact?.value || '')}
-                </span>
-                ${o.notes ? `<div class="rq-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}
-            </div>
+            ${payPending ? payNoticeHtml : ``}
 
             <div class="rq-section" style="text-align:right">
                 <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rq-view-link">
@@ -462,8 +459,8 @@ function buildOrderCard(o) {
 
 function statusPtBR(s) {
     return { pending:t('requestStatusPending'), processing:t('requestStatusProcessing'),
-             ready:t('requestStatusReady'), expired:t('requestStatusExpired'),
-             cancelled:t('requestStatusCancelled') }[s] || s;
+             ready:t('requestStatusReady'), completed:t('requestStatusCompleted'),
+             expired:t('requestStatusExpired'),cancelled:t('requestStatusCancelled') }[s] || s;
 }
 
 function decodeJwt(token) {
@@ -475,5 +472,6 @@ function esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
+
 </body>
 </html>

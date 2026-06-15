@@ -38,10 +38,8 @@
 /* Download cards */
 .rd-dl-list { display:flex; flex-direction:column; gap:var(--sp-4); }
 .rd-dl-card { border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); overflow:hidden; }
-.rd-dl-card.available { border-color:var(--success-color); }
 .rd-dl-card-head { display:flex; align-items:center; gap:var(--sp-4);
     padding:var(--sp-4) var(--sp-5); background:var(--bg-secondary); }
-.rd-dl-card.available .rd-dl-card-head { background:var(--bg-success); }
 .rd-dl-icon { font-size:1.5rem; flex-shrink:0; }
 .rd-dl-info { flex:1; min-width:0; }
 .rd-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
@@ -81,7 +79,7 @@
 .rd-pay-head { display: flex; align-items: center; gap: var(--sp-4);
     padding: var(--sp-4) var(--sp-5); }
 .rd-pay-card.pay-required .rd-pay-head { background: var(--bg-warning); }
-.rd-pay-card.pay-pending  .rd-pay-head { background: var(--bg-info); }
+.rd-pay-card.pay-pending  .rd-pay-head { background: var(--bg-accent-color); }
 .rd-pay-card.pay-done     .rd-pay-head { background: var(--bg-success); }
 .rd-pay-icon  { font-size: 1.6rem; flex-shrink: 0; }
 .rd-pay-title { font-size: var(--font-size-mdm); font-weight: 700; color: var(--text-primary); }
@@ -89,7 +87,7 @@
 .rd-pay-amount { font-size: var(--font-size-mxxl); font-weight: 700;
     color: var(--accent-color); margin-left: auto; flex-shrink: 0; }
 
-.rd-pay-body  { padding: var(--sp-5); background: var(--bg-primary);
+.rd-pay-body  { padding: 0; background: var(--bg-primary);
     border-top: 1px solid var(--border-color); }
 
 /* CPF step */
@@ -101,14 +99,14 @@
     background: var(--bg-secondary); color: var(--text-primary); font-size: var(--font-size-mdm);
     font-family: inherit; outline: none; transition: border-color .15s; }
 .rd-cpf-input:focus { border-color: var(--accent-color); }
-.rd-cpf-hint { font-size: var(--font-size-xs); color: var(--text-tertiary); }
-.rd-cpf-err  { font-size: var(--font-size-sm); color: var(--error-color); display: none; margin-top: var(--sp-2); }
+.rd-cpf-hint { padding: 0 var(--sp-4); font-size: var(--font-size-xs); color: var(--text-tertiary); }
+.rd-cpf-err  { padding: 0 var(--sp-4); font-size: var(--font-size-sm); color: var(--error-color); display: none; margin-top: var(--sp-2); }
 
 /* QR Code */
 .rd-qr-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
 .rd-qr-img  { width: 200px; height: 200px; border-radius: var(--border-radius-size-md);
     border: 1px solid var(--border-color); background: #fff; padding: 8px; }
-.rd-qr-copy-wrap { width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); }
+.rd-qr-copy-wrap { width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); }
 .rd-qr-code-text { font-size: var(--font-size-xs); font-family: monospace; word-break: break-all;
     background: var(--bg-secondary); border: 1px solid var(--border-color);
     border-radius: var(--border-radius-size-md); padding: var(--sp-3); color: var(--text-secondary);
@@ -116,7 +114,7 @@
 .rd-qr-timer { font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; }
 .rd-qr-timer span { color: var(--accent-color); font-weight: 700; }
 .rd-poll-status { text-align: center; font-size: var(--font-size-sm); color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: var(--sp-3); }
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin: var(--sp-3) 0; }
 .rd-poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color);
     animation: rd-blink 1.2s ease-in-out infinite; }
 @keyframes rd-blink { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -161,17 +159,17 @@
     </div>
         
     <div id="rd-content" style="display:none">
-        <div class="adm-layout">
-            <!-- Sidebar -->
-            <aside class="adm-sidebar sidebar-wide">
-                <div id="rd-order-sidebar" style="padding:0 var(--sp-5)"></div>
-            </aside>
-
+        <div class="adm-layout narrow-width layout-inverted">
             <!-- Conteúdo -->
             <div class="adm-main" style="padding:0 var(--sp-5)">
                 <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
                 <div id="rd-order-body"></div>
             </div>
+
+            <!-- Sidebar -->
+            <aside class="adm-sidebar-right sidebar-wide">
+                <div id="rd-order-sidebar" style="padding:0 var(--sp-5)"></div>
+            </aside>
         </div>
     </div>
 
@@ -203,6 +201,8 @@ let _payState = {
     countdownTimer: null,
     restored:     false,  // true = QR veio do servidor (não gerado nesta sessão)
 };
+
+LanguageManager.init();
 
 function t(key) { return (LanguageManager ? LanguageManager.t(key) : null) || key; }
 
@@ -330,6 +330,7 @@ function buildOrderDetail(o) {
         </div>`
 
     const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
+        <div class="rd-section-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</div>
         <div class="prog">
             ${steps.map((s, i) => {
                 let cls = '';
@@ -341,6 +342,31 @@ function buildOrderDetail(o) {
                         </div>`;
             }).join('')}
         </div>` : ``;
+
+    // ── Seção de valores de pagamento ──────────────────────────────────────
+    const paymentValueHtml = (o.paymentAmount > 0 && o.platformFeePercent != null) ? (() => {
+        const fee     = o.platformFeePercent / 100;
+        const total   = parseFloat(o.paymentAmount);
+        const taxaVal = total * fee;
+        const netVal  = total - taxaVal;
+        const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return `
+        <div class="rd-section-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</div>
+        <div class="detail-list">
+            <div class="detail-list-item">
+                <span class="detail-list-label">${t('requestValue')}</span>
+                <span class="detail-list-value">${fmt(netVal)}</span>
+            </div>
+            <div class="detail-list-item">
+                <span class="detail-list-label">${t('requestFee')} (${o.platformFeePercent}%)</span>
+                <span class="detail-list-value" style="color:var(--text-secondary)">${fmt(taxaVal)}</span>
+            </div>
+            <div class="detail-list-item" style="background-color:var(--bg-primary);">
+                <span class="detail-list-label" style="color:var(--accent-color);font-weight:700">${t('requestTotalValue')}</span>
+                <span class="detail-list-value" style="color:var(--accent-color);font-weight:700">${fmt(total)}</span>
+            </div>
+        </div>`;
+    })() : ''
 
     // ── Seção de pagamento Pix ─────────────────────────────────────────────
     const paymentHtml = buildPaymentSection(o);
@@ -372,20 +398,20 @@ function buildOrderDetail(o) {
             expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
         } else {
             const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
-            expText    = '✓ ' + t('requestLinkValidDays').replace('{n}', days);
+            expText    = t('requestLinkValidDays').replace('{n}', days);
             expCls     = 'valid';
         }
 
         return `
         <div class="rd-dl-card ${(!blocked && link) ? 'available' : ''}">
             <div class="rd-dl-card-head">
-                <div class="rd-dl-icon">${blocked ? '🔒' : '📥'}</div>
                 <div class="rd-dl-info">
                     <div class="rd-dl-label">${esc(item.label)}</div>
                     <div class="rd-dl-sub">${esc(item.meta||'')}${item.date ? ' · ' + esc(item.date) : ''}${item.station ? ' · ' + esc(item.station) : ''}</div>
                 </div>
             </div>
-            ${(payRequired && !payDone)
+            ${o.status === 'cancelled' ? '' :
+            (payRequired && !payDone)
                 ? `<div class="rd-locked-notice">⚠ Realize o pagamento acima para liberar este conteúdo.</div>`
                 : link
                     ? `<div class="rd-dl-card-body">
@@ -427,11 +453,15 @@ function buildOrderDetail(o) {
         </div>
         ${o.notes ? `<div class="rd-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}
         
-        <div class="section-divider"></div>
+        <div class="section-divider-transparent"></div>
 
         ${progressHtml}
 
         <div class="section-divider"></div>
+
+        ${paymentValueHtml}
+
+        <div class="section-divider-transparent"></div>
         
         ${paymentHtml}`;
 
@@ -454,7 +484,6 @@ function buildOrderDetail(o) {
 // ── Seção de pagamento Pix ─────────────────────────────────────────────────
 function buildPaymentSection(o) {
     // Só exibe se o pedido estiver "ready" e tiver valor configurado
-    if (o.status !== 'ready') return '';
     if (!o.paymentAmount || o.paymentAmount <= 0) return '';
     // Acesso liberado manualmente pelo admin — não exibe seção de pagamento
     if (o.paymentAccessGranted === true) return '';
@@ -466,15 +495,23 @@ function buildPaymentSection(o) {
     if (pay?.status === 'approved' || o.status === 'completed') {
         return `
         <div class="rd-section">
-            <div class="rd-section-title">Pagamento</div>
-            <div class="rd-pay-card pay-done">
-                <div class="rd-pay-head">
-                    <span class="rd-pay-icon">✅</span>
-                    <div>
-                        <div class="rd-pay-title">Pagamento confirmado!</div>
-                        <div class="rd-pay-sub">Pago em ${pay?.paidAt ? new Date(pay.paidAt).toLocaleString('pt-BR') : '—'}</div>
+            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
+            <div class="detail-list">
+                <div class="detail-list">
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Status</span>
+                        <span class="detail-list-value" style="color:var(--text-success)">Aprovado</span>
                     </div>
-                    <div class="rd-pay-amount">${amount}</div>
+                    ${pay?.mpPaymentId ? `
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">ID</span>
+                        <span class="detail-list-value">${esc(String(pay.mpPaymentId))}</span>
+                    </div>` : ''}
+                    ${pay?.paidAt ? `
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Pago em</span>
+                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString('pt-BR')}</span>
+                    </div>` : ''}
                 </div>
             </div>
         </div>`;
@@ -484,7 +521,7 @@ function buildPaymentSection(o) {
     if (pay?.status === 'cancelled') {
         return `
         <div class="rd-section">
-            <div class="rd-section-title">Pagamento</div>
+            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
             <div class="rd-pay-card" style="border-color:var(--error-color)">
                 <div class="rd-pay-head" style="background:var(--bg-error)">
                     <span class="rd-pay-icon">❌</span>
@@ -502,15 +539,13 @@ function buildPaymentSection(o) {
 
     return `
     <div class="rd-section">
-        <div class="rd-section-title">Pagamento</div>
+        <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
         <div class="rd-pay-card ${hasPendingQr ? 'pay-pending' : 'pay-required'}" id="rd-pay-card">
             <div class="rd-pay-head">
-                <span class="rd-pay-icon">${hasPendingQr ? '⏳' : '💳'}</span>
                 <div>
                     <div class="rd-pay-title">${hasPendingQr ? 'Aguardando pagamento' : 'Pagamento necessário'}</div>
-                    <div class="rd-pay-sub">${hasPendingQr ? 'Escaneie o QR Code ou copie o código Pix' : 'Realize o pagamento via Pix para receber seus conteúdos'}</div>
+                    <div class="rd-pay-sub">${hasPendingQr ? 'Escaneie o QR Code ou copie o código Pix' : 'Realize o pagamento via Pix para receber os conteúdos'}</div>
                 </div>
-                <div class="rd-pay-amount">${amount}</div>
             </div>
             <div class="rd-pay-body" id="rd-pay-body">
                 ${hasPendingQr ? renderQrStep() : renderCpfStep()}
@@ -522,15 +557,20 @@ function buildPaymentSection(o) {
 function renderCpfStep() {
     return `
     <div class="rd-cpf-field">
-        <label class="rd-cpf-label">CPF do pagador</label>
-        <input id="rd-cpf-input" class="rd-cpf-input" type="text" maxlength="14"
-            inputmode="numeric" placeholder="000.000.000-00"
-            oninput="maskCpf(this)"
-            onkeydown="if(event.key==='Enter') submitCpf()">
-        <div class="rd-cpf-hint">Exigência fiscal do Mercado Pago para pagamentos via Pix.</div>
+        <div class="detail-list-item">
+            <span class="detail-list-label">${t('requestCPFPayer')}</span>
+            <span class="detail-list-value">
+                <input id="rd-cpf-input" class="adm-input adm-input-text" maxlength="14"
+                    inputmode="numeric" placeholder="000.000.000-00"
+                    oninput="maskCpf(this)"
+                    onkeydown="if(event.key==='Enter') submitCpf()">
+            </span>
+        </div>
+        
+        <div class="rd-cpf-hint">${t('requestFiscalRequirement')}</div>
         <div class="rd-cpf-err" id="rd-cpf-err"></div>
     </div>
-    <button class="action-btn btn-primary" style="width:100%;justify-content:center"
+    <button class="action-btn btn-primary" style="width: calc(100% - (2 * var(--sp-4)));margin: 0 var(--sp-4) var(--sp-4) var(--sp-4)"
         onclick="submitCpf()">
         Gerar QR Code Pix →
     </button>`;
@@ -549,7 +589,7 @@ function renderQrStep() {
             <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
             <button class="action-btn btn-ghost" style="width:100%;justify-content:center"
                 onclick="copyCodigo()">
-                📋 Copiar código Pix
+                Pix copia e cola
             </button>` : ''}
         </div>
         <div class="rd-qr-timer" id="rd-qr-timer">⏱ Válido por <span id="rd-countdown">—</span></div>
@@ -588,7 +628,7 @@ async function submitCpf() {
     const cpf    = input?.value || '';
 
     if (!cpfValid(cpf)) {
-        errEl.textContent    = 'CPF inválido. Verifique e tente novamente.';
+        errEl.textContent    = t('requestCPFError');
         errEl.style.display  = 'block';
         input?.focus();
         return;
@@ -637,7 +677,7 @@ function copyCodigo() {
     if (!code) return;
     navigator.clipboard.writeText(code).then(() => {
         const btn = event.target;
-        btn.textContent = '✓ Copiado!';
+        btn.textContent = 'Copiado!';
         setTimeout(() => { btn.textContent = '📋 Copiar código Pix'; }, 2000);
     });
 }
@@ -708,6 +748,7 @@ function statusPtBR(s) {
         pending:   t('requestStatusPending'),
         processing: t('requestStatusProcessing'),
         ready:     t('requestStatusReady'),
+        completed:   t('requestStatusCompleted'),
         expired:   t('requestStatusExpired'),
         cancelled: t('requestStatusCancelled'),
     }[s] || s;

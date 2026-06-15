@@ -157,6 +157,11 @@ header {
     background: var(--border-color);
 }
 
+.section-divider-transparent {
+    margin: var(--sp-4) 0;
+    height: 0px;
+}
+
 .sport-nav {
     display: grid;
     grid-template-columns: repeat(4, 2fr);
@@ -756,7 +761,7 @@ input[type="text"]:focus {
 
 /* Perfil */
 .profile-box {
-    margin: 5px 5px ;
+    margin: 5px 5px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-size-lg);
@@ -1283,7 +1288,7 @@ input[type="text"]:focus {
 }
 
 .motor-event-content {
-    padding: 16px 0;
+    padding: 0;
     animation: slideDown 0.3s ease-out;
 }
 
@@ -1757,6 +1762,7 @@ input[type="text"]:focus {
 .pill-removed,   .st-cancelled { background: var(--bg-error); color: var(--text-error) }
 .pill-unchanged, .st-expired   { background: var(--bg-tertiary); color: var(--text-secondary); }
 .st-processing                 { background: var(--bg-info); color: var(--text-info); }
+.st-completed                  { background: var(--bg-accent-color); color: var(--accent-color); }
 
 .expand-icon {
     color: var(--text-secondary);
@@ -2145,6 +2151,10 @@ input[type="text"]:focus {
     .detail-grid.technical {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
+
+    .profile-box {
+        margin: var(--sp-4) var(--sp-5);
+    }
 }
 
 @media (max-width: 600px) {
@@ -2191,7 +2201,7 @@ input[type="text"]:focus {
         bottom: 30px;
         width: calc(100% - 3.5rem - 50px);
         left: 1.75rem;
-        z-index: 1000;
+        z-index: 900;
         height: 40px;
     }
 
@@ -2241,8 +2251,6 @@ input[type="text"]:focus {
     gap: 0;
     min-width: 0;
 }
-
-.browse-sub-section { }
 
 .browse-sub-divider {
     height: 1px;
