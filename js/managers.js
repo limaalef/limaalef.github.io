@@ -7,6 +7,11 @@ const AppState = {
     itemsPerPage: CONFIG.DEFAULT_ITEMS_PER_PAGE
 };
 
+const noFilterLogos = [
+    "channel_logos/sbt.svg",
+    "channel_logos/record.svg"
+];
+
 const PaginationManager = {
     update(apiResponse) {
         if (apiResponse.pagination) {
@@ -96,7 +101,7 @@ const CardManager = {
                 </div>
             </div>
             <div class="match-footer">
-                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo" onerror="this.style.display='none'">` : '<div></div>'}
+                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
                 <div class="tech-badges">
                     ${match.Qualidade ? `<span class="tech-badge">${match.Qualidade}</span>` : ''}
                     <span class="tech-badge">${audioFormat}</span>
@@ -150,7 +155,7 @@ const MotorCardManager = {
                 <div class="motor-phase-name">${phase || 'N/A'}</div>
             </div>
             <div class="motor-footer">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : '<div></div>'}
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
                 <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
             </div>
         `;
@@ -185,7 +190,7 @@ const ListManager = {
             </div>
             <div style="text-align: center; font-size: 0.85em;">${match.Qualidade || 'N/A'}</div>
             <div style="text-align: right;">
-                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">${match.Emissora || 'N/A'}</span>`}
+                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">${match.Emissora || 'N/A'}</span>`}
             </div>
         `;
         return item;
@@ -218,7 +223,7 @@ const MotorListManager = {
             </div>
             <div style="text-align: center; font-size: 0.85em;">${eventCount} ${eventLabel}</div>
             <div style="text-align: right;">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
             </div>
         `;
         return item;
@@ -330,8 +335,9 @@ const MatchModal = {
         const videoTitle = LanguageManager.t('video') || 'Vídeo';
         const imageTitle = LanguageManager.t('image') || 'Imagem';
         
+        const _matchCarouselId = `carousel-match-${match.ID || Date.now()}`;
         body.innerHTML = `
-            ${match.Imagem ? `<img src="${match.Imagem}" alt="Imagem da partida" class="modal-image" onerror="this.onerror=null; this.remove();">` : ''}
+            ${match.Imagem ? ImageCarousel.renderHTML(match.Imagem, _matchCarouselId) : ''}
             
             <div class="modal-division">
             <div class="detail-section">
@@ -429,6 +435,9 @@ const MatchModal = {
             ` : ''}
         `;
         
+        if (match.Imagem && Array.isArray(match.Imagem) && match.Imagem.length > 1) {
+            ImageCarousel.init(_matchCarouselId, match.Imagem);
+        }
         modal?.classList.add('active');
     },
     async fetchAndShow(id, sport = 'football') {
@@ -526,6 +535,7 @@ const MotorModal = {
         
         score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
         
+        const _motorCarousels = [];
         const eventsHtml = (event.Eventos || []).map((evt, index) => {
         const videoTitle = LanguageManager.t('video') || 'Vídeo';
         const videoHtml = event['Video Embed'] ? `
@@ -552,7 +562,14 @@ const MotorModal = {
                 <div class="motor-event-content" id="content-${index}" style="display: none;">
                     ${videoHtml}
                     
-                    ${evt.image ? `<img src="${evt.image}" alt="${evt.event_type}" class="modal-image" onerror="this.style.display='none'">` : ''}
+                    ${(() => {
+                        if (!evt.image) return '';
+                        const cid = `carousel-motor-${index}-${Date.now()}`;
+                        if (Array.isArray(evt.image) && evt.image.length > 1) {
+                            _motorCarousels.push({ id: cid, images: evt.image });
+                        }
+                        return ImageCarousel.renderHTML(evt.image, cid);
+                    })()}
                     
                    <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
@@ -626,6 +643,7 @@ const MotorModal = {
     }).join('');
         
         body.innerHTML = eventsHtml;
+        _motorCarousels.forEach(c => ImageCarousel.init(c.id, c.images));
         modal?.classList.add('active');
     },
     
@@ -763,5 +781,94 @@ const FilterManager = {
             return matchesQuery && matchesYear;
         });
         Renderer.render();
+    }
+};
+
+const ImageCarousel = {
+    _carousels: {},
+
+    renderHTML(image, id) {
+        const images = Array.isArray(image) ? image : [image];
+        if (images.length === 0) return '';
+
+        if (images.length === 1) {
+            return `<img src="${images[0]}" alt="Imagem" class="modal-image" onerror="this.onerror=null; this.remove();">`;
+        }
+
+        const carouselId = id || `carousel-${Date.now()}`;
+        return `
+            <div class="modal-image-carousel" id="${carouselId}" data-index="0" data-total="${images.length}">
+                <img src="${images[0]}" alt="Imagem 1 de ${images.length}" class="modal-image carousel-img" onerror="this.style.opacity='0'">
+                <button class="carousel-btn carousel-btn-prev" onclick="ImageCarousel.prev('${carouselId}')">&#8249;</button>
+                <button class="carousel-btn carousel-btn-next" onclick="ImageCarousel.next('${carouselId}')">&#8250;</button>
+                <div class="carousel-counter"><span class="carousel-current">1</span> / ${images.length}</div>
+            </div>`;
+    },
+
+    _getImages(carouselEl) {
+        const id = carouselEl.id;
+        if (this._carousels[id]) return this._carousels[id];
+        // fallback: re-derive from rendered src (only works for first image loaded)
+        return null;
+    },
+
+    init(carouselId, images) {
+        this._carousels[carouselId] = images;
+    },
+
+    prev(carouselId) {
+        this._navigate(carouselId, -1);
+    },
+
+    next(carouselId) {
+        this._navigate(carouselId, 1);
+    },
+
+    _navigate(carouselId, direction) {
+        const el = document.getElementById(carouselId);
+        if (!el) return;
+        const images = this._carousels[carouselId];
+        if (!images) return;
+        if (el.dataset.animating === 'true') return;
+
+        const total = images.length;
+        let idx = parseInt(el.dataset.index, 10);
+        const nextIdx = (idx + direction + total) % total;
+
+        const current = el.querySelector('.carousel-img');
+        const incoming = current.cloneNode();
+        incoming.src = images[nextIdx];
+        incoming.alt = `Imagem ${nextIdx + 1} de ${total}`;
+        incoming.style.position = 'absolute';
+        incoming.style.top = '0';
+        incoming.style.left = '0';
+        incoming.style.transform = direction > 0 ? 'translateX(100%)' : 'translateX(-100%)';
+        incoming.style.transition = 'none';
+        el.style.position = 'relative';
+        el.appendChild(incoming);
+
+        el.dataset.animating = 'true';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                incoming.style.transition = 'transform 0.35s ease';
+                current.style.transition = 'transform 0.35s ease';
+                incoming.style.transform = 'translateX(0)';
+                current.style.transform = direction > 0 ? 'translateX(-100%)' : 'translateX(100%)';
+            });
+        });
+
+        incoming.addEventListener('transitionend', () => {
+            current.remove();
+            incoming.style.position = '';
+            incoming.style.top = '';
+            incoming.style.left = '';
+            incoming.style.transform = '';
+            incoming.style.transition = '';
+            incoming.classList.add('carousel-img');
+            el.dataset.index = nextIdx;
+            el.dataset.animating = 'false';
+            const counter = el.querySelector('.carousel-current');
+            if (counter) counter.textContent = nextIdx + 1;
+        }, { once: true });
     }
 };

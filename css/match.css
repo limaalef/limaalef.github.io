@@ -1,7 +1,3 @@
-body {
-    background: var(--bg-secondary);
-}
-
 header {
     background-color: var(--accent-color);
 }
@@ -44,10 +40,6 @@ header {
 .modal-title-competition,
 .modal-title-phase {
     text-align: center;
-}
-
-.modal-division {
-    margin-top: 16px;
 }
 
 .motor-event-accordion {
