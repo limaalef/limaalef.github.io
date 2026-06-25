@@ -90,13 +90,13 @@ const CardManager = {
             <div class="match-date">${dateDisplay}</div>
             <div class="match-teams">
                 <div class="team">
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${match.Mandante || 'Time 1'}</span>
+                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${LanguageManager.t(match.Mandante) || 'Time 1'}</span>
                     <span class="score ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${homeGoals}</span>
                 </div>
                 <div class="team">
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${match.Visitante || 'Time 2'}</span>
+                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${LanguageManager.t(match.Visitante) || 'Time 2'}</span>
                     <span class="score ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${awayGoals}</span>
                 </div>
             </div>
@@ -183,7 +183,7 @@ const ListManager = {
         item.innerHTML = `
             <div><strong>${Utils.formatDate(match.Data, true)}</strong></div>
             <div>
-                <strong>${match.Mandante} ${scoreText} ${match.Visitante}</strong> ${statusBadge}
+                <strong>${LanguageManager.t(match.Mandante)} ${scoreText} ${LanguageManager.t(match.Visitante)}</strong> ${statusBadge}
                 <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
                     ${competition} - ${phase}
                 </div>
@@ -267,25 +267,25 @@ const MatchModal = {
             const pendingText = LanguageManager.t('pendingMatch');
             scoreHtml = `
                 <div class="score-desktop">
-                    <span class="score-team-name">${match.Mandante}</span>
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
+                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${match.Visitante}</span>
+                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
                     <span class="badge badge-warning score-status-badge">${pendingText}</span>
                 </div>
                 <div class="score-mobile">
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${match.Mandante}</span>
+                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
                         </div>
                         <span class="score-mobile-value">${homeGoals}</span>
                     </div>
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${match.Visitante}</span>
+                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
                         </div>
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
@@ -297,24 +297,24 @@ const MatchModal = {
         } else {
             scoreHtml = `
                 <div class="score-desktop">
-                    <span class="score-team-name">${match.Mandante}</span>
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
+                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${match.Visitante}</span>
+                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
                 </div>
                 <div class="score-mobile">
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${match.Mandante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${match.Mandante}</span>
+                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
                         </div>
                         <span class="score-mobile-value">${homeGoals}</span>
                     </div>
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${match.Visitante}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${match.Visitante}</span>
+                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
                         </div>
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
