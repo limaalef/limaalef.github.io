@@ -1,4 +1,12 @@
 const APIService = {
+    async _fetchJson(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data.success) throw new Error('API retornou erro');
+        return data;
+    },
+
     async fetchMatches(page, itemsPerPage) {
         const loadingMessage = LanguageManager.t('loadingData');
         Utils.showNotification(loadingMessage, 'info');
@@ -11,23 +19,12 @@ const APIService = {
             url.searchParams.append('embed', 'true');
         }
 
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        if (!data.success) throw new Error('API retornou erro');
-
-        return data;
+        return this._fetchJson(url.toString());
     },
 
     async fetchById(id, sport) {
         const url = `${CONFIG.CF_API_URLS[sport]}/${encodeURIComponent(id)}`;
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        if (!data.success) throw new Error('API retornou erro');
+        const data = await this._fetchJson(url);
 
         return {
             ...data,
@@ -44,13 +41,7 @@ const APIService = {
         url.searchParams.set('page', page);
         url.searchParams.set('limit', itemsPerPage);
 
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        if (!data.success) throw new Error('API retornou erro');
-
-        return data;
+        return this._fetchJson(url.toString());
     },
 
     async fetchTodayInHistory() {
@@ -59,13 +50,38 @@ const APIService = {
         url.searchParams.set('today_in_history', 'true');
         url.searchParams.set('fields', 'id,date,home_team,away_team,championship');
 
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
-        const data = await response.json();
-        if (!data.success) throw new Error('API retornou erro');
-        
-        return data;
+        return this._fetchJson(url.toString());
+    },
+
+    async fetchByTeam(page, itemsPerPage) {
+        const loadingMessage = LanguageManager.t('loadingData');
+        Utils.showNotification(loadingMessage, 'info');
+
+        const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
+        url.searchParams.append('max_items', 1500);
+        url.searchParams.append('page', page);
+        url.searchParams.append('search_type', CollectionState.type);
+        url.searchParams.append('search', CollectionState.query);
+
+        if (CollectionState.yearFilter) {
+            url.searchParams.append('year', CollectionState.yearFilter);
+        }
+
+        if (CONFIG.videoFilter) {
+            url.searchParams.append('embed', 'true');
+        }
+
+        return this._fetchJson(url.toString());
+    },
+
+    async fetchEnrichment(matchId, sport) {
+        try {
+            const url = `${CONFIG.REQUEST_API_BASE}/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
+            const res = await fetch(url);
+            if (!res.ok) return null;
+            const response = await res.json();
+            return response.data || null;
+        } catch { return null; }
     },
 
     transformData(apiResponse, sport = CONFIG.currentSport) {

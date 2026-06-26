@@ -47,7 +47,6 @@ const STATS_ORDER = [
 
 // ─── Init ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-    LanguageManager.init();
     await window._headerPromise;
 
     const params = new URLSearchParams(location.search);
@@ -82,7 +81,7 @@ function renderMatch(match, sport, raw) {
     renderStorage(match, 'meStorageBadges');
     renderObsAndTags(match);
 
-    fetchEnrichment(match.ID, sport).then(detail => {
+    APIService.fetchEnrichment(match.ID, sport).then(detail => {
         if (!detail) {
             document.getElementById('meBody').style.display = 'block';
             return;
@@ -98,8 +97,7 @@ function renderMatch(match, sport, raw) {
 
 // ─── Hero ────────────────────────────────────────
 function renderHero(match) {
-    const homeGoals = parseGoals(match['Gols mandante']);
-    const awayGoals = parseGoals(match['Gols visitante']);
+    const { homeGoals, awayGoals } = Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
     const hasScore  = homeGoals !== null && awayGoals !== null;
 
     const compLogoSlug = (match.Competição || '')
@@ -408,17 +406,6 @@ function renderLineups(homeTeam, awayTeam) {
         `;
         grid.appendChild(col);
     });
-}
-
-// ─── Enriquecimento via Worker ────────────────────────────────────────────────
-async function fetchEnrichment(matchId, sport) {
-    try {
-        const url = `${CONFIG.REQUEST_API_BASE}/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
-        const res = await fetch(url);
-        if (!res.ok) return null;
-        const response = await res.json();
-        return response.data || null;
-    } catch { return null; }
 }
 
 // ─── Helpers ─────────────────────────────────────

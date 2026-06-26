@@ -9,8 +9,10 @@ const AppState = {
 
 const noFilterLogos = [
     "channel_logos/sbt.svg",
-    "channel_logos/record.svg",
-    "channel_logos/fox_sports.svg"
+    "channel_logos/record.svg",,
+    "channel_logos/band.svg",
+    "channel_logos/fox_sports.svg",
+    "channel_logos/band_sports.svg"
 ];
 
 const PaginationManager = {
@@ -46,14 +48,9 @@ const CardManager = {
         card.className = `match-card ${status} ${hasVideo}`;
         card.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
         
-        const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
-        const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
-        const homeWinner = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
-        const awayWinner = homeGoals !== '' && awayGoals !== '' && awayGoals > homeGoals;
-
-        const hasWinner = homeWinner || awayWinner;
-        const homeLoser = hasWinner && !homeWinner;
-        const awayLoser = hasWinner && !awayWinner;
+        const { homeGoals, homeWinner, homeLoser,
+                awayGoals, awayWinner, awayLoser,
+                hasWinner } = Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
         
         const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
         const statusBadge = status === 'pending' ? `<span class="match-status">${statusText}</span>` : '';
@@ -156,7 +153,7 @@ const MotorCardManager = {
                 <div class="motor-phase-name">${phase || 'N/A'}</div>
             </div>
             <div class="motor-footer">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
+                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(event['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
                 <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
             </div>
         `;
@@ -171,8 +168,8 @@ const ListManager = {
         item.className = `list-item ${status}`;
         item.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
         
-        const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
-        const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
+        const homeGoals = Utils.parseGoals(match['Gols mandante']);
+        const awayGoals = Utils.parseGoals(match['Gols visitante']);
         const scoreText = `${homeGoals} x ${awayGoals}`;
         
         const statusText = LanguageManager.t('pendingMatch');
@@ -182,7 +179,7 @@ const ListManager = {
         const phase = LanguageManager.translateText(match.Fase);
 
         item.innerHTML = `
-            <div><strong>${Utils.formatDate(match.Data, true)}</strong></div>
+            <div><strong>${Utils.formatMatchDate(match.Data, true)}</strong></div>
             <div>
                 <strong>${LanguageManager.t(match.Mandante)} ${scoreText} ${LanguageManager.t(match.Visitante)}</strong> ${statusBadge}
                 <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
@@ -249,15 +246,15 @@ const MatchModal = {
             <div class="modal-title-phase">${phase}</div>
         `;
         
-        const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined ? Math.round(parseFloat(match['Gols mandante'])) : '';
-        const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined ? Math.round(parseFloat(match['Gols visitante'])) : '';
+        const homeGoals = Utils.parseGoals(match['Gols mandante']);
+        const awayGoals = Utils.parseGoals(match['Gols visitante']);
 
         const embed = match['Video Embed'];
         
         // ADICIONAR: HTML do vídeo embed (se existir)
         const videoHtml = match['Video Embed'] ? `
             <div class="watch-button-container">
-                <a href="watch?id=${match.ID}" class="watch-match-button">
+                <a href="watch.html?id=${match.ID}" class="watch-match-button">
                     <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
                 </a>
             </div>
@@ -346,7 +343,7 @@ const MatchModal = {
                 <div class="detail-list">
                     <div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('date')}</span>
-                        <span class="detail-list-value">${Utils.formatDate(match.Data)}</span>
+                        <span class="detail-list-value">${Utils.formatMatchDate(match.Data)}</span>
                     </div>
                     <div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('competition')}</span>
@@ -520,8 +517,8 @@ const MotorModal = {
             <div class="modal-title-phase">${phase}</div>
         `;
         
-        const startDate = Utils.formatDate(event.DataInicio);
-        const endDate = Utils.formatDate(event.DataFim);
+        const startDate = Utils.formatMatchDate(event.DataInicio);
+        const endDate = Utils.formatMatchDate(event.DataFim);
         const dateRange = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
         
         score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
@@ -533,7 +530,7 @@ const MotorModal = {
             <div class="detail-section">
                 <div class="section-title">${videoTitle}</div>
                 <div style="text-align: center; padding: 30px;">
-                    <a href="watch?id=${match.ID}" class="watch-button" target="_blank">
+                    <a href="watch.html?id=${match.ID}" class="watch-button" target="_blank">
                         <span style="font-size: 3em;">▶️</span>
                         <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir evento</div>
                     </a>
@@ -546,7 +543,7 @@ const MotorModal = {
                 <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
                     <div class="motor-event-header-content">
                         <span class="motor-event-title">${LanguageManager.translateText(evt.event_type) || 'Evento'}</span>
-                        <span class="motor-event-date">${Utils.formatDate(evt.date)}</span>
+                        <span class="motor-event-date">${Utils.formatMatchDate(evt.date)}</span>
                     </div>
                     <span class="motor-event-icon" id="icon-${index}">▼</span>
                 </div>
@@ -567,7 +564,7 @@ const MotorModal = {
                         <div class="detail-list">
                             <div class="detail-list-item">
                                 <div class="detail-list-label">${LanguageManager.t('date')}</div>
-                                <div class="detail-list-value">${Utils.formatDate(evt.date)}</div>
+                                <div class="detail-list-value">${Utils.formatMatchDate(evt.date)}</div>
                             </div>
                             <div class="detail-list-item">
                                 <div class="detail-list-label">${LanguageManager.t('broadcaster')}</div>

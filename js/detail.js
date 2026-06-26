@@ -1,35 +1,16 @@
-/**
- * app.collection.js
- * Lógica exclusiva da página collection.html (time/competição com sidebar).
- * Substitui app.js nesta página.
- */
-
 /* ─────────────────────────────────────────
    Estado da página
 ───────────────────────────────────────── */
 const CollectionState = {
-    query: null,          // valor de ?q= na URL
+    query: null,
     type: null,
-    yearFilter: null,     // ano selecionado (null = todos)
+    yearFilter: null,
 };
 
 /* ─────────────────────────────────────────
    SidebarManager — carrega e exibe a sidebar
 ───────────────────────────────────────── */
 const SidebarManager = {
-    /**
-     * Carrega os dados da sidebar para o contexto (time ou competição).
-     *
-     * Estratégia em duas etapas:
-     *   1. Consulta o CollectionsDB local (collections.js) — resposta instantânea.
-     *   2. Se não encontrar localmente E CONFIG.CONTEXT_API_URL estiver definida,
-     *      tenta a API remota como fallback.
-     *
-     * Estrutura esperada (local ou API):
-     *   Para clube:       { type: 'club',        name, full_name, logo, founded_year, country, description, sport }
-     *   Para competição:  { type: 'competition', name, logo, organizer, format, scope, description, sport }
-     *   sport deve ser 'football' | 'others' | 'motor'
-     */
     async load(query) {
         const loading = document.getElementById('sidebarLoading');
         const content = document.getElementById('sidebarContent');
@@ -146,41 +127,6 @@ const SidebarManager = {
 };
 
 /* ─────────────────────────────────────────
-   Extensões do APIService para esta página
-───────────────────────────────────────── */
-Object.assign(APIService, {
-    /**
-     * Busca partidas filtrando por query (time/competição) e ano opcional.
-     */
-    async fetchByTeam(page, itemsPerPage) {
-        const loadingMessage = LanguageManager.t('loadingData');
-        Utils.showNotification(loadingMessage, 'info');
-
-        const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
-        url.searchParams.append('max_items', 1500);
-        url.searchParams.append('page', page);
-        url.searchParams.append('search_type', CollectionState.type);
-        url.searchParams.append('search', CollectionState.query);
-
-        if (CollectionState.yearFilter) {
-            url.searchParams.append('year', CollectionState.yearFilter);
-        }
-
-        if (CONFIG.videoFilter) {
-            url.searchParams.append('embed', 'true');
-        }
-
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        if (!data.success) throw new Error('API retornou erro');
-
-        return data;
-    }
-});
-
-/* ─────────────────────────────────────────
    Patch no Renderer para filtro por ano via API
    (não filtra localmente — dispara nova requisição)
 ───────────────────────────────────────── */
@@ -247,13 +193,9 @@ CardManager.create = function (match) {
     // ── Placar central ──
     const teamsEl = card.querySelector('.match-teams');
     if (teamsEl) {
-        const homeGoals = match['Gols mandante'] !== '' && match['Gols mandante'] !== null && match['Gols mandante'] !== undefined
-            ? Math.round(parseFloat(match['Gols mandante'])) : '';
-        const awayGoals = match['Gols visitante'] !== '' && match['Gols visitante'] !== null && match['Gols visitante'] !== undefined
-            ? Math.round(parseFloat(match['Gols visitante'])) : '';
-
-        const homeWinner = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
-        const awayWinner = homeGoals !== '' && awayGoals !== '' && awayGoals > homeGoals;
+        const { homeGoals, homeWinner,
+                awayGoals, awayWinner,
+                hasWinner } = Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
 
         const scoreCenter = document.createElement('div');
         scoreCenter.className = 'match-score-center';
@@ -279,10 +221,7 @@ CardManager.create = function (match) {
 const CollectionApp = {
     applyTheme(sport) {
         CONFIG.currentSport = sport;
-        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
-        if (sport === 'football') document.body.classList.add('theme-football');
-        else if (sport === 'others') document.body.classList.add('theme-others');
-        else if (sport === 'motor')  document.body.classList.add('theme-motor');
+        Utils.applySportTheme(sport);
     },
 
     async loadData() {
@@ -308,25 +247,20 @@ const CollectionApp = {
             const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText')} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
             Utils.showNotification(message, 'success');
         } catch (error) {
-            document.getElementById('matchesContainer').innerHTML = `
-                <div class="empty-state">
-                    <h2>Erro ao carregar dados</h2>
-                    <p>Verifique a URL da API</p>
-                    <p style="font-size:0.9em;margin-top:10px;">Erro: ${error.message}</p>
-                </div>
-            `;
+            document.getElementById('matchesContainer').innerHTML =
+                Utils.emptyStateHtml(
+                    'Erro ao carregar dados',
+                    `Verifique a URL da API<br><span style="font-size:0.9em;margin-top:10px;">Erro: ${error.message}</span>`
+                );
         }
     },
 
     readUrlParams() {
-        const params = new URLSearchParams(window.location.search);
+        const { id, sport, page, raw: params } = Utils.getUrlParams();
 
         // Redireciona se vier com ?id=
-        const id       = parseInt(params.get('id'));
-        const sportParam = params.get('sport') || 'football';
         if (id > 0) {
-            const validSport = ['football', 'others', 'motor'].includes(sportParam) ? sportParam : 'football';
-            window.location.replace(`match.html?id=${id}&sport=${validSport}`);
+            window.location.replace(`match.html?id=${id}&sport=${sport}`);
             return true;
         }
 
@@ -343,7 +277,6 @@ const CollectionApp = {
         CollectionState.type = s_type;
 
         // Página inicial
-        const page = parseInt(params.get('page'));
         if (page > 0) AppState.currentPage = page;
 
         // Busca no input
@@ -377,7 +310,6 @@ const CollectionApp = {
             Renderer.render();
         };
 
-        LanguageManager.init();
         if (this.readUrlParams()) return;
 
         if (!CollectionState.query) return;

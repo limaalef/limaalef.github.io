@@ -1,16 +1,9 @@
 const MatchPage = {
     async init() {
-        LanguageManager.init();
-
-        const params = new URLSearchParams(window.location.search);
-        const id     = parseInt(params.get('id'));
-        const sport  = ['football', 'others', 'motor'].includes(params.get('sport'))
-            ? params.get('sport')
-            : 'football';
+        const { id, sport } = Utils.getUrlParams();
 
         // Aplica tema
-        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
-        document.body.classList.add(sport === 'motor' ? 'theme-motor' : sport === 'others' ? 'theme-others' : 'theme-football');
+        Utils.applySportTheme(sport);
 
         if (!id) {
             this.renderError('ID não informado na URL.');
@@ -34,8 +27,8 @@ const MatchPage = {
 
         // Atualiza o <title> da página
         if (sport !== 'motor') {
-            const homeGoals = match['Gols mandante'] != null && match['Gols mandante'] !== '' ? Math.round(parseFloat(match['Gols mandante'])) : '';
-            const awayGoals = match['Gols visitante'] != null && match['Gols visitante'] !== '' ? Math.round(parseFloat(match['Gols visitante'])) : '';
+            const homeGoals = Utils.parseGoals(match['Gols mandante']);
+            const awayGoals = Utils.parseGoals(match['Gols visitante']);
             const score = homeGoals !== '' ? ` ${homeGoals}x${awayGoals} ` : ' x ';
             document.title = `${match.Mandante}${score}${match.Visitante} — Sports Archive`;
         } else {
@@ -76,4 +69,7 @@ const MatchPage = {
     }
 };
 
-window.addEventListener('DOMContentLoaded', () => MatchPage.init());
+window.addEventListener('DOMContentLoaded', async () => {
+    await window._headerPromise;
+    MatchPage.init();
+});

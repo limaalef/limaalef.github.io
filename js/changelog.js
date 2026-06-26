@@ -1,40 +1,11 @@
-/* ── helpers ── */
-function modeLabel(mode) {
-    const map = {
-        football:   { icon: '', key: 'modeFootball' },
-        multisport: { icon: '', key: 'modeMultisport' },
-        motorsport: { icon: '', key: 'modeMotorsport' }
-    };
-    const m = map[mode];
-    if (m) return LanguageManager.t(m.key);
-    return `📁 ${mode}`;
-}
-
-function formatTimestamp(ts) {
-    if (!ts) return '';
-    try {
-        const d = new Date(ts + (ts.endsWith('Z') ? '' : 'Z'));
-        const pad = n => String(n).padStart(2, '0');
-        return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch { return ts; }
-}
-
-function modeClass(mode) {
-    return { football: 'mode-football', multisport: 'mode-multisport', motorsport: 'mode-motorsport' }[mode] || 'mode-motorsport';
-}
-
-function sportForMode(mode) {
-    if (mode === 'motorsport') return 'motor';
-    if (mode === 'multisport') return 'others';
-    return 'football';
-}
-
 /* ── render ── */
 function renderEntry(entry, index) {
     const s = entry.summary || {};
     const added     = s.added     || 0;
     const modified  = s.modified  || 0;
     const removed   = s.removed   || 0;
+
+    const {mode, slug, modeName} = Utils.modeLabelName(entry.mode);
 
     const pillsHtml = [
         added     ? `<span class="pill pill-added">+${added} ${LanguageManager.t('cl_added')}</span>`         : '',
@@ -55,18 +26,18 @@ function renderEntry(entry, index) {
             const fieldChanges = c.field_changes || [];
             const fieldHtml = fieldChanges.length
                 ? `<ul class="field-changes-list">${fieldChanges.map(f =>
-                    `<li><span class="fc-field">${escapeHtml(f.field)}</span><span class="fc-action fc-${f.action}">${LanguageManager.t(fcKey[f.action] || 'fc_modified')}</span></li>`
+                    `<li><span class="fc-field">${Utils.escapeHtml(f.field)}</span><span class="fc-action fc-${f.action}">${LanguageManager.t(fcKey[f.action] || 'fc_modified')}</span></li>`
                   ).join('')}</ul>`
                 : '';
             const idBadge = `<span class="change-id">${c.id != null ? '#' + c.id : '—'}</span>`;
             const descContent = c.id != null && c.action !== 'removed'
                 ? `<span class="change-desc change-id-link"
                        title="${LanguageManager.t('viewDetails') || 'Ver detalhes'}"
-                       onclick="MatchModal.fetchAndShow(${c.id}, '${sportForMode(entry.mode)}')">
-                       ${escapeHtml(c.description || '')}
+                       onclick="MatchModal.fetchAndShow(${c.id}, '${slug}')">
+                       ${Utils.escapeHtml(c.description || '')}
                        ${fieldHtml}
                    </span>`
-                : `<span class="change-desc">${escapeHtml(c.description || '')}${fieldHtml}</span>`;
+                : `<span class="change-desc">${Utils.escapeHtml(c.description || '')}${fieldHtml}</span>`;
             return `
             <div class="change-item">
                 ${idBadge}
@@ -89,12 +60,12 @@ function renderEntry(entry, index) {
     <div class="sync-entry" id="entry-${index}">
         <div class="sync-entry-header" onclick="toggleEntry(${index})">
             <div class="sync-entry-left">
-                <span class="sync-mode-badge ${modeClass(entry.mode)}">${modeLabel(entry.mode)}</span>
+                <span class="sync-mode-badge mode-${mode}">${modeName}</span>
                 
                 <div class="sync-summary-pills">${pillsHtml || `<span class="pill pill-unchanged">0</span>`}</div>
             </div>
             <div class="sync-entry-right">
-                <span class="sync-timestamp">${formatTimestamp(entry.timestamp)}</span>
+                <span class="sync-timestamp">${Utils.formatDateTime(entry.timestamp)}</span>
                 <span class="expand-icon">▼</span>
             </div>
         </div>
@@ -105,14 +76,6 @@ function renderEntry(entry, index) {
 function toggleEntry(index) {
     const el = document.getElementById(`entry-${index}`);
     if (el) el.classList.toggle('open');
-}
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
 }
 
 /* ── fetch & render ── */
@@ -130,7 +93,7 @@ async function loadChangelog() {
         State.totalPages = data.pagination?.total_pages || 1;
 
         if (items.length === 0) {
-            content.innerHTML = `<div class="state-box"><div class="icon">📭</div><h2>${LanguageManager.t('cl_empty')}</h2><p>${LanguageManager.t('cl_emptyMsg')}</p></div>`;
+            content.innerHTML = Utils.sectionStateHtml('📭', `<h2>${LanguageManager.t('cl_empty')}</h2><p>${LanguageManager.t('cl_emptyMsg')}</p>`);
             return;
         }
 
@@ -138,7 +101,7 @@ async function loadChangelog() {
         updatePagination();
 
     } catch (err) {
-        content.innerHTML = `<div class="state-box"><div class="icon">❌</div><h2>${LanguageManager.t('cl_error')}</h2><p>${LanguageManager.t('cl_checkUrl')}</p><p style="font-size:.85em;margin-top:8px;color:var(--error-color)">${escapeHtml(err.message)}</p></div>`;
+        content.innerHTML = Utils.sectionStateHtml('❌', `<h2>${LanguageManager.t('cl_error')}</h2><p>${LanguageManager.t('cl_checkUrl')}</p><p style="font-size:.85em;margin-top:8px;color:var(--error-color)">${Utils.escapeHtml(err.message)}</p>`);
     }
 }
 
@@ -163,8 +126,8 @@ const State = {
 };
 
 /* ── init ── */
-window.addEventListener('DOMContentLoaded', () => {
-    LanguageManager.init();
+window.addEventListener('DOMContentLoaded', async () => {
+    await window._headerPromise;
 
     document.getElementById('modeFilter').addEventListener('change', e => {
         State.mode = e.target.value;

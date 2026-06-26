@@ -17,15 +17,15 @@ const App = {
             const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText')} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
             Utils.showNotification(message, 'success');
         } catch (error) {
-            document.getElementById('matchesContainer').innerHTML = `
-                <div class="empty-state">
-                    <h2>Erro ao carregar dados</h2>
-                    <p>Verifique a URL da API</p>
-                    <p style="font-size: 0.9em; margin-top: 10px;">Erro: ${error.message}</p>
-                </div>
-            `;
+            console.log(error);
+            document.getElementById('matchesContainer').innerHTML =
+                Utils.emptyStateHtml(
+                    'Erro ao carregar dados',
+                    `Verifique a URL da API<br><span style="font-size:0.9em;margin-top:10px;">Erro: ${error.message}</span>`
+                );
         }
     },
+
     switchView(view) {
         AppState.currentView = view;
         document.querySelectorAll('.view-btn').forEach(btn => {
@@ -33,51 +33,36 @@ const App = {
         });
         Renderer.render();
     },
+
     switchSport(sport) {
         CONFIG.currentSport = sport;
         AppState.currentPage = 1;
         document.querySelectorAll('.sport-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sport === sport);
         });
-        
-        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
-        
-        if (sport === 'football') {
-            document.body.classList.add('theme-football');
-        } else if (sport === 'others') {
-            document.body.classList.add('theme-others');
-        } else if (sport === 'motor') {
-            document.body.classList.add('theme-motor');
-        }
-        
+        Utils.applySportTheme(sport);
         this.loadData();
     },
-    readUrlParams() {
-        const params = new URLSearchParams(window.location.search);
 
-        const id = parseInt(params.get('id'));
-        const sportParam = params.get('sport') || 'football';
+    readUrlParams() {
+        const { sport, id, page, raw: params } = Utils.getUrlParams();
+
         if (id > 0) {
-            const validSport = ['football', 'others', 'motor'].includes(sportParam) ? sportParam : 'football';
-            window.location.replace(`match.html?id=${id}&sport=${validSport}`);
+            window.location.replace(`match.html?id=${id}&sport=${sport}`);
             return true;
         }
- 
-        const sport = params.get('sport');
-        if (sport && ['football', 'others', 'motor'].includes(sport)) {
-            CONFIG.currentSport = sport;
-            document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
-            if (sport === 'football') document.body.classList.add('theme-football');
-            if (sport === 'others') document.body.classList.add('theme-others');
-            if (sport === 'motor')  document.body.classList.add('theme-motor');
+
+        const rawSport = params.get('sport');
+        if (rawSport && Utils.VALID_SPORTS.includes(rawSport)) {
+            CONFIG.currentSport = rawSport;
+            Utils.applySportTheme(rawSport);
             document.querySelectorAll('.sport-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.sport === sport);
+                btn.classList.toggle('active', btn.dataset.sport === rawSport);
             });
         }
- 
-        const page = parseInt(params.get('page'));
+
         if (page > 0) AppState.currentPage = page;
- 
+
         const view = params.get('view');
         if (view && ['grid', 'list'].includes(view)) {
             AppState.currentView = view;
@@ -85,15 +70,15 @@ const App = {
                 btn.classList.toggle('active', btn.dataset.view === view);
             });
         }
- 
+
         const search = params.get('search');
         if (search) {
             const searchInput = document.getElementById('searchInput');
             if (searchInput) searchInput.value = search;
         }
     },
+
     init() {
-        LanguageManager.init();
         if (this.readUrlParams()) return;
 
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
@@ -128,11 +113,8 @@ const App = {
 
         document.addEventListener('keydown', (e) => {
             const modalOpen = document.getElementById('modal').classList.contains('active');
-            const searchFocused = document.activeElement === document.getElementById('searchInput');
-
             if (e.key === 'Escape' && modalOpen) {
                 MatchModal.close();
-                return;
             }
         });
 

@@ -28,13 +28,6 @@ const RequestModule = (() => {
     let user   = null;
     let _panel = null;
 
-    // ── i18n helper ───────────────────────────────────────────
-    // Usa LanguageManager se disponível, caso contrário devolve
-    // a chave — evita crash se o módulo carregar isolado.
-    function t(key) {
-        return LanguageManager ? LanguageManager.t(key) : key;
-    }
-
     // ── Persistência ─────────────────────────────────────────
     function saveCart() {
         localStorage.setItem('sa_cart', JSON.stringify(cart));
@@ -45,16 +38,15 @@ const RequestModule = (() => {
     //  API PÚBLICA
     // ══════════════════════════════════════════════════════════
     const API = {
-
         addItem(match) {
             const sport = CONFIG?.currentSport || 'football';
             if (cart.find(c => c.id === match.ID && c.sport === sport)) {
-                Utils.showNotification(t('requestAlreadyInCart'), 'warning');
+                Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'warning');
                 return;
             }
             cart.push(_buildItem(match, sport));
             saveCart();
-            Utils.showNotification(t('requestAdded'), 'success');
+            Utils.showNotification(LanguageManager.t('requestAdded'), 'success');
             _renderCartList();
         },
 
@@ -110,7 +102,7 @@ const RequestModule = (() => {
                 sport,
                 label: `${match.Campeonato} — ${match.Fase}`,
                 date:  Utils.formatMotorDateRange?.(match.DataInicio, match.DataFim) || '',
-                meta:  `${(match.Eventos || []).length} ${t('requestEvents')}`,
+                meta:  `${(match.Eventos || []).length} ${LanguageManager.t('requestEvents')}`,
             };
         }
         
@@ -149,7 +141,7 @@ const RequestModule = (() => {
         btn.id        = 'om-cart-btn';
         btn.className = 'om-cart-fab';
         btn.setAttribute('data-i18n-title', 'requestCartTitle');
-        btn.title     = t('requestCartTitle');
+        btn.title     = LanguageManager.t('requestCartTitle');
         btn.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <circle cx="9"  cy="21" r="1"/>
@@ -176,8 +168,8 @@ const RequestModule = (() => {
         _panel.setAttribute('aria-modal', 'true');
         _panel.innerHTML = `
             <div class="om-panel-header">
-                <h3 data-i18n="requestCart">${t('requestCart')}</h3>
-                <button class="btn close-btn" id="om-panel-close" aria-label="${t('requestClose')}">×</button>
+                <h3 data-i18n="requestCart">${LanguageManager.t('requestCart')}</h3>
+                <button class="btn close-btn" id="om-panel-close" aria-label="${LanguageManager.t('requestClose')}">×</button>
             </div>
             <div class="om-panel-body"  id="om-panel-body"></div>
             <div class="om-panel-footer" id="om-panel-footer"></div>
@@ -206,8 +198,8 @@ const RequestModule = (() => {
         if (cart.length === 0) {
             body.innerHTML = `
                 <div class="om-empty">
-                    <p data-i18n="requestListEmpty">${t('requestListEmpty')}</p>
-                    <p class="om-hint" data-i18n="requestListHint">${t('requestListHint')}</p>
+                    <p data-i18n="requestListEmpty">${LanguageManager.t('requestListEmpty')}</p>
+                    <p class="om-hint" data-i18n="requestListHint">${LanguageManager.t('requestListHint')}</p>
                 </div>`;
             footer.innerHTML = '';
             return;
@@ -223,8 +215,8 @@ const RequestModule = (() => {
                             <span class="om-item-date">${_esc(item.date)} - ${_esc(item.station)}</span>
                         </div>
                         <button class="om-remove-btn"
-                            title="${t('requestRemove')}"
-                            aria-label="${t('requestRemove')}: ${_esc(item.label)}"
+                            title="${LanguageManager.t('requestRemove')}"
+                            aria-label="${LanguageManager.t('requestRemove')}: ${_esc(item.label)}"
                             onclick="RequestModule.removeItem('${item.id}','${item.sport}')">✕</button>
                     </li>
                 `).join('')}
@@ -233,19 +225,19 @@ const RequestModule = (() => {
         footer.innerHTML = `
             <div class="om-footer-top">
                 <a href="my-requests.html" class="om-my-requests-link">
-                    <span data-i18n="requestMyRequests">${t('requestMyRequests')}</span>
+                    <span data-i18n="requestMyRequests">${LanguageManager.t('requestMyRequests')}</span>
                 </a>
             </div>
             <div class="om-footer-info">
-                ${cart.length} <span data-i18n="requestItemsSelected">${t('requestItemsSelected')}</span>
+                ${cart.length} <span data-i18n="requestItemsSelected">${LanguageManager.t('requestItemsSelected')}</span>
             </div>
             <div class="om-footer-actions">
                 <button class="action-btn btn-ghost"
                     data-i18n="requestClear"
-                    onclick="RequestModule.clearCart()">${t('requestClear')}</button>
+                    onclick="RequestModule.clearCart()">${LanguageManager.t('requestClear')}</button>
                 <button class="action-btn btn-primary"
                     onclick="RequestModule.openCheckout()">
-                    <span data-i18n="requestSubmit">${t('requestSubmit')}</span> →
+                    <span data-i18n="requestSubmit">${LanguageManager.t('requestSubmit')}</span> →
                 </button>
             </div>`;
     }
@@ -255,7 +247,7 @@ const RequestModule = (() => {
     // ══════════════════════════════════════════════════════════
     API.openCheckout = function () {
         if (cart.length === 0) {
-            Utils.showNotification(t('requestCartEmpty'), 'warning');
+            Utils.showNotification(LanguageManager.t('requestCartEmpty'), 'warning');
             return;
         }
         if (user) { _renderContactStep(); return; }
@@ -269,9 +261,9 @@ const RequestModule = (() => {
         body.innerHTML = `
             <div class="om-step">
                 <div class="om-step-title">
-                    1 / 2 — <span data-i18n="requestStepLogin">${t('requestStepLogin')}</span>
+                    1 / 2 — <span data-i18n="requestStepLogin">${LanguageManager.t('requestStepLogin')}</span>
                 </div>
-                <p class="om-step-desc" data-i18n="requestLoginDesc">${t('requestLoginDesc')}</p>
+                <p class="om-step-desc" data-i18n="requestLoginDesc">${LanguageManager.t('requestLoginDesc')}</p>
                 <div class="om-oauth-buttons">
                     <button class="om-oauth-btn om-google" id="om-login-google">
                         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
@@ -280,7 +272,7 @@ const RequestModule = (() => {
                             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         </svg>
-                        <span data-i18n="requestLoginGoogle">${t('requestLoginGoogle')}</span>
+                        <span data-i18n="requestLoginGoogle">${LanguageManager.t('requestLoginGoogle')}</span>
                     </button>
                 </div>
             </div>`;
@@ -288,7 +280,7 @@ const RequestModule = (() => {
         footer.innerHTML = `
             <button class="action-btn btn-ghost"
                 data-i18n="requestBack"
-                onclick="RequestModule._backToCart()">← ${t('requestBack')}</button>`;
+                onclick="RequestModule._backToCart()">← ${LanguageManager.t('requestBack')}</button>`;
 
         document.getElementById('om-login-google')
             .addEventListener('click', () => _loginGoogle());
@@ -304,7 +296,7 @@ const RequestModule = (() => {
         body.innerHTML = `
             <div class="om-step">
                 <div class="om-step-title">
-                    2 / 2 — <span data-i18n="requestStepContact">${t('requestStepContact')}</span>
+                    2 / 2 — <span data-i18n="requestStepContact">${LanguageManager.t('requestStepContact')}</span>
                 </div>
                 <div class="om-user-info">
                     <img src="${_esc(user.picture || '')}" class="om-avatar"
@@ -315,9 +307,9 @@ const RequestModule = (() => {
                         <small>${_esc(user.email)}</small>
                     </div>
                 </div>
-                <p class="om-step-desc" data-i18n="requestContactDesc">${t('requestContactDesc')}</p>
+                <p class="om-step-desc" data-i18n="requestContactDesc">${LanguageManager.t('requestContactDesc')}</p>
 
-                <div class="om-contact-selector" role="group" aria-label="${t('requestContactChannel')}">
+                <div class="om-contact-selector" role="group" aria-label="${LanguageManager.t('requestContactChannel')}">
                     <label class="om-contact-opt" data-channel="email">
                         <input type="radio" name="om-channel" value="email">E-mail
                     </label>
@@ -336,14 +328,14 @@ const RequestModule = (() => {
                 </div>
 
                 <div id="om-contact-input-wrap" class="om-contact-input-wrap" style="display:none">
-                    <label id="om-contact-label" for="om-contact-value">${t('requestContactLabel')}</label>
+                    <label id="om-contact-label" for="om-contact-value">${LanguageManager.t('requestContactLabel')}</label>
                     <input id="om-contact-value" class="om-input" type="text" placeholder="">
                 </div>
                 <div class="om-contact-input-wrap">
-                    <label for="om-notes" data-i18n="requestNotesLabel">${t('requestNotesLabel')}</label>
+                    <label for="om-notes" data-i18n="requestNotesLabel">${LanguageManager.t('requestNotesLabel')}</label>
                     <textarea id="om-notes" class="om-input om-textarea"
                         data-i18n-placeholder="requestNotesPlaceholder"
-                        placeholder="${t('requestNotesPlaceholder')}"></textarea>
+                        placeholder="${LanguageManager.t('requestNotesPlaceholder')}"></textarea>
                 </div>
             </div>`;
 
@@ -351,9 +343,9 @@ const RequestModule = (() => {
             <div class="om-footer-actions">
                 <button class="action-btn btn-ghost"
                     data-i18n="requestBack"
-                    onclick="RequestModule._backToCart()">← ${t('requestBack')}</button>
+                    onclick="RequestModule._backToCart()">← ${LanguageManager.t('requestBack')}</button>
                 <button class="action-btn btn-primary" id="om-submit-btn">
-                    <span data-i18n="requestSend">${t('requestSend')}</span>
+                    <span data-i18n="requestSend">${LanguageManager.t('requestSend')}</span>
                 </button>
             </div>`;
 
@@ -403,13 +395,13 @@ const RequestModule = (() => {
         const notes   = document.getElementById('om-notes')?.value?.trim();
 
         if (!channel || !contact) {
-            Utils.showNotification(t('requestFillContact'), 'warning');
+            Utils.showNotification(LanguageManager.t('requestFillContact'), 'warning');
             return;
         }
 
         const btn = document.getElementById('om-submit-btn');
         btn.disabled    = true;
-        btn.textContent = t('requestSending');
+        btn.textContent = LanguageManager.t('requestSending');
 
         try {
             const res = await fetch(`${CFG.apiBase}/orders`, {
@@ -428,9 +420,9 @@ const RequestModule = (() => {
             _renderSuccessStep(data.orderId);
             API.clearCartEndOrder();
         } catch (err) {
-            Utils.showNotification(`${t('requestError')}: ${err.message}`, 'error');
+            Utils.showNotification(`${LanguageManager.t('requestError')}: ${err.message}`, 'error');
             btn.disabled    = false;
-            btn.textContent = `${t('requestSend')}`;
+            btn.textContent = `${LanguageManager.t('requestSend')}`;
         }
     }
 
@@ -439,14 +431,14 @@ const RequestModule = (() => {
         const footer = document.getElementById('om-panel-footer');
         body.innerHTML = `
             <div class="om-step om-success">
-                <h3 data-i18n="requestSuccessTitle">${t('requestSuccessTitle')}</h3>
-                <p>${t('requestSuccessId')} <strong>#${_esc(String(requestId))}</strong></p>
-                <p class="om-hint" data-i18n="requestSuccessHint">${t('requestSuccessHint')}</p>
+                <h3 data-i18n="requestSuccessTitle">${LanguageManager.t('requestSuccessTitle')}</h3>
+                <p>${LanguageManager.t('requestSuccessId')} <strong>#${_esc(String(requestId))}</strong></p>
+                <p class="om-hint" data-i18n="requestSuccessHint">${LanguageManager.t('requestSuccessHint')}</p>
             </div>`;
         footer.innerHTML = `
             <button class="action-btn btn-primary"
                 data-i18n="requestClose"
-                onclick="RequestModule.closePanel()">${t('requestClose')}</button>`;
+                onclick="RequestModule.closePanel()">${LanguageManager.t('requestClose')}</button>`;
     }
 
     API._backToCart = function () { _renderCartList(); };
@@ -522,21 +514,21 @@ const RequestModule = (() => {
 
             const btn = document.createElement('button');
             btn.className = `om-add-btn${inCart ? ' om-added' : ''}`;
-            btn.title     = inCart ? t('requestAlreadyAdded') : t('requestAddBtn');
-            btn.setAttribute('aria-label', inCart ? t('requestAlreadyAdded') : t('requestAddBtn'));
-            btn.textContent = inCart ? `${t('requestAdded')}` : `${t('requestAddBtn')}`;
+            btn.title     = inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtn');
+            btn.setAttribute('aria-label', inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtn'));
+            btn.textContent = inCart ? `${LanguageManager.t('requestAdded')}` : `${LanguageManager.t('requestAddBtn')}`;
 
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const match = AppState?.matches?.find(m => String(m.ID) === String(id));
                 if (!match) return;
                 if (API.isInCart(match.ID, sport)) {
-                    Utils.showNotification(t('requestAlreadyInCart'), 'info');
+                    Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
                     return;
                 }
                 API.addItem(match);
-                btn.textContent = `${t('requestAdded')}`;
-                btn.title       = t('requestAlreadyAdded');
+                btn.textContent = `${LanguageManager.t('requestAdded')}`;
+                btn.title       = LanguageManager.t('requestAlreadyAdded');
                 btn.classList.add('om-added');
             });
 
@@ -552,7 +544,7 @@ const RequestModule = (() => {
             const id     = card?.dataset.matchId;
             const inCart = id ? API.isInCart(id, sport) : false;
             btn.classList.toggle('om-added', inCart);
-            btn.textContent = inCart ? `${t('requestAdded')}` : `+ ${t('requestAddBtn')}`;
+            btn.textContent = inCart ? `${LanguageManager.t('requestAdded')}` : `+ ${LanguageManager.t('requestAddBtn')}`;
         });
     }
 

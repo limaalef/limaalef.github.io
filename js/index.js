@@ -1,24 +1,3 @@
-/* ── helpers ── */
-function formatTimestamp(ts) {
-    if (!ts) return '';
-    try {
-        const d = new Date(ts + (ts.endsWith('Z') ? '' : 'Z'));
-        const pad = n => String(n).padStart(2, '0');
-        return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch { return ts.slice(0, 16).replace('T', ' '); }
-}
-
-function modeLabel(mode) {
-    const map = { football: 'modeFootball', multisport: 'modeMultisport', motorsport: 'modeMotorsport' };
-    return LanguageManager.t(map[mode] ?? 'modeFootball');
-}
-
-function escapeHtml(str) {
-    return String(str ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 /* ── render the 3 most recent sync groups ── */
 function renderRecentChanges(entries) {
     const groups = entries.slice(0, 3);
@@ -49,7 +28,7 @@ function renderRecentChanges(entries) {
         const itemsHtml = shown.map(c => `
             <div class="cl-group-item">
                 <div class="cl-dot ${c.action}"></div>
-                <span class="cl-item-desc">${escapeHtml(c.description || 'ID ' + c.id)}</span>
+                <span class="cl-item-desc">${Utils.escapeHtml(c.description || 'ID ' + c.id)}</span>
                 <span class="cl-item-badge ${c.action}">${LanguageManager.t('action' + c.action.charAt(0).toUpperCase() + c.action.slice(1))}</span>
             </div>`).join('');
 
@@ -61,7 +40,7 @@ function renderRecentChanges(entries) {
         <div class="cl-group">
             <div class="cl-group-header">
                 <div class="cl-group-pills">${pills || '<span class="pill pill-unchanged">0</span>'}</div>
-                <span class="cl-group-ts">${formatTimestamp(entry.timestamp)}</span>
+                <span class="cl-group-ts">${Utils.formatDateTime(entry.timestamp)}</span>
             </div>
             <div class="cl-group-items">
                 ${itemsHtml}
@@ -130,10 +109,10 @@ const TodayInHistory = {
                <span class="tih-score ${awayWinner ? 'winner' : ''}">${ga}</span>`
             : `<span class="tih-score-sep">vs</span>`;
 
-        const comp     = escapeHtml(item.Competição || '');
-        const fase     = escapeHtml(item.Fase       || '');
-        const home     = escapeHtml(item.Mandante   || '?');
-        const away     = escapeHtml(item.Visitante  || '?');
+        const comp     = Utils.escapeHtml(item.Competição || '');
+        const fase     = Utils.escapeHtml(item.Fase       || '');
+        const home     = Utils.escapeHtml(item.Mandante   || '?');
+        const away     = Utils.escapeHtml(item.Visitante  || '?');
         const homeLogo = item['Logo mandante']  ? `<img src="${item['Logo mandante']}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
         const awayLogo = item['Logo visitante'] ? `<img src="${item['Logo visitante']}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
 
@@ -366,8 +345,8 @@ function applyI18n() {
 }
 
 /* ── init ── */
-window.addEventListener('DOMContentLoaded', () => {
-    LanguageManager.init();
+window.addEventListener('DOMContentLoaded', async () => {
+    await window._headerPromise;
 
     document.getElementById('langToggle').addEventListener('click', () => {
         const newLang = LanguageManager.currentLang === 'pt-BR' ? 'en' : 'pt-BR';
