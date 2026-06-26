@@ -1,64 +1,271 @@
-header {
-    background-color: var(--accent-color);
-}
-
-.container {
-    max-width: 100%;
-    padding: 0rem;
-}
-
-.match-page {
-    margin: 0 auto;
-    padding: 0rem;
-}
-
-.header-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-.modal-header {
-    border-radius: 0rem !important;
-}
-
-.modal-body {
+.logo-title-header {
     max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.comp-logo {
+    width: var(--sp-9);
+    height: var(--sp-9);
+    object-fit: contain;
+}
+
+.modal-title-competition, .modal-title-phase {
+    text-align: left;
+}
+
+.me-body {
+    max-width: 1400px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 6fr 5fr;
 }
 
-.modal-body:not(:has(img)) {
-    max-width: 720px;
+/* ── Hero ── */
+.score-overlay {
+    background: var(--accent-color);
+    color: var(--text-accent-color);
+    padding: 16px 20px 20px;
+}
+
+@media (max-width: 768px) {
+    .me-body {
+        padding-bottom: 2rem;
+        display: block;
+    }
+}
+
+/* ========================================
+   MATCH ENRICHED PAGE
+   ======================================== */
+
+
+
+/* ── Body ── */
+.me-section {
+    padding: 1rem;
+}
+
+/* ── Forma recente ── */
+.me-form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
+}
+.me-form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.me-form-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    min-width: 80px;
+    font-weight: 500;
+}
+.me-form-badges {
+    display: flex;
+    gap: 5px;
+}
+.me-form-win,
+.me-form-loss,
+.me-form-draw {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--border-radius-size-circle);
+    font-size: 0;
+    font-weight: 700;
+}
+.me-form-win  { background: #6dff33; color: var(--text-success); }
+.me-form-loss { background: #ff2323; color: var(--text-error); }
+.me-form-draw { background: #585858; color: var(--text-tertiary); }
+
+/* ── Estatísticas ── */
+.me-stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0;
+}
+.me-stat-row {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 36px 1fr 36px;
+    align-items: center;
+    gap: 8px;
+    align-items: end;
 }
-
-.modal-image {
-    max-height: none;
-}
-
-.modal-title-competition,
-.modal-title-phase {
+.me-stat-value {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--text-primary);
     text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.me-stat-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.me-stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.2;
+}
+.me-stat-bar {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    display: flex;
+    overflow: hidden;
+    background: var(--border-color);
+}
+.me-stat-bar-home {
+    height: 100%;
+    border-radius: 2px 0 0 2px;
+    transition: width 0.4s ease;
 }
 
-.motor-event-accordion {
-    background-color: #ffffff00;
+.me-stat-bar-away {
+    height: 100%;
+    border-radius: 0 2px 2px 0;
+    transition: width 0.4s ease;
 }
 
-@media (max-width: 1080px) {
-    .modal-body {
-        grid-template-columns: 10fr 6fr;
+/* ── Escalação ── */
+.me-lineup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-xl);
+    overflow: hidden;
+}
+.me-lineup-col {
+    padding: 12px 14px;
+    background-color: var(--bg-secondary);
+}
+.me-lineup-col:first-child {
+    border-right: 1px solid var(--border-color);
+}
+
+/* Header do time na escalação (escudo + nome + formação) */
+.me-lineup-team-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.me-lineup-team-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.me-lineup-team-info {
+    flex: 1;
+    min-width: 0;
+}
+.me-lineup-team-name {
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.me-lineup-formation {
+    font-size: var(--font-size-sm);
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-top: 2px;
+}
+.me-lineup-coach {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: 1px;
+}
+
+.me-player-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+.me-player-row:last-child { border-bottom: none; }
+.me-player-num {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    min-width: 18px;
+    font-variant-numeric: tabular-nums;
+}
+.me-player-name { flex: 1; }
+.me-player-pos {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-align: right;
+}
+.me-player-row.sub { opacity: 0.55; }
+.me-lineup-sub-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 0 2px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* ── Tags de momentos marcantes ── */
+.me-tags-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.me-tag {
+    padding: 5px 14px;
+    border-radius: var(--border-radius-size-circle);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+}
+.me-tag.record   { background: var(--bg-warning);   color: var(--text-warning);   }
+.me-tag.historic { background: var(--bg-info);       color: var(--text-info);      }
+.me-tag.scorer   { background: var(--bg-success);    color: var(--text-success);   }
+.me-tag.default  { background: var(--bg-secondary);  color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+.me-obs {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-lg);
+}
+
+/* ── Responsivo ── */
+@media (max-width: 640px) {
+    .me-lineup-grid {
+        grid-template-columns: 1fr;
     }
-}
-
-@media (max-width: 840px) {
-    .modal-body {
-        display: flex;
-        flex-direction: column;
+    .me-lineup-col:first-child {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .modal-division {
-        margin-top: 0px;
+    .me-stat-row {
+        grid-template-columns: 28px 1fr 28px;
+        gap: 6px;
     }
 }

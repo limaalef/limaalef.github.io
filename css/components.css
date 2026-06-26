@@ -930,12 +930,13 @@ input[type="text"]:focus {
 
 .back-btn {
     border: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.45);
+    color: #ddd;
 }
 
 .back-btn:hover {
     border-color: var(--accent-color);
-    color: var(--accent-color);
-    transform: rotate(360deg);    
+    color: var(--accent-color);    
 }
 
 .close-btn {
@@ -1239,11 +1240,22 @@ input[type="text"]:focus {
 }
 
 /* Badges */
-.storage-badges {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    flex-wrap: wrap;
+.storage-badge {
+    padding: 6px 14px;
+    border-radius: var(--border-radius-size-md);
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    margin-right: var(--sp-2);
+}
+
+.storage-badge.badge-success {
+    background-color: var(--success-color);
+    color: var(--bg-primary)
+}
+
+.storage-badge.badge-info {
+    background-color: var(--info-color);
+    color: var(--bg-primary)
 }
 
 .badge {

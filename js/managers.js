@@ -9,7 +9,8 @@ const AppState = {
 
 const noFilterLogos = [
     "channel_logos/sbt.svg",
-    "channel_logos/record.svg"
+    "channel_logos/record.svg",
+    "channel_logos/fox_sports.svg"
 ];
 
 const PaginationManager = {
@@ -418,8 +419,8 @@ const MatchModal = {
             <div class="detail-section">
                 <div class="section-title modal-style">${storageTitle}</div>
                 <div class="storage-badges">
-                    ${match.Local ? `<span class="badge badge-success">💾 ${match.Local}</span>` : ''}
-                    ${match.Nuvem && match.Nuvem.toLowerCase() === 'nuvem' ? `<span class="badge badge-info">☁️ ${LanguageManager.t('cloud')}</span>` : ''}
+                    ${match.Local ? `<span class="storage-badge badge-success">${match.Local}</span>` : ''}
+                    ${match.Nuvem && match.Nuvem.toLowerCase() === 'nuvem' ? `<span class="storage-badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}
                     ${!match.Local && (!match.Nuvem || match.Nuvem.toLowerCase() !== 'nuvem') ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento registrado'}</span>` : ''}
                 </div>
             </div>
@@ -463,7 +464,7 @@ const MatchModal = {
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('id', id);
             urlParams.set('sport', sport);
-            const shareUrl = `${window.location.origin}/match.html?${urlParams.toString()}`;
+            const shareUrl = `${window.location.origin}/${sport === 'football' ? 'match.html' : 'event.html'}?${urlParams.toString()}`;
             navigator.clipboard.writeText(shareUrl).then(() => {
                 Utils.showNotification('Link copiado!', 'success');
             }).catch(() => {
@@ -495,16 +496,6 @@ const MatchModal = {
                     <p>${err.message}</p>
                 </div>`;
         }
-    },
-    copyShareLink(id) {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('id', id);
-        const shareUrl = `${window.location.origin}/match.html?${urlParams.toString()}`;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            Utils.showNotification('Link copiado!', 'success');
-        }).catch(() => {
-            Utils.showNotification('Erro ao copiar link', 'error');
-        });
     },
     close() {
         document.body.style.overflow = '';
@@ -622,8 +613,8 @@ const MotorModal = {
                     <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
                         <div class="storage-badges">
-                            ${evt.technical_details?.local ? `<span class="badge badge-success">💾 ${evt.technical_details.local}</span>` : ''}
-                            ${evt.technical_details?.cloud ? `<span class="badge badge-info">☁️ ${LanguageManager.t('cloud')}</span>` : ''}
+                            ${evt.technical_details?.local ? `<span class="badge badge-success">${evt.technical_details.local}</span>` : ''}
+                            ${evt.technical_details?.cloud ? `<span class="badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}
                             ${!evt.technical_details?.local && !evt.technical_details?.cloud ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento'}</span>` : ''}
                         </div>
                     </div>

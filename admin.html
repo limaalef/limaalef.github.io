@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <title>Admin | Sports Archive</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="css/theme.css">
@@ -449,7 +449,7 @@ async function openOrder(id) {
     document.getElementById('adm-modal-title').textContent = 'Carregando...';
     document.getElementById('modal-body').innerHTML = '<div class="adm-loading">Buscando pedido...</div>';
     document.getElementById('adm-modal').classList.add('active');
-    const res   = await fetch(`${ADM_CFG.apiBase}/orders/${id}`, { headers: { Authorization: `Bearer ${admToken}` } });
+    const res   = await fetch(`${ADM_CFG.apiBase}/orders/${id}/admin`, { headers: { Authorization: `Bearer ${admToken}` } });
     const order = await res.json();
     document.getElementById('adm-modal-title').textContent = order.id;
     document.getElementById('modal-body').innerHTML = buildOrderDetail(order);
@@ -506,7 +506,6 @@ function buildOrderDetail(o) {
 
         const linkRow = link
             ? `<div class="adm-item-link-row">
-                ${url ? `<a class="adm-item-link-url" href="${url}" target="_blank" rel="noopener">${url}</a>` : '<span class="adm-item-link-url" style="color:var(--text-tertiary)">sem URL</span>'}
                 <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
                 ${disabled ? '<span class="pill st-expired" style="font-size:var(--font-size-xs)">OFF</span>' : ''}
                 <button class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
@@ -515,29 +514,32 @@ function buildOrderDetail(o) {
                 </button>
                 <button class="action-btn btn-danger btn-xs" onclick="removeItemLink('${o.id}',${idx})">✕</button>
                </div>`
-            : `<div class="adm-item-no-link">Sem link — preencha abaixo e clique em Salvar</div>`;
+            : `<div class="adm-item-no-link">Sem link</div>`;
 
         return `
         <div class="adm-item" id="adm-item-${idx}">
-            <div class="adm-item-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
-            <div class="adm-item-meta">${esc(item.meta||'')}${item.date?' · '+esc(item.date):''}</div>
-            ${linkRow}
+            <div class="adm-item-header">
+                <div>
+                    <div class="adm-item-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
+                    <div class="adm-item-meta">${esc(item.meta||'')}${item.date?' · '+esc(item.date):''}</div>
+                </div>
+                <div>
+                    ${linkRow}
+                </div>
+            </div>
             <div class="detail-list" style="margin-top:var(--sp-3)">
                 <div class="detail-list-item">
                     <span class="detail-list-label">URL</span>
                     <span class="detail-list-value"><input class="adm-input adm-input-text" id="lnk-url-${idx}" placeholder="https://..." value="${esc(link?.url||'')}"></span>
                 </div>
                 <div class="detail-list-item">
-                    <span class="detail-list-label">Drive File ID</span>
-                    <span class="detail-list-value"><input class="adm-input adm-input-text" id="lnk-gdrive-${idx}" placeholder="1BxiMV..." value="${esc(link?.gdrive_id||'')}"></span>
-                </div>
-                <div class="detail-list-item">
                     <span class="detail-list-label">Expiração</span>
                     <span class="detail-list-value">
                         <select class="adm-input adm-input-select" id="lnk-expiry-${idx}">
+                            <option value="-1" selected>Nunca</option>
                             <option value="168">7 dias</option>
                             <option value="360">15 dias</option>
-                            <option value="720" selected>30 dias</option>
+                            <option value="720">30 dias</option>
                             <option value="1440">60 dias</option>
                             <option value="2160">90 dias</option>
                             <option value="0">Indefinidamente</option>

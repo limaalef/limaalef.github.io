@@ -2,38 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evento — Sports Archive</title>
-    <meta name="description" content="Confira os dados desta incrível partida.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Partida — Sports Archive</title>
+    <meta name="description" content="Detalhes completos da partida no arquivo esportivo pessoal.">
     <meta name="robots" content="noindex">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-    <!-- Meta Tags Básicas -->
-    <meta name="description" content="Confira os dados desta incrível partida.">
-    <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
     <meta name="author" content="@limaalef">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="http://archive.limaalef.com/">
-    <meta property="og:title" content="Sports Archive">
-    <meta property="og:description" content="Confira os dados desta incrível partida.">
-    <meta property="og:image" content="http://archive.limaalef.com/banner.png">
-    <meta property="og:image:width" content="763">
-    <meta property="og:image:height" content="241">
-    <meta property="og:site_name" content="Sports Archive">
-    <meta property="og:locale" content="pt_BR">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="http://archive.limaalef.com/">
-    <meta name="twitter:title" content="Sports Archive">
-    <meta name="twitter:description" content="Confira os dados desta incrível partida.">
-    <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
-    <meta name="twitter:creator" content="@limaalef">
-    <meta name="twitter:site" content="@limaalef">
-    
-    <!-- Favicon -->
+
     <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="shortcut icon" href="/icons/favicon.ico" />
@@ -42,9 +16,10 @@
 
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/event.css">
     <link rel="stylesheet" href="css/match.css">
 </head>
-<!-- Google tag (gtag.js) -->
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -52,16 +27,14 @@
     gtag('js', new Date());
     gtag('config', 'G-JJZTBEGJ91');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877"
-crossorigin="anonymous"></script>
+
 <body class="theme-football">
     <header>
         <div class="header-frame" id="header"
-            data-title="Match"
-            data-back="true"
-            '>        
+            data-title="Partida"
+            data-back="true">
         </div>
-        
+
         <div class="control-group">
             <button id="langToggle" class="lang-btn" style="display: none;"
                     title="Change language / Mudar idioma">
@@ -71,18 +44,88 @@ crossorigin="anonymous"></script>
     </header>
 
     <div class="container">
-        <div class="match-page">
-            <div id="matchPageContent">
-                <div class="state-box">
-                    <div class="icon">⏳</div>
-                    <h2 data-i18n="loading">Carregando...</h2>
+
+        <!-- Loading state -->
+        <div id="matchEnrichedLoading">
+            <div class="state-box">
+                <div class="icon">⏳</div>
+                <h2>Carregando partida...</h2>
+            </div>
+        </div>
+
+        <!-- Erro -->
+        <div id="matchEnrichedError" style="display:none;">
+            <div class="state-box">
+                <div class="icon">❌</div>
+                <h2>Partida não encontrada</h2>
+                <p>Verifique o ID na URL e tente novamente.</p>
+            </div>
+        </div>
+
+        <!-- Conteúdo -->
+        <div id="matchEnrichedContent" style="display:none;">
+
+            <!-- ── HERO: carousel de imagens + placar ── -->
+            <div class="me-hero" id="meHero"></div>
+
+            <!-- ── SEÇÕES ── -->
+            <div class="me-body" id="meBody">
+                <div class="modal-body" id="modalBody">
+                    <div id="image-carousel"></div>
+
+                    <!-- MATCH INFO -->
+                    <div class="modal-division">
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="tvInfo"></div>
+                            <div class="detail-list" id="meTvInfo"></div>
+                        </div>
+
+                        <div class="detail-section" id="meRefereeSection" style="display:none;">
+                            <div class="section-title modal-style" data-i18n="refereeInfo"></div>
+                            <div class="detail-list" id="meRefereeInfo"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="technicalInfo"></div>
+                            <div class="detail-grid" id="meTechInfo"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="storageInfo"></div>
+                            <div class="storage-badges" id="meStorageBadges"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="statistics"></div>
+                            <div class="me-stats-list" id="meStatisticsInfo"></div>
+                        </div>
+
+                    <!-- ESCALAÇÃO -->
+                    <div class="me-section" id="meLineupSection" style="display:none;">
+                        <div class="home-section-header">
+                            <div class="home-section-header-title">
+                                <div class="section-title modal-style" data-i18n="lineup"></div>
+                            </div>
+                        </div>
+                        <div class="me-lineup-grid" id="meLineupGrid"></div>
+                    </div>
+
+                    <!-- MOMENTOS MARCANTES (tags) -->
+                    <div class="detail-section" id="meTagsSection" style="display:none;">
+                        <div class="section-title modal-style" data-i18n="observations"></div>
+                        <div class="detail-item" style="grid-column: 1/-1;">
+                            <div class="detail-value" id="meObs"></div>
+                        </div>
+                        <div class="me-tags-wrap" id="meTagsList"></div>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- Footer -->
     <div id="footer"></div>
 
     <script src="js/config.js"></script>
