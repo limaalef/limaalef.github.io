@@ -299,6 +299,7 @@ const translations = {
         requestPaymentSummary:     'Resumo de pagamento',
 
         'República Tcheca': 'Tchéquia',
+        'Bósnia': 'Bósnia e Herzegovina',
     },
     'en': {
         'Copa São Paulo de Futebol Júnior': 'Under-20 Sao Paulo Cup',
@@ -698,6 +699,7 @@ const translations = {
         'Estados Unidos': 'United States',
         'Áustria': 'Austria',
         'Bélgica': 'Belgium',
+        'Bósnia': 'Bosnia and Herzegovina',
         'Bósnia e Herzegovina': 'Bosnia and Herzegovina',
         'Croácia': 'Croatia',
         'Tchéquia': 'Czechia',

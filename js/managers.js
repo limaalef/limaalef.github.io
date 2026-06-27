@@ -341,75 +341,74 @@ const MatchModal = {
             <div class="detail-section">
                 <div class="section-title modal-style">${matchInfoTitle}</div>
                 <div class="detail-list">
-                    <div class="detail-list-item">
+                    ${match.Data ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('date')}</span>
                         <span class="detail-list-value">${Utils.formatMatchDate(match.Data)}</span>
-                    </div>
-                    <div class="detail-list-item">
+                    </div>` : ''}
+                    ${competition ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('competition')}</span>
-                        <span class="detail-list-value">${competition || 'N/A'}</span>
-                    </div>
-                    <div class="detail-list-item">
+                        <span class="detail-list-value">${competition}</span>
+                    </div>` : ''}
+                    ${phase ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('phase')}</span>
-                        <span class="detail-list-value">${phase || 'N/A'}</span>
-                    </div>
-                    <div class="detail-list-item">
+                        <span class="detail-list-value">${phase}</span>
+                    </div>` : ''}
+                    ${match.Estadio ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('stadium')}</span>
-                        <span class="detail-list-value">${match.Estadio || 'N/A'}</span>
-                    </div>
-                    <div class="detail-list-item">
+                        <span class="detail-list-value">${match.Estadio}</span>
+                    </div>` : ''}
+                    ${match.Tipo ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('type')}</span>
-                        <span class="detail-list-value">${LanguageManager.translateText(match.Tipo) || 'N/A'}</span>
-                    </div>
+                        <span class="detail-list-value">${LanguageManager.translateText(match.Tipo)}</span>
+                    </div>` : ''}
                 </div>
             </div>
 
             <div class="detail-section">
                 <div class="section-title modal-style">${tvInfoTitle}</div>
                 <div class="detail-list">
-                    
-                    <div class="detail-list-item">
+                    ${match.Emissora ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('broadcaster')}</span>
-                        <span class="detail-list-value">${match.Emissora || 'N/A'}</span>
-                    </div>
-                    <div class="detail-list-item">
+                        <span class="detail-list-value">${match.Emissora}</span>
+                    </div>` : ''}
+                    ${match.Origem ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('origin')}</span>
-                        <span class="detail-list-value">${LanguageManager.translateText(match.Origem) || 'N/A'}</span>
-                    </div>
-                    <div class="detail-list-item">
+                        <span class="detail-list-value">${LanguageManager.translateText(match.Origem)}</span>
+                    </div>` : ''}
+                    ${match.Narração ? `<div class="detail-list-item">
                         <span class="detail-list-label">${LanguageManager.t('narration')}</span>
-                        <span class="detail-list-value">${match.Narração || 'N/A'}</span>
-                    </div>
+                        <span class="detail-list-value">${match.Narração}</span>
+                    </div>` : ''}
                 </div>                
             </div>
             
             <div class="detail-section">
                 <div class="section-title modal-style">${technicalInfoTitle}</div>
                 <div class="detail-grid technical">
-                    <div class="detail-item">
+                    ${match.ID ? `<div class="detail-item">
                         <div class="detail-label">ID</div>
-                        <div class="detail-value">${match.ID || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
+                        <div class="detail-value">${match.ID}</div>
+                    </div>` : ''}
+                    ${match.Qualidade ? `<div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('quality')}</div>
-                        <div class="detail-value">${match.Qualidade || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
+                        <div class="detail-value">${match.Qualidade}</div>
+                    </div>` : ''}
+                    ${audioFormat ? `<div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('audioFormat')}</div>
                         <div class="detail-value">${audioFormat}</div>
-                    </div>
-                    <div class="detail-item">
+                    </div>` : ''}
+                    ${match.Bitrate ? `<div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('bitrate')}</div>
-                        <div class="detail-value">${match.Bitrate ? match.Bitrate + ' Mbps' : 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
+                        <div class="detail-value">${match.Bitrate + ' Mbps'}</div>
+                    </div>` : ''}
+                    ${match.Duração ? `<div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('duration')}</div>
-                        <div class="detail-value">${match.Duração || 'N/A'}</div>
-                    </div>
-                    <div class="detail-item">
+                        <div class="detail-value">${match.Duração}</div>
+                    </div>` : ''}
+                    ${match.Tamanho ? `<div class="detail-item">
                         <div class="detail-label">${LanguageManager.t('fileSize')}</div>
                         <div class="detail-value">${Utils.formatSize(match.Tamanho)}</div>
-                    </div>
+                    </div>` : ''}
                 </div>
             </div>
             
@@ -562,48 +561,48 @@ const MotorModal = {
                    <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
                         <div class="detail-list">
-                            <div class="detail-list-item">
+                            ${evt.date ? `<div class="detail-list-item">
                                 <div class="detail-list-label">${LanguageManager.t('date')}</div>
                                 <div class="detail-list-value">${Utils.formatMatchDate(evt.date)}</div>
-                            </div>
-                            <div class="detail-list-item">
+                            </div>` : ''}
+                            ${evt.station?.name ? `<div class="detail-list-item">
                                 <div class="detail-list-label">${LanguageManager.t('broadcaster')}</div>
-                                <div class="detail-list-value">${evt.station?.name || 'N/A'}</div>
-                            </div>
-                            <div class="detail-list-item">
+                                <div class="detail-list-value">${evt.station?.name}</div>
+                            </div>` : ''}
+                            ${evt.station?.origem ? `<div class="detail-list-item">
                                 <div class="detail-list-label">${LanguageManager.t('origin')}</div>
-                                <div class="detail-list-value">${evt.station?.origem || 'N/A'}</div>
-                            </div>
-                            <div class="detail-list-item">
+                                <div class="detail-list-value">${evt.station?.origem}</div>
+                            </div>` : ''}
+                            ${evt.station?.narracao ? `<div class="detail-list-item">
                                 <div class="detail-label">${LanguageManager.t('narration')}</div>
-                                <div class="detail-value">${evt.station?.narracao || 'N/A'}</div>
-                            </div>
+                                <div class="detail-value">${evt.station?.narracao}</div>
+                            </div>` : ''}
                         </div>
                     </div>
                     
                     <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
                         <div class="detail-grid technical">
-                            <div class="detail-item">
+                            ${evt.technical_details?.video_quality ? `<div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('quality')}</div>
-                                <div class="detail-value">${evt.technical_details?.video_quality || 'N/A'}</div>
-                            </div>
-                            <div class="detail-item">
+                                <div class="detail-value">${evt.technical_details?.video_quality}</div>
+                            </div>` : ''}
+                            ${evt.technical_details?.audio_format ? `<div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('audioFormat')}</div>
-                                <div class="detail-value">${LanguageManager.translateText(evt.technical_details?.audio_format || 'N/A')}</div>
-                            </div>
-                            <div class="detail-item">
+                                <div class="detail-value">${LanguageManager.translateText(evt.technical_details?.audio_format)}</div>
+                            </div>` : ''}
+                            ${evt.technical_details?.video_bitrate ? `<div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('bitrate')}</div>
                                 <div class="detail-value">${evt.technical_details?.video_bitrate ? evt.technical_details.video_bitrate + ' Mbps' : 'N/A'}</div>
-                            </div>
-                            <div class="detail-item">
+                            </div>` : ''}
+                            ${evt.technical_details?.duration ? `<div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('duration')}</div>
-                                <div class="detail-value">${evt.technical_details?.duration || 'N/A'}</div>
-                            </div>
-                            <div class="detail-item">
+                                <div class="detail-value">${evt.technical_details?.duration}</div>
+                            </div>` : ''}
+                            ${evt.technical_details?.file_size ? `<div class="detail-item">
                                 <div class="detail-label">${LanguageManager.t('fileSize')}</div>
                                 <div class="detail-value">${Utils.formatSize(evt.technical_details?.file_size)}</div>
-                            </div>
+                            </div>` : ''}
                         </div>
                     </div>
                     

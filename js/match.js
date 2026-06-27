@@ -182,7 +182,7 @@ function renderTechInfo(match, divId) {
         { label: 'ID',               value: match.ID },
         { label: 'Qualidade',        value: match.Qualidade },
         { label: 'Formato de Áudio', value: match['Formato de áudio'] },
-        { label: 'Bitrate',          value: match.Bitrate },
+        { label: 'Bitrate',          value: (match.Bitrate + ' Mbps') },
         { label: 'Duração',          value: match.Duração },
         { label: 'Tamanho',          value: Utils.formatSize(match.Tamanho) },
     ].filter(i => i.value);
@@ -304,6 +304,8 @@ function renderStatistics(stats, detail) {
                 const total = hv + av;
                 const homePct = total > 0 ? Math.round((hv / total) * 100) : 50;
                 const hasBar  = !isNaN(hv) && !isNaN(av);
+
+                const equalZero = hv === 0 && av === 0
                 return `
                 <div class="me-stat-row">
                     <span class="me-stat-value">${s.home}</span>
@@ -311,8 +313,8 @@ function renderStatistics(stats, detail) {
                         <span class="me-stat-label">${s.label}</span>
                         ${hasBar ? `
                         <div class="me-stat-bar">
-                            <div class="me-stat-bar-home" style="background:${detail.homeTeam.colors?.primary};width:${homePct}%"></div>
-                            <div class="me-stat-bar-away" style="background:${detail.awayTeam.colors?.primary};width:${100 - homePct}%"></div>
+                            <div class="me-stat-bar-home" style="background:${equalZero ? 'var(--border-color)' : detail.homeTeam.colors?.primary};width:${homePct}%"></div>
+                            <div class="me-stat-bar-away" style="background:${equalZero ? 'var(--border-color)' : detail.awayTeam.colors?.primary};width:${100 - homePct}%"></div>
                         </div>` : ''}
                     </div>
                     <span class="me-stat-value">${s.away}</span>
@@ -338,7 +340,16 @@ function renderLineups(homeTeam, awayTeam) {
 
         const col = document.createElement('div');
         
-        if (color3 === color2 || color3 === '#000000') {
+        if (color2 === color1 || (color3 === color2 && color2 === '#000000')) {
+            col.style.backgroundImage = `
+                linear-gradient(
+                    to right,
+                    ${color1} 0%,
+                    ${color1} 100%
+                )
+            `;
+        }
+        else if (color3 === color2 || color3 === '#000000') {
             col.style.backgroundImage = `
                 linear-gradient(
                     to right,
@@ -346,15 +357,6 @@ function renderLineups(homeTeam, awayTeam) {
                     ${color1} 50%,
                     ${color2} 50%,
                     ${color2} 100%
-                )
-            `;
-        }
-        else if (color2 === color1 || color2 === '#000000') {
-            col.style.backgroundImage = `
-                linear-gradient(
-                    to right,
-                    ${color1} 0%,
-                    ${color1} 100%
                 )
             `;
         }
