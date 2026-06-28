@@ -6,15 +6,11 @@
     <title>Assistir — Sports Archive</title>
     <meta name="description" content="Assista a jogos completos com qualidade direto do meu arquivo pessoal.">
     <meta name="robots" content="noindex">
-    
-    <!-- Meta Tags Básicas -->
-    <meta name="description" content="Assista a jogos completos com qualidade direto do meu arquivo pessoal.">
-    <meta name="keywords" content="assistir jogo, futebol ao vivo, esportes, vídeo">
     <meta name="author" content="@limaalef">
-    
-    <!-- Open Graph / Facebook -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="video.other">
-    <meta property="og:url" content="http://archive.limaalef.com/watch">
+    <meta property="og:url" content="http://archive.limaalef.com/watch" id="og-url">
     <meta property="og:title" content="Assistir jogo - Sports Archive" id="og-title">
     <meta property="og:description" content="Assista a jogos completos com qualidade direto do meu arquivo pessoal." id="og-description">
     <meta property="og:image" content="http://archive.limaalef.com/banner.png" id="og-image">
@@ -22,7 +18,7 @@
     <meta property="og:image:height" content="241">
     <meta property="og:site_name" content="Sports Archive">
     <meta property="og:locale" content="pt_BR">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="player">
     <meta name="twitter:url" content="http://archive.limaalef.com/watch" id="twitter-url">
@@ -31,8 +27,7 @@
     <meta name="twitter:image" content="http://archive.limaalef.com/banner.png" id="twitter-image">
     <meta name="twitter:creator" content="@limaalef">
     <meta name="twitter:site" content="@limaalef">
-    
-    <!-- Favicon -->    
+
     <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="shortcut icon" href="/icons/favicon.ico" />
@@ -41,233 +36,145 @@
 
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/match.css">
     <link rel="stylesheet" href="css/watch.css">
 </head>
-<!-- Google tag (gtag.js) -->
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-JJZTBEGJ91');
 </script>
+
 <body>
     <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="index.html">
-                    <img src="logo.png" alt="Logo" class="site-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="site-logo" style="display: none;">🏆</div>
-                </a>
-            </div>
-            
-            <div class="header-options">
-                <div class="sport-selector">
-                    <button class="sport-btn" onclick="window.location.href='index.html'">
-                        ⬅️ <span data-i18n="backToCollection">Voltar para Coleção</span>
-                    </button>
-                </div>
+        <div class="header-frame" id="header"
+            data-title="Assistir"
+            data-back="true">
+        </div>
 
-                <div class="control-group">
-                    <button id="langToggle" class="lang-btn" style="padding: 10px 14px;" title="Change language / Mudar idioma">
-                        <span id="langFlag">🇧🇷</span>
-                    </button>
-                </div>
-            </div>
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display: none;"
+                    title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
         </div>
     </header>
-    
-    <div class="watch-container">
-        <!-- Match Header -->
-        <div class="match-info-header">
-            <div class="match-meta">
-                <div class="stadium-info">
-                    <span class="stadium-icon">🏟️</span>
-                    <span id="stadium">-</span>
-                </div>
-                <div class="match-round" id="round">-</div>
-                <div class="match-datetime">
-                    <span class="date-icon">📅</span>
-                    <span id="matchDate">-</span>
-                    <span class="time-icon">🕐</span>
-                    <span id="matchTime">-</span>
-                </div>
-            </div>
-            
-            <div class="match-competition">
-                <div class="competition-badge" id="competition">-</div>
-            </div>
-            
-            <div class="match-score-header">
-                <div class="team-score home">
-                    <div class="team-info">
-                        <div class="team-name" id="homeTeam">-</div>
-                        <span class="team-score-value-inline" id="homeScore-inline">-</span>
-                    </div>
-                    <img src="" alt="" class="team-logo-large" id="homeLogo" style="display: none;">
-                </div>
-                
-                <div class="score-separator">
-                    <div class="team-score-value" id="homeScore">-</div>
-                    <div class="vs-text">X</div>
-                    <div class="team-score-value" id="awayScore">-</div>
-                </div>
-                
-                <div class="team-score away">
-                    <div class="team-info">
-                        <div class="team-name" id="awayTeam">-</div>
-                        <span class="team-score-value-inline" id="awayScore-inline">-</span>
-                    </div>
-                    <img src="" alt="" class="team-logo-large" id="awayLogo" style="display: none;">
-                </div>
+
+    <div class="container">
+
+        <!-- Loading -->
+        <div id="watchLoading">
+            <div class="state-box">
+                <div class="icon">⏳</div>
+                <h2>Carregando partida...</h2>
             </div>
         </div>
 
-        <!-- Video Player Section -->
-        <div class="video-section">
-            <div class="lineup-column home-lineup">
-                <h3 class="lineup-title">
-                    <span class="lineup-icon">👕</span>
-                    <span data-i18n="homeLineup">Escalação Mandante</span>
-                </h3>
-                <div class="lineup-list" id="homeLineup">
-                    <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary);">
-                        <div style="font-size: 2em; margin-bottom: 10px;">⚽</div>
-                        <div style="font-size: 0.9em;">Carregando...</div>
-                    </div>
-                </div>
+        <!-- Erro -->
+        <div id="watchError" style="display:none;">
+            <div class="state-box">
+                <div class="icon">❌</div>
+                <h2>Partida não encontrada</h2>
+                <p>Verifique o ID na URL e tente novamente.</p>
             </div>
-            
-            <div class="video-player">
-                <div class="video-container-watch">
-                    <iframe 
-                        id="videoPlayer"
-                        src="" 
-                        frameborder="0" 
-                        allowfullscreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        style="display: none;"
-                    ></iframe>
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary);">
-                        <div style="text-align: center; color: var(--text-secondary);">
-                            <div style="font-size: 4em; margin-bottom: 20px;">⚽</div>
-                            <div style="font-size: 1.2em; font-weight: 600;">Carregando vídeo...</div>
+        </div>
+
+        <!-- Conteúdo -->
+        <div id="watchContent" style="display:none;">
+
+            <!-- Hero: mesmo padrão do match -->
+            <div class="me-hero" id="watchHero"></div>
+
+            <!-- Vídeo + Escalações -->
+            <div class="watch-video-section">
+
+                <div class="me-lineup-col watch-lineup-col" id="watchHomeLineup">
+                    <div class="me-lineup-team-header">
+                        <div class="me-lineup-team-info">
+                            <div class="me-lineup-team-name" id="watchHomeTeamName">—</div>
+                            <div class="me-lineup-formation" id="watchHomeFormation"></div>
+                        </div>
+                    </div>
+                    <div id="watchHomeLineupList"></div>
+                </div>
+
+                <div class="watch-player-wrap">
+                    <div class="video-container-watch">
+                        <iframe
+                            id="videoPlayer"
+                            src=""
+                            frameborder="0"
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            style="display:none;">
+                        </iframe>
+                        <div id="videoPlaceholder" class="watch-video-placeholder">
+                            <div class="icon">🎥</div>
+                            <div data-i18n="videoUnavailable">Vídeo não disponível</div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="lineup-column away-lineup">
-                <h3 class="lineup-title">
-                    <span class="lineup-icon">👕</span>
-                    <span data-i18n="awayLineup">Escalação Visitante</span>
-                </h3>
-                <div class="lineup-list" id="awayLineup">
-                    <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary);">
-                        <div style="font-size: 2em; margin-bottom: 10px;">⚽</div>
-                        <div style="font-size: 0.9em;">Carregando...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Match Details -->
-        <div class="match-details">
-            <div class="details-tabs">
-                <button class="tab-btn active" data-tab="technical">
-                    <span data-i18n="technicalInfo">Especificações Técnicas</span>
-                </button>
-                <button class="tab-btn" data-tab="stats">
-                    <span data-i18n="matchStats">Estatísticas</span>
-                </button>
-                <button class="tab-btn" data-tab="highlights">
-                    <span data-i18n="highlights">Destaques</span>
-                </button>
-                <button class="tab-btn" data-tab="commentary">
-                    <span data-i18n="commentary">Narração</span>
-                </button>
-            </div>
-
-            <div class="tab-content active" id="technical">
-                <div class="detail-grid-watch">
-                    <div class="detail-card">
-                        <div class="detail-icon">📺</div>
-                        <div class="detail-label" data-i18n="broadcaster">Emissora</div>
-                        <div class="detail-value">-</div>
+                <div class="me-lineup-col watch-lineup-col" id="watchAwayLineup">
+                    <div class="me-lineup-team-header">
+                        <div class="me-lineup-team-info">
+                            <div class="me-lineup-team-name" id="watchAwayTeamName">—</div>
+                            <div class="me-lineup-formation" id="watchAwayFormation"></div>
+                        </div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">🎙️</div>
-                        <div class="detail-label" data-i18n="narration">Narração</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">🎬</div>
-                        <div class="detail-label" data-i18n="quality">Qualidade</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">🔊</div>
-                        <div class="detail-label" data-i18n="audioFormat">Áudio</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">⏱️</div>
-                        <div class="detail-label" data-i18n="duration">Duração</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">💾</div>
-                        <div class="detail-label" data-i18n="fileSize">Tamanho</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">📊</div>
-                        <div class="detail-label" data-i18n="bitrate">Bitrate</div>
-                        <div class="detail-value">-</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-icon">🗄️</div>
-                        <div class="detail-label" data-i18n="storage">Armazenamento</div>
-                        <div class="detail-value">-</div>
-                    </div>
+                    <div id="watchAwayLineupList"></div>
                 </div>
             </div>
 
-            <div class="tab-content" id="stats">
-                <div class="stats-grid">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 3em; margin-bottom: 15px;">📊</div>
-                        <div style="font-size: 1.1em; font-weight: 600;">Carregando estatísticas...</div>
+            <!-- Informações abaixo do player: duas colunas iguais -->
+            <div class="me-body watch-info-body" id="watchBody">
+
+                <div class="modal-body">
+                    <div class="modal-division">
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="tvInfo"></div>
+                            <div class="detail-list" id="watchTvInfo"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="technicalInfo"></div>
+                            <div class="detail-list" id="watchTechInfo"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="section-title modal-style" data-i18n="storageInfo"></div>
+                            <div class="storage-badges" id="meStorageBadges"></div>
+                        </div>
                     </div>
                 </div>
+
+                <div>
+                    <div class="me-section" id="mePlaysSection" style="display:none;">
+                        <div class="section-title modal-style" data-i18n="plays"></div>
+                        <div class="detail-list plays-list" id="mePlaysList"></div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="section-title modal-style" data-i18n="statistics"></div>
+                        <div class="detail-list me-stats-list" id="meStatisticsInfo"></div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="tab-content" id="highlights">
-                <div class="highlights-list">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 3em; margin-bottom: 15px;">⚽</div>
-                        <div style="font-size: 1.1em; font-weight: 600;">Carregando destaques...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="commentary">
-                <div class="commentary-info">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary); grid-column: 1/-1;">
-                        <div style="font-size: 3em; margin-bottom: 15px;">🎙️</div>
-                        <div style="font-size: 1.1em; font-weight: 600;">Carregando informações...</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <div id="footer"></div>
 
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
     <script src="js/watch.js"></script>
 </body>
 </html>
