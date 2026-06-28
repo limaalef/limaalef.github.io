@@ -29,6 +29,7 @@ const translations = {
         withVideo: 'Com vídeo',
         watchMatch: 'Assistir jogo',
         watchEvent: 'Assistir evento',
+        seeStats: 'Ver estatísticas',
         search: 'Buscar...',
         cards: 'Cartões',
         list: 'Lista',
@@ -130,7 +131,7 @@ const translations = {
         tackle:             'Desarmes',
         defense:            'Defesas do goleiro',
         totalPasses:        'Passes totais',
-        rightPasses:        'Passes certos',
+        rightPasses:        'Passes certos (%)',
         wrongPasses:        'Passes errados',
         penaltyReceived:    'Pênaltis sofridos',
 
@@ -399,6 +400,7 @@ const translations = {
         withVideo: 'With video',
         watchMatch: 'Watch Match',
         watchEvent: 'Watch Event',
+        seeStats: 'Statistics',
         search: 'Search...',
         cards: 'Cards',
         list: 'List',
@@ -505,7 +507,7 @@ const translations = {
         tackle:             'Tackles',
         defense:            'Goalkeeper saves',
         totalPasses:        'Total passes',
-        rightPasses:        'Completed passes',
+        rightPasses:        'Completed passes (%)',
         wrongPasses:        'Incompleted passes',
         penaltyReceived:    'Penalties received',
         // ── index.js ──

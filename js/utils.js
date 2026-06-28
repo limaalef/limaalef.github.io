@@ -202,6 +202,17 @@ const Utils = {
     sectionStateHtml(icon, message) {
         return `<div class="section-state"><div class="icon">${icon}</div><p>${message}</p></div>`;
     },
+
+    setDetailList(list) {
+        const items = list.filter(i => i.value);
+
+        return items.map(i => `
+            <div class="detail-list-item">
+                <div class="detail-list-label">${LanguageManager.t(i.label)}</div>
+                <div class="detail-list-value">${i.value}</div>
+            </div>
+        `).join('');
+    }
 };
 
 LanguageManager.init()

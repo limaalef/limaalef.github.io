@@ -98,6 +98,7 @@ const APIService = {
                 Eventos: item.events || [],
                 'Logo emissora': item.main_station_logo || '',
                 'Video Embed': item.embed_video || '',
+                'Mais dados': !!item.match_data,
                 type: item.type || ''
             }));
         }
@@ -128,6 +129,7 @@ const APIService = {
             Bitrate: item.technical_details?.video_bitrate || '',
             'Formato de áudio': item.technical_details?.audio_format || '2.0',
             'Video Embed': item.embed_video || '',
+            'Mais dados': !!item.match_data,
             Tipo: item.type || ''
         }));
     }

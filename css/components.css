@@ -1270,29 +1270,44 @@ input[type="text"]:focus {
 .badge-warning { border: 1px solid var(--warning-color); color: var(--warning-color); }
 
 /* Botão Assistir Partida */
-.watch-button-container {
-    text-align: center;
-    margin-top: 10px;
+.score-header-buttons {
+    margin: 0 -20px -20px -20px;
+    display: grid;
+    grid-template-columns: auto;
+    grid-auto-flow: column;
+}
+
+.score-button {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-5);
+    padding: 6px 12px;
+    text-decoration: none;
+    transition: all 0.5s ease;
+    font-weight: 700;
+    font-size: var(--font-size-md);
+}
+
+.see-stats-button {
+    color: var(--text-accent-color);
 }
 
 .watch-match-button {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-5);
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    color: #000;
-    padding: 6px 12px;
-    border-radius: var(--border-radius-size-xl);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 700;
-    font-size: 0.55em;
+    background: var(--accent-color);
+    color: var(--text-accent-color);
 }
 
-.watch-match-button:hover {
-    transform: translateY(-3px) scale(1.03);
+.score-button.watch-match-button:hover {
     box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
     background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
+    color: #000;
+}
+
+.score-button.see-stats-button:hover {
+    background: var(--text-accent-color);
+    color: var(--accent-color);
 }
 
 /* ========================================

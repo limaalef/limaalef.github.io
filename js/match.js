@@ -19,25 +19,6 @@ const TAG_RULES = [
 ];
 
 // Mapa de chaves de estatística → label PT
-const STATS_LABELS = {
-    ballPossession:     'Posse de bola (%)',
-    goalFinish:         'Finalizações no gol',
-    wrongFinish:        'Finalizações para fora',
-    blockedFinish:      'Finalizações bloqueadas',
-    ballOnThePost:      'Na trave',
-    cornerKick:         'Escanteios',
-    foulMade:           'Faltas',
-    offSide:            'Impedimentos',
-    yellowCardReceived: 'Cartões amarelos',
-    redCardReceived:    'Cartões vermelhos',
-    tackle:             'Desarmes',
-    defense:            'Defesas do goleiro',
-    totalPasses:        'Passes totais',
-    rightPasses:        'Passes certos',
-    wrongPasses:        'Passes errados',
-    penaltyReceived:    'Pênaltis sofridos',
-};
-
 const STATS_ORDER = [
     'ballPossession', 'goalFinish', 'wrongFinish', 'blockedFinish',
     'ballOnThePost', 'cornerKick', 'foulMade', 'offSide',
@@ -52,6 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(location.search);
     const id    = params.get('id');
     const sport = params.get('sport') || 'football';
+
+    Utils.applySportTheme(sport);
 
     if (!id) { showError(); return; }
 
@@ -165,35 +148,25 @@ function renderImages(match) {
 function renderTvInfo(match, divId) {
     const rows = [
         { label: 'broadcaster', value: match.Emissora               || 'N/A' },
-        { label: 'narration', value: match.Narração                 || 'N/A' },
-        { label: 'origin',   value: LanguageManager.t(match.Origem) || 'N/A' },
-        { label: 'type',     value: LanguageManager.t(match.Tipo)   || 'N/A' },
-    ].filter(r => r.value && r.value !== '—');
+        { label: 'narration',   value: match.Narração                 || 'N/A' },
+        { label: 'origin',      value: LanguageManager.t(match.Origem) || 'N/A' },
+        { label: 'type',        value: LanguageManager.t(match.Tipo)   || 'N/A' },
+    ];
 
-    document.getElementById(divId).innerHTML = rows.map(r => `
-        <div class="detail-list-item">
-            <span class="detail-list-label">${LanguageManager.t(r.label)}</span>
-            <span class="detail-list-value">${r.value}</span>
-        </div>
-    `).join('');
+    document.getElementById(divId).innerHTML = Utils.setDetailList(rows);
 }
 
 function renderTechInfo(match, divId) {
     const items = [
-        { label: 'ID',               value: match.ID },
-        { label: 'Qualidade',        value: match.Qualidade },
-        { label: 'Formato de Áudio', value: match['Formato de áudio'] },
-        { label: 'Bitrate',          value: (match.Bitrate + ' Mbps') },
-        { label: 'Duração',          value: match.Duração },
-        { label: 'Tamanho',          value: Utils.formatSize(match.Tamanho) },
-    ].filter(i => i.value);
+        { label: 'ID',          value: match.ID },
+        { label: 'quality',     value: match.Qualidade },
+        { label: 'audioFormat', value: match['Formato de áudio'] },
+        { label: 'bitrate',     value: (match.Bitrate + ' Mbps') },
+        { label: 'duration',    value: match.Duração },
+        { label: 'fileSize',    value: Utils.formatSize(match.Tamanho) },
+    ];
 
-    document.getElementById(divId).innerHTML = items.map(i => `
-        <div class="detail-list-item">
-            <div class="detail-list-label">${i.label}</div>
-            <div class="detail-list-value">${i.value}</div>
-        </div>
-    `).join('');
+    document.getElementById(divId).innerHTML = Utils.setDetailList(items);
 }
 
 function renderStorage(match, divId) {
@@ -221,20 +194,15 @@ function renderObsAndTags(match) {
 
 function renderMatchInfo(detail) {
     const rows = [
-        detail.referees?.referee ?            { label: LanguageManager.t('referee'),       value: detail.referees.referee                } : null,
-        detail.referees?.assistants?.length ? { label: LanguageManager.t('refereeAssis'),  value: detail.referees.assistants.join(' · ') } : null,
-        detail.referees?.fourth_official ?    { label: LanguageManager.t('refereeFourth'), value: detail.referees.fourth_official       } : null,
-    ].filter(Boolean);
-
-    if (!rows.length) return;
+        detail.referees?.referee ?            { label: 'referee',       value: detail.referees.referee                } : null,
+        detail.referees?.assistants?.length ? { label: 'refereeAssis',  value: detail.referees.assistants.join(' · ') } : null,
+        detail.referees?.fourth_official ?    { label: 'refereeFourth', value: detail.referees.fourth_official       } : null,
+    ];
 
     document.getElementById('meRefereeSection').style.display = 'block'
-    document.getElementById('meRefereeInfo').innerHTML = rows.map(r => `
-        <div class="detail-list-item">
-            <div class="detail-list-label">${r.label}</div>
-            <div class="detail-list-value">${r.value}</div>
-        </div>
-    `).join('');
+    document.getElementById('meRefereeInfo').innerHTML = Utils.setDetailList(rows);
+
+    if (!rows.length) return;
 
     const row = document.querySelector(".score-date-row");
 
@@ -299,26 +267,46 @@ function renderStatistics(stats, detail) {
 
     if (!rows.length) return;
 
-    document.getElementById('meStatisticsInfo').innerHTML = rows.map(s => {
+    const statsList = document.getElementById('meStatisticsInfo');
+
+    const homeColor = detail.homeTeam.colors.primary
+    const homeName = detail.homeTeam.name
+    const awayColor = detail.awayTeam.colors.primary
+    const awayName = detail.awayTeam.name
+
+    statsList.innerHTML = getTeamHeaderList(detail)
+    
+    statsList.innerHTML += rows
+        .filter(s => !(parseFloat(s.home) === 0 && parseFloat(s.away) === 0))
+        .map(s => {
                 const hv = parseFloat(s.home);
                 const av = parseFloat(s.away);
                 const total = hv + av;
                 const homePct = total > 0 ? Math.round((hv / total) * 100) : 50;
                 const hasBar  = !isNaN(hv) && !isNaN(av);
+                let percentSignal = '';
+
+                if (s.label.includes(" (%)")) {
+                    s.label = s.label.replace(" (%)", "");
+                    percentSignal = "%"
+                }
 
                 const equalZero = hv === 0 && av === 0
                 return `
                 <div class="me-stat-row">
-                    <span class="me-stat-value">${s.home}</span>
                     <div class="me-stat-center">
-                        <span class="me-stat-label">${s.label}</span>
+                        <div class="me-stat-data">
+                            <span class="me-stat-value">${s.home}${percentSignal}</span>
+                            <span class="me-stat-label">${s.label}</span>
+                            <span class="me-stat-value">${s.away}${percentSignal}</span>
+                        </div>
                         ${hasBar ? `
                         <div class="me-stat-bar">
                             <div class="me-stat-bar-home" style="background:${equalZero ? 'var(--border-color)' : detail.homeTeam.colors?.primary};width:${homePct}%"></div>
                             <div class="me-stat-bar-away" style="background:${equalZero ? 'var(--border-color)' : detail.awayTeam.colors?.primary};width:${100 - homePct}%"></div>
                         </div>` : ''}
                     </div>
-                    <span class="me-stat-value">${s.away}</span>
+                    
                 </div>`;
             }).join('')
 }
@@ -397,17 +385,37 @@ function renderLineups(homeTeam, awayTeam) {
                 </div>
             `).join('')}
             ${substitute.length ? `
-                <div class="me-lineup-sub-label">${LanguageManager.t('subtitutes')}</div>
-                ${substitute.map(p => `
-                    <div class="me-player-row sub">
-                        <span class="me-player-num">${p.shirtNumber ?? ''}</span>
-                        <span class="me-player-name">${p.name || p.fullName || '—'}</span>
-                        <span class="me-player-pos">${p.posSlug || ''}</span>
-                    </div>
-                `).join('')}
+                <div class="me-lineup-sub-header">
+                    <button class="me-lineup-sub-label" type="button">
+                        <span>${LanguageManager.t('subtitutes')}</span>
+                        <span>▼</span>
+                    </button>
+                </div>
+
+                <div class="me-lineup-sub-list" hidden>
+                    ${substitute.map(p => `
+                        <div class="me-player-row sub">
+                            <span class="me-player-num">${p.shirtNumber ?? ''}</span>
+                            <span class="me-player-name">${p.name || p.fullName || '—'}</span>
+                            <span class="me-player-pos">${p.posSlug || ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
             ` : ''}
         `;
         grid.appendChild(col);
+
+        const toggle = col.querySelector('.me-lineup-sub-label');
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const list = col.querySelector('.me-lineup-sub-list');
+                const open = !list.hidden;
+
+                list.hidden = open;
+                toggle.innerHTML = `<span>${LanguageManager.t('subtitutes')}</span><span>${open ? '▼' : '▲'}</span> `;
+            });
+        }
     });
 }
 
@@ -485,6 +493,23 @@ function renderPlays(detail, homeTeamAbbr) {
     }).join('');
 }
  
+function getTeamHeaderList(info) {
+    const homeColor = info.homeTeam.colors.primary
+    const homeName = info.homeTeam.name
+    const awayColor = info.awayTeam.colors.primary
+    const awayName = info.awayTeam.name
+
+    return `<div class="plays-header-names">
+        <div class="plays-header-grid" style="">
+        <span class="me-lineup-team-name plays-names"${homeColor ? ` style="color:${homeColor};${getTeamColorsStyle(info.homeTeam.colors)};border-right:1px solid var(--border-color);"` : ''}>
+                ${LanguageManager.t(homeName) || ''}
+        </span>
+        <span class="me-lineup-team-name plays-names"${awayColor ? ` style="color:${awayColor};${getTeamColorsStyle(info.awayTeam.colors)};"` : ''}>
+                ${LanguageManager.t(awayName) || ''}
+        </span>
+        </div>
+    </div>`
+}
 
 function getTeamColorsStyle(colors) {
     const color1 = colors.primary;

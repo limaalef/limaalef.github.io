@@ -253,9 +253,18 @@ const MatchModal = {
         
         // ADICIONAR: HTML do vídeo embed (se existir)
         const videoHtml = match['Video Embed'] ? `
-            <div class="watch-button-container">
-                <a href="watch.html?id=${match.ID}" class="watch-match-button">
-                    <span class="watch-match-text">${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
+            <div class="score-button-container">
+                <a href="watch.html?id=${match.ID}" class="score-button watch-match-button">
+                    <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
+                </a>
+            </div>
+        ` : '';
+
+        // ADICIONAR: HTML das estatistucas (se existir)
+        const statsHTML = match['Mais dados'] ? `
+            <div class="score-button-container">
+                <a href="match.html?id=${match.ID}" class="score-button see-stats-button">
+                    <span>${LanguageManager.t('seeStats') || 'Veja estatísticas'}</span>
                 </a>
             </div>
         ` : '';
@@ -317,7 +326,10 @@ const MatchModal = {
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
                 </div>
-                ${videoHtml}
+                ${(match['Mais dados'] || match['Video Embed']) ? `<div class="score-header-buttons">
+                    ${statsHTML}
+                    ${videoHtml}
+                </div>` : ''}
             `;
         }
         
