@@ -155,7 +155,7 @@
 }
 
 .me-lineup-col {
-    padding: 12px 14px;
+    padding: var(--sp-4);
     background-color: var(--bg-secondary);
 }
 .me-lineup-col:first-child {
@@ -166,7 +166,7 @@
 .me-lineup-team-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--sp-4);
     margin-bottom: 10px;
 }
 .me-lineup-team-logo {
@@ -265,3 +265,132 @@
         gap: 6px;
     }
 }
+
+.plays-list {
+    background-color: var(--bg-secondary);
+}
+
+.plays-header-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.plays-names {
+    padding: var(--sp-4) var(--sp-4) Var(--sp-2);
+}
+
+/* Separador de período (1T / 2T / Prorr.) */
+.plays-period-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    position: relative;
+}
+.plays-period-label::before,
+.plays-period-label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 47%;
+    height: 1px;
+    background: var(--border-color);
+}
+.plays-period-label::before { left: 0; }
+.plays-period-label::after  { right: 0; }
+ 
+/* Linha de um gol */
+.plays-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0;
+}
+.plays-row:last-child { padding-bottom: var(--sp-3); }
+ 
+/* Coluna lateral (home = esquerda, away = direita) */
+.plays-side {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+    min-width: 0;
+    opacity: 0;          /* oculto quando não é o lado do gol */
+    pointer-events: none;
+}
+.plays-side--active {
+    opacity: 1;
+    pointer-events: auto;
+}
+ 
+/* Home: alinha à direita (nome fica junto ao centro) */
+.plays-home {
+    justify-content: flex-end;
+    flex-direction: row;
+    text-align: right;
+}
+ 
+/* Away: alinha à esquerda */
+.plays-away {
+    justify-content: flex-start;
+    flex-direction: row;
+    text-align: left;
+}
+ 
+/* Nome do jogador */
+.plays-player-name {
+    font-size: var(--font-size-mdm);
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+ 
+/* Minuto central */
+.plays-minute {
+    font-size: var(--font-size-mdm);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    min-width: 55px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.plays-minute-mark {
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    color: var(--text-tertiary);
+}
+ 
+/* Badge de tipo de gol (P = pênalti, C = contra) */
+.goals-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.goals-type-penalty {
+    background: var(--bg-info);
+    color: var(--text-info);
+}
+.goals-type-own-goal {
+    background: var(--bg-error);
+    color: var(--text-error);
+}
+ 
+/* Responsivo: nomes menores em telas muito pequenas */
+@media (max-width: 360px) {
+    .plays-player-name { max-width: 88px; font-size: var(--font-size-sm); }
+    .plays-minute      { min-width: 30px; }
+}
+ 
