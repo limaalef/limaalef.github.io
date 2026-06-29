@@ -16,9 +16,9 @@
     --header-color: var(--bg-primary);
     --border-color: #d8d6d0;
 
-    --accent-color: #3b82f6;
-    --accent-hover: #629bf8;
-    --bg-accent-color: #ccdcf5;
+    --accent-color: #8b5cf6;
+    --accent-hover: #7c3aed;
+    --bg-accent-color: #ede9fe;
     --text-accent-color: #ffffff;
     
     /* Cores de Status */
@@ -54,8 +54,11 @@
     --font-size-lg: 1.05rem;
     --font-size-xl: 1.175rem;
     --font-size-xxl: 1.275rem;
+    --font-size-sxxl: 1.6rem;
     --font-size-mxxl: 1.8rem;
     --font-size-xxxl: 2.05rem;
+    --font-size-xxxxl: 2.3rem;
+    --font-size-xxxxxl: 2.5rem;
 
     /* Border sizes */
     --border-radius-size-xs: 0.25rem;
@@ -88,8 +91,11 @@
         --font-size-lg: 1rem;
         --font-size-xl: 1.125rem;
         --font-size-xxl: 1.25rem;
+        --font-size-sxxl: 1.4rem;
         --font-size-mxxl: 1.75rem;
         --font-size-xxxl: 2rem;
+        --font-size-xxxxl: 2.12rem;
+        --font-size-xxxxxl: 2.35rem;
 
         --logo-size: 45px;
 
@@ -107,8 +113,11 @@
         --font-size-lg: 0.95rem;
         --font-size-xl: 1.1rem;
         --font-size-xxl: 1.2rem;
+        --font-size-sxxl: 1.45rem;
         --font-size-mxxl: 1.7rem;
         --font-size-xxxl: 1.9rem;
+        --font-size-xxxxl: 2.05rem;
+        --font-size-xxxxxl: 2.2rem;
 
         --logo-size: 40px;
         

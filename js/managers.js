@@ -344,7 +344,34 @@ const MatchModal = {
         const observationsTitle = LanguageManager.t('observations');
         const videoTitle = LanguageManager.t('video') || 'Vídeo';
         const imageTitle = LanguageManager.t('image') || 'Imagem';
+
+        const rows_match_info = [
+            { label: 'date',        value: Utils.formatMatchDate(match.Data) },
+            { label: 'competition', value: competition },
+            { label: 'phase',       value: phase },
+            { label: 'venue',       value: match.Estadio },
+            { label: 'type',        value: LanguageManager.translateText(match.Tipo) },
+        ];
         
+        const rows_tv_info = [
+            { label: 'broadcaster', value: match.Emissora },
+            { label: 'origin',      value: LanguageManager.translateText(match.Origem) },
+            { label: 'narration',   value: match.Narração },
+        ];
+        
+        const rows_tech_info = [
+            { label: 'ID',          value: match.ID },
+            { label: 'quality',     value: match.Qualidade },
+            { label: 'audioFormat', value: audioFormat },
+            { label: 'bitrate',     value: match.Bitrate + ' Mbps' },
+            { label: 'duration',    value: match.Duração },
+            { label: 'fileSize',    value: Utils.formatSize(match.Tamanho) },
+        ];
+
+        const match_info = Elements.setDetailList(rows_match_info);
+        const tv_info = Elements.setDetailList(rows_tv_info);
+        const tech_info = Elements.setDetailGrid(rows_tech_info);
+
         const _matchCarouselId = `carousel-match-${match.ID || Date.now()}`;
         body.innerHTML = `
             ${match.Imagem ? ImageCarousel.renderHTML(match.Imagem, _matchCarouselId) : ''}
@@ -352,84 +379,27 @@ const MatchModal = {
             <div class="modal-division">
             <div class="detail-section">
                 <div class="section-title modal-style">${matchInfoTitle}</div>
-                <div class="detail-list">
-                    ${match.Data ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('date')}</span>
-                        <span class="detail-list-value">${Utils.formatMatchDate(match.Data)}</span>
-                    </div>` : ''}
-                    ${competition ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('competition')}</span>
-                        <span class="detail-list-value">${competition}</span>
-                    </div>` : ''}
-                    ${phase ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('phase')}</span>
-                        <span class="detail-list-value">${phase}</span>
-                    </div>` : ''}
-                    ${match.Estadio ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('stadium')}</span>
-                        <span class="detail-list-value">${match.Estadio}</span>
-                    </div>` : ''}
-                    ${match.Tipo ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('type')}</span>
-                        <span class="detail-list-value">${LanguageManager.translateText(match.Tipo)}</span>
-                    </div>` : ''}
-                </div>
+                ${match_info}
             </div>
 
             <div class="detail-section">
                 <div class="section-title modal-style">${tvInfoTitle}</div>
                 <div class="detail-list">
-                    ${match.Emissora ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('broadcaster')}</span>
-                        <span class="detail-list-value">${match.Emissora}</span>
-                    </div>` : ''}
-                    ${match.Origem ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('origin')}</span>
-                        <span class="detail-list-value">${LanguageManager.translateText(match.Origem)}</span>
-                    </div>` : ''}
-                    ${match.Narração ? `<div class="detail-list-item">
-                        <span class="detail-list-label">${LanguageManager.t('narration')}</span>
-                        <span class="detail-list-value">${match.Narração}</span>
-                    </div>` : ''}
+                    ${tv_info}
                 </div>                
             </div>
             
             <div class="detail-section">
                 <div class="section-title modal-style">${technicalInfoTitle}</div>
                 <div class="detail-grid technical">
-                    ${match.ID ? `<div class="detail-item">
-                        <div class="detail-label">ID</div>
-                        <div class="detail-value">${match.ID}</div>
-                    </div>` : ''}
-                    ${match.Qualidade ? `<div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('quality')}</div>
-                        <div class="detail-value">${match.Qualidade}</div>
-                    </div>` : ''}
-                    ${audioFormat ? `<div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('audioFormat')}</div>
-                        <div class="detail-value">${audioFormat}</div>
-                    </div>` : ''}
-                    ${match.Bitrate ? `<div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('bitrate')}</div>
-                        <div class="detail-value">${match.Bitrate + ' Mbps'}</div>
-                    </div>` : ''}
-                    ${match.Duração ? `<div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('duration')}</div>
-                        <div class="detail-value">${match.Duração}</div>
-                    </div>` : ''}
-                    ${match.Tamanho ? `<div class="detail-item">
-                        <div class="detail-label">${LanguageManager.t('fileSize')}</div>
-                        <div class="detail-value">${Utils.formatSize(match.Tamanho)}</div>
-                    </div>` : ''}
+                    ${tech_info}
                 </div>
             </div>
             
             <div class="detail-section">
                 <div class="section-title modal-style">${storageTitle}</div>
                 <div class="storage-badges">
-                    ${match.Local ? `<span class="storage-badge badge-success">${match.Local}</span>` : ''}
-                    ${match.Nuvem && match.Nuvem.toLowerCase() === 'nuvem' ? `<span class="storage-badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}
-                    ${!match.Local && (!match.Nuvem || match.Nuvem.toLowerCase() !== 'nuvem') ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento registrado'}</span>` : ''}
+                    ${Elements.setStorageBadges(match.Local,match.Nuvem)}
                 </div>
             </div>
             
@@ -533,11 +503,28 @@ const MotorModal = {
         const dateRange = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
         
         score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
-        
+
         const _motorCarousels = [];
         const eventsHtml = (event.Eventos || []).map((evt, index) => {
-        const videoTitle = LanguageManager.t('video') || 'Vídeo';
-        const videoHtml = event['Video Embed'] ? `
+            const rows_tv_info = [
+                { label: 'broadcaster', value: evt.station?.name },
+                { label: 'origin',      value: LanguageManager.translateText(evt.station?.origem) },
+                { label: 'narration',   value: evt.station?.narracao },
+            ];
+            
+            const rows_tech_info = [
+                { label: 'quality',     value: evt.technical_details?.video_quality },
+                { label: 'audioFormat', value: LanguageManager.translateText(evt.technical_details?.audio_format) },
+                { label: 'bitrate',     value: evt.technical_details?.video_bitrate + ' Mbps' },
+                { label: 'duration',    value: evt.technical_details?.duration },
+                { label: 'fileSize',    value: Utils.formatSize(evt.technical_details?.file_size) },
+            ];
+
+            const tv_info = Elements.setDetailList(rows_tv_info);
+            const tech_info = Elements.setDetailGrid(rows_tech_info);
+
+            const videoTitle = LanguageManager.t('video') || 'Vídeo';
+            const videoHtml = event['Video Embed'] ? `
             <div class="detail-section">
                 <div class="section-title">${videoTitle}</div>
                 <div style="text-align: center; padding: 30px;">
@@ -573,57 +560,21 @@ const MotorModal = {
                    <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
                         <div class="detail-list">
-                            ${evt.date ? `<div class="detail-list-item">
-                                <div class="detail-list-label">${LanguageManager.t('date')}</div>
-                                <div class="detail-list-value">${Utils.formatMatchDate(evt.date)}</div>
-                            </div>` : ''}
-                            ${evt.station?.name ? `<div class="detail-list-item">
-                                <div class="detail-list-label">${LanguageManager.t('broadcaster')}</div>
-                                <div class="detail-list-value">${evt.station?.name}</div>
-                            </div>` : ''}
-                            ${evt.station?.origem ? `<div class="detail-list-item">
-                                <div class="detail-list-label">${LanguageManager.t('origin')}</div>
-                                <div class="detail-list-value">${evt.station?.origem}</div>
-                            </div>` : ''}
-                            ${evt.station?.narracao ? `<div class="detail-list-item">
-                                <div class="detail-label">${LanguageManager.t('narration')}</div>
-                                <div class="detail-value">${evt.station?.narracao}</div>
-                            </div>` : ''}
+                            ${tv_info}
                         </div>
                     </div>
                     
                     <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
                         <div class="detail-grid technical">
-                            ${evt.technical_details?.video_quality ? `<div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('quality')}</div>
-                                <div class="detail-value">${evt.technical_details?.video_quality}</div>
-                            </div>` : ''}
-                            ${evt.technical_details?.audio_format ? `<div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('audioFormat')}</div>
-                                <div class="detail-value">${LanguageManager.translateText(evt.technical_details?.audio_format)}</div>
-                            </div>` : ''}
-                            ${evt.technical_details?.video_bitrate ? `<div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('bitrate')}</div>
-                                <div class="detail-value">${evt.technical_details?.video_bitrate ? evt.technical_details.video_bitrate + ' Mbps' : 'N/A'}</div>
-                            </div>` : ''}
-                            ${evt.technical_details?.duration ? `<div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('duration')}</div>
-                                <div class="detail-value">${evt.technical_details?.duration}</div>
-                            </div>` : ''}
-                            ${evt.technical_details?.file_size ? `<div class="detail-item">
-                                <div class="detail-label">${LanguageManager.t('fileSize')}</div>
-                                <div class="detail-value">${Utils.formatSize(evt.technical_details?.file_size)}</div>
-                            </div>` : ''}
+                            ${tech_info}
                         </div>
                     </div>
                     
                     <div class="detail-section">
                         <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
                         <div class="storage-badges">
-                            ${evt.technical_details?.local ? `<span class="badge badge-success">${evt.technical_details.local}</span>` : ''}
-                            ${evt.technical_details?.cloud ? `<span class="badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}
-                            ${!evt.technical_details?.local && !evt.technical_details?.cloud ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento'}</span>` : ''}
+                            ${Elements.setStorageBadges(evt.technical_details?.local,evt.technical_details?.cloud)}
                         </div>
                     </div>
                     

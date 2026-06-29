@@ -1,4 +1,3 @@
-.container         { margin: 0; }
 .adm-layout, .user-layout { display: flex; min-height: calc(100vh - 60px); }
 .narrow-width      { max-width: var(--page-width-size); margin: auto;}
 .adm-sidebar       { min-width: 200px; width: 17%; flex-shrink: 0; border-right: 1px solid var(--border-color);

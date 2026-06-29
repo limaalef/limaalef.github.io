@@ -23,12 +23,10 @@
 
 #watchHomeLineup {
     border: solid 1px var(--border-color);
-    border-right: 0px;
     border-radius: var(--border-radius-size-xl) 0 0 var(--border-radius-size-xl);
 }
 #watchAwayLineup {
     border: solid 1px var(--border-color);
-    border-left: 0px;
     border-radius: 0 var(--border-radius-size-xl) var(--border-radius-size-xl) 0;
 }
 
@@ -103,13 +101,13 @@
         grid-row: 2;
         margin-left: var(--sp-5);
         margin-top: var(--sp-5);
-        border-right: 1px;
     }
     #watchAwayLineup {
         grid-column: 2;
         grid-row: 2;
         margin-right: var(--sp-5);
         margin-top: var(--sp-5);
+        border-left: 0px;
     }
 }
 
