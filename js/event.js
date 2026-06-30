@@ -48,6 +48,8 @@ const MatchPage = {
         // Chama o show() existente — ele popula modalTitle, modalScore e modalBody
         if (sport === 'motor') {
             MotorModal.show(match);
+        } else if (sport === 'carnaval') {
+            CarnavalModal.show(match);
         } else {
             MatchModal.show(match);
         }

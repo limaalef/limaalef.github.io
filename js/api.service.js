@@ -102,7 +102,38 @@ const APIService = {
                 type: item.type || ''
             }));
         }
-        
+        else if (sport === 'carnaval') {
+            return (apiResponse.data || []).map(item => ({
+                ID: item.id ?? '',
+                Data: item.date || '',
+                Emissora: item.station?.name || '',
+                Origem: item.station?.origem || '',
+                Narração: item.station?.narracao || '',
+                'Logo emissora': item.station?.logo || '',
+                Cidade: item.championship?.city || '',
+                Divisão: item.championship?.division || '',
+                Venue: item.championship?.venue || '',
+                Escola: item.samba_school?.name || '',
+                Enredo: item.samba_school?.plot,
+                Carnavalesco: item.samba_school?.carnavalesco || '',
+                Interprete: item.samba_school?.interpreter || '',
+                Logo: item.samba_school?.logo,
+                'Nota_final': item.samba_school?.result?.total || '',
+                Posição: item.samba_school?.result?.final_position || '',
+                Notas: item.samba_school?.result?.category || '',
+                Obs: item.additional_info || '',
+                Imagem: item.image || '',
+                Local: item.technical_details?.local || '',
+                Nuvem: item.technical_details?.cloud ? 'Nuvem' : '',
+                Duração: item.technical_details?.duration || '',
+                Tamanho: item.technical_details?.file_size || '',
+                Qualidade: item.technical_details?.video_quality || '',
+                Bitrate: item.technical_details?.video_bitrate || '',
+                'Formato de áudio': item.technical_details?.audio_format || '2.0',
+                'Video Embed': item.embed_video || '',
+                Tipo: item.type || ''
+            }));
+        }
         return (apiResponse.data || []).map(item => ({
             ID: item.id ?? '',
             Data: item.date || '',

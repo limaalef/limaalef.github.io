@@ -44,41 +44,20 @@ const CollectionsDB = (() => {
 
     /* ── API pública ─────────────────────────────────────────────────── */
     return {
-        /**
-         * Garante que o JSON foi carregado.
-         * Deve ser aguardado antes de qualquer consulta.
-         * @returns {Promise<void>}
-         */
         ready() {
             return _load();
         },
 
-        /**
-         * Localiza uma entrada pelo valor do parâmetro ?q= na URL.
-         * Case-insensitive, ignora espaços extras.
-         * @param {string} query
-         * @returns {object|null}
-         */
         find(query) {
             if (!query || !_ready) return null;
             const q = query.trim().toLowerCase();
             return _data.find(e => e.key.toLowerCase() === q) || null;
         },
 
-        /**
-         * Retorna todas as entradas de um determinado esporte.
-         * @param {'football'|'others'|'motor'} sport
-         * @returns {object[]}
-         */
         bySport(sport) {
             return _data.filter(e => e.sport === sport);
         },
 
-        /**
-         * Adiciona ou atualiza uma entrada em memória (não persiste no JSON).
-         * Usado pelo SidebarManager para cachear respostas de API remota.
-         * @param {object} entry
-         */
         upsert(entry) {
             const idx = _data.findIndex(
                 e => e.key.toLowerCase() === entry.key.toLowerCase()

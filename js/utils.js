@@ -1,5 +1,5 @@
 const Utils = {
-    VALID_SPORTS: ['football', 'others', 'motor'],
+    VALID_SPORTS: ['football', 'others', 'motor', 'carnaval'],
 
     parseDate(dateStr) {
         if (!dateStr) return null;
@@ -61,7 +61,8 @@ const Utils = {
         const map = {
             football:   { slug: 'football', key: 'modeFootball', },
             multisport: { slug: 'others', key: 'modeMultisport' },
-            motorsport: { slug: 'motor', key: 'modeMotorsport' }
+            motorsport: { slug: 'motor', key: 'modeMotorsport' },
+            carnaval: { slug: 'carnaval', key: 'modeCarnaval' }
         };
 
         const modeName = LanguageManager.t(map[mode].key) || mode;
@@ -181,7 +182,7 @@ const Utils = {
     },
 
     applySportTheme(sport) {
-        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor');
+        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor', 'theme-carnaval');
         document.body.classList.add(`theme-${sport}`);
     },
 
@@ -498,6 +499,31 @@ const Elements = {
         }
 
         return col;
+    },
+
+    renderJudgmentItems(judgments) {
+        return judgments.map(judgment => {
+            const discardedIndexes = Array.isArray(judgment.discarded_indexes)
+                ? judgment.discarded_indexes
+                : [judgment.discarded_indexes];
+
+            const scoresHTML = judgment.scores.map((score, index) => {
+                const isDiscard = discardedIndexes.includes(index);
+                return `<span class="score${isDiscard ? ' discard' : ''}">${score === 10 ? score.toFixed(1) : score}</span>`;
+            }).join('');
+
+            const validScores = judgment.scores.filter((_, i) => !discardedIndexes.includes(i));
+            const partialTotal = validScores.reduce((sum, s) => sum + s, 0).toFixed(1);
+
+            return `
+            <div class="detail-list-item judgment-item">
+                <div class="detail-list-label">${judgment.name}</div>
+                <div class="detail-list-value judgment-values">
+                    <div class="judgment-scores">${scoresHTML}</div>
+                    <span class="judgment-total">${partialTotal}</span>
+                </div>
+            </div>`;
+        }).join('');
     }
 };
 

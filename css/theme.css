@@ -41,7 +41,8 @@
     --mode-football: #3b82f6;
     --mode-others: #f59e0b;
     --mode-motor: #ef4444;
-
+    --mode-carnaval: #bd10ae;
+    
     /* Max sizes */
     --page-width-size: 1400px;
 
@@ -133,6 +134,7 @@
 .mode-football   { color: #fff; background-color: var(--mode-football); }
 .mode-multisport { color: #000; background-color: var(--mode-others); }
 .mode-motorsport { color: #fff; background-color: var(--mode-motor); }
+.mode-carnaval   { color: #000; background-color: var(--mode-carnaval); }
 
 /* TEMA: OUTROS FUTEBOL */
 body.theme-football {
@@ -155,6 +157,14 @@ body.theme-motor {
     --accent-color: rgb(239, 68, 68);
     --accent-color-rgb: 239, 68, 68;
     --accent-hover: rgb(247, 103, 103);
+    --text-accent-color: #ffffff;
+}
+
+/* TEMA: CARNAVAL */
+body.theme-carnaval {
+    --accent-color: rgb(165, 38, 154);
+    --accent-color-rgb: 165, 38, 154;
+    --accent-hover: rgb(223, 90, 212);
     --text-accent-color: #ffffff;
 }
 
@@ -194,6 +204,7 @@ body.theme-motor {
     .mode-football   { background-color: #0f213f; color: var(--mode-football); }
     .mode-multisport { background-color: #382402; color: var(--mode-others); }
     .mode-motorsport { background-color: #3b1111; color: var(--mode-motor); }
+    .mode-carnaval   { background-color: #380235; color: var(--mode-carnaval); }
 }
 
 
