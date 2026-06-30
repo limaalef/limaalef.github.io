@@ -7,6 +7,7 @@ const translations = {
         football: 'Futebol',
         otherSports: 'Outros esportes',
         motorSports: 'Automobilismo',
+        carnaval: 'Carnaval',
         sectionTodayTitle: 'Hoje na história',
         evento: 'evento',
         eventos: 'eventos',
@@ -42,7 +43,16 @@ const translations = {
         order: 'Pedido',
         competition: 'Competição',
         phase: 'Fase',
+        city: 'Cidade',
+        division: 'Divisão',
+        plot: 'Samba-enredo',
+        carnavalesco: 'Carnavalesco',
+        interpreter: 'Intérprete',
+        finalPos: 'Posição final',
+        finalScore: 'Pontuação final',
         stadium: 'Estádio',
+        place: 'colocação',
+        points: 'pontos',
         venue: 'Local',
         broadcaster: 'Emissora',
         narration: 'Narração',
@@ -70,6 +80,8 @@ const translations = {
         dataUpdated: 'Dados atualizados com sucesso!',
         matchInfo: 'Informações da partida',
         eventInfo: 'Informações do evento',
+        carnavalInfo: 'Informações do desfile',
+        competitionInfo: 'Apuração',
         tvInfo: 'Informações de televisionamento',
         technicalInfo: 'Especificações técnicas',
         storageInfo: 'Armazenamento',
@@ -152,6 +164,7 @@ const translations = {
         modeFootball:        'Futebol',
         modeMultisport:      'Multiesporte',
         modeMotorsport:      'Automobilismo',
+        modeCarnaval:        'Carnaval',
         overflowSuffix:      'item(s) neste grupo',
         modeAdded:           '✅ Adicionados',
         modeModified:        '✏️ Modificados',
@@ -380,6 +393,7 @@ const translations = {
         football: 'Football',
         otherSports: 'Other sports',
         motorSports: 'Motorsport',
+        carnaval: 'Carnaval',
         sectionTodayTitle: 'Today in history',
         event: 'event',
         events: 'events',
@@ -415,7 +429,16 @@ const translations = {
         order: 'Order',
         competition: 'Competition',
         phase: 'Phase',
+        city: 'City',
+        division: 'Division',
+        plot: 'Plot',
+        carnavalesco: 'Carnavalesco',
+        interpreter: 'Interpreter',
+        finalPos: 'Final position',
+        finalScore: 'Final score',
         stadium: 'Stadium',
+        place: 'place',
+        points: 'points',
         venue: 'Venue',
         broadcaster: 'Broadcaster',
         narration: 'Commentary',
@@ -443,6 +466,8 @@ const translations = {
         dataUpdated: 'Data successfully updated!',
         matchInfo: 'Match information',
         eventInfo: 'Event information',
+        carnavalInfo: 'Parade information',
+        competitionInfo: 'Result information',
         tvInfo: 'TV Information',
         technicalInfo: 'Technical Information',
         storageInfo: 'Storage Information',
@@ -529,6 +554,7 @@ const translations = {
         modeFootball:        'Football',
         modeMultisport:      'Other Sports',
         modeMotorsport:      'Motorsport',
+        modeCarnaval:        'Carnaval',
         overflowSuffix:      'more item(s) in this group',
         modeAdded:           '✅ Added',
         modeModified:        '✏️ Modified',
@@ -874,6 +900,18 @@ const LanguageManager = {
         }
         
         return text;
+    },
+
+    translateOrdinary(num, type) {
+        if (this.currentLang === 'en') {
+            return (String(num) + this.getOrdinalSuffix(num))
+        } else {
+            if (type === 'fem') {
+                return (String(num) + 'ª')
+            } else {
+                return (String(num) + 'º')
+            }
+        }
     },
     
     getOrdinalSuffix(num) {

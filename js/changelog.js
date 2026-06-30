@@ -101,6 +101,7 @@ async function loadChangelog() {
         updatePagination();
 
     } catch (err) {
+        console.error(err)
         content.innerHTML = Utils.sectionStateHtml('❌', `<h2>${LanguageManager.t('cl_error')}</h2><p>${LanguageManager.t('cl_checkUrl')}</p><p style="font-size:.85em;margin-top:8px;color:var(--error-color)">${Utils.escapeHtml(err.message)}</p>`);
     }
 }
