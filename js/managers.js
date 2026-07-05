@@ -442,7 +442,9 @@ const MatchModal = {
             <div class="modal-division">
             <div class="detail-section">
                 <div class="section-title modal-style">${matchInfoTitle}</div>
-                ${match_info}
+                <div class="detail-list">
+                    ${match_info}
+                </div>
             </div>
 
             <div class="detail-section">
