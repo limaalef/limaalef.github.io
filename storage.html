@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Storage — Sports Archive</title>
+    <meta name="description" content="Gerenciamento de armazenamento do arquivo esportivo pessoal.">
+    <meta name="robots" content="noindex">
+    <meta name="author" content="@limaalef">
+
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/storage.css">
+</head>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JJZTBEGJ91');
+</script>
+
+<body>
+    <header>
+        <div class="header-frame" id="header"
+            data-title="Storage"
+            data-back="true">
+        </div>
+
+        <div class="control-group">
+            <button id="langToggle" class="lang-btn" style="display: none;"
+                    title="Change language / Mudar idioma">
+                <span id="langFlag">🇧🇷</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section-divider"></div>
+
+        <!-- ── OVERVIEW ── -->
+        <div class="storage-overview" id="storageOverview">
+
+            <!-- Alert dinâmico (renderizado por JS se tiver volume crítico) -->
+            <div id="storageAlert"></div>
+
+            <!-- Stats topo -->
+            <div class="stats" id="storageStats">
+                <div class="stat">
+                    <div class="stat-value highlighted" id="statTotalSize">—</div>
+                    <div class="stat-label">Total em arquivo</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="statTotalGames">—</div>
+                    <div class="stat-label">Jogos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="statTotalDuration">—</div>
+                    <div class="stat-label">Duração total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="statCloudCoverage">—</div>
+                    <div class="stat-label">Backup em cloud</div>
+                </div>
+            </div>
+
+            <!-- Barra de distribuição geral -->
+            <div class="home-section">
+                <div class="home-section-header">
+                    <div class="home-section-header-title">
+                        <p class="home-section-title">Distribuição dos volumes</p>
+                    </div>
+                    <span class="home-section-detail" id="totalCapacityLabel">—</span>
+                </div>
+                <div class="storage-dist-bar" id="distBar"></div>
+                <div class="storage-dist-legend" id="distLegend"></div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Volumes físicos -->
+            <div class="home-section">
+                <div class="home-section-header">
+                    <div class="home-section-header-title">
+                        <p class="home-section-title">Volumes físicos</p>
+                    </div>
+                </div>
+                <div class="volumes-grid" id="volumeList">
+                    <div class="section-state"><p>Carregando volumes...</p></div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Cloud -->
+            <div class="home-section">
+                <div class="home-section-header">
+                    <div class="home-section-header-title">
+                        <p class="home-section-title">Cloud backup</p>
+                    </div>
+                </div>
+                <div id="cloudCard">
+                    <div class="section-state"><p>Carregando...</p></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── DETALHE DO VOLUME (tela secundária) ── -->
+        <div class="storage-detail" id="storageDetail" style="display:none;">
+
+            <!-- Header do volume -->
+            <div class="home-section">
+                <button class="btn back-btn" id="backToOverview" style="margin-bottom: 12px;">‹</button>
+
+                <div class="volume-hero" id="volumeHero"></div>
+
+                <!-- Barra de uso -->
+                <div class="storage-bar-wrap" id="volumeBarWrap"></div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Filtros rápidos -->
+            <div class="controls">
+                <div class="filter-options">
+                    <div class="filter-sub-group expand">
+                        <div class="search-box">
+                            <input type="text" id="volumeSearch" placeholder="🔍 Buscar jogo...">
+                        </div>
+                    </div>
+                    <div class="filter-sub-group">
+                        <div class="pagination" id="volumePagination">
+                            <div class="back-btn-group">
+                                <button id="volFirstPage">«</button>
+                                <button id="volPrevPage">‹</button>
+                            </div>
+                            <div class="pages-info-group">
+                                <span class="value contrast" id="volPageNum">1</span>
+                                <span class="label"> de </span>
+                                <span class="value" id="volPageTotal">1</span>
+                            </div>
+                            <div class="back-btn-group">
+                                <button id="volNextPage">›</button>
+                                <button id="volLastPage">»</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros por ano e qualidade -->
+                <div class="year-filter-bar" id="volumeYearFilter"></div>
+
+                <!-- Filtros de qualidade e cloud -->
+                <div class="storage-quick-filters" id="storageQuickFilters">
+                    <button class="storage-filter-btn active" data-filter="all">Todos</button>
+                    <button class="storage-filter-btn" data-filter="4k">4K</button>
+                    <button class="storage-filter-btn" data-filter="1080">1080p</button>
+                    <button class="storage-filter-btn" data-filter="no-cloud">Sem cloud ☁️</button>
+                </div>
+            </div>
+
+            <!-- Lista de jogos do volume -->
+            <div class="match-container" id="volumeGames">
+                <div class="section-state"><p>Selecione um volume para ver os jogos.</p></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn close-btn" onclick="MatchModal.close()">×</button>
+                <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
+                <div id="modalScore" class="modal-score"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.service.js"></script>
+    <script src="js/managers.js"></script>
+    <script src="js/storage.js"></script>
+</body>
+</html>
