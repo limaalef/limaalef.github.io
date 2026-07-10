@@ -21,6 +21,7 @@ body {
     max-width: var(--page-width-size);
     padding: 0px;
     margin: 0 auto;
+    position: relative;
 }
 
 .two-columns {
@@ -47,6 +48,26 @@ header {
     align-items: center;
     padding: var(--sp-4) var(--sp-6);
     gap: var(--sp-5);
+}
+
+.my-requests-btn {
+    position: absolute;
+    right: var(--sp-6);
+    top: var(--sp-8);
+    border: 1px solid var(--accent-color);
+    border-radius: var(--border-radius-size-md);
+    padding: var(--sp-1) var(--sp-3);
+    font-size: var(--font-size-mdm);
+    color: var(--accent-color);
+    background: var(--bg-primary);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.my-requests-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--text-accent-color);
+    font-weight: 700;
 }
 
 .match-container {
@@ -868,7 +889,7 @@ input[type="text"]:focus {
 .modal-header {
     background: var(--accent-color);
     color: var(--text-accent-color);
-    padding: var(--sp-6);
+    padding: var(--sp-6) var(--sp-6) 0 var(--sp-6);
     border-radius: var(--border-radius-size-xl) var(--border-radius-size-xl) 0 0;
     position: relative;
     transition: background 0.3s ease;
@@ -1322,8 +1343,11 @@ input[type="text"]:focus {
 
 /* Botão Assistir Partida */
 .score-header-buttons {
-    margin: 0 -20px -20px -20px;
     display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-1);
+    min-height: var(--sp-3);
+    padding-bottom: var(--sp-3);
     grid-template-columns: auto;
     grid-auto-flow: column;
 }
@@ -1338,11 +1362,15 @@ input[type="text"]:focus {
     text-decoration: none;
     transition: all 0.5s ease;
     font-weight: 700;
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-mdm);
+    border: 1px solid var(--text-accent-color);
+    border-radius: var(--border-radius-size-sm);
+    color: var(--text-accent-color);
 }
 
-.see-stats-button {
-    color: var(--text-accent-color);
+.score-button:hover {
+    background: var(--text-accent-color);
+    color: var(--accent-color);
 }
 
 .watch-match-button {
@@ -1354,11 +1382,7 @@ input[type="text"]:focus {
     box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
     background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
     color: #000;
-}
-
-.score-button.see-stats-button:hover {
-    background: var(--text-accent-color);
-    color: var(--accent-color);
+    border-color: #ffd900;
 }
 
 /* ========================================
@@ -2469,7 +2493,7 @@ input[type="text"]:focus {
 }
 
 .list-overflow {
-    padding-top: var(--sp-7);
+    padding-top: var(--sp-8);
 }
 
 .browse-scroll-list::-webkit-scrollbar { display: none; }

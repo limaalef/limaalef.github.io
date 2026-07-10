@@ -16,7 +16,9 @@
 
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/detail.css">
     <link rel="stylesheet" href="css/storage.css">
+    <link rel="stylesheet" href="css/request.css">
 </head>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
@@ -58,16 +60,8 @@
                     <div class="stat-label">Total em arquivo</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value" id="statTotalGames">—</div>
-                    <div class="stat-label">Jogos</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="statTotalDuration">—</div>
-                    <div class="stat-label">Duração total</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="statCloudCoverage">—</div>
-                    <div class="stat-label">Backup em cloud</div>
+                    <div class="stat-value" id="statTotalDisks">—</div>
+                    <div class="stat-label">Quantidade de discos</div>
                 </div>
             </div>
 
@@ -116,62 +110,107 @@
         <!-- ── DETALHE DO VOLUME (tela secundária) ── -->
         <div class="storage-detail" id="storageDetail" style="display:none;">
 
-            <!-- Header do volume -->
-            <div class="home-section">
-                <button class="btn back-btn" id="backToOverview" style="margin-bottom: 12px;">‹</button>
+            <div class="collection-layout">
 
-                <div class="volume-hero" id="volumeHero"></div>
+                <!-- SIDEBAR: dados do volume -->
+                <aside class="collection-sidebar">
+                    <div class="volume-group">
+                        <button class="btn back-btn" id="backToOverview">‹</button>
+                        <div class="volume-hero" id="volumeHero"></div>
+                    </div>
 
-                <!-- Barra de uso -->
-                <div class="storage-bar-wrap" id="volumeBarWrap"></div>
-            </div>
+                    <!-- Barra de uso -->
+                    <div class="storage-bar-wrap" id="volumeBarWrap"></div>
 
-            <div class="section-divider"></div>
+                    <div class="section-divider"></div>
 
-            <!-- Filtros rápidos -->
-            <div class="controls">
-                <div class="filter-options">
-                    <div class="filter-sub-group expand">
-                        <div class="search-box">
-                            <input type="text" id="volumeSearch" placeholder="🔍 Buscar jogo...">
+                    <div class="stats sidebar-stats" id="volumeStats">
+                        <div class="stat">
+                            <div class="stat-value highlighted" id="volStatGames">—</div>
+                            <div class="stat-label">Jogos</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value highlighted" id="volStatSize">—</div>
+                            <div class="stat-label">Tamanho no volume</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="volStatDuration">—</div>
+                            <div class="stat-label">Duração total</div>
                         </div>
                     </div>
-                    <div class="filter-sub-group">
-                        <div class="pagination" id="volumePagination">
-                            <div class="back-btn-group">
-                                <button id="volFirstPage">«</button>
-                                <button id="volPrevPage">‹</button>
+                </aside>
+
+                <!-- CONTEÚDO PRINCIPAL: filtros + jogos -->
+                <div class="collection-main">
+
+                    <!-- Filtros rápidos -->
+                    <div class="controls">
+                        <!-- Filtros por ano e qualidade -->
+                        <div class="filter-options">
+                            <div class="filter-sub-group expand">
+                                <div class="control-group" style="max-width: 120px;">
+                                    <div class="dropdown-group">
+                                        <label data-i18n="years">Anos</label>
+                                        <select class="f-select" id="volumeYearFilter">
+                                            <option value="all" data-i18n="allYears">Todos os anos</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="pages-info-group">
-                                <span class="value contrast" id="volPageNum">1</span>
-                                <span class="label"> de </span>
-                                <span class="value" id="volPageTotal">1</span>
+
+                            <div class="filter-sub-group">
+                                <div class="search-box">
+                                    <input type="text" id="volumeSearch" placeholder="Buscar...">
+                                </div>
                             </div>
-                            <div class="back-btn-group">
-                                <button id="volNextPage">›</button>
-                                <button id="volLastPage">»</button>
+                        </div>
+
+                        <div class="filter-options">
+                            <div class="filter-sub-group">
+                                <div class="view-toggle" id="storageQuickFilters">
+                                    <div class="view-btn active" data-filter="all">
+                                        <span data-filter="all">Tudo</span>
+                                    </div>
+                                    
+                                    <div class="view-btn" data-filter="4k">
+                                        <span data-filter="4k">4K</span>
+                                    </div>
+
+                                    <div class="view-btn" data-filter="1080">
+                                        <span data-filter="1080">Full HD</span>
+                                    </div>
+
+                                    <div class="view-btn" data-filter="no-cloud">Sem cloud</div>
+                                </div>
+                            </div>
+
+                            <div class="filter-sub-group">
+                                <div class="pagination" id="volumePagination">
+                                    <div class="back-btn-group">
+                                        <button id="volFirstPage">«</button>
+                                        <button id="volPrevPage">‹</button>
+                                    </div>
+                                    <div class="pages-info-group">
+                                        <span class="value contrast" id="volPageNum">1</span>
+                                        <span class="label"> de </span>
+                                        <span class="value" id="volPageTotal">1</span>
+                                    </div>
+                                    <div class="back-btn-group">
+                                        <button id="volNextPage">›</button>
+                                        <button id="volLastPage">»</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Filtros por ano e qualidade -->
-                <div class="year-filter-bar" id="volumeYearFilter"></div>
+                    <!-- Lista de jogos do volume -->
+                    <div class="match-container" id="volumeGames">
+                        <div class="section-state"><p>Selecione um volume para ver os jogos.</p></div>
+                    </div>
 
-                <!-- Filtros de qualidade e cloud -->
-                <div class="storage-quick-filters" id="storageQuickFilters">
-                    <button class="storage-filter-btn active" data-filter="all">Todos</button>
-                    <button class="storage-filter-btn" data-filter="4k">4K</button>
-                    <button class="storage-filter-btn" data-filter="1080">1080p</button>
-                    <button class="storage-filter-btn" data-filter="no-cloud">Sem cloud ☁️</button>
                 </div>
             </div>
-
-            <!-- Lista de jogos do volume -->
-            <div class="match-container" id="volumeGames">
-                <div class="section-state"><p>Selecione um volume para ver os jogos.</p></div>
-            </div>
-
         </div>
     </div>
 
@@ -194,5 +233,6 @@
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/request.js"></script>
 </body>
 </html>

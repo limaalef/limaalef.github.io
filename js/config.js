@@ -40,6 +40,13 @@ window._headerPromise = new Promise(resolve => {
 
         // Logo e título
         const logo = document.getElementById('logo-header-svg');
+        
+        if (container.dataset.reqbtn !== 'false') {
+            const browserLang = navigator.language || 'pt-BR';
+            document.getElementById('headerRequestBtn').textContent = browserLang === 'pt-BR' ? 'Meus pedidos' : 'My requests'
+        } else {
+            document.getElementById('headerRequestBtn').style.display = 'None'
+        }
 
         if ((isMobile || container.dataset.forced === 'true') && container.dataset.back === 'true') {
             document.getElementById('page-title').textContent = container.dataset.title || '';

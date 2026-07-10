@@ -389,7 +389,8 @@ const MatchModal = {
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
                 </div>
-                ${(match['Mais dados'] || match['Video Embed']) ? `<div class="score-header-buttons">
+                <div class="score-header-buttons">
+                ${(match['Mais dados'] || match['Video Embed']) ? `
                     ${statsHTML}
                     ${videoHtml}
                 </div>` : ''}
@@ -969,8 +970,7 @@ const Renderer = {
             if (date) years.add(date.getFullYear());
         });
         const yearFilter = document.getElementById('yearFilter');
-        const allYearsText = LanguageManager.t('allYears');
-        yearFilter.innerHTML = `<option value="" data-i18n="allYears">${allYearsText}</option>`;
+        yearFilter.innerHTML = `<option value="" data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
         Array.from(years).sort((a, b) => b - a).forEach(year => {
             const option = document.createElement('option');
             option.value = year;

@@ -6,17 +6,6 @@
 
 const VOLUME_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
 
-const COMP_COLORS = {
-    'copa do mundo': '#ef4444',
-    'world cup':     '#ef4444',
-    'champions':     '#3b82f6',
-    'libertadores':  '#7c3aed',
-    'brasileirão':   '#10b981',
-    'brasileiro':    '#10b981',
-    'paulistão':     '#10b981',
-    'premier':       '#3b82f6',
-};
-
 // Nomes de "discos" que são apenas categorias da planilha, não hardware real
 const PSEUDO_DISKS = new Set(['local', 'nuvem', 'para baixar', 'desconhecido']);
 
@@ -40,7 +29,7 @@ const StorageState = {
 // ─── Init ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
     await window._headerPromise;
-    await Promise.all([loadDisks(), loadAllMatches()]);
+    await Promise.all([loadDisks()]);
     buildVolumes();
     buildOverview();
     bindOverviewEvents();
@@ -55,14 +44,10 @@ async function loadDisks() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
-        // Estrutura da API: { success, data: [[{ summary, disks }], { registros, espaco }] }
-        const payload = Array.isArray(json.data?.[0])
-            ? json.data[0][0]       // formato aninhado vindo do sync script
-            : json.data;            // formato direto { summary, disks }
+        const payload = Array.isArray(json.data?.[0]) ? json.data[0][0] : json.data;
 
         StorageState.diskSummary = payload?.summary || null;
 
-        // Filtra pseudo-discos (Nuvem, Local, PARA BAIXAR) e discos sem hardware definido
         StorageState.disksMeta = (payload?.disks || []).filter(d =>
             d.name &&
             !PSEUDO_DISKS.has(d.name.toLowerCase()) &&
@@ -74,28 +59,15 @@ async function loadDisks() {
     }
 }
 
-async function loadAllMatches() {
-    try {
-        const data    = APIService.fetchMatches(1, 200);
-        const matches = APIService.transformData(data, 'football');
-        StorageState.allMatches = matches;
-    } catch (err) {
-        console.error('Erro ao carregar jogos:', err);
-        document.getElementById('storageStats').innerHTML =
-            `<div class="section-state"><p>Erro ao carregar dados.</p></div>`;
-    }
-}
-
 // ─── Normaliza um disco da API ───────────────────
 function normalizeDisk(disk) {
     const totalGB = disk.total_gb || 0;
     const usedGB  = disk.used_gb  || 0;
+    const freeGB  = disk.free_gb  || 0;
+    const pct     = disk.used_pct || 0;
 
-    // Recalcula free no cliente — API retorna free_gb: 0 quando planilha não preenchida
     const knownTotal = totalGB > 0;
-    const freeGB  = knownTotal ? Math.max(totalGB - usedGB, 0) : null;
-    const pct     = knownTotal ? Math.min(Math.round((usedGB / totalGB) * 100), 100) : null;
-    const rawPct  = knownTotal ? Math.round((usedGB / totalGB) * 100) : null; // pode passar 100
+    const rawPct  = pct;
 
     return {
         ...disk,
@@ -108,9 +80,9 @@ function normalizeDisk(disk) {
         rawPct,
         knownTotal,
         level: !knownTotal    ? 'ok'
-             : rawPct >= 100  ? 'critical'
-             : rawPct >= 85   ? 'critical'
-             : rawPct >= 70   ? 'warning'
+             : pct >= 100  ? 'critical'
+             : pct >= 95   ? 'critical'
+             : pct >= 90   ? 'warning'
              : 'ok',
     };
 }
@@ -142,7 +114,9 @@ function buildVolumes() {
                     ...disk,
                     archiveGB,
                     archivePct,
-                    matches,
+                    // Os jogos deste volume só são buscados quando o
+                    // detalhamento é aberto (ver loadVolumeMatches).
+                    matches: null,
                     color: VOLUME_COLORS[idx % VOLUME_COLORS.length],
                 };
             })
@@ -157,7 +131,7 @@ function buildVolumes() {
                 const freeGB  = totalGB - usedGB;
                 const pct     = Math.round((usedGB / totalGB) * 100);
                 return {
-                    name, matches: items,
+                    name, matches: null,
                     color: VOLUME_COLORS[idx % VOLUME_COLORS.length],
                     model: '—', brand: '—', disk_type: '—',
                     usedGB, archiveGB: usedGB, otherGB: 0,
@@ -197,9 +171,7 @@ function buildOverview() {
         ? Math.round((cloud.syncedCount / cloud.totalCount) * 100) : 0;
 
     document.getElementById('statTotalSize').textContent     = formatGB(totalUsedGB);
-    document.getElementById('statTotalGames').textContent    = allMatches.length.toLocaleString('pt-BR');
-    document.getElementById('statTotalDuration').textContent = formatHours(totalDuration);
-    document.getElementById('statCloudCoverage').textContent = `${cloudPct}%`;
+    document.getElementById('statTotalDisks').textContent    = diskSummary?.total_disks;
     document.getElementById('totalCapacityLabel').textContent =
         `${formatGB(totalCapGB)} total · ${formatGB(totalFreeGB)} livres`;
 
@@ -213,8 +185,7 @@ function buildOverview() {
         alerts.push(`<div class="storage-alert home-section">
             <span class="alert-icon">🔴</span>
             <span><strong>${overDisks.map(v => v.name).join(', ')}</strong>
-            ${overDisks.length > 1 ? 'estão' : 'está'} com uso acima de 100% —
-            verifique a planilha ou mova arquivos.</span>
+            ${overDisks.length > 1 ? 'estão' : 'está'} com uso acima de 100%</span>
         </div>`);
     }
     if (critVols.length) {
@@ -358,7 +329,7 @@ function renderCloudCard() {
 }
 
 // ─── Detalhe do volume ───────────────────────────
-function openVolumeDetail(vol) {
+async function openVolumeDetail(vol) {
     StorageState.currentVolume    = vol;
     StorageState.currentPage      = 1;
     StorageState.activeYearFilter = 'all';
@@ -379,7 +350,6 @@ function openVolumeDetail(vol) {
     ].join('');
 
     document.getElementById('volumeHero').innerHTML = `
-        <div class="volume-hero-icon">💾</div>
         <div class="volume-hero-info">
             <div class="volume-hero-name">${vol.name}</div>
             <div class="volume-hero-model">${modelLine}</div>
@@ -409,8 +379,72 @@ function openVolumeDetail(vol) {
         </div>` : ''}
     `;
 
+    renderVolumeStats(null); // "—" enquanto carrega jogos/duração
+    const sizeEl = document.getElementById('volStatSize');
+    if (sizeEl) sizeEl.textContent = formatGB(vol.archive_gb);
+
+    document.getElementById('volumeYearFilter').innerHTML = '';
+    document.getElementById('volumeGames').innerHTML =
+        `<div class="section-state"><p>Carregando jogos do volume...</p></div>`;
+
+    await loadVolumeMatches(vol);
+
+    if (StorageState.currentVolume !== vol) return;
+
+    AppState.matches = vol.matches;
+
+    renderVolumeStats(vol.matches);
     buildYearFilter(vol.matches);
     applyFiltersAndRender();
+}
+
+// Busca os jogos de um volume específico só quando o detalhamento é aberto,
+// usando o filtro server-side search_type=storage&search=<nome do disco>.
+async function loadVolumeMatches(vol) {
+    try {
+        const itemsPerPage = 1500;
+        const MAX_PAGES    = 10;
+
+        let page       = 1;
+        let matches    = [];
+        let totalItems = Infinity;
+
+        while (matches.length < totalItems && page <= MAX_PAGES) {
+            const apiResponse = await APIService.fetchByStorage(vol.name, page, itemsPerPage);
+            matches = matches.concat(APIService.transformData(apiResponse, 'football'));
+
+            totalItems = apiResponse?.pagination?.total_items
+                ?? apiResponse?.total_registros
+                ?? apiResponse?.total_records
+                ?? matches.length;
+
+            page++;
+        }
+
+        vol.matches = matches;
+    } catch (err) {
+        console.error(`Erro ao carregar jogos do volume "${vol.name}":`, err);
+        vol.matches = [];
+        document.getElementById('volumeGames').innerHTML =
+            `<div class="section-state"><p>Erro ao carregar jogos deste volume.</p></div>`;
+    }
+}
+
+// Atualiza os stats da sidebar (Jogos / Duração) com base nos jogos carregados
+function renderVolumeStats(matches) {
+    const gamesEl = document.getElementById('volStatGames');
+    const durEl   = document.getElementById('volStatDuration');
+    if (!gamesEl || !durEl) return;
+
+    if (!matches) {
+        gamesEl.textContent = '—';
+        durEl.textContent   = '—';
+        return;
+    }
+
+    const totalDuration = matches.reduce((a, m) => a + parseDuration(m.Duração), 0);
+    gamesEl.textContent = matches.length.toLocaleString('pt-BR');
+    durEl.textContent   = formatHours(totalDuration);
 }
 
 function buildYearFilter(matches) {
@@ -418,32 +452,24 @@ function buildYearFilter(matches) {
         const d = Utils.parseDate(m.Data);
         return d ? d.getFullYear() : null;
     }).filter(Boolean))].sort((a, b) => b - a);
-
-    const bar = document.getElementById('volumeYearFilter');
-    bar.innerHTML = '';
-    const allBtn = document.createElement('button');
-    allBtn.className = 'year-btn active';
-    allBtn.textContent = 'Todos';
-    allBtn.dataset.year = 'all';
-    bar.appendChild(allBtn);
-
+ 
+    const select = document.getElementById('volumeYearFilter');
+    select.innerHTML = `<option value="all" data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
+ 
     years.forEach(y => {
-        const btn = document.createElement('button');
-        btn.className = 'year-btn';
-        btn.textContent = y;
-        btn.dataset.year = y;
-        bar.appendChild(btn);
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        select.appendChild(opt);
     });
-
-    bar.addEventListener('click', e => {
-        const btn = e.target.closest('.year-btn');
-        if (!btn) return;
-        bar.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        StorageState.activeYearFilter = btn.dataset.year;
+ 
+    select.value = StorageState.activeYearFilter;
+ 
+    select.onchange = () => {
+        StorageState.activeYearFilter = select.value;
         StorageState.currentPage = 1;
         applyFiltersAndRender();
-    });
+    };
 }
 
 function applyFiltersAndRender() {
@@ -485,71 +511,70 @@ function applyFiltersAndRender() {
     StorageState.totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
     StorageState.currentPage = Math.min(StorageState.currentPage, StorageState.totalPages);
 
-    renderVolumeGames();
+    const start = (StorageState.currentPage - 1) * itemsPerPage;
+    AppState.filteredMatches = filtered.slice(start, start + itemsPerPage);
+    Renderer.render();
+
     updateVolumePagination();
 }
 
-function renderVolumeGames() {
-    const { filteredMatches, currentPage, itemsPerPage } = StorageState;
-    const container = document.getElementById('volumeGames');
+if (!Renderer._storagePatched) {
+    Renderer.render = function () {
+        const container = document.getElementById('volumeGames');
+        if (!container) return;
 
-    if (!filteredMatches.length) {
-        container.innerHTML = `<div class="section-state"><p>Nenhum jogo encontrado.</p></div>`;
-        return;
+        if (AppState.filteredMatches.length === 0) {
+            container.innerHTML = `<div class="section-state"><p>Nenhum jogo encontrado.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = '<div class="matches-grid" id="grid"></div>';
+        const grid = document.getElementById('grid');
+        AppState.filteredMatches.forEach(match => grid.appendChild(CardManager.create(match)));
+
+        document.dispatchEvent(new CustomEvent('matchesRendered'));
+    };
+    Renderer._storagePatched = true;
+}
+
+// ─── Card de jogo
+const _origCardCreate = CardManager.create.bind(CardManager);
+CardManager.create = function (match) {
+    const card = _origCardCreate(match);
+
+    const compInfo = card.querySelector('.competition-info');
+    if (compInfo) {
+        const phaseEl = compInfo.querySelector('.match-phase');
+        const dateDisplay = Utils.formatMatchDate(match.Data);
+        const competitionEl = compInfo.querySelector('.match-competition');
+        compInfo.innerHTML = `
+            ${competitionEl ? competitionEl.outerHTML : ''}
+            <div class="match-phase-date-row">
+                <span class="match-phase">${phaseEl ? phaseEl.textContent : ''}</span>
+                <span class="match-date-inline">${dateDisplay}</span>
+            </div>
+        `;
     }
 
-    const start = (currentPage - 1) * itemsPerPage;
-    const page  = filteredMatches.slice(start, start + itemsPerPage);
-    container.innerHTML = '';
-    const list = document.createElement('div');
-    list.className = 'matches-list';
-    page.forEach(m => list.appendChild(buildStorageGameCard(m)));
-    container.appendChild(list);
-}
+    const teamsEl = card.querySelector('.match-teams');
+    if (teamsEl) {
+        const { homeGoals, homeWinner, awayGoals, awayWinner } =
+            Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
 
-function buildStorageGameCard(match) {
-    const homeGoals = parseFloat(match['Gols mandante']);
-    const awayGoals = parseFloat(match['Gols visitante']);
-    const hasScore  = !isNaN(homeGoals) && !isNaN(awayGoals);
-    const homeWin   = hasScore && homeGoals > awayGoals;
-    const awayWin   = hasScore && awayGoals > homeGoals;
-    const color     = compColor(match.Competição);
-    const synced    = !!match.Nuvem;
+        const scoreCenter = document.createElement('div');
+        scoreCenter.className = 'match-score-center';
+        scoreCenter.innerHTML = `
+            <span class="score-val ${homeWinner ? 'winner' : awayWinner ? 'loser' : ''}">${homeGoals !== '' ? homeGoals : '-'}</span>
+            <span class="score-sep">x</span>
+            <span class="score-val ${awayWinner ? 'winner' : homeWinner ? 'loser' : ''}">${awayGoals !== '' ? awayGoals : '-'}</span>
+        `;
 
-    const card = document.createElement('div');
-    card.className = 'storage-game-card';
-    card.addEventListener('click', () => MatchModal.fetchAndShow(match.ID, 'football'));
-    card.innerHTML = `
-        <div class="storage-game-comp">
-            <span class="storage-comp-dot" style="background:${color}"></span>
-            ${match.Competição || ''}
-            ${match.Fase ? `· <span>${match.Fase}</span>` : ''}
-        </div>
-        <div class="storage-game-teams">
-            <div class="storage-team-home">
-                ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" class="storage-team-logo" onerror="this.style.display='none'" alt="">` : ''}
-                <span class="storage-team-name ${homeWin ? 'winner' : awayWin ? 'loser' : ''}">${match.Mandante || '—'}</span>
-            </div>
-            <div class="storage-score-center">
-                <span class="sc-val ${homeWin ? 'winner' : awayWin ? 'loser' : ''}">${hasScore ? Math.round(homeGoals) : '—'}</span>
-                <span class="sc-sep">×</span>
-                <span class="sc-val ${awayWin ? 'winner' : homeWin ? 'loser' : ''}">${hasScore ? Math.round(awayGoals) : '—'}</span>
-            </div>
-            <div class="storage-team-away">
-                <span class="storage-team-name ${awayWin ? 'winner' : homeWin ? 'loser' : ''}">${match.Visitante || '—'}</span>
-                ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" class="storage-team-logo" onerror="this.style.display='none'" alt="">` : ''}
-            </div>
-        </div>
-        <div class="storage-game-footer">
-            ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" class="broadcaster-logo" style="height:18px" onerror="this.style.display='none'" alt="">` : ''}
-            ${match.Qualidade ? `<span class="tech-badge">${match.Qualidade}</span>` : ''}
-            ${match['Formato de áudio'] ? `<span class="tech-badge">${match['Formato de áudio']}</span>` : ''}
-            <span class="cloud-indicator ${synced ? 'synced' : 'unsynced'}" title="${synced ? 'Backup em cloud' : 'Sem backup'}"></span>
-            <span class="storage-game-size">${match.Tamanho || ''}</span>
-        </div>
-    `;
+        const teams = teamsEl.querySelectorAll('.team');
+        if (teams.length === 2) teamsEl.insertBefore(scoreCenter, teams[1]);
+    }
+
     return card;
-}
+};
 
 function updateVolumePagination() {
     const { currentPage, totalPages } = StorageState;
@@ -587,9 +612,9 @@ function bindDetailEvents() {
     });
 
     document.getElementById('storageQuickFilters').addEventListener('click', e => {
-        const btn = e.target.closest('.storage-filter-btn');
+        const btn = e.target.closest('.view-btn');
         if (!btn) return;
-        document.querySelectorAll('.storage-filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         StorageState.activeQualFilter = btn.dataset.filter;
         StorageState.currentPage = 1;
@@ -612,15 +637,6 @@ function estimateTotalCapacity(usedGB) {
     const usedTB = usedGB / 1024;
     for (const t of tbs) { if (usedTB <= t * 0.98) return t * 1024; }
     return usedGB * 1.15;
-}
-
-function compColor(competition) {
-    if (!competition) return 'var(--text-tertiary)';
-    const lc = competition.toLowerCase();
-    for (const [key, val] of Object.entries(COMP_COLORS)) {
-        if (lc.includes(key)) return val;
-    }
-    return 'var(--accent-color)';
 }
 
 function formatGB(gb) {

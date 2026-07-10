@@ -501,9 +501,6 @@ const RequestModule = (() => {
         });
     }
 
-    // ══════════════════════════════════════════════════════════
-    //  BOTÃO "+ PEDIR" NOS CARDS
-    // ══════════════════════════════════════════════════════════
     function _injectRequestButtons() {
         const sport = CONFIG?.currentSport || 'football';
         document.querySelectorAll('.match-card[data-match-id]').forEach(card => {
@@ -536,6 +533,53 @@ const RequestModule = (() => {
         });
     }
 
+    function _injectModalButton(match) {
+        const scoreEl = document.getElementById('modalScore');
+        if (!scoreEl) return;
+
+        const sport = CONFIG?.currentSport || 'football';
+
+        // Reaproveita/cria o mesmo container usado por "Statistics" e "Assistir jogo"
+        let buttonsRow = scoreEl.querySelector('.score-header-buttons');
+        if (!buttonsRow) {
+            buttonsRow = document.createElement('div');
+            buttonsRow.className = 'score-header-buttons';
+            scoreEl.appendChild(buttonsRow);
+        }
+
+        let wrap = document.getElementById('modalAddBtnWrap');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.className = 'score-button-container';
+            wrap.id = 'modalAddBtnWrap';
+            wrap.innerHTML = `<button id="modalAddBtn" class="score-button modal-add-btn"><span></span></button>`;
+            buttonsRow.appendChild(wrap);
+        } else if (wrap.parentElement !== buttonsRow) {
+            // modal foi trocado (novo match.show()) — reanexa no container atual
+            buttonsRow.appendChild(wrap);
+        }
+
+        const btn = document.getElementById('modalAddBtn');
+        _updateModalButtonState(btn, match, sport);
+
+        btn.onclick = () => {
+            if (API.isInCart(match.ID, sport)) {
+                Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
+                return;
+            }
+            API.addItem(match);
+            _updateModalButtonState(btn, match, sport);
+        };
+    }
+
+    function _updateModalButtonState(btn, match, sport) {
+        const inCart = API.isInCart(match.ID, sport);
+        const label  = inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtnText');
+        btn.querySelector('span').textContent = label;
+        btn.title = label;
+        btn.classList.toggle('om-added', inCart);
+    }
+
     // Atualiza estado visual dos botões sem reinjetar (ex: troca de esporte)
     function _refreshButtonStates() {
         const sport = CONFIG?.currentSport || 'football';
@@ -560,7 +604,7 @@ const RequestModule = (() => {
     // ══════════════════════════════════════════════════════════
     function _patchManagers() {
         // Patch CardManager.create
-        if (window.CardManager && !CardManager._rmPatched) {
+        if (typeof CardManager !== 'undefined' && !CardManager._rmPatched) {
             const orig = CardManager.create.bind(CardManager);
             CardManager.create = function (match) {
                 const card = orig(match);
@@ -571,7 +615,7 @@ const RequestModule = (() => {
         }
 
         // Patch MotorCardManager.create
-        if (window.MotorCardManager && !MotorCardManager._rmPatched) {
+        if (typeof MotorCardManager !== 'undefined' && !MotorCardManager._rmPatched) {
             const orig = MotorCardManager.create.bind(MotorCardManager);
             MotorCardManager.create = function (match) {
                 const card = orig(match);
@@ -579,6 +623,26 @@ const RequestModule = (() => {
                 return card;
             };
             MotorCardManager._rmPatched = true;
+        }
+    }
+
+    function _patchModal() {
+        if (typeof MatchModal !== 'undefined' && !MatchModal._rmPatched) {
+            const origShow = MatchModal.show.bind(MatchModal);
+            MatchModal.show = function (match) {
+                origShow(match);
+                _injectModalButton(match);
+            };
+            MatchModal._rmPatched = true;
+        }
+
+        if (typeof MotorModal !== 'undefined' && !MotorModal._rmPatched) {
+            const origShow = MotorModal.show.bind(MotorModal);
+            MotorModal.show = function (event) {
+                origShow(event);
+                _injectModalButton(event);
+            };
+            MotorModal._rmPatched = true;
         }
     }
 
@@ -596,12 +660,14 @@ const RequestModule = (() => {
         // estar undefined no momento em que _init() executa.
         document.addEventListener('matchesRendered', () => {
             _patchManagers();        // garante data-match-id nos creates futuros
+            _patchModal();
             _injectRequestButtons(); // injeta nos cards já no DOM
         });
 
         // Garante patch assim que os managers existirem
         // (útil se DOMContentLoaded já disparou antes do evento)
         _patchManagers();
+        _patchModal();
 
         // ESC fecha o painel
         document.addEventListener('keydown', (e) => {

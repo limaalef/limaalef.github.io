@@ -28,7 +28,7 @@
     background: var(--bg-warning);
     border: 1px solid var(--warning-color);
     color: var(--text-warning);
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -313,7 +313,13 @@
 .cloud-action-btn:hover { background: var(--bg-tertiary); }
 
 /* ── DETALHE DO VOLUME ── */
-.storage-detail { }
+.volume-group {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 34px auto;
+    padding: var(--sp-6) var(--sp-5) var(--sp-5);
+    gap: var(--sp-3);
+}
 
 .volume-hero {
     display: flex;
@@ -321,32 +327,23 @@
     gap: 14px;
     margin-bottom: 14px;
 }
-.volume-hero-icon {
-    width: 44px;
-    height: 44px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-xxl);
-    color: var(--text-tertiary);
-    flex-shrink: 0;
-}
+
 .volume-hero-name {
     font-size: var(--font-size-mxxl);
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.03em;
 }
+
 .volume-hero-model {
     font-size: var(--font-size-sm);
     color: var(--text-tertiary);
     margin-top: 2px;
 }
 
-.storage-bar-wrap { margin-bottom: 8px; }
+.storage-bar-wrap {
+    padding: 0 var(--sp-5) var(--sp-5) var(--sp-5);
+}
 .storage-bar-bg {
     height: 6px;
     background: var(--bg-tertiary);
@@ -398,109 +395,6 @@
     color: var(--text-accent-color);
 }
 
-/* ── Cards de jogos na visão do volume ── */
-/* Reutiliza .match-card do components.css com pequenas extensões */
-.storage-game-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-xl);
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-}
-.storage-game-card:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-primary);
-}
-
-.storage-game-comp {
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
-}
-.storage-comp-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.storage-game-teams {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 8px;
-}
-.storage-team-home {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-}
-.storage-team-away {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: flex-end;
-    min-width: 0;
-}
-.storage-team-name {
-    font-size: var(--font-size-lg);
-    font-weight: 500;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.storage-team-name.winner { color: var(--accent-color); font-weight: 700; }
-.storage-team-name.loser  { color: var(--text-tertiary); font-weight: 400; }
-.storage-team-logo { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
-
-.storage-score-center {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: nowrap;
-    padding: 0 4px;
-}
-.storage-score-center .sc-sep {
-    font-size: var(--font-size-md);
-    color: var(--text-tertiary);
-    font-weight: 400;
-}
-.storage-score-center .sc-val.winner { color: var(--accent-color); }
-.storage-score-center .sc-val.loser  { color: var(--text-tertiary); font-weight: 400; }
-
-/* Footer do card: badges técnicos + tamanho + cloud */
-.storage-game-footer {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-.storage-game-size {
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-    margin-left: auto;
-}
-.cloud-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-.cloud-indicator.synced   { background: var(--info-color); }
-.cloud-indicator.unsynced { background: var(--bg-tertiary); border: 1px solid var(--border-color); }
-
 /* ── Responsivo ── */
 @media (max-width: 496px) {
     .volume-card-detail {
@@ -512,8 +406,5 @@
     }
     .storage-overview .stats .stat {
         flex: 1 1 calc(50% - 10px);
-    }
-    .storage-game-teams {
-        grid-template-columns: 1fr auto 1fr;
     }
 }

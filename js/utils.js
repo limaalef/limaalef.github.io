@@ -240,7 +240,6 @@ const Elements = {
     },
 
     setStorageBadges(local, cloud) {
-        console.log(cloud)
         return `
             ${local ? `<span class="storage-badge badge-success">${local}</span>` : ''}
             ${cloud || String(cloud).toLowerCase() === 'nuvem' ? `<span class="storage-badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}

@@ -142,27 +142,24 @@ Renderer.populateYearFilter = function () {
     const bar = document.getElementById('yearFilterBar');
     if (!bar) return;
 
-    const allYearsText = LanguageManager.t('allYears') || 'Todos';
-    const sortedYears  = Array.from(years).sort((a, b) => b - a);
-
-    bar.innerHTML = [null, ...sortedYears].map(year => {
-        const isActive = year === CollectionState.yearFilter;
-        const label    = year === null ? allYearsText : year;
-        return `<button class="year-btn ${isActive ? 'active' : ''}" data-year="${year ?? ''}">${label}</button>`;
-    }).join('');
-
-    bar.querySelectorAll('.year-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const val = btn.dataset.year;
-            CollectionState.yearFilter = val ? parseInt(val) : null;
-
-            bar.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            AppState.currentPage = 1;
-            CollectionApp.loadData();
-        });
+    bar.innerHTML = `<option value=null data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
+ 
+    years.forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        bar.appendChild(opt);
     });
+ 
+    bar.value = CollectionState.yearFilter;
+ 
+    bar.onchange = () => {
+        const val = bar.value;
+        CollectionState.yearFilter = val ? parseInt(val) : null;
+        AppState.currentPage = 1;
+        CollectionApp.loadData();
+        console.log(CollectionState.yearFilter)
+    };
 };
 
 /* ─────────────────────────────────────────

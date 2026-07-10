@@ -17,6 +17,7 @@
     --border-color: #d8d6d0;
 
     --accent-color: #8b5cf6;
+    --accent-color-rgb: 139, 92, 246;
     --accent-hover: #7c3aed;
     --bg-accent-color: #ede9fe;
     --text-accent-color: #ffffff;
@@ -185,6 +186,7 @@ body.theme-carnaval {
         --border-color: #333333;
 
         --accent-color: #e8ff4a;
+        --accent-color-rgb: 232, 255, 74;
         --accent-hover: #bdda07;
         --bg-accent-color: #1e2200;
         --text-accent-color: #000000;

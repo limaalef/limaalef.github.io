@@ -22,7 +22,7 @@
     --om-avatar-size:   38px;
     --om-z-overlay:     9010;
     --om-z-panel:       9020;
-    --om-z-fab:         800;
+    --om-z-fab:         1000;
     --om-z-add-btn:     10;
 }
 
@@ -424,11 +424,31 @@
 /* Cards precisam de position: relative para o botão absoluto */
 .match-card { position: relative !important; }
 
+.modal-add-btn {
+    background-color: var(--accent-color);
+}
+
+.modal-add-btn:hover {
+    background-color: var(--text-accent-color);
+    color: var(--accent-color);
+}
+
+.modal-add-btn.om-added {
+    border-color: var(--success-color);
+    background: var(--bg-success);
+    color: var(--text-success);
+}
+
+.modal-add-btn.om-added:hover {
+    background: var(--success-color);
+    color: var(--text-accent-color);
+}
+
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVO
    ══════════════════════════════════════════════════════════════ */
 @media (max-width: 496px) {
-    .om-panel { width: 100vw; }
+    .om-panel { width: 100%; border-left: 0px;}
 
     .om-cart-fab {
         width: var(--om-fab-size-sm);
