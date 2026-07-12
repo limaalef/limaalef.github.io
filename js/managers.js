@@ -42,11 +42,21 @@ const PaginationManager = {
 const CardManager = {
     create(match) {
         const card = document.createElement('div');
+        const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
+        const sourceCount = sources ? sources.length : 1;
+
         card.dataset.matchId = match.ID;
         const status = Utils.getMatchStatus(match);
         const hasVideo = match['Video Embed'] ? 'has-video' : '';
         card.className = `match-card ${status} ${hasVideo}`;
-        card.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
+        card.onclick = () => {
+            if (sources && sources.length > 1) {
+                SourcePicker.open(match);
+            } else {
+                const singleId = (sources && sources.length === 1) ? sources[0].id : match.ID;
+                MatchModal.fetchAndShow(singleId, CONFIG.currentSport);
+            }
+        };
         
         const { homeGoals, homeWinner, homeLoser,
                 awayGoals, awayWinner, awayLoser,
@@ -99,11 +109,18 @@ const CardManager = {
                 </div>
             </div>
             <div class="match-footer">
-                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
-                <div class="tech-badges">
-                    ${match.Qualidade ? `<span class="tech-badge">${match.Qualidade}</span>` : ''}
-                    <span class="tech-badge">${audioFormat}</span>
-                </div>
+                ${sourceCount > 1 ? `
+                    <div class="sources-count-badge" title="${sourceCount} ${LanguageManager.t('sourcesCount') || 'fontes disponíveis'}">
+                        <span class="sources-count-value">${sourceCount}</span>
+                        <span class="sources-count-label">${LanguageManager.t('sourcesCount')}</span>
+                    </div>
+                ` : `
+                    ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
+                    <div class="tech-badges">
+                        ${match.Qualidade ? `<span class="tech-badge">${match.Qualidade}</span>` : ''}
+                        <span class="tech-badge">${audioFormat}</span>
+                    </div>
+                `}
             </div>
         `;
         return card;
@@ -228,8 +245,16 @@ const ListManager = {
     create(match) {
         const item = document.createElement('div');
         const status = Utils.getMatchStatus(match);
+        const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
         item.className = `list-item ${status}`;
-        item.onclick = () => MatchModal.fetchAndShow(match.ID, CONFIG.currentSport);
+        item.onclick = () => {
+            if (sources && sources.length > 1) {
+                SourcePicker.open(match);
+            } else {
+                const singleId = (sources && sources.length === 1) ? sources[0].id : match.ID;
+                MatchModal.fetchAndShow(singleId, CONFIG.currentSport);
+            }
+        };
         
         const homeGoals = Utils.parseGoals(match['Gols mandante']);
         const awayGoals = Utils.parseGoals(match['Gols visitante']);
@@ -241,6 +266,10 @@ const ListManager = {
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
 
+        const broadcasterCell = (sources && sources.length > 1)
+            ? `<span style="font-size: 0.85em; color: var(--text-secondary);">${sources.length} ${LanguageManager.t('sourcesCount') || 'fontes'}</span>`
+            : (match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">${match.Emissora || 'N/A'}</span>`);
+
         item.innerHTML = `
             <div><strong>${Utils.formatMatchDate(match.Data, true)}</strong></div>
             <div>
@@ -251,7 +280,7 @@ const ListManager = {
             </div>
             <div style="text-align: center; font-size: 0.85em;">${match.Qualidade || 'N/A'}</div>
             <div style="text-align: right;">
-                ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">${match.Emissora || 'N/A'}</span>`}
+                ${broadcasterCell}
             </div>
         `;
         return item;
@@ -288,6 +317,57 @@ const MotorListManager = {
             </div>
         `;
         return item;
+    }
+};
+
+const SourcePicker = {
+    open(match) {
+        document.body.style.overflow = 'hidden';
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const score = document.getElementById('modalScore');
+        const body  = document.getElementById('modalBody');
+        if (!modal || !title || !score || !body) return;
+
+        modal.querySelector('.modal-content').style.minHeight = '1px'
+
+        const existingShareBtn = document.getElementById('modalShareBtn');
+        if (existingShareBtn) existingShareBtn.remove();
+
+        const competition = LanguageManager.translateText(match.Competição);
+        const phase = LanguageManager.translateText(match.Fase);
+
+        title.innerHTML = ``;
+
+        score.innerHTML = ``;
+
+        const sources = Array.isArray(match.Fontes) ? match.Fontes : [];
+        const chooseSourceTitle = LanguageManager.t('chooseSource');
+
+        body.innerHTML = `
+            <div class="detail-section">
+                <div class="section-title modal-style">${chooseSourceTitle}</div>
+                <div class="source-picker-list" id="sourcePickerList">
+                    ${sources.map(src => `
+                        <button class="source-picker-item" data-source-id="${src.id}">
+                            ${src.station?.logo
+                                ? `<img src="${src.station.logo}" alt="${src.station?.name || ''}" class="broadcaster-logo${noFilterLogos.includes(src.station.logo) ? ' no-filter' : ''}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'source-picker-fallback-name',textContent:${JSON.stringify(src.station?.name || `#${src.id}`)}}))">`
+                                : `<span class="source-picker-fallback-name">${src.station?.name || `#${src.id}`}</span>`
+                            }
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        body.querySelectorAll('.source-picker-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.querySelector('.modal-content').style.removeProperty('min-height');
+                MatchModal.fetchAndShow(btn.dataset.sourceId, CONFIG.currentSport);
+            });
+        });
+
+        modal.classList.add('active');
     }
 };
 
@@ -946,8 +1026,10 @@ const Renderer = {
         
         const totalFileSize = apiResponse?.total_size;
         const totalMinutes = apiResponse?.total_duration;
+        const totalFiles = apiResponse?.total_files;
         
         document.getElementById('totalGames').textContent = totalGames;
+        document.getElementById('totalFiles').textContent = totalFiles;
         document.getElementById('totalSize').textContent = pendingCount;
 
         if (totalFileSize < 1099511627776) {
@@ -984,6 +1066,7 @@ const FilterManager = {
     apply() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         const year = document.getElementById('yearFilter').value;
+        
         AppState.filteredMatches = AppState.matches.filter(match => {
             const matchesQuery = Object.values(match).some(val => String(val).toLowerCase().includes(query));
             let matchesYear = true;

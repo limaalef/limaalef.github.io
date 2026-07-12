@@ -14,6 +14,10 @@ const APIService = {
         const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
+
+        if (CONFIG.currentSport === 'football') {
+            url.searchParams.append('type', 'group');
+        }
         
         if (CONFIG.videoFilter) {
             url.searchParams.append('embed', 'true');
@@ -62,6 +66,10 @@ const APIService = {
         url.searchParams.append('page', page);
         url.searchParams.append('search_type', CollectionState.type);
         url.searchParams.append('search', CollectionState.query);
+
+        if (CONFIG.currentSport === 'football' && CollectionState.type !== 'commentor') {
+            url.searchParams.append('type', 'group');
+        }
 
         if (CollectionState.yearFilter) {
             url.searchParams.append('year', CollectionState.yearFilter);
@@ -146,34 +154,41 @@ const APIService = {
                 Tipo: item.type || ''
             }));
         }
-        return (apiResponse.data || []).map(item => ({
-            ID: item.id ?? '',
-            Data: item.date || '',
-            Emissora: item.station?.name || '',
-            Origem: item.station?.origem || '',
-            Narração: item.station?.narracao || '',
-            'Logo emissora': item.station?.logo || '',
-            Competição: item.championship?.name || '',
-            Fase: item.championship?.phase || '',
-            Estadio: item.championship?.stadium || '',
-            Mandante: item.home_team?.name || '',
-            'Gols mandante': item.home_team?.goals,
-            'Logo mandante': item.home_team?.logo || '',
-            Visitante: item.away_team?.name || '',
-            'Gols visitante': item.away_team?.goals,
-            'Logo visitante': item.away_team?.logo || '',
-            Obs: item.additional_info || '',
-            Imagem: item.image || '',
-            Local: item.technical_details?.local || '',
-            Nuvem: item.technical_details?.cloud ? 'Nuvem' : '',
-            Duração: item.technical_details?.duration || '',
-            Tamanho: item.technical_details?.file_size || '',
-            Qualidade: item.technical_details?.video_quality || '',
-            Bitrate: item.technical_details?.video_bitrate || '',
-            'Formato de áudio': item.technical_details?.audio_format || '2.0',
-            'Video Embed': item.embed_video || '',
-            'Mais dados': !!item.match_data,
-            Tipo: item.type || ''
-        }));
+        return (apiResponse.data || []).map(item => {
+            const sources = Array.isArray(item.sources) ? item.sources : null;
+
+            return {
+                ID: item.id ?? '',
+                Data: item.date || '',
+                Emissora: item.station?.name || '',
+                Origem: item.station?.origem || '',
+                Narração: item.station?.narracao || '',
+                'Logo emissora': item.station?.logo || '',
+                Competição: item.championship?.name || '',
+                Fase: item.championship?.phase || '',
+                Estadio: item.championship?.stadium || '',
+                Mandante: item.home_team?.name || '',
+                'Gols mandante': item.home_team?.goals,
+                'Logo mandante': item.home_team?.logo || '',
+                Visitante: item.away_team?.name || '',
+                'Gols visitante': item.away_team?.goals,
+                'Logo visitante': item.away_team?.logo || '',
+                Obs: item.additional_info || '',
+                Imagem: item.image || '',
+                Local: item.technical_details?.local || '',
+                Nuvem: item.technical_details?.cloud ? 'Nuvem' : '',
+                Duração: item.technical_details?.duration || '',
+                Tamanho: item.technical_details?.file_size ?? item.total_file_size ?? '',
+                Qualidade: item.technical_details?.video_quality || '',
+                Bitrate: item.technical_details?.video_bitrate || '',
+                'Formato de áudio': item.technical_details?.audio_format || '2.0',
+                'Video Embed': item.embed_video || (item.has_video ? true : ''),
+                'Mais dados': !!item.match_data || !!item.has_stats,
+                Tipo: item.type || '',
+                // Agrupamento de fontes (só presente na listagem)
+                Fontes: sources,
+                QtdFontes: sources ? sources.length : 1
+            };
+        });
     }
 };

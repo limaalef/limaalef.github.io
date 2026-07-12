@@ -608,7 +608,15 @@ const RequestModule = (() => {
             const orig = CardManager.create.bind(CardManager);
             CardManager.create = function (match) {
                 const card = orig(match);
-                card.dataset.matchId = match.ID;
+                const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
+
+                if (sources && sources.length > 1) {
+                    card.dataset.groupId = match.ID;
+                    card.dataset.sourceCount = String(sources.length);
+                    delete card.dataset.matchId;
+                } else {
+                    card.dataset.matchId = (sources && sources.length === 1) ? sources[0].id : match.ID;
+                }
                 return card;
             };
             CardManager._rmPatched = true;

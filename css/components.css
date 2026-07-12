@@ -570,23 +570,7 @@ input[type="text"]:focus {
 
 /* Cards com Vídeo */
 .match-card.has-video {
-    border: 2px solid #FFD700;
-}
-
-.match-card.has-video::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
-    animation: shimmerGold 3s infinite;
-}
-
-@keyframes shimmerGold {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    border: 1px solid #af9500;
 }
 
 .match-card.has-video:hover {
@@ -758,6 +742,65 @@ input[type="text"]:focus {
     color: var(--text-secondary);
     background-color: var(--bg-tertiary);
     transition: background 0.3s ease;
+}
+
+.sources-count-badge {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-1);
+    padding: var(--sp-1) var(--sp-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-xs);
+    background-color: var(--bg-tertiary);
+}
+
+.sources-count-value {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--accent-color, var(--text-primary));
+}
+
+.sources-count-label {
+    font-size: var(--font-size-mds);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.source-picker-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+}
+
+.source-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    height: 56px;
+    padding: var(--sp-2) var(--sp-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-sm);
+    background-color: var(--bg-tertiary);
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.source-picker-item:hover {
+    border-color: var(--accent-color, var(--text-primary));
+    transform: translateY(-2px);
+}
+
+.source-picker-item .broadcaster-logo {
+    height: 28px;
+    max-width: 88px;
+}
+
+.source-picker-fallback-name {
+    font-size: var(--font-size-mds);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 /* ========================================

@@ -244,6 +244,7 @@ const CollectionApp = {
             const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText')} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
             Utils.showNotification(message, 'success');
         } catch (error) {
+            console.log(error)
             document.getElementById('matchesContainer').innerHTML =
                 Utils.emptyStateHtml(
                     'Erro ao carregar dados',
