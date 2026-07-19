@@ -56,6 +56,11 @@ function renderWatch(match, sport, raw) {
         if (detail.plays) {
             Elements.renderPlays(detail, detail.homeTeam.tla);
         }
+
+        if (detail.penalties?.length) {
+            Elements.renderPenalties(detail, detail.homeTeam.tla);
+        }
+        
     });
 }
 

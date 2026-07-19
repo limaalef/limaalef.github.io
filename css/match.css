@@ -417,3 +417,137 @@
     .plays-minute      { min-width: 30px; }
 }
  
+/* Cabeçalho com nomes dos times e placar */
+.pen-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4) var(--sp-2);
+    background: var(--bg-secondary);
+}
+ 
+.pen-team-name {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+}
+.pen-team-name.home { justify-content: flex-start; }
+.pen-team-name.away { justify-content: flex-end;   }
+ 
+.pen-team-logo {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+ 
+.pen-score {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: -0.02em;
+}
+
+.pen-score-row {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    position: relative;
+}
+.pen-score-row::before,
+.pen-score-row::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 46%;
+    height: 1px;
+    background: var(--border-color);
+}
+.pen-score-row::before { left: 0; }
+.pen-score-row::after  { right: 0; }
+ 
+/* Indicador de quem bateu primeiro */
+.pen-first-label {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0 var(--sp-4) var(--sp-1);
+    font-size: var(--font-size-sm);
+    gap: 6px;
+}
+ 
+.pen-first-arrow {
+    font-size: var(--font-size-xs);
+    color: var(--accent-color);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.pen-first-arrow.home { grid-column: 1; text-align: left;  }
+.pen-first-arrow.away { grid-column: 3; text-align: right; }
+ 
+/* Linha de uma rodada */
+.pen-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+}
+.pen-row:last-child { padding-bottom: var(--sp-3); }
+ 
+/* Número da rodada (centro) */
+.pen-round {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-weight: 600;
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+ 
+/* Célula de uma cobrança */
+.pen-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-width: 0;
+}
+.pen-cell.home { justify-content: flex-start; flex-direction: row-reverse; }
+.pen-cell.away { justify-content: flex-end;   flex-direction: row-reverse; }
+.pen-cell.empty { opacity: 0; pointer-events: none; }
+ 
+/* Ícone de gol/erro */
+.pen-icon {
+    font-size: var(--font-size-md);
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+ 
+/* Nome do cobrador */
+.pen-name {
+    font-size: var(--font-size-mdm);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+ 
+/* Coloração por resultado */
+.pen-cell.scored .pen-name { color: var(--text-primary); }
+.pen-cell.missed .pen-name { color: var(--text-tertiary); text-decoration: line-through; }
+.pen-cell.missed .pen-icon { opacity: 0.45; }
+ 
+/* Responsivo */
+@media (max-width: 360px) {
+    .pen-name  { max-width: 76px; font-size: var(--font-size-sm); }
+    .pen-round { min-width: 22px; }
+}

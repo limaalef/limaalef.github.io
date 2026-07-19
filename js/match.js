@@ -59,6 +59,9 @@ function renderMatch(match, sport, raw) {
         document.getElementById('modalBody').style.display = 'block';
 
         Elements.renderPlays(detail, detail.homeTeam.tla);
+        if (detail.penalties?.length) {
+            Elements.renderPenalties(detail, detail.homeTeam.tla);
+        }
         renderMatchInfo(detail);
         renderLastResults(detail.last_results, detail.homeTeam?.name, detail.awayTeam?.name);
         Elements.renderStatistics(detail.statistics, detail);
