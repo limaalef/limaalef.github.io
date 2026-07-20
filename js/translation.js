@@ -48,6 +48,14 @@ const translations = {
         competition: 'Competição',
         phase: 'Fase',
         city: 'Cidade',
+
+        'Público pagante': 'Público pagante',
+        'Público total': 'Público total',
+        'Público': 'Público total',
+        revenue: 'Renda',
+        ticketAveragePrice: 'Valor médio do ingresso',
+        stadiumCapacity: "da capacidade",
+
         division: 'Divisão',
         plot: 'Samba-enredo',
         carnavalesco: 'Carnavalesco',
@@ -90,6 +98,7 @@ const translations = {
         technicalInfo: 'Especificações técnicas',
         storageInfo: 'Armazenamento',
         refereeInfo: 'Arbitragem',
+        attRevInfo: 'Público e renda',
         referee: 'Árbitro',
         refereeAssis: 'Assistentes',
         refereeFourth: 'Quarto árbitro',
@@ -483,6 +492,7 @@ const translations = {
         technicalInfo: 'Technical Information',
         storageInfo: 'Storage Information',
         refereeInfo: 'Referee Information',
+        attRevInfo: 'Attendance and revenue',
         referee: 'Referee',
         refereeAssis: 'Assistants',
         refereeFourth: 'Fourth official',
@@ -520,6 +530,13 @@ const translations = {
         Apelido: 'Nickname',
         Estádio: 'Stadium',
         Cidade: 'City',
+
+        'Público pagante': 'Paid attendance',
+        'Público total': 'Attendance',
+        'Público': 'Attendance',
+        revenue: 'Revenue',
+        ticketAveragePrice: 'Average ticket price',
+        stadiumCapacity: "stadium's capacity",
 
         Cabo: 'Cable TV',
         Download: 'Download',
@@ -822,6 +839,14 @@ const LanguageManager = {
         window.appLang = lang;
         document.getElementById('langFlag').textContent = lang === 'pt-BR' ? '🇧🇷' : '🇺🇸';
         this.updateAllTexts(rerender);
+    },
+
+    getLanguage() {
+        if (this.currentLang === 'en') {
+            return 'en-US'
+        } else {
+            return 'pt-BR'
+        }
     },
 
     t(key) {

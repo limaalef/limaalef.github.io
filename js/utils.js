@@ -219,9 +219,17 @@ const Elements = {
         if (!items.length) return null;
 
         return items.map(i => `
-            <div class="detail-list-item">
-                <div class="detail-list-label">${LanguageManager.t(i.label)}</div>
-                <div class="detail-list-value">${i.value}</div>
+            <div class="detail-list-item ${i.noNewLine === true ? 'no-new-line' : '' }">
+                ${i.progressBar === true ? `
+                    <div class="detail-list-progress-bar">
+                        <div style="height:100%; width:${i.value}%; background:var(--accent-color); border-radius:3px;"></div>
+                    </div>
+                    <div class="detail-list-progress-bar-value">${i.label}</div>`: 
+                    `<div class="detail-list-label">
+                        ${i.svg || ''}
+                        ${LanguageManager.t(i.label)}
+                    </div>
+                    <div class="detail-list-value">${i.value}</div>` }
             </div>
         `).join('');
     },

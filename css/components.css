@@ -1276,12 +1276,33 @@ input[type="text"]:focus {
 
 .detail-label,
 .detail-list-label {
+    display: flex;
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
 }
 
 .detail-list-label {
-    width: 30%;
+    width: 35%;
+    gap: var(--sp-1);
+}
+
+.detail-list-label svg {
+    width: calc(var(--font-size-sm) + 0.25rem);
+    height: var(--font-size-sm);
+}
+
+.detail-list-progress-bar {
+    height: 5px;
+    flex: 1;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-right: var(--sp-3);
+}
+
+.detail-list-progress-bar-value {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 .detail-value,
@@ -1293,14 +1314,13 @@ input[type="text"]:focus {
 }
 
 .detail-list-value {
-    width: 70%;
+    width: auto;
     text-align: right;
 }
 
 .detail-list {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-1);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-size-xl);
     overflow: hidden;
@@ -1312,10 +1332,16 @@ input[type="text"]:focus {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-top: 1px solid var(--border-color);
 }
 
-.detail-list-item:not(:last-child) {
-    border-bottom: 1px solid var(--border-color);
+.detail-list-item:first-child {
+    border-top: 0px
+}
+
+.detail-list-item.no-new-line {
+    border-top: 0px;
+    padding-top: 0px;
 }
 
 .detail-list-item.judgment-item {
