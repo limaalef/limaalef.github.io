@@ -1282,7 +1282,7 @@ input[type="text"]:focus {
 }
 
 .detail-list-label {
-    width: 35%;
+    min-width: 35%;
     gap: var(--sp-1);
 }
 
