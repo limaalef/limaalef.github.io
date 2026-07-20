@@ -204,31 +204,11 @@ function renderMatchInfo(detail) {
 }
 
 function renderAttRev(detail) {
-    const rows = [
-        { label: detail.attendance.label,  value: detail.attendance.value.toLocaleString(LanguageManager.getLanguage()), svg: '<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'},
-        
-        ...(detail.attendance.pct ? [
-        { label: `${detail.attendance.pct}% ` + LanguageManager.translateText('stadiumCapacity'), value: detail.attendance.pct, noNewLine: true, progressBar: true }] : []),
-        
-        { label: 'revenue',  value: detail.revenue.value.toLocaleString(LanguageManager.getLanguage(), {style: 'currency', currency: detail.revenue.currency}), svg: '<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_443_3628)"><rect x="2" y="6" width="20" height="12" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 10C21.4747 10 20.9546 9.89654 20.4693 9.69552C19.984 9.4945 19.543 9.19986 19.1716 8.82843C18.8001 8.45699 18.5055 8.01604 18.3045 7.53073C18.1035 7.04543 18 6.52529 18 6L22 6L22 10Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 18C18 16.9391 18.4214 15.9217 19.1716 15.1716C19.9217 14.4214 20.9391 14 22 14L22 18L18 18Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14C3.06087 14 4.07828 14.4214 4.82843 15.1716C5.57857 15.9217 6 16.9391 6 18L2 18L2 14Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6C6 7.06087 5.57857 8.07828 4.82843 8.82843C4.07828 9.57857 3.06087 10 2 10L2 6H6Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.0741 9.5H11.3333C10.597 9.5 10 10.0596 10 10.75C10 11.4404 10.597 12 11.3333 12H13.1111C13.8475 12 14.4444 12.5596 14.4444 13.25C14.4444 13.9404 13.8475 14.5 13.1111 14.5H10" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9.51733V8.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 15.5173V14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_443_3628"><rect width="24" height="24" fill="white"/></clipPath></defs></svg>'},
-        
-        ...(detail.revenue.averageTicket ? [
-        { label: 'ticketAveragePrice', value: detail.revenue.averageTicket.toLocaleString(LanguageManager.getLanguage(), {style: 'currency', currency: detail.revenue.currency}), svg: '<svg fill="currentcolor" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M4,8.39l2,2.09L8.39,7.76l2.69,2.75,4.7-5.89L14.22,3.38l-3.3,4.11L8.29,4.81,6,7.52l-1.91-2L.29,9.29l1.42,1.42ZM0,12.3v1.4H16V12.3Z"/></svg>' }] : [])
-    ];
-
-    htmlEl = Elements.setDetailList(rows);
-
-    if (!htmlEl) return;
-
-    document.getElementById('meAttRevSection').style.display = 'block'
-    document.getElementById('meAttRevInfo').innerHTML = htmlEl;
-}
-
-function renderAttRev(detail) {
     const attendance = Array.isArray(detail.attendance)
         ? detail.attendance
         : [detail.attendance];
 
+        console.log(attendance)
     const rows = [
         ...attendance.flatMap(item => [
             {
@@ -237,10 +217,10 @@ function renderAttRev(detail) {
                 svg: '<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
             },
 
-            ...(item.pct && item.label.toLowerCase() === 'público total'
+            ...(item.occupancy && item.label.toLowerCase() === 'público total'
                 ? [{
-                    label: `${item.pct}% ${LanguageManager.translateText('stadiumCapacity')}`,
-                    value: item.pct,
+                    label: `${item.occupancy}% ${LanguageManager.translateText('stadiumCapacity')}`,
+                    value: item.occupancy,
                     noNewLine: true,
                     progressBar: true
                 }]
@@ -271,6 +251,35 @@ function renderAttRev(detail) {
                 ),
                 svg: '<svg fill="currentcolor" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M4,8.39l2,2.09L8.39,7.76l2.69,2.75,4.7-5.89L14.22,3.38l-3.3,4.11L8.29,4.81,6,7.52l-1.91-2L.29,9.29l1.42,1.42ZM0,12.3v1.4H16V12.3Z"/></svg>'
             }]
+            : []),
+
+        ...(detail.revenue.adjustedRevenue != null
+            ? [
+                {
+                    label: `inflationAdjusted`,
+                    value: detail.revenue.adjustedRevenue.value.toLocaleString(
+                        LanguageManager.getLanguage(),
+                        {
+                            style: 'currency',
+                            currency: detail.revenue.adjustedRevenue.currency
+                        }
+                    ),
+                    svg: '<svg viewBox="0 0 385 190" fill="currentcolor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><g><path d="M385.375,65.087c-1.439-2.148-3.904-3.404-6.461-3.337l-50.696,1.368c-3.471,0.094-6.429,2.547-7.161,5.941 c-0.732,3.395,0.95,6.85,4.074,8.366l11.846,5.75L196.96,183.012l-95.409-86.504c-4.738-4.296-11.955-4.322-16.723-0.062 L4.173,168.491c-5.149,4.599-5.594,12.501-0.995,17.649c4.598,5.148,12.499,5.594,17.649,0.995l72.265-64.55l94.533,85.709 c2.369,2.147,5.376,3.239,8.398,3.239c2.532,0,5.074-0.767,7.255-2.322L350.82,104.01l0.701,11.074 c0.22,3.464,2.777,6.329,6.193,6.939c0.444,0.079,0.889,0.118,1.328,0.118c2.938,0,5.662-1.724,6.885-4.483l20.077-45.327 C387.052,69.968,386.815,67.234,385.375,65.087z"/></g></svg>'
+                },
+                {
+                    label: '',
+                    value: '+' + `${(detail.revenue.adjustedRevenue.realIncrease / 100).toLocaleString(
+                        LanguageManager.getLanguage(),
+                        {
+                            style: 'percent',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }
+                    )}` + ` nominal`,
+                    noNewLine: true,
+                    smallColored: '#25b148',
+                }
+            ]
             : [])
     ];
 
@@ -319,7 +328,6 @@ function renderLastResults(last_results, homeName, awayName) {
     awayBadges.innerHTML = away.map(resultIcon).join("");
     teams[1].after(awayBadges);
 }
-
 
 function renderLineups(homeTeam, awayTeam) {
     if (!homeTeam?.lineup && !awayTeam?.lineup) return;

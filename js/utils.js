@@ -229,7 +229,7 @@ const Elements = {
                         ${i.svg || ''}
                         ${LanguageManager.t(i.label)}
                     </div>
-                    <div class="detail-list-value">${i.value}</div>` }
+                    <div class="detail-list-value ${i.smallColored ? '" style="color:' + i.smallColored + ';font-size:var(--font-size-xs);font-weight: 400;' : ''}">${i.value}</div>` }
             </div>
         `).join('');
     },
