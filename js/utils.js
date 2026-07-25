@@ -363,7 +363,11 @@ const Elements = {
 
         if (!rows.length) return;
 
+        const section = document.getElementById('meStatisticsSection');
         const statsList = document.getElementById('meStatisticsInfo');
+
+        section.style.display = 'block';
+        
         statsList.innerHTML = this.getTeamHeaderList(detail);
         statsList.innerHTML += rows
             .filter(s => !(parseFloat(s.home) === 0 && parseFloat(s.away) === 0))
