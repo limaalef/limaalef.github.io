@@ -96,7 +96,7 @@ const APIService = {
 
     async fetchEnrichment(matchId, sport) {
         try {
-            const url = `${CONFIG.REQUEST_API_BASE}/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
+            const url = `${CONFIG.REQUEST_API_BASE}/v2/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
             const res = await fetch(url);
             if (!res.ok) return null;
             const response = await res.json();
