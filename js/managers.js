@@ -380,6 +380,8 @@ const MatchModal = {
         const body = document.getElementById('modalBody');
         if (!title || !score || !body) return;
         const status = Utils.getMatchStatus(match);
+
+        console.log(match)
         
         const competition = LanguageManager.translateText(match.Competição);
         const phase = LanguageManager.translateText(match.Fase);
@@ -490,7 +492,7 @@ const MatchModal = {
         const imageTitle = LanguageManager.t('image') || 'Imagem';
 
         const rows_match_info = [
-            { label: 'date',        value: Utils.formatMatchDate(match.Data) },
+            { label: 'date',        value: Utils.formatDateTime(match.Data) },
             { label: 'competition', value: competition },
             { label: 'phase',       value: phase },
             { label: 'venue',       value: match.Estadio },
@@ -1087,6 +1089,10 @@ const ImageCarousel = {
     renderHTML(image, id) {
         const images = Array.isArray(image) ? image : [image];
         if (images.length === 0) return '';
+
+        for (let i = 0; i < image.length; i++) {
+            image[i] = "matches_image/" + image[i];
+        }
 
         if (images.length === 1) {
             return `<img src="${images[0]}" alt="Imagem" class="modal-image" onerror="this.onerror=null; this.remove();">`;

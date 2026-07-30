@@ -58,15 +58,15 @@ function renderMatch(match, sport, raw) {
         }
         document.getElementById('modalBody').style.display = 'block';
 
-        Elements.renderPlays(detail, detail.homeTeam.tla);
+        Elements.renderPlays(detail, detail.home_team.tla);
         if (detail.penalties?.length) {
-            Elements.renderPenalties(detail, detail.homeTeam.tla);
+            Elements.renderPenalties(detail, detail.home_team.tla);
         }
         renderMatchInfo(detail);
         renderAttRev(detail);
-        renderLastResults(detail.last_results, detail.homeTeam?.name, detail.awayTeam?.name);
+        renderLastResults(detail.last_results, detail.home_team?.name, detail.away_team?.name);
         Elements.renderStatistics(detail.statistics, detail);
-        renderLineups(detail.homeTeam, detail.awayTeam);
+        renderLineups(detail.home_team, detail.away_team);
     });
 }
 
@@ -307,8 +307,8 @@ function renderAttRev(detail) {
 
 function renderLastResults(last_results, homeName, awayName) {
     if (!last_results) return;
-    const home = last_results.homeTeam || [];
-    const away = last_results.awayTeam || [];
+    const home = last_results.home_team || [];
+    const away = last_results.away_team || [];
     if (!home.length && !away.length) return;
 
     const resultIcon = r => {
@@ -343,15 +343,15 @@ function renderLastResults(last_results, homeName, awayName) {
     teams[1].after(awayBadges);
 }
 
-function renderLineups(homeTeam, awayTeam) {
-    if (!homeTeam?.lineup && !awayTeam?.lineup) return;
+function renderLineups(home_team, away_team) {
+    if (!home_team?.lineup && !away_team?.lineup) return;
 
     document.getElementById('meLineupSection').style.display = 'block';
 
     const grid = document.getElementById('meLineupGrid');
     grid.innerHTML = '';
 
-    [homeTeam, awayTeam].forEach(team => {
+    [home_team, away_team].forEach(team => {
         if (!team?.lineup) return;
         grid.appendChild(Elements.buildLineupCol(team));
     });

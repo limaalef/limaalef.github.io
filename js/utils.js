@@ -24,7 +24,7 @@ const Utils = {
     formatDateTime(ts) {
         if (!ts) return '';
         try {
-            const d = new Date(ts + (ts.endsWith('Z') ? '' : 'Z'));
+            const d = new Date(ts + (ts.endsWith('Z') ? '' : ''));
             const pad = n => String(n).padStart(2, '0');
             return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         } catch { return ts.slice(0, 16).replace('T', ' '); }
@@ -285,17 +285,17 @@ const Elements = {
     },
 
     getTeamHeaderList(info) {
-        const homeColor = info.homeTeam.colors.primary;
-        const homeName  = info.homeTeam.name;
-        const awayColor = info.awayTeam.colors.primary;
-        const awayName  = info.awayTeam.name;
+        const homeColor = info.home_team.colors.primary;
+        const homeName  = info.home_team.name;
+        const awayColor = info.away_team.colors.primary;
+        const awayName  = info.away_team.name;
 
         return `<div class="plays-header-names">
             <div class="plays-header-grid">
-                <span class="me-lineup-team-name plays-names"${homeColor ? ` style="color:${homeColor};${this.getTeamColorsStyle(info.homeTeam.colors)};border-right:1px solid var(--border-color);"` : ''}>
+                <span class="me-lineup-team-name plays-names"${homeColor ? ` style="color:${homeColor};${this.getTeamColorsStyle(info.home_team.colors)};border-right:1px solid var(--border-color);"` : ''}>
                     ${LanguageManager.t(homeName) || ''}
                 </span>
-                <span class="me-lineup-team-name plays-names"${awayColor ? ` style="color:${awayColor};${this.getTeamColorsStyle(info.awayTeam.colors)};"` : ''}>
+                <span class="me-lineup-team-name plays-names"${awayColor ? ` style="color:${awayColor};${this.getTeamColorsStyle(info.away_team.colors)};"` : ''}>
                     ${LanguageManager.t(awayName) || ''}
                 </span>
             </div>
@@ -350,8 +350,8 @@ const Elements = {
     renderStatistics(stats, detail) {
         if (!stats || typeof stats !== 'object') return;
 
-        const home = stats.homeTeam || {};
-        const away = stats.awayTeam || {};
+        const home = stats.home_team || {};
+        const away = stats.away_team || {};
 
         const rows = this.STATS_ORDER
             .filter(key => home[key] !== undefined || away[key] !== undefined)
@@ -393,8 +393,8 @@ const Elements = {
                         </div>
                         ${hasBar ? `
                         <div class="me-stat-bar">
-                            <div class="me-stat-bar-home" style="background:${equalZero ? 'var(--border-color)' : detail.homeTeam.colors?.primary};width:${homePct}%"></div>
-                            <div class="me-stat-bar-away" style="background:${equalZero ? 'var(--border-color)' : detail.awayTeam.colors?.primary};width:${100 - homePct}%"></div>
+                            <div class="me-stat-bar-home" style="background:${equalZero ? 'var(--border-color)' : detail.home_team.colors?.primary};width:${homePct}%"></div>
+                            <div class="me-stat-bar-away" style="background:${equalZero ? 'var(--border-color)' : detail.away_team.colors?.primary};width:${100 - homePct}%"></div>
                         </div>` : ''}
                     </div>
                 </div>`;
@@ -460,8 +460,8 @@ const Elements = {
         const list      = document.getElementById('mePenaltiesList');
         if (!container || !list) return;
  
-        const homeTeam = detail.homeTeam;
-        const awayTeam = detail.awayTeam;
+        const homeTeam = detail.home_team;
+        const awayTeam = detail.away_team;
         const penScore = detail.score?.penalties; // { home: N, away: N } ou null
  
         // Quem bateu primeiro
