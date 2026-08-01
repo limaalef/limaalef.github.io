@@ -107,7 +107,7 @@ const APIService = {
                 Campeonato: item.championship?.name || '',
                 Fase: item.championship?.phase || '',
                 Pais: item.championship?.country_name || '',
-                Bandeira: item.championship?.country_flag || '',
+                Bandeira: item.championship?.country_flag || ("teams_logos/" + item.championship?.country_name.lower().replace(" ", "-") + ".svg"),
                 DataInicio: item.start_date || '',
                 DataFim: item.end_date || '',
                 Eventos: item.events || [],
@@ -152,10 +152,11 @@ const APIService = {
         return (apiResponse.data || []).map(item => {
             const sources = Array.isArray(item.sources) ? item.sources : null;
 
+            const prefix = img => img.startsWith("matches_image/") ? img : "matches_image/" + img;
             if (typeof item.media?.image === "string") {
-                item.media.image = "matches_image/" + item.media.image;
+                item.media.image = prefix(item.media.image);
             } else if (Array.isArray(item.media?.image)) {
-                item.media.image = item.media.image.map(img => "matches_image/" + img);
+                item.media.image = item.media.image.map(prefix);
             }
             
             return {
