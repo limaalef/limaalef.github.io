@@ -1090,10 +1090,6 @@ const ImageCarousel = {
         const images = Array.isArray(image) ? image : [image];
         if (images.length === 0) return '';
 
-        for (let i = 0; i < image.length; i++) {
-            image[i] = "matches_image/" + image[i];
-        }
-
         if (images.length === 1) {
             return `<img src="${images[0]}" alt="Imagem" class="modal-image" onerror="this.onerror=null; this.remove();">`;
         }

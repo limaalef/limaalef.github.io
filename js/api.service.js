@@ -151,6 +151,12 @@ const APIService = {
         }
         return (apiResponse.data || []).map(item => {
             const sources = Array.isArray(item.sources) ? item.sources : null;
+
+            if (typeof item.media?.image === "string") {
+                item.media.image = "matches_image/" + item.media.image;
+            } else if (Array.isArray(item.media?.image)) {
+                item.media.image = item.media.image.map(img => "matches_image/" + img);
+            }
             
             return {
                 ID: item.id ?? '',

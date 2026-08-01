@@ -1,7 +1,7 @@
 const CONFIG = {
     API_URLS: {
-        football: 'https://api-archive.limaalef.com/v2/matches/football/',
-        others: 'https://api-archive.limaalef.com/v2/matches/multisport/',
+        football: 'https://api-archive.limaalef.com/v2/matches/football/?',
+        others: 'https://api-archive.limaalef.com/v2/matches/multisport/?',
         motor: 'https://api.limaalef.com/archive/matches?type=motor',
         carnaval: 'https://api.limaalef.com/archive/matches?type=carnaval'
     },
