@@ -54,6 +54,7 @@ const MatchPage = {
             MatchModal.show(match);
         }
 
+        document.body.style.overflow = '';
         // O show() adiciona .active ao #modal (que não existe aqui), ignora silenciosamente
     },
 

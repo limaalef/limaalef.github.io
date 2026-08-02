@@ -86,7 +86,7 @@ const TodayInHistory = {
         try {
             const data = await APIService.fetchTodayInHistory();
             todayDate(data)
-            this.items = APIService.transformData(data);
+            this.items = data.data; 
             this.render();
             
         } catch (err) {
@@ -96,11 +96,11 @@ const TodayInHistory = {
     },
 
     _cardHtml(item) {
-        const id   = item.ID;
-        const year = Utils.parseDate(item.Data)?.getFullYear() || (item.Data || '').slice(0, 4) || '?';
+        const id   = item.id;
+        const year = Utils.parseDate(item.date)?.getFullYear() || (item.date || '').slice(0, 4) || '?';
 
-        const gh = item['Gols mandante']  ?? '';
-        const ga = item['Gols visitante'] ?? '';
+        const gh = item.home_team.goals  ?? '';
+        const ga = item.away_team.goals ?? '';
         const homeWinner = gh !== '' && ga !== '' && Number(gh) > Number(ga);
         const awayWinner = gh !== '' && ga !== '' && Number(ga) > Number(gh);
         const scoreHtml  = gh !== '' && ga !== ''
@@ -109,12 +109,12 @@ const TodayInHistory = {
                <span class="tih-score ${awayWinner ? 'winner' : ''}">${ga}</span>`
             : `<span class="tih-score-sep">vs</span>`;
 
-        const comp     = Utils.escapeHtml(item.Competição || '');
-        const fase     = Utils.escapeHtml(item.Fase       || '');
-        const home     = Utils.escapeHtml(item.Mandante   || '?');
-        const away     = Utils.escapeHtml(item.Visitante  || '?');
-        const homeLogo = item['Logo mandante']  ? `<img src="${item['Logo mandante']}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
-        const awayLogo = item['Logo visitante'] ? `<img src="${item['Logo visitante']}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
+        const comp     = Utils.escapeHtml(item.championship.name || '');
+        const fase     = Utils.escapeHtml(item.championship.phase || '');
+        const home     = Utils.escapeHtml(item.home_team.name || '?');
+        const away     = Utils.escapeHtml(item.away_team.name || '?');
+        const homeLogo = item.home_team.logo ? `<img src="${item.home_team.logo}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
+        const awayLogo = item.away_team.logo ? `<img src="${item.away_team.logo}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
 
         return `
         <div class="tih-card" onclick="TodayModal.show(${id}, 'football')">

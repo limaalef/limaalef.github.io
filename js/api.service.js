@@ -45,7 +45,7 @@ const APIService = {
     },
 
     async fetchTodayInHistory() {
-        const base = CONFIG.API_URLS['football'].replace(/\?$/, '');
+        const base = 'https://api.limaalef.com/archive/matches';
         const url = new URL(base);
         url.searchParams.set('today_in_history', 'true');
         url.searchParams.set('fields', 'id,date,home_team,away_team,championship');
@@ -107,7 +107,7 @@ const APIService = {
                 Campeonato: item.championship?.name || '',
                 Fase: item.championship?.phase || '',
                 Pais: item.championship?.country_name || '',
-                Bandeira: item.championship?.country_flag || ("teams_logos/" + item.championship?.country_name.lower().replace(" ", "-") + ".svg"),
+                Bandeira: item.championship?.country_flag || '',
                 DataInicio: item.start_date || '',
                 DataFim: item.end_date || '',
                 Eventos: item.events || [],
@@ -151,15 +151,8 @@ const APIService = {
         }
         return (apiResponse.data || []).map(item => {
             const sources = Array.isArray(item.sources) ? item.sources : null;
-
-            const prefix = img => img.startsWith("matches_image/") ? img : "matches_image/" + img;
-            if (typeof item.media?.image === "string") {
-                item.media.image = prefix(item.media.image);
-            } else if (Array.isArray(item.media?.image)) {
-                item.media.image = item.media.image.map(prefix);
-            }
-            
             return {
+                ...item,
                 ID: item.id ?? '',
                 Data: item.utcDate || '',
                 Emissora: item.station?.name || '',

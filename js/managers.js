@@ -371,6 +371,7 @@ const SourcePicker = {
     }
 };
 
+// REVISADO
 const MatchModal = {
     show(match) {
         document.body.style.overflow = 'hidden';
@@ -380,35 +381,34 @@ const MatchModal = {
         const body = document.getElementById('modalBody');
         if (!title || !score || !body) return;
         const status = Utils.getMatchStatus(match);
-
-        console.log(match)
         
-        const competition = LanguageManager.translateText(match.Competição);
-        const phase = LanguageManager.translateText(match.Fase);
+        const competition = LanguageManager.translateText(match.competition.name);
+        const phase = LanguageManager.translateText(match.competition.phase);
         
         title.innerHTML = `
             <div class="section-title modal-title-competition">${competition}</div>
             <div class="modal-title-phase">${phase}</div>
         `;
         
-        const homeGoals = Utils.parseGoals(match['Gols mandante']);
-        const awayGoals = Utils.parseGoals(match['Gols visitante']);
+        const homeGoals = Utils.parseGoals(match.score.fullTime?.home);
+        const awayGoals = Utils.parseGoals(match.score.fullTime?.away);
 
-        const embed = match['Video Embed'];
+        const embed = match.media?.embed_video;
         
         // ADICIONAR: HTML do vídeo embed (se existir)
-        const videoHtml = match['Video Embed'] ? `
+        const videoId = match.id
+        const videoHtml = embed ? `
             <div class="score-button-container">
-                <a href="watch.html?id=${match.ID}" class="score-button watch-match-button">
+                <a href="watch.html?id=${videoId}" class="score-button watch-match-button">
                     <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
                 </a>
             </div>
         ` : '';
 
         // ADICIONAR: HTML das estatistucas (se existir)
-        const statsHTML = match['Mais dados'] ? `
+        const statsHTML = match.media?.has_stats ? `
             <div class="score-button-container">
-                <a href="match.html?id=${match.ID}" class="score-button see-stats-button">
+                <a href="match.html?id=${videoId}" class="score-button see-stats-button">
                     <span>${LanguageManager.t('seeStats') || 'Veja estatísticas'}</span>
                 </a>
             </div>
@@ -419,25 +419,25 @@ const MatchModal = {
             const pendingText = LanguageManager.t('pendingMatch');
             scoreHtml = `
                 <div class="score-desktop">
-                    <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
+                    ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
+                    ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
                     <span class="badge badge-warning score-status-badge">${pendingText}</span>
                 </div>
                 <div class="score-mobile">
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
+                            ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
                         </div>
                         <span class="score-mobile-value">${homeGoals}</span>
                     </div>
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
+                            ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
                         </div>
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
@@ -449,30 +449,30 @@ const MatchModal = {
         } else {
             scoreHtml = `
                 <div class="score-desktop">
-                    <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
+                    ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
                     <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
+                    ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
                 </div>
                 <div class="score-mobile">
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.Mandante)}</span>
+                            ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
                         </div>
                         <span class="score-mobile-value">${homeGoals}</span>
                     </div>
                     <div class="score-mobile-row">
                         <div class="score-mobile-team">
-                            ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.Visitante)}</span>
+                            ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                            <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
                         </div>
                         <span class="score-mobile-value">${awayGoals}</span>
                     </div>
                 </div>
                 <div class="score-header-buttons">
-                ${(match['Mais dados'] || match['Video Embed']) ? `
+                ${(match.media?.has_stats || embed) ? `
                     ${statsHTML}
                     ${videoHtml}
                 </div>` : ''}
@@ -481,46 +481,36 @@ const MatchModal = {
         
         score.innerHTML = scoreHtml;
         
-        const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
-
-        const matchInfoTitle = LanguageManager.t('matchInfo');
-        const tvInfoTitle = LanguageManager.t('tvInfo');
-        const technicalInfoTitle = LanguageManager.t('technicalInfo');
-        const storageTitle = LanguageManager.t('storageInfo');
-        const observationsTitle = LanguageManager.t('observations');
-        const videoTitle = LanguageManager.t('video') || 'Vídeo';
-        const imageTitle = LanguageManager.t('image') || 'Imagem';
-
         const rows_match_info = [
-            { label: 'date',        value: Utils.formatDateTime(match.Data) },
-            { label: 'competition', value: competition },
-            { label: 'phase',       value: phase },
-            { label: 'venue',       value: match.Estadio },
-            { label: 'type',        value: LanguageManager.translateText(match.Tipo) },
+            { label: 'date', value: Utils.formatDateTime(match.utcDate), svg: '<svg viewBox="0 0 12 15" fill="currentcolor" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg"><path d="M11.882 3.187a.476.476 0 0 1 .475.475v11.063a.476.476 0 0 1-.475.475H1.118a.476.476 0 0 1-.475-.475V3.662a.476.476 0 0 1 .475-.475h1.328v.721a1.425 1.425 0 0 0 2.85 0v-.72H7.71v.72a1.425 1.425 0 0 0 2.85 0v-.72zm-.634 3.37H1.752v7.535h9.496zm-7.384.821H2.621V8.67h1.243zm0 2.292H2.621v1.292h1.243zm0 2.292H2.621v1.291h1.243zm.561-8.054V2.475a.554.554 0 1 0-1.108 0v1.433a.554.554 0 1 0 1.108 0zm1.613 3.47H4.794V8.67h1.244zm0 2.292H4.794v1.292h1.244zm0 2.292H4.794v1.291h1.244zm2.174-4.584H6.968V8.67h1.244zm0 2.292H6.968v1.292h1.244zm0 2.292H6.968v1.291h1.244zm1.477-8.054V2.475a.554.554 0 0 0-1.108 0v1.433a.554.554 0 0 0 1.108 0zm.696 3.47H9.142V8.67h1.243zm0 2.292H9.142v1.292h1.243zm0 2.292H9.142v1.291h1.243z"/></svg>' },
+            { label: 'city', value: match.venue?.city, svg: `<svg fill="currentColor"version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="00 0 315 315" xml:space="preserve"><g>
+<path d="M290.012,95.991c-3.629,7.01-7.824,14.115-12.246,21.031l-1.756,2.72c-3.723,5.708-7.569,11.257-11.343,16.485 c14.51,8.949,22.596,19.327,22.596,29.444c0,12.723-12.775,25.861-35.051,36.046c-7.314,3.344-15.367,6.236-23.97,8.676 c1.678-11.29,2.717-23.054,3.084-35.087c-0.849,0.231-1.727,0.365-2.625,0.365c-2.895,0-5.648-1.255-7.547-3.44 c-1.376-1.583-4.934-5.721-9.724-11.623c0.028,1.684,0.054,3.369,0.054,5.063c0,17.288-1.48,34.029-4.283,49.556 c-15.526,2.802-32.267,4.283-49.554,4.283c-17.29,0-34.032-1.48-49.561-4.283c-2.802-15.527-4.282-32.268-4.282-49.556 s1.48-34.029,4.282-49.556c15.528-2.802,32.271-4.283,49.561-4.283c6.46,0,12.843,0.207,19.115,0.612 c-4.195-6.804-8.103-13.727-11.412-20.507c-2.558-0.063-5.123-0.105-7.703-0.105c-15.396,0-30.438,1.12-44.727,3.243 c2.439-8.604,5.332-16.657,8.676-23.971c10.185-22.274,23.323-35.05,36.046-35.051c0.001,0,0.002,0,0.003,0 c0.245,0,0.491,0.014,0.737,0.023c2.158-7.064,5.347-13.683,9.401-19.672c-3.351-0.225-6.729-0.351-10.137-0.351 c-0.001,0-0.001,0-0.002,0h-0.001c-0.001,0-0.002,0-0.003,0C75.143,16.056,8.026,83.173,8.026,165.671 c0,82.498,67.116,149.615,149.615,149.618c0.001,0,0.002,0,0.003,0h0.001c0.001,0,0.001,0,0.002,0 c82.498,0,149.615-67.118,149.615-149.618C307.263,140.525,301.017,116.813,290.012,95.991z M114.175,43.561 c-3.869,5.612-7.476,12.028-10.768,19.227C98.425,73.686,94.34,85.98,91.2,99.229c-13.247,3.14-25.541,7.224-36.439,12.206 c-7.199,3.292-13.617,6.899-19.229,10.769C48.586,85.644,77.615,56.615,114.175,43.561z M63.078,129.624 c7.314-3.344,15.366-6.235,23.969-8.675c-2.123,14.287-3.242,29.327-3.242,44.722c0,15.395,1.119,30.434,3.242,44.721 c-8.603-2.439-16.655-5.331-23.968-8.675c-22.276-10.186-35.052-23.324-35.052-36.046 C28.026,152.948,40.802,139.809,63.078,129.624z M35.532,209.137c5.612,3.869,12.03,7.477,19.229,10.769 c10.897,4.982,23.191,9.067,36.439,12.207c3.14,13.248,7.225,25.543,12.207,36.441c3.292,7.199,6.899,13.615,10.768,19.227 C77.615,274.727,48.585,245.697,35.532,209.137z M157.645,295.289c-0.001,0-0.002,0-0.003,0 c-12.723-0.001-25.861-12.777-36.046-35.051c-3.344-7.314-6.236-15.367-8.676-23.971c14.289,2.123,29.33,3.243,44.727,3.243 c15.394,0,30.433-1.119,44.719-3.242c-2.439,8.604-5.332,16.656-8.676,23.97C183.506,282.513,170.367,295.289,157.645,295.289z M201.11,287.784c3.869-5.612,7.478-12.03,10.77-19.23c4.983-10.898,9.068-23.192,12.208-36.441 c13.248-3.139,25.543-7.225,36.441-12.207c7.199-3.292,13.616-6.899,19.228-10.769C266.703,245.7,237.672,274.731,201.11,287.784z"/>
+<path d="M229.034,154.702c0.898,0,1.749-0.402,2.319-1.097c9.218-11.23,55.2-68.64,55.2-96.088C286.553,25.802,260.75,0,229.035,0 c-31.715,0-57.517,25.802-57.517,57.517c0,27.459,45.98,84.861,55.197,96.088C227.285,154.3,228.136,154.702,229.034,154.702z M198.035,54.169c0-17.093,13.907-31,31-31c17.093,0,31,13.907,31,31s-13.907,31-31,31 C211.942,85.169,198.035,71.263,198.035,54.169z"/></g></svg>`
+            },
+            { label: 'type', value: LanguageManager.translateText(match.type) },
         ];
-        
-        const rows_tv_info = [
-            { label: 'broadcaster', value: match.Emissora },
-            { label: 'origin',      value: LanguageManager.translateText(match.Origem) },
-            { label: 'narration',   value: match.Narração },
-        ];
-        
-        const rows_tech_info = [
-            { label: 'ID',          value: match.ID },
-            { label: 'quality',     value: match.Qualidade },
-            { label: 'audioFormat', value: audioFormat },
-            { label: 'bitrate',     value: match.Bitrate + ' Mbps' },
-            { label: 'duration',    value: match.Duração },
-            { label: 'fileSize',    value: Utils.formatSize(match.Tamanho) },
-        ];
+        const matchInfoTitle = LanguageManager.t('matchInfo');
+        const match_info  = Elements.setDetailList(rows_match_info);
 
-        const match_info = Elements.setDetailList(rows_match_info);
-        const tv_info = Elements.setDetailList(rows_tv_info);
-        const tech_info = Elements.setDetailGrid(rows_tech_info);
+        const tvInfoTitle = LanguageManager.t('tvInfo');
+        const tv_info     = Elements.renderTvInfo(match, false, false);
 
-        const _matchCarouselId = `carousel-match-${match.ID || Date.now()}`;
+        const technicalInfoTitle = LanguageManager.t('technicalInfo');
+        const tech_info   = Elements.renderTechInfo(match);
+
+        const refereeTitle = LanguageManager.t('refereeInfo');
+        const referee_info = Elements.renderRefereeInfo(match);
+
+        const attRevTitle = LanguageManager.t('attRevInfo');
+        const attrev_info = Elements.renderAttRev(match);
+
+        const storageTitle = LanguageManager.t('storageInfo');
+
+        const observationsTitle = LanguageManager.t('observations');
+
+        const { html, images, carouselId } = Elements.renderImages(match, "matches_image/", null);
         body.innerHTML = `
-            ${match.Imagem ? ImageCarousel.renderHTML(match.Imagem, _matchCarouselId) : ''}
+            ${html}
             
             <div class="modal-division">
             <div class="detail-section">
@@ -539,31 +529,45 @@ const MatchModal = {
             
             <div class="detail-section">
                 <div class="section-title modal-style">${technicalInfoTitle}</div>
-                <div class="detail-grid technical">
+                <div class="detail-list">
                     ${tech_info}
                 </div>
             </div>
+
+            ${referee_info ? `<div class="detail-section">
+                <div class="section-title modal-style">${refereeTitle}</div>
+                <div class="detail-list">
+                    ${referee_info}
+                </div>
+            </div>` : ''}
+            
+            ${attrev_info ? `<div class="detail-section">
+                <div class="section-title modal-style">${attRevTitle}</div>
+                <div class="detail-list">
+                    ${attrev_info}
+                </div>
+            </div>` : ''}
             
             <div class="detail-section">
                 <div class="section-title modal-style">${storageTitle}</div>
                 <div class="storage-badges">
-                    ${Elements.setStorageBadges(match.Local,match.Nuvem)}
+                    ${Elements.setStorageBadges(match.technical_details?.local,match.technical_details?.nuvem)}
                 </div>
             </div>
             
-            ${match.Obs ? `
+            ${match.additional_info ? `
                 <div class="detail-section">
                     <div class="section-title modal-style">${observationsTitle}</div>
                     <div class="detail-item" style="grid-column: 1/-1;">
-                        <div class="detail-value">${match.Obs}</div>
+                        <div class="detail-value">${match.additional_info}</div>
                     </div>
                 </div>
                 </div>
             ` : ''}
         `;
         
-        if (match.Imagem && Array.isArray(match.Imagem) && match.Imagem.length > 1) {
-            ImageCarousel.init(_matchCarouselId, match.Imagem);
+        if (Array.isArray(images) && images.length > 1) {
+            ImageCarousel.init(carouselId, images);
         }
         modal?.classList.add('active');
     },
@@ -606,7 +610,7 @@ const MatchModal = {
 
         try {
             const apiResponse = await APIService.fetchById(id, sport);
-            const items = APIService.transformData(apiResponse, sport);
+            const items = apiResponse.data;
             if (!items.length) throw new Error('Item não encontrado');
 
             if (sport === 'motor') {
