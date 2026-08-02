@@ -716,8 +716,8 @@ const Elements = {
     },
 
     renderStatistics(detail) {
-        const home = detail.statistics.homeTeam || {};
-        const away = detail.statistics.awayTeam || {};
+        const home = detail.statistics?.homeTeam || {};
+        const away = detail.statistics?.awayTeam || {};
 
         const rows = STATS_ORDER
             .filter(key => home[key] !== undefined || away[key] !== undefined)
@@ -726,7 +726,7 @@ const Elements = {
                 home:  home[key]?.total ?? '—',
                 away:  away[key]?.total ?? '—',
             }));
-        console.log(away)
+        
         if (!rows.length) return;
 
         const section = document.getElementById('meStatisticsSection');
