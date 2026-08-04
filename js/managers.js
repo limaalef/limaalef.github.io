@@ -392,10 +392,10 @@ const MatchModal = {
         
         const homeGoals = Utils.parseGoals(match.score.fullTime?.home);
         const awayGoals = Utils.parseGoals(match.score.fullTime?.away);
-
+        const pendingText = LanguageManager.t('pendingMatch');
         const embed = match.media?.embed_video;
         
-        // ADICIONAR: HTML do vídeo embed (se existir)
+        // HTML do vídeo embed (se existir)
         const videoId = match.id
         const videoHtml = embed ? `
             <div class="score-button-container">
@@ -405,79 +405,50 @@ const MatchModal = {
             </div>
         ` : '';
 
-        // ADICIONAR: HTML das estatistucas (se existir)
+        // HTML das estatistucas (se existir)
         const statsHTML = match.media?.has_stats ? `
             <div class="score-button-container">
-                <a href="match.html?id=${videoId}" class="score-button see-stats-button">
+                <a href="match.html?id=${videoId}&sport=${CONFIG.currentSport}" class="score-button see-stats-button">
                     <span>${LanguageManager.t('seeStats') || 'Veja estatísticas'}</span>
                 </a>
             </div>
         ` : '';
         
         let scoreHtml = '';
-        if (status === 'pending') {
-            const pendingText = LanguageManager.t('pendingMatch');
-            scoreHtml = `
-                <div class="score-desktop">
-                    <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                    ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                    <span class="badge badge-warning score-status-badge">${pendingText}</span>
+        scoreHtml = `
+            <div class="score-desktop">
+                <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
+                ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
+                ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
+                <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
+                ${status === 'pending' ? `<span class="badge badge-warning score-status-badge">${pendingText}</span>` : ''}
+            </div>
+            <div class="score-mobile">
+                <div class="score-mobile-row">
+                    <div class="score-mobile-team">
+                        ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
+                    </div>
+                    <span class="score-mobile-value">${homeGoals}</span>
                 </div>
-                <div class="score-mobile">
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                        </div>
-                        <span class="score-mobile-value">${homeGoals}</span>
+                <div class="score-mobile-row">
+                    <div class="score-mobile-team">
+                        ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
                     </div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                        </div>
-                        <span class="score-mobile-value">${awayGoals}</span>
-                    </div>
-                    <div class="score-mobile-status">
-                        <span class="badge badge-warning">${pendingText}</span>
-                    </div>
+                    <span class="score-mobile-value">${awayGoals}</span>
                 </div>
-            `;
-        } else {
-            scoreHtml = `
-                <div class="score-desktop">
-                    <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                    ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                    ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                </div>
-                <div class="score-mobile">
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                        </div>
-                        <span class="score-mobile-value">${homeGoals}</span>
-                    </div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                        </div>
-                        <span class="score-mobile-value">${awayGoals}</span>
-                    </div>
-                </div>
-                <div class="score-header-buttons">
-                ${(match.media?.has_stats || embed) ? `
-                    ${statsHTML}
-                    ${videoHtml}
+                ${status === 'pending' ? `<div class="score-mobile-status">
+                    <span class="badge badge-warning">${pendingText}</span>
                 </div>` : ''}
-            `;
-        }
+            </div>
+            <div class="score-header-buttons">
+            ${(match.media?.has_stats || embed) ? `
+                ${statsHTML}
+                ${videoHtml}
+            </div>` : ''}
+        `;
         
         score.innerHTML = scoreHtml;
         
@@ -594,7 +565,7 @@ const MatchModal = {
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('id', id);
             urlParams.set('sport', sport);
-            const shareUrl = `${window.location.origin}/${sport === 'football' ? 'match.html' : 'event.html'}?${urlParams.toString()}`;
+            const shareUrl = `${window.location.origin}/${sport === 'football' || sport === 'multisport' ? 'match.html' : 'event.html'}?${urlParams.toString()}`;
             navigator.clipboard.writeText(shareUrl).then(() => {
                 Utils.showNotification('Link copiado!', 'success');
             }).catch(() => {
@@ -610,14 +581,18 @@ const MatchModal = {
 
         try {
             const apiResponse = await APIService.fetchById(id, sport);
-            const items = apiResponse.data;
-            if (!items.length) throw new Error('Item não encontrado');
 
             if (sport === 'motor') {
+                const items = APIService.transformData(apiResponse, sport);
+                if (!items.length) throw new Error('Item não encontrado');
                 MotorModal.show(items[0]);
             } else if (sport === 'carnaval') {
+                const items = APIService.transformData(apiResponse, sport);
+                if (!items.length) throw new Error('Item não encontrado');
                 CarnavalModal.show(items[0]);
             } else {
+                const items = apiResponse.data;
+                if (!items.length) throw new Error('Item não encontrado');
                 MatchModal.show(items[0]);
             }
         } catch (err) {
@@ -658,7 +633,7 @@ const CarnavalModal = {
         // ADICIONAR: HTML do vídeo embed (se existir)
         const videoHtml = match['Video Embed'] ? `
             <div class="score-button-container">
-                <a href="watch.html?id=${match.ID}" class="score-button watch-match-button">
+                <a href="watch.html?id=${match.id}" class="score-button watch-match-button">
                     <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
                 </a>
             </div>
@@ -875,7 +850,7 @@ const MotorModal = {
             <div class="detail-section">
                 <div class="section-title">${videoTitle}</div>
                 <div style="text-align: center; padding: 30px;">
-                    <a href="watch.html?id=${match.ID}" class="watch-button" target="_blank">
+                    <a href="watch.html?id=${match.id}" class="watch-button" target="_blank">
                         <span style="font-size: 3em;">▶️</span>
                         <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir evento</div>
                     </a>

@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const params = new URLSearchParams(location.search);
     const id     = params.get('id');
-    const sport  = params.get('sport') || 'football';
-
+    let sport  = params.get('sport');
+    
     Utils.applySportTheme(sport);
+
+    sport = sport === 'others' ? 'multisport' : sport
 
     if (!id) { showError(); return; }
 
