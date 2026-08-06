@@ -101,24 +101,11 @@ const APIService = {
 
     transformData(apiResponse, sport = CONFIG.currentSport) {
         if (sport === 'motor') {
-            return (apiResponse.data || []).map(item => ({
-                ID: item.id || '',
-                Tipo: 'motor',
-                Campeonato: item.championship?.name || '',
-                Fase: item.championship?.phase || '',
-                Pais: item.championship?.country_name || '',
-                Bandeira: item.championship?.country_flag || '',
-                DataInicio: item.start_date || '',
-                DataFim: item.end_date || '',
-                Eventos: item.events || [],
-                'Logo emissora': item.main_station_logo || '',
-                'Video Embed': item.embed_video || '',
-                'Mais dados': !!item.match_data,
-                type: item.type || ''
-            }));
+            return apiResponse.data
         }
         else if (sport === 'carnaval') {
             return (apiResponse.data || []).map(item => ({
+                ...item,
                 ID: item.id ?? '',
                 Data: item.date || '',
                 Emissora: item.station?.name || '',
@@ -153,36 +140,8 @@ const APIService = {
             const sources = Array.isArray(item.sources) ? item.sources : null;
             return {
                 ...item,
-                ID: item.id ?? '',
-                Data: item.utcDate || '',
-                Emissora: item.station?.name || '',
-                Origem: item.station?.source_type || '',
-                Narração: item.station?.commentary || '',
-                'Logo emissora': item.station?.logo || '',
-                Competição: item.competition?.name || '',
-                Fase: item.competition?.phase || '',
-                Estadio: item.venue?.name || '',
-                Mandante: item.home_team?.name || '',
-                'Gols mandante': item.score?.fullTime.home,
-                'Logo mandante': item.home_team?.logo || ("teams_logos/" + item.home_team?.name + ".svg"),
-                Visitante: item.away_team?.name || '',
-                'Gols visitante': item.score?.fullTime.away,
-                'Logo visitante': item.away_team?.logo || ("teams_logos/" + item.away_team?.name + ".svg"),
-                Obs: item.additional_info || '',
-                Imagem: item.media?.image || '',
-                Local: item.technical_details?.local || '',
-                Nuvem: item.technical_details?.cloud ? 'Nuvem' : '',
-                Duração: item.technical_details?.duration || '',
-                Tamanho: item.technical_details?.file_size ?? item.total_file_size ?? '',
-                Qualidade: item.technical_details?.video_quality || '',
-                Bitrate: item.technical_details?.video_bitrate || '',
-                'Formato de áudio': item.technical_details?.audio_format || '2.0',
-                'Video Embed': item.media?.embed_video || (item.has_video ? true : ''),
-                'Mais dados': !!item.media?.has_stats || '',
-                Tipo: item.type || '',
-                // Agrupamento de fontes (só presente na listagem)
-                Fontes: sources,
-                QtdFontes: sources ? sources.length : 1
+                sources: sources,
+                qtd_sources: sources ? sources.length : 1
             };
         });
     }

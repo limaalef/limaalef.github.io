@@ -40,7 +40,7 @@ const RequestModule = (() => {
     const API = {
         addItem(match) {
             const sport = CONFIG?.currentSport || 'football';
-            if (cart.find(c => c.id === match.ID && c.sport === sport)) {
+            if (cart.find(c => c.id === match.id && c.sport === sport)) {
                 Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'warning');
                 return;
             }
@@ -98,27 +98,37 @@ const RequestModule = (() => {
     function _buildItem(match, sport) {
         if (sport === 'motor') {
             return {
-                id:    match.ID,
+                id:    match.id,
                 sport,
-                label: `${match.Campeonato} — ${match.Fase}`,
-                date:  Utils.formatMotorDateRange?.(match.DataInicio, match.DataFim) || '',
-                meta:  `${(match.Eventos || []).length} ${LanguageManager.t('requestEvents')}`,
+                label: `${match.competition?.name} · ${match.competition?.phase}`,
+                date:  Utils.formatMotorDateRange?.(match.start_date, match.end_date) || '',
+                meta:  `${(match.events || []).length} ${LanguageManager.t('requestEvents')}`,
+            };
+        }
+        if (sport === 'carnaval') {
+            return {
+                id:    match.id,
+                sport,
+                label: `${match.Escola + '· ' + match.Enredo}`.trim(),
+                date:  Utils.formatMatchDate?.(match.Data) || match.Data || '',
+                meta:  `${match.Cidade} · ${match.Divisão}`,
+                station: `${match.Emissora}`,
             };
         }
         
-        const home  = match.Mandante  || '?';
-        const away  = match.Visitante || '?';
-        const gh    = match['Gols mandante']  ?? '';
-        const ga    = match['Gols visitante'] ?? '';
+        const home  = match.home_team?.name  || '?';
+        const away  = match.away_team?.name  || '?';
+        const gh    = match.home_team?.goals ?? '';
+        const ga    = match.away_team?.goals ?? '';
         const score = (gh !== '' && ga !== '') ? ` ${gh} x ${ga}` : ' x ';
-        const tv    = match.Emissora || '';
+        const tv    = match.station?.name || '';
 
         return {
-            id:    match.ID,
+            id:    match.id,
             sport,
             label: `${home} ${score} ${away}`,
-            date:  Utils.formatMatchDate?.(match.Data) || match.Data || '',
-            meta:  `${match.Competição || ''} ${match.Fase ? '· ' + match.Fase : ''}`.trim(),
+            date:  Utils.formatMatchDate?.(match.utcDate) || match.utcDate || '',
+            meta:  `${match.competition?.name || ''} ${match.competition?.phase ? '· ' + match.competition?.phase : ''}`.trim(),
             station: tv,
         };
     }
@@ -212,7 +222,7 @@ const RequestModule = (() => {
                         <div class="om-item-info">
                             <span class="om-item-meta">${_esc(item.meta)}</span>
                             <span class="om-item-label">${_esc(item.label)}</span>
-                            <span class="om-item-date">${_esc(item.date)} - ${_esc(item.station)}</span>
+                            <span class="om-item-date">ID: ${_esc(item.id)} - ${_esc(item.date)} - ${_esc(item.station)}</span>
                         </div>
                         <button class="om-remove-btn"
                             title="${LanguageManager.t('requestRemove')}"
@@ -517,9 +527,9 @@ const RequestModule = (() => {
 
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const match = AppState?.matches?.find(m => String(m.ID) === String(id));
+                const match = AppState?.matches?.find(m => String(m.id) === String(id));
                 if (!match) return;
-                if (API.isInCart(match.ID, sport)) {
+                if (API.isInCart(match.id, sport)) {
                     Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
                     return;
                 }
@@ -563,7 +573,7 @@ const RequestModule = (() => {
         _updateModalButtonState(btn, match, sport);
 
         btn.onclick = () => {
-            if (API.isInCart(match.ID, sport)) {
+            if (API.isInCart(match.id, sport)) {
                 Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
                 return;
             }
@@ -573,7 +583,7 @@ const RequestModule = (() => {
     }
 
     function _updateModalButtonState(btn, match, sport) {
-        const inCart = API.isInCart(match.ID, sport);
+        const inCart = API.isInCart(match.id, sport);
         const label  = inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtnText');
         btn.querySelector('span').textContent = label;
         btn.title = label;
@@ -611,11 +621,11 @@ const RequestModule = (() => {
                 const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
 
                 if (sources && sources.length > 1) {
-                    card.dataset.groupId = match.ID;
+                    card.dataset.groupId = match.id;
                     card.dataset.sourceCount = String(sources.length);
                     delete card.dataset.matchId;
                 } else {
-                    card.dataset.matchId = (sources && sources.length === 1) ? sources[0].id : match.ID;
+                    card.dataset.matchId = (sources && sources.length === 1) ? sources[0].id : match.id;
                 }
                 return card;
             };
@@ -627,10 +637,21 @@ const RequestModule = (() => {
             const orig = MotorCardManager.create.bind(MotorCardManager);
             MotorCardManager.create = function (match) {
                 const card = orig(match);
-                card.dataset.matchId = match.ID;
+                card.dataset.matchId = match.id;
                 return card;
             };
             MotorCardManager._rmPatched = true;
+        }
+
+        // Patch CarnavalCardManager.create
+        if (typeof CarnavalCardManager !== 'undefined' && !CarnavalCardManager._rmPatched) {
+            const orig = CarnavalCardManager.create.bind(CarnavalCardManager);
+            CarnavalCardManager.create = function (match) {
+                const card = orig(match);
+                card.dataset.matchId = match.id;
+                return card;
+            };
+            CarnavalCardManager._rmPatched = true;
         }
     }
 
@@ -651,6 +672,15 @@ const RequestModule = (() => {
                 _injectModalButton(event);
             };
             MotorModal._rmPatched = true;
+        }
+
+        if (typeof CarnavalModal !== 'undefined' && !CarnavalModal._rmPatched) {
+            const origShow = CarnavalModal.show.bind(CarnavalModal);
+            CarnavalModal.show = function (event) {
+                origShow(event);
+                _injectModalButton(event);
+            };
+            CarnavalModal._rmPatched = true;
         }
     }
 

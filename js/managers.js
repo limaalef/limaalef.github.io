@@ -39,57 +39,58 @@ const PaginationManager = {
     goToLast() { if (AppState.currentPage < AppState.totalPages) { AppState.currentPage = AppState.totalPages; App.loadData(); } }
 };
 
+// REVISADO
 const CardManager = {
     create(match) {
         const card = document.createElement('div');
-        const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
+        const sources = Array.isArray(match.sources) ? match.sources : null;
         const sourceCount = sources ? sources.length : 1;
 
-        card.dataset.matchId = match.ID;
+        card.dataset.matchId = match.id;
         const status = Utils.getMatchStatus(match);
-        const hasVideo = match['Video Embed'] ? 'has-video' : '';
+        const hasVideo = match.has_embed_video;
         card.className = `match-card ${status} ${hasVideo}`;
         card.onclick = () => {
             if (sources && sources.length > 1) {
                 SourcePicker.open(match);
             } else {
-                const singleId = (sources && sources.length === 1) ? sources[0].id : match.ID;
+                const singleId = (sources && sources.length === 1) ? sources[0].id : match.id;
                 MatchModal.fetchAndShow(singleId, CONFIG.currentSport);
             }
         };
         
         const { homeGoals, homeWinner, homeLoser,
                 awayGoals, awayWinner, awayLoser,
-                hasWinner } = Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
+                hasWinner } = Utils.parseWinner(match.home_team?.goals, match.away_team?.goals);
         
         const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
         const statusBadge = status === 'pending' ? `<span class="match-status">${statusText}</span>` : '';
 
-        const competition = LanguageManager.translateText(match.Competição);
-        const phase = LanguageManager.translateText(match.Fase);
-        const audioFormat = LanguageManager.translateText(match['Formato de áudio']);
+        const competition = LanguageManager.translateText(match.competition?.name);
+        const phase = LanguageManager.translateText(match.competition?.phase);
+        const audioFormat = LanguageManager.translateText(match.technical_details?.audio_format);
         
         // Gerar URL do logo da competição
         let competitionLogo = '';
-        if (match.Competição && match.Data) {
-            const competitionSlug = match.Competição
+        if (match.competition?.name && match.utcDate) {
+            const competitionSlug = match.competition?.name
                 .toLowerCase()
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '') // Remove acentos
                 .replace(/\s+/g, '_');
             
-            const matchDate = Utils.parseDate(match.Data);
+            const matchDate = Utils.parseDate(match.utcDate);
             const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
             competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
         }
 
         // Formatar a data
-        const dateDisplay = Utils.formatMatchDate(match.Data);
+        const dateDisplay = Utils.formatMatchDate(match.utcDate);
         
         card.innerHTML = `
             ${statusBadge}
             <div class="match-header">
-                ${competitionLogo ? `<img src="${competitionLogo}" alt="${match.Competição}" class="competition-logo" onerror="this.style.display='none'">` : ''}
+                ${competitionLogo ? `<img src="${competitionLogo}" alt="${match.competition?.name}" class="competition-logo" onerror="this.style.display='none'">` : ''}
                 <div class="competition-info">
                     <div class="match-competition">${competition || 'N/A'}</div>
                     <div class="match-phase">${phase || ''}</div>
@@ -98,13 +99,13 @@ const CardManager = {
             <div class="match-date">${dateDisplay}</div>
             <div class="match-teams">
                 <div class="team">
-                    ${match['Logo mandante'] ? `<img src="${match['Logo mandante']}" alt="${LanguageManager.t(match.Mandante)}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${LanguageManager.t(match.Mandante) || 'Time 1'}</span>
+                    ${match.home_team?.logo ? `<img src="${match.home_team?.logo}" alt="${LanguageManager.t(match.home_team?.name)}" class="team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${LanguageManager.t(match.home_team?.name) || 'Time 1'}</span>
                     <span class="score ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${homeGoals}</span>
                 </div>
                 <div class="team">
-                    ${match['Logo visitante'] ? `<img src="${match['Logo visitante']}" alt="${LanguageManager.t(match.Visitante)}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${LanguageManager.t(match.Visitante) || 'Time 2'}</span>
+                    ${match.away_team?.logo ? `<img src="${match.away_team?.logo}" alt="${LanguageManager.t(match.away_team?.name)}" class="team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${LanguageManager.t(match.away_team?.name) || 'Time 2'}</span>
                     <span class="score ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${awayGoals}</span>
                 </div>
             </div>
@@ -115,9 +116,9 @@ const CardManager = {
                         <span class="sources-count-label">${LanguageManager.t('sourcesCount')}</span>
                     </div>
                 ` : `
-                    ${match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
+                    ${match.station?.logo ? `<img src="${match.station?.logo}" alt="${match.station?.name}" class="broadcaster-logo${noFilterLogos.includes(match.station?.logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
                     <div class="tech-badges">
-                        ${match.Qualidade ? `<span class="tech-badge">${match.Qualidade}</span>` : ''}
+                        ${match.technical_details?.video_quality ? `<span class="tech-badge">${match.technical_details?.video_quality}</span>` : ''}
                         <span class="tech-badge">${audioFormat}</span>
                     </div>
                 `}
@@ -127,50 +128,51 @@ const CardManager = {
     }
 };
 
+// REVISADO
 const MotorCardManager = {
     create(event) {
         const card = document.createElement('div');
-        const hasVideo = event['Video Embed'] ? 'has-video' : '';
+        const hasVideo = event.media?.video_embed ? 'has-video' : '';
         card.className = `match-card motor-event ${hasVideo}`;
-        card.onclick = () => MatchModal.fetchAndShow(event.ID, 'motor');
+        card.onclick = () => MatchModal.fetchAndShow(event.id, 'motor');
         
-        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
+        const dateRange = Utils.formatMotorDateRange(event.start_date, event.end_date);
         
-        const competition = LanguageManager.translateText(event.Campeonato);
-        const phase = LanguageManager.translateText(event.Fase);
+        const competition = LanguageManager.translateText(event.competition?.name);
+        const phase = LanguageManager.translateText(event.competition?.phase);
         
-        const eventCount = event.Eventos?.length || 0;
+        const eventCount = event.events?.length || 0;
         const eventLabel = LanguageManager.currentLang === 'en' 
             ? (eventCount === 1 ? 'event' : 'events')
             : (eventCount === 1 ? 'evento' : 'eventos');
         
         let competitionLogo = '';
-        if (event.Campeonato && event.DataInicio) {
-            const competitionSlug = event.Campeonato
+        if (event.competition?.name && event.start_date) {
+            const competitionSlug = event.competition?.name
                 .toLowerCase()
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '') // Remove acentos
                 .replace(/\s+/g, '_');
             
-            const matchDate = Utils.parseDate(event.DataInicio);
+            const matchDate = Utils.parseDate(event.start_date);
             const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
             competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
         }
 
         card.innerHTML = `
             <div class="match-header">
-                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.Campeonato}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
+                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.competition?.phase}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
                 <div class="competition-info">
                     <div class="match-competition">${competition || 'N/A'}</div>
                 </div>
             </div>
             <div class="match-date">${dateRange}</div>
             <div class="motor-phase-section">
-                ${event.Pais ? `<img src="${event.Bandeira}" alt="${event.Pais}" class="country-flag" onerror="this.style.display='none'">` : ''}
+                ${event.competition?.country_name ? `<img src="${event.competition?.country_flag}" alt="${event.competition?.country_name}" class="country-flag" onerror="this.style.display='none'">` : ''}
                 <div class="motor-phase-name">${phase || 'N/A'}</div>
             </div>
             <div class="motor-footer">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(event['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
+                ${event.main_station_logo ? `<img src="${event.main_station_logo}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(event.main_station_logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
                 <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
             </div>
         `;
@@ -241,6 +243,7 @@ const CarnavalCardManager = {
     }
 };
 
+// DESCONTINUADO
 const ListManager = {
     create(match) {
         const item = document.createElement('div');
@@ -273,7 +276,7 @@ const ListManager = {
         item.innerHTML = `
             <div><strong>${Utils.formatMatchDate(match.Data, true)}</strong></div>
             <div>
-                <strong>${LanguageManager.t(match.Mandante)} ${scoreText} ${LanguageManager.t(match.Visitante)}</strong> ${statusBadge}
+                <strong>${LanguageManager.t(match.home_team?.name)} ${scoreText} ${LanguageManager.t(match.away_team?.name)}</strong> ${statusBadge}
                 <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
                     ${competition} - ${phase}
                 </div>
@@ -287,6 +290,7 @@ const ListManager = {
     }
 };
 
+// DESCONTINUADO
 const MotorListManager = {
     create(event) {
         const item = document.createElement('div');
@@ -320,6 +324,7 @@ const MotorListManager = {
     }
 };
 
+// REVISADO
 const SourcePicker = {
     open(match) {
         document.body.style.overflow = 'hidden';
@@ -334,14 +339,14 @@ const SourcePicker = {
         const existingShareBtn = document.getElementById('modalShareBtn');
         if (existingShareBtn) existingShareBtn.remove();
 
-        const competition = LanguageManager.translateText(match.Competição);
-        const phase = LanguageManager.translateText(match.Fase);
+        const competition = LanguageManager.translateText(match.competition?.name);
+        const phase = LanguageManager.translateText(match.competition?.phase);
 
         title.innerHTML = ``;
 
         score.innerHTML = ``;
 
-        const sources = Array.isArray(match.Fontes) ? match.Fontes : [];
+        const sources = Array.isArray(match.sources) ? match.sources : [];
         const chooseSourceTitle = LanguageManager.t('chooseSource');
 
         body.innerHTML = `
@@ -583,7 +588,7 @@ const MatchModal = {
             const apiResponse = await APIService.fetchById(id, sport);
 
             if (sport === 'motor') {
-                const items = APIService.transformData(apiResponse, sport);
+                const items = apiResponse.data;
                 if (!items.length) throw new Error('Item não encontrado');
                 MotorModal.show(items[0]);
             } else if (sport === 'carnaval') {
@@ -803,6 +808,7 @@ const CarnavalModal = {
     }
 };
 
+// REVISADO
 const MotorModal = {
     show(event) {
         document.body.style.overflow = 'hidden';
@@ -811,108 +817,82 @@ const MotorModal = {
         const score = document.getElementById('modalScore');
         const body = document.getElementById('modalBody');
         if (!title || !score || !body) return;
+        body.classList.add('motor-division');
         
-        const competition = LanguageManager.translateText(event.Campeonato);
-        const phase = LanguageManager.translateText(event.Fase);
+        const competition = LanguageManager.translateText(event.competition?.name);
+        const phase = LanguageManager.translateText(event.competition?.phase);
         
         title.innerHTML = `
             <div class="section-title modal-title-competition">${competition}</div>
             <div class="modal-title-phase">${phase}</div>
         `;
         
-        const startDate = Utils.formatMatchDate(event.DataInicio);
-        const endDate = Utils.formatMatchDate(event.DataFim);
+        const startDate = Utils.formatMatchDate(event.start_date);
+        const endDate = Utils.formatMatchDate(event.end_date);
         const dateRange = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
         
-        score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div>`;
+        score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div><div class="score-header-buttons"></div>`;
 
         const _motorCarousels = [];
-        const eventsHtml = (event.Eventos || []).map((evt, index) => {
-            const rows_tv_info = [
-                { label: 'broadcaster', value: evt.station?.name },
-                { label: 'origin',      value: LanguageManager.translateText(evt.station?.origem) },
-                { label: 'narration',   value: evt.station?.narracao },
-            ];
-            
-            const rows_tech_info = [
-                { label: 'quality',     value: evt.technical_details?.video_quality },
-                { label: 'audioFormat', value: LanguageManager.translateText(evt.technical_details?.audio_format) },
-                { label: 'bitrate',     value: evt.technical_details?.video_bitrate + ' Mbps' },
-                { label: 'duration',    value: evt.technical_details?.duration },
-                { label: 'fileSize',    value: Utils.formatSize(evt.technical_details?.file_size) },
-            ];
-
-            const tv_info = Elements.setDetailList(rows_tv_info);
-            const tech_info = Elements.setDetailGrid(rows_tech_info);
-
+        const eventsHtml = (event.events || []).map((evt, index) => {
+            const tv_info     = Elements.renderTvInfo(evt, false, false);
+            const tech_info   = Elements.renderTechInfo(evt);
             const videoTitle = LanguageManager.t('video') || 'Vídeo';
-            const videoHtml = event['Video Embed'] ? `
-            <div class="detail-section">
-                <div class="section-title">${videoTitle}</div>
-                <div style="text-align: center; padding: 30px;">
-                    <a href="watch.html?id=${match.id}" class="watch-button" target="_blank">
-                        <span style="font-size: 3em;">▶️</span>
-                        <div style="font-size: 1.2em; font-weight: 700; margin-top: 10px;">Assistir evento</div>
-                    </a>
-                </div>
-            </div>
-        ` : '';
-        
-        return `
-            <div class="motor-event-accordion">
-                <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
-                    <div class="motor-event-header-content">
-                        <span class="motor-event-title">${LanguageManager.translateText(evt.event_type) || 'Evento'}</span>
-                        <span class="motor-event-date">${Utils.formatMatchDate(evt.date)}</span>
-                    </div>
-                    <span class="motor-event-icon" id="icon-${index}">▼</span>
-                </div>
-                <div class="motor-event-content" id="content-${index}" style="display: none;">
-                    ${videoHtml}
-                    
-                    ${(() => {
-                        if (!evt.image) return '';
-                        const cid = `carousel-motor-${index}-${Date.now()}`;
-                        if (Array.isArray(evt.image) && evt.image.length > 1) {
-                            _motorCarousels.push({ id: cid, images: evt.image });
-                        }
-                        return ImageCarousel.renderHTML(evt.image, cid);
-                    })()}
-                    
-                   <div class="detail-section">
-                        <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
-                        <div class="detail-list">
-                            ${tv_info}
+              
+            return `
+                <div class="motor-event-accordion">
+                    <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
+                        <div class="motor-event-header-content">
+                            <span class="motor-event-title">${LanguageManager.translateText(evt.event_type) || 'Evento'}</span>
+                            <span class="motor-event-date">${Utils.formatMatchDate(evt.utcDate)}</span>
                         </div>
+                        <span class="motor-event-icon" id="icon-${index}">▼</span>
                     </div>
-                    
+                    <div class="motor-event-content" id="content-${index}" style="display: none;">
+                        
+                        ${(() => {
+                            if (!evt.media?.image) return '';
+                            const cid = `carousel-motor-${index}-${Date.now()}`;
+                            if (Array.isArray(evt.media?.image) && evt.media?.image.length > 1) {
+                                _motorCarousels.push({ id: cid, images: evt.media?.image });
+                            }
+                            return ImageCarousel.renderHTML(evt.media?.image, cid);
+                        })()}
+                        
                     <div class="detail-section">
-                        <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
-                        <div class="detail-grid technical">
-                            ${tech_info}
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
-                        <div class="storage-badges">
-                            ${Elements.setStorageBadges(evt.technical_details?.local,evt.technical_details?.cloud)}
-                        </div>
-                    </div>
-                    
-                    ${evt.additional_info ? `
-                        <div class="detail-section">
-                            <div class="section-title modal-style">${LanguageManager.t('observations')}</div>
-                                <div class="detail-item" style="grid-column: 1/-1;">
-                                    <div class="detail-value">${evt.additional_info}</div>
-                                </div>
+                            <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
+                            <div class="detail-list">
+                                ${tv_info}
                             </div>
                         </div>
-                    ` : ''}
+                        
+                        <div class="detail-section">
+                            <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
+                            <div class="detail-list">
+                                ${tech_info}
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
+                            <div class="storage-badges">
+                                ${Elements.setStorageBadges(evt.technical_details?.local,evt.technical_details?.cloud)}
+                            </div>
+                        </div>
+                        
+                        ${evt.additional_info ? `
+                            <div class="detail-section">
+                                <div class="section-title modal-style">${LanguageManager.t('observations')}</div>
+                                    <div class="detail-item" style="grid-column: 1/-1;">
+                                        <div class="detail-value">${evt.additional_info}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
         
         body.innerHTML = eventsHtml;
         _motorCarousels.forEach(c => ImageCarousel.init(c.id, c.images));
@@ -943,6 +923,7 @@ const MotorModal = {
     }
 };
 
+// REVISADO
 const Renderer = {
     render() {
         const container = document.getElementById('matchesContainer');
@@ -1028,7 +1009,7 @@ const Renderer = {
     populateYearFilter() {
         const years = new Set();
         AppState.matches.forEach(match => {
-            const dateField = match.Tipo === 'motor' ? match.DataInicio : match.Data;
+            const dateField = CONFIG.currentSport === 'motor' ? match.start_date : match.utcDate;
             const date = Utils.parseDate(dateField);
             if (date) years.add(date.getFullYear());
         });
@@ -1043,6 +1024,7 @@ const Renderer = {
     }
 };
 
+// REVISADO
 const FilterManager = {
     apply() {
         const query = document.getElementById('searchInput').value.toLowerCase();
@@ -1051,8 +1033,9 @@ const FilterManager = {
         AppState.filteredMatches = AppState.matches.filter(match => {
             const matchesQuery = Object.values(match).some(val => String(val).toLowerCase().includes(query));
             let matchesYear = true;
+            
             if (year) {
-                const dateField = match.Tipo === 'motor' ? match.DataInicio : match.Data;
+                const dateField = CONFIG.currentSport === 'motor' ? match.start_date : match.utcDate;
                 const date = Utils.parseDate(dateField);
                 matchesYear = date && date.getFullYear().toString() === year;
             }
@@ -1061,6 +1044,7 @@ const FilterManager = {
         Renderer.render();
     }
 };
+
 
 const ImageCarousel = {
     _carousels: {},

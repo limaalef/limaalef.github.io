@@ -27,6 +27,10 @@ header {
     grid-template-columns: 2fr 1fr;
 }
 
+.motor-division {
+    grid-template-columns: 1fr 1fr;
+}
+
 .modal-body:not(:has(img)) {
     max-width: 720px;
     display: grid;
@@ -49,6 +53,10 @@ header {
 @media (max-width: 1080px) {
     .modal-body {
         grid-template-columns: 10fr 6fr;
+    }
+
+    .motor-division {
+        grid-template-columns: 1fr 1fr;
     }
 }
 

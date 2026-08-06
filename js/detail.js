@@ -134,7 +134,7 @@ const _origPopulateYearFilter = Renderer.populateYearFilter.bind(Renderer);
 Renderer.populateYearFilter = function () {
     const years = new Set();
     AppState.matches.forEach(match => {
-        const dateField = match.Tipo === 'motor' ? match.DataInicio : match.Data;
+        const dateField = CONFIG.currentSport === 'motor' ? match.start_date : match.utcDate;
         const date = Utils.parseDate(dateField);
         if (date) years.add(date.getFullYear());
     });
@@ -174,7 +174,7 @@ CardManager.create = function (match) {
     const compInfo = card.querySelector('.competition-info');
     if (compInfo) {
         const phaseEl = compInfo.querySelector('.match-phase');
-        const dateDisplay = Utils.formatMatchDate(match.Data);
+        const dateDisplay = Utils.formatMatchDate(match.utcDate);
 
         // Substitui o conteúdo do competition-info para incluir a linha fase/data
         const competitionEl = compInfo.querySelector('.match-competition');
@@ -192,7 +192,7 @@ CardManager.create = function (match) {
     if (teamsEl) {
         const { homeGoals, homeWinner,
                 awayGoals, awayWinner,
-                hasWinner } = Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
+                hasWinner } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
 
         const scoreCenter = document.createElement('div');
         scoreCenter.className = 'match-score-center';

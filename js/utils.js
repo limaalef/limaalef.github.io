@@ -274,34 +274,17 @@ const Elements = {
         const color2 = colors.secondary;
         const color3 = colors.tertiary;
 
-        if (color2 === color1 || (color3 === color2 && color2 === '#000000')) {
-            return `
-                background-image:linear-gradient(to right,${color1} 0%,${color1} 100%);
-                background-repeat:no-repeat;
-                background-position:center top;
-                background-size:100% 4px;
-            `;
-        }
-        if (color3 === color2 || color3 === '#000000') {
-            return `
-                background-image:linear-gradient(to right,${color1} 0%,${color1} 50%,${color2} 50%,${color2} 100%);
-                background-repeat:no-repeat;
-                background-position:center top;
-                background-size:100% 4px;
-            `;
-        }
         return `
             background-image:linear-gradient(to right,${color1} 0%,${color1} 33.33%,${color2} 33.33%,${color2} 66.66%,${color3} 66.66%,${color3} 100%);
             background-repeat:no-repeat;
             background-position:center top;
-            background-size:100% 4px;
-        `;
+            background-size:100% 4px;`
     },
 
     getTeamHeaderList(info) {
-        const homeColor = info.home_team.colors.primary;
-        const homeName  = info.home_team.name;
-        const awayColor = info.away_team.colors.primary;
+        const homeColor = info.home_team?.colors?.primary;
+        const homeName  = info.home_team?.name;
+        const awayColor = info.away_team?.colors?.primary;
         const awayName  = info.away_team.name;
 
         return `<div class="plays-header-names">
@@ -389,7 +372,7 @@ const Elements = {
 
     renderTvInfo(match, divId = true, showType = true) {
         const rows = [
-            { label: 'broadcaster', value: match.station?.name,                           svg: '<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.0254 8.40554C20.7987 8.20998 20.5218 8.09678 20.3141 8.02584C20.0833 7.94703 19.8184 7.88184 19.5383 7.82624C18.9764 7.71473 18.2727 7.62624 17.4908 7.55704C15.9221 7.41822 13.955 7.34998 12 7.34998C10.045 7.34997 8.0779 7.41821 6.50923 7.55704C5.7273 7.62623 5.02357 7.71473 4.46174 7.82624C4.18161 7.88184 3.91672 7.94703 3.68594 8.02583C3.4782 8.09677 3.20126 8.20998 2.97462 8.40553C2.76112 8.58976 2.63916 8.81815 2.56971 8.97159C2.49263 9.14189 2.43333 9.32752 2.38581 9.50895C2.29052 9.87283 2.21854 10.3144 2.16365 10.7872C2.05319 11.7386 2 12.9242 2 14.1032C2 15.283 2.05326 16.4858 2.16311 17.4726C2.21784 17.9643 2.28883 18.4229 2.38053 18.807C2.46043 19.1416 2.59126 19.5854 2.85131 19.906C3.08981 20.2 3.43086 20.3352 3.60561 20.3981C3.82965 20.4789 4.09015 20.5429 4.36115 20.596C4.90739 20.703 5.60964 20.7873 6.39637 20.853C7.97657 20.9851 9.99449 21.05 12 21.05C14.0055 21.05 16.0234 20.9851 17.6036 20.853C18.3904 20.7873 19.0926 20.703 19.6388 20.596C19.9098 20.5429 20.1703 20.4789 20.3944 20.3981C20.5691 20.3352 20.9102 20.2 21.1487 19.906C21.4087 19.5854 21.5396 19.1416 21.6195 18.807C21.7112 18.4229 21.7822 17.9643 21.8369 17.4726C21.9467 16.4858 22 15.283 22 14.1032C22 12.9242 21.9468 11.7386 21.8363 10.7872C21.7815 10.3144 21.7095 9.87284 21.6142 9.50896C21.5667 9.32752 21.5074 9.14189 21.4303 8.9716C21.3608 8.81815 21.2389 8.58976 21.0254 8.40554Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="11.4858" y1="6.44995" x2="8.39999" y2="3.36416" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="-1" x2="5.36396" y2="-1" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 11.1 6.44995)" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+            { label: 'broadcaster', value: match.station?.name,                           svg: '<svg viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.0254 8.40554C20.7987 8.20998 20.5218 8.09678 20.3141 8.02584C20.0833 7.94703 19.8184 7.88184 19.5383 7.82624C18.9764 7.71473 18.2727 7.62624 17.4908 7.55704C15.9221 7.41822 13.955 7.34998 12 7.34998C10.045 7.34997 8.0779 7.41821 6.50923 7.55704C5.7273 7.62623 5.02357 7.71473 4.46174 7.82624C4.18161 7.88184 3.91672 7.94703 3.68594 8.02583C3.4782 8.09677 3.20126 8.20998 2.97462 8.40553C2.76112 8.58976 2.63916 8.81815 2.56971 8.97159C2.49263 9.14189 2.43333 9.32752 2.38581 9.50895C2.29052 9.87283 2.21854 10.3144 2.16365 10.7872C2.05319 11.7386 2 12.9242 2 14.1032C2 15.283 2.05326 16.4858 2.16311 17.4726C2.21784 17.9643 2.28883 18.4229 2.38053 18.807C2.46043 19.1416 2.59126 19.5854 2.85131 19.906C3.08981 20.2 3.43086 20.3352 3.60561 20.3981C3.82965 20.4789 4.09015 20.5429 4.36115 20.596C4.90739 20.703 5.60964 20.7873 6.39637 20.853C7.97657 20.9851 9.99449 21.05 12 21.05C14.0055 21.05 16.0234 20.9851 17.6036 20.853C18.3904 20.7873 19.0926 20.703 19.6388 20.596C19.9098 20.5429 20.1703 20.4789 20.3944 20.3981C20.5691 20.3352 20.9102 20.2 21.1487 19.906C21.4087 19.5854 21.5396 19.1416 21.6195 18.807C21.7112 18.4229 21.7822 17.9643 21.8369 17.4726C21.9467 16.4858 22 15.283 22 14.1032C22 12.9242 21.9468 11.7386 21.8363 10.7872C21.7815 10.3144 21.7095 9.87284 21.6142 9.50896C21.5667 9.32752 21.5074 9.14189 21.4303 8.9716C21.3608 8.81815 21.2389 8.58976 21.0254 8.40554Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="11.4858" y1="6.44995" x2="8.39999" y2="3.36416" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="-1" x2="5.36396" y2="-1" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 11.1 6.44995)" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
             { label: 'narration',   value: match.station?.commentary,                     svg: '<svg viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 10V12C19 15.866 15.866 19 12 19M5 10V12C5 15.866 8.13401 19 12 19M12 19V22M8 22H16M12 15C10.3431 15 9 13.6569 9 12V5C9 3.34315 10.3431 2 12 2C13.6569 2 15 3.34315 15 5V12C15 13.6569 13.6569 15 12 15Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
             { label: 'origin',      value: LanguageManager.t(match.station?.source_type), svg: '<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" class="cf-icon-svg"><path d="M13.27 14.91a.554.554 0 0 1-.392-.946 6.201 6.201 0 1 0-8.763 0 .554.554 0 1 1-.784.784 7.31 7.31 0 1 1 10.331 0 .55.55 0 0 1-.392.162zm-2.16-2.159a.554.554 0 0 1-.392-.946 3.142 3.142 0 1 0-4.444 0 .554.554 0 0 1-.783.784 4.25 4.25 0 1 1 6.011 0 .553.553 0 0 1-.391.162zm-1.117 3.32H9.05V10.99a1.511 1.511 0 1 0-1.108 0v5.081H7a.554.554 0 0 0 0 1.109h2.993a.554.554 0 0 0 0-1.109z"/></svg>' },
             ...(showType ? [{ label: 'type',        value: LanguageManager.t(match.type) }] : []),

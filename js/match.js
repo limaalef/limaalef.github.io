@@ -45,7 +45,7 @@ function renderMatch(match, sport) {
 }
 
 function renderHero(match) {
-    const { homeGoals, awayGoals } = Utils.parseWinner(match.score.fullTime?.home, match.score.fullTime?.away);
+    const { homeGoals, awayGoals } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
     const hasScore  = homeGoals !== null && awayGoals !== null;
 
     const compLogoSlug = (match.competition?.name || '')
