@@ -218,8 +218,8 @@ header {
     color: #fff
 }
 
-.sport-nav-card.others:hover {
-    background-color: var(--mode-others);
+.sport-nav-card.multisport:hover {
+    background-color: var(--mode-multisport);
     color: #000
 }
 
@@ -278,10 +278,10 @@ header {
     border: 1px solid var(--mode-football);
 }
 
-.sport-btn.others.active {
-    background: var(--mode-others);
+.sport-btn.multisport.active {
+    background: var(--mode-multisport);
     color: #fff;
-    border: 1px solid var(--mode-others);
+    border: 1px solid var(--mode-multisport);
 }
 
 .sport-btn.motor.active {

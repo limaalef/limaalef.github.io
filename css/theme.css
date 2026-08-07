@@ -40,7 +40,7 @@
 
     /* Cores dAs categorias */
     --mode-football: #3b82f6;
-    --mode-others: #f59e0b;
+    --mode-multisport: #f59e0b;
     --mode-motor: #ef4444;
     --mode-carnaval: #bd10ae;
     
@@ -133,7 +133,7 @@
 
 /* Cores dos modos */
 .mode-football   { color: #fff; background-color: var(--mode-football); }
-.mode-multisport { color: #000; background-color: var(--mode-others); }
+.mode-multisport { color: #000; background-color: var(--mode-multisport); }
 .mode-motorsport { color: #fff; background-color: var(--mode-motor); }
 .mode-carnaval   { color: #000; background-color: var(--mode-carnaval); }
 
@@ -146,7 +146,7 @@ body.theme-football {
 }
 
 /* TEMA: OUTROS ESPORTES */
-body.theme-others {
+body.theme-multisport {
     --accent-color: rgb(245, 158, 11);
     --accent-color-rgb: 245, 158, 11;
     --accent-hover: rgb(247, 173, 46);
@@ -204,7 +204,7 @@ body.theme-carnaval {
     }
 
     .mode-football   { background-color: #0f213f; color: var(--mode-football); }
-    .mode-multisport { background-color: #382402; color: var(--mode-others); }
+    .mode-multisport { background-color: #382402; color: var(--mode-multisport); }
     .mode-motorsport { background-color: #3b1111; color: var(--mode-motor); }
     .mode-carnaval   { background-color: #380235; color: var(--mode-carnaval); }
 }

@@ -1,5 +1,5 @@
 const Utils = {
-    VALID_SPORTS: ['football', 'others', 'motor', 'carnaval'],
+    VALID_SPORTS: ['football', 'multisport', 'motor', 'carnaval'],
 
     parseDate(dateStr) {
         if (!dateStr) return null;
@@ -60,7 +60,7 @@ const Utils = {
     modeLabelName(mode) {
         const map = {
             football:   { slug: 'football', key: 'modeFootball', },
-            multisport: { slug: 'others', key: 'modeMultisport' },
+            multisport: { slug: 'multisport', key: 'modeMultisport' },
             motorsport: { slug: 'motor', key: 'modeMotorsport' },
             carnaval: { slug: 'carnaval', key: 'modeCarnaval' }
         };
@@ -182,7 +182,7 @@ const Utils = {
     },
 
     applySportTheme(sport) {
-        document.body.classList.remove('theme-football', 'theme-others', 'theme-motor', 'theme-carnaval');
+        document.body.classList.remove('theme-football', 'theme-multisport', 'theme-motor', 'theme-carnaval');
         document.body.classList.add(`theme-${sport}`);
     },
 
@@ -274,11 +274,28 @@ const Elements = {
         const color2 = colors.secondary;
         const color3 = colors.tertiary;
 
+        if (color2 === null && color3 === null) {
+            return `
+                background-image:linear-gradient(to right,${color1} 0%,${color1} 100%);
+                background-repeat:no-repeat;
+                background-position:center top;
+                background-size:100% 4px;
+            `;
+        }
+        if (color3 === null) {
+            return `
+                background-image:linear-gradient(to right,${color1} 0%,${color1} 50%,${color2} 50%,${color2} 100%);
+                background-repeat:no-repeat;
+                background-position:center top;
+                background-size:100% 4px;
+            `;
+        }
         return `
             background-image:linear-gradient(to right,${color1} 0%,${color1} 33.33%,${color2} 33.33%,${color2} 66.66%,${color3} 66.66%,${color3} 100%);
             background-repeat:no-repeat;
             background-position:center top;
-            background-size:100% 4px;`
+            background-size:100% 4px;
+        `;
     },
 
     getTeamHeaderList(info) {
@@ -339,10 +356,10 @@ const Elements = {
     renderImages(match, dir = null, containerId = 'image-carousel') {
         const carouselId = `carousel-match-${match.id || match.ID || Date.now()}`;
 
-        let images = match.media?.image ?? match.Imagem;
+        let images = match.Imagem || match.media?.image;
 
         if (dir) {
-            const prefix = img => img.startsWith(dir) ? img : dir + img;
+            const prefix = img => img.startsWith(dir) ? CONFIG.IMAGE_CONTENT_URL + img : CONFIG.IMAGE_CONTENT_URL + dir + img;
 
             if (typeof images === "string") {
                 images = prefix(images);

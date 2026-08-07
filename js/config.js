@@ -1,13 +1,13 @@
 const CONFIG = {
     API_URLS: {
         football: 'https://api-archive.limaalef.com/v2/matches/football/?',
-        others: 'https://api-archive.limaalef.com/v2/matches/multisport/?',
+        multisport: 'https://api-archive.limaalef.com/v2/matches/multisport/?',
         motor: 'https://api-archive.limaalef.com/v2/motorsport/?',
         carnaval: 'https://api.limaalef.com/archive/matches?type=carnaval'
     },
     CF_API_URLS: {
         football: 'https://api-archive.limaalef.com/v2/matches/football/',
-        others: 'https://api-archive.limaalef.com/v2/matches/multisport/',
+        multisport: 'https://api-archive.limaalef.com/v2/matches/multisport/',
         motor: 'https://api-archive.limaalef.com/v2/motorsport/',
         carnaval: 'https://api-archive.limaalef.com/matches/carnaval'
     },
@@ -16,6 +16,7 @@ const CONFIG = {
     GOOGLE_CLIENT_ID:  '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
     CHANGELOG_URL:     'https://api-archive.limaalef.com/changelog',
     CONTEXT_API_URL:   'https://api.limaalef.com/archive/matches?', 
+    IMAGE_CONTENT_URL: 'https://img.limaalef.com/',
     DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football',
     videoFilter: false

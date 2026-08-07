@@ -82,7 +82,7 @@ const App = {
         if (this.readUrlParams()) return;
 
         document.getElementById('footballBtn').addEventListener('click', () => this.switchSport('football'));
-        document.getElementById('othersBtn').addEventListener('click', () => this.switchSport('others'));
+        document.getElementById('multisportBtn').addEventListener('click', () => this.switchSport('multisport'));
         document.getElementById('motorBtn').addEventListener('click', () => this.switchSport('motor'));
         document.getElementById('carnavalBtn').addEventListener('click', () => this.switchSport('carnaval'));
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());

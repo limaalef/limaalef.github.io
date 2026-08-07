@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     Utils.applySportTheme(sport);
 
-    sport = sport === 'others' ? 'multisport' : sport
+    sport = sport === 'multisport' ? 'multisport' : sport
 
     if (!id) { showError(); return; }
 

@@ -740,9 +740,9 @@ const CarnavalModal = {
         const result_info = Elements.renderJudgmentItems(match.Notas)
         const tech_info = Elements.setDetailGrid(rows_tech_info);
 
-        const _matchCarouselId = `carousel-match-${match.ID || Date.now()}`;
+        const { html, images, carouselId } = Elements.renderImages(match, "matches_image/", null);
         body.innerHTML = `
-            ${match.Imagem ? ImageCarousel.renderHTML(match.Imagem, _matchCarouselId) : ''}
+            ${html}
             
             <div class="modal-division">
             <div class="detail-section">
@@ -792,8 +792,8 @@ const CarnavalModal = {
             ` : ''}
         `;
         
-        if (match.Imagem && Array.isArray(match.Imagem) && match.Imagem.length > 1) {
-            ImageCarousel.init(_matchCarouselId, match.Imagem);
+        if (Array.isArray(images) && images.length > 1) {
+            ImageCarousel.init(carouselId, images);
         }
         modal?.classList.add('active');
     },
@@ -856,7 +856,7 @@ const MotorModal = {
                             if (Array.isArray(evt.media?.image) && evt.media?.image.length > 1) {
                                 _motorCarousels.push({ id: cid, images: evt.media?.image });
                             }
-                            return ImageCarousel.renderHTML(evt.media?.image, cid);
+                            return ImageCarousel.renderHTML(CONFIG.IMAGE_CONTENT_URL + evt.media?.image, cid);
                         })()}
                         
                     <div class="detail-section">
