@@ -435,7 +435,8 @@ const Elements = {
         if (!divId) {
             return result;
         } else {
-            section ? document.getElementById(section).style.display = 'block' : null;
+            console.log(detail)
+            section && detail.referees?.referee ? document.getElementById(section).style.display = 'block' : null;
             document.getElementById(divId).innerHTML = result;
         }
     },
