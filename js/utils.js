@@ -642,8 +642,8 @@ const Elements = {
                 : `<span class="plays-sub-line"><span class="plays-sub-in">▲</span> ${inName}</span>`;
 
             const lineOut = isHome
-                ? `<span class="plays-sub-line" style="margin-top:-4px;">${outName} <span class="plays-sub-out">▼</span></span>`
-                : `<span class="plays-sub-line" style="margin-top:-4px;"><span class="plays-sub-out">▼</span> ${outName}</span>`;
+                ? `<span class="plays-sub-line" style="margin-top:-3px;">${outName} <span class="plays-sub-out">▼</span></span>`
+                : `<span class="plays-sub-line" style="margin-top:-3px;"><span class="plays-sub-out">▼</span> ${outName}</span>`;
 
             return `
                 <span class="plays-sub ${sideClass}">
