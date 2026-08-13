@@ -606,13 +606,16 @@ const Elements = {
             const badge  = this.goalTypeBadge(play.playType);
             const icon   = this.playTypeBadge(play.playType);
             const minute = `${play.minute}<span class="plays-minute-mark">'</span>`;
+
+            const nameContent = this.getPlayerNameContent(play, isHome);
+
             const playerHome = `
-                <span class="plays-player-name">${play.popularName || play.name || '—'}</span>
+                <span class="plays-player-name">${nameContent}</span>
                 ${badge}${icon}
             `;
             const playerAway = `
                 ${icon}${badge}
-                <span class="plays-player-name">${play.popularName || play.name || '—'}</span>
+                <span class="plays-player-name">${nameContent}</span>
             `;
             return `
                 <div class="plays-row">
@@ -626,6 +629,30 @@ const Elements = {
                 </div>
             `;
         }).join('');
+    },
+
+    getPlayerNameContent(play, isHome) {
+        if (play.playType === 'SUBSTITUTION') {
+            const inName  = play.playerIn?.popularName  || play.playerIn?.name  || '—';
+            const outName = play.playerOut?.popularName || play.playerOut?.name || '—';
+            const sideClass = isHome ? 'plays-sub--home' : 'plays-sub--away';
+
+            const lineIn  = isHome
+                ? `<span class="plays-sub-line">${inName} <span class="plays-sub-in">▲</span></span>`
+                : `<span class="plays-sub-line"><span class="plays-sub-in">▲</span> ${inName}</span>`;
+
+            const lineOut = isHome
+                ? `<span class="plays-sub-line" style="margin-top:-4px;">${outName} <span class="plays-sub-out">▼</span></span>`
+                : `<span class="plays-sub-line" style="margin-top:-4px;"><span class="plays-sub-out">▼</span> ${outName}</span>`;
+
+            return `
+                <span class="plays-sub ${sideClass}">
+                    ${lineIn}
+                    ${lineOut}
+                </span>
+            `;
+        }
+        return play.popularName || play.name || '—';
     },
 
     renderPenalties(detail, homeTla) {

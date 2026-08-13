@@ -410,6 +410,26 @@
     background: var(--bg-error);
     color: var(--text-error);
 }
+
+/* Substituições */
+.plays-sub {
+    display: flex;
+    flex-direction: column;
+}
+
+.plays-sub--home {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.plays-sub--away {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.plays-sub-in  { color: #22c55e; }
+.plays-sub-out { color: #ef4444; }
+
 /* Responsivo: nomes menores em telas muito pequenas */
 @media (max-width: 360px) {
     .plays-player-name { max-width: 88px; font-size: var(--font-size-sm); }
