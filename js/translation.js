@@ -192,8 +192,12 @@ const translations = {
         sectionWorldCupTitle: 'Pesquisa por Copa do Mundo FIFA',
 
         'sectioncompetition-worldcup': 'Copa do Mundo FIFA',
+        'sectioncompetition-wcu20fem26': 'Polônia 2026',
         'sectioncompetition-worldcup26': 'América 2026',
+        'sectioncompetition-wcclub2025': 'EUA 2025',
+        'sectioncompetition-wcfem2023': 'AUS&NZ 2023',
         'sectioncompetition-worldcup22': 'Catar 2022',
+        'sectioncompetition-wcfem2019': 'França 2019',
         'sectioncompetition-worldcup18': 'Rússia 2018',
         'sectioncompetition-worldcup14': 'Brasil 2014',
         'sectioncompetition-worldcup10': 'África do Sul 2010',
@@ -603,8 +607,12 @@ const translations = {
         sectionWorldCupTitle: 'FIFA World Cup',
 
         'sectioncompetition-worldcup': 'FIFA World Cup',
+        'sectioncompetition-wcu20fem26': 'Poland 2026',
         'sectioncompetition-worldcup26': 'America 2026',
+        'sectioncompetition-wcclub2025': 'USA 2025',
+        'sectioncompetition-wcfem2023': 'AUS&NZ 2023',
         'sectioncompetition-worldcup22': 'Qatar 2022',
+        'sectioncompetition-wcfem2019': 'França 2019',
         'sectioncompetition-worldcup18': 'Russia 2018',
         'sectioncompetition-worldcup14': 'Brazil 2014',
         'sectioncompetition-worldcup10': 'South Africa 2010',
@@ -809,6 +817,7 @@ const translations = {
         'Grécia': 'Greece',
         'Eslováquia': 'Slovakia',
         'Eslovênia': 'Slovenia',
+        'Tanzãnia': 'Tanzania'
     }
 };
 
