@@ -359,6 +359,7 @@ const SourcePicker = {
                                 ? `<img src="${src.station.logo}" alt="${src.station?.name || ''}" class="broadcaster-logo${noFilterLogos.includes(src.station.logo) ? ' no-filter' : ''}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'source-picker-fallback-name',textContent:${JSON.stringify(src.station?.name || `#${src.id}`)}}))">`
                                 : `<span class="source-picker-fallback-name">${src.station?.name || `#${src.id}`}</span>`
                             }
+                            <div class="source-picker-video-quality">${src.video_quality}</div>
                         </button>
                     `).join('')}
                 </div>

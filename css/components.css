@@ -776,14 +776,13 @@ input[type="text"]:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 96px;
-    height: 56px;
-    padding: var(--sp-2) var(--sp-4);
+    flex-direction: column;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-size-sm);
     background-color: var(--bg-tertiary);
     cursor: pointer;
     transition: border-color 0.2s ease, transform 0.15s ease;
+    gap: var(--sp-3);
 }
 
 .source-picker-item:hover {
@@ -792,8 +791,9 @@ input[type="text"]:focus {
 }
 
 .source-picker-item .broadcaster-logo {
-    height: 28px;
-    max-width: 88px;
+    padding: var(--sp-3) var(--sp-4) 0 var(--sp-4);
+    height: 35px;
+    max-width: 105px;
 }
 
 .source-picker-fallback-name {
@@ -801,6 +801,15 @@ input[type="text"]:focus {
     font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
+}
+
+.source-picker-video-quality {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0 var(--sp-3) var(--sp-1) var(--sp-3) ;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: background 0.3s ease;
 }
 
 /* ========================================
