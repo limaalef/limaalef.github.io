@@ -774,6 +774,8 @@ input[type="text"]:focus {
 
 .source-picker-item {
     display: flex;
+    min-width: 110px;
+    gap: var(--sp-3);
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -782,7 +784,6 @@ input[type="text"]:focus {
     background-color: var(--bg-tertiary);
     cursor: pointer;
     transition: border-color 0.2s ease, transform 0.15s ease;
-    gap: var(--sp-3);
 }
 
 .source-picker-item:hover {
@@ -916,6 +917,11 @@ input[type="text"]:focus {
 
 @keyframes slideIn {
     from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideFromDown {
+    from { transform: translateY(100%); opacity: 1; }
     to { transform: translateY(0); opacity: 1; }
 }
 
@@ -2426,14 +2432,27 @@ input[type="text"]:focus {
         padding: 0px;
     }
 
+    .modal-broadcasters {
+        align-items: flex-end;
+        z-index: 1100;
+    }
+
     .modal-header {
         border-radius: 0px;
+    }
+
+    .modal-header.modal-down {
+        border-radius: var(--sp-6) var(--sp-6) 0 0;
     }
 
     .modal-content {
         border-radius: 0px;
         max-width: 100%;
         max-height: 100%;
+    }
+
+    .modal-content.modal-down-effect {
+        animation: slideFromDown 0.3s ease-out;
     }
 
     .detail-grid.technical {

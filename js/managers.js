@@ -334,6 +334,10 @@ const SourcePicker = {
         const body  = document.getElementById('modalBody');
         if (!modal || !title || !score || !body) return;
 
+        modal.classList.add('modal-broadcasters');
+        document.querySelector('.modal-header').classList.add('modal-down');
+        document.querySelector('.modal-content').classList.add('modal-down-effect');
+
         modal.querySelector('.modal-content').style.minHeight = '1px'
 
         const existingShareBtn = document.getElementById('modalShareBtn');
@@ -342,16 +346,15 @@ const SourcePicker = {
         const competition = LanguageManager.translateText(match.competition?.name);
         const phase = LanguageManager.translateText(match.competition?.phase);
 
-        title.innerHTML = ``;
-
-        score.innerHTML = ``;
-
         const sources = Array.isArray(match.sources) ? match.sources : [];
         const chooseSourceTitle = LanguageManager.t('chooseSource');
 
+        title.innerHTML = `<div class="section-title modal-title-competition">${chooseSourceTitle}</div>`;
+
+        score.innerHTML = `<div class="score-header-buttons"></div>`;
+
         body.innerHTML = `
-            <div class="detail-section">
-                <div class="section-title modal-style">${chooseSourceTitle}</div>
+            <div class="detail-section" style="margin-bottom:10rem;">
                 <div class="source-picker-list" id="sourcePickerList">
                     ${sources.map(src => `
                         <button class="source-picker-item" data-source-id="${src.id}">
@@ -381,6 +384,11 @@ const SourcePicker = {
 const MatchModal = {
     show(match) {
         document.body.style.overflow = 'hidden';
+
+        document.getElementById('modal').classList.remove('modal-broadcasters');
+        document.querySelector('.modal-content').classList.remove('modal-down-effect');
+        document.querySelector('.modal-header').classList.remove('modal-down');
+
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const score = document.getElementById('modalScore');
@@ -612,7 +620,14 @@ const MatchModal = {
     },
     close() {
         document.body.style.overflow = '';
-        document.getElementById('modal').classList.remove('active');
+
+        const modal = document.getElementById('modal');
+
+        modal.classList.add('closing');
+
+        modal.addEventListener('transitionend', () => {
+            modal.classList.remove('active', 'closing');
+        }, { once: true });
     }
 };
 
