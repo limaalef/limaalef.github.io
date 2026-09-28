@@ -66,7 +66,7 @@ const SidebarManager = {
 
         // Escudo / logo
         const logoEl  = document.getElementById('sidebarLogo');
-        logoEl.src = info.logo || `teams_logos/${query}.svg`;
+        logoEl.src = info.logo || `teams_logos/${query.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-")}.svg`;
         logoEl.alt = info.name || query;
         logoEl.style.display = '';
 

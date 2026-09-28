@@ -56,8 +56,14 @@ const APIService = {
     async fetchByTeam(page, itemsPerPage) {
         const loadingMessage = LanguageManager.t('loadingData');
         Utils.showNotification(loadingMessage, 'info');
+        let url = null
 
-        const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
+        if (CollectionState.type === "commentary") {
+            url = new URL(CONFIG.API_URLS.allsports);
+        } else {
+            url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
+        }
+        
         url.searchParams.append('max_items', 100);
         url.searchParams.append('page', page);
         url.searchParams.append(CollectionState.type, CollectionState.query);
