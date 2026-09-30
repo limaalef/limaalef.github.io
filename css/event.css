@@ -47,7 +47,7 @@ header {
 }
 
 .motor-event-accordion {
-    background-color: #ffffff00;
+    background-color: transparent;
 }
 
 @media (max-width: 1080px) {

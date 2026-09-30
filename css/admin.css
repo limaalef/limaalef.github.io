@@ -1,9 +1,10 @@
-.adm-layout, .user-layout { display: flex; min-height: calc(100vh - 60px); }
+.adm-layout, .user-layout { display: flex; min-height: calc(100vh - 60px);
+                     min-height: calc(100dvh - 60px); }
 .narrow-width      { max-width: var(--page-width-size); margin: auto;}
 .adm-sidebar       { min-width: 200px; width: 17%; flex-shrink: 0; border-right: 1px solid var(--border-color);
-                     position: sticky; top: 0; min-height: 100vh; overflow-y: auto; scrollbar-width: none; }
+                     position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: none; }
 .adm-sidebar-right { min-width: 200px; width: 17%; flex-shrink: 0; border-left: 1px solid var(--border-color);
-                     position: sticky; top: 0; min-height: 100vh; overflow-y: auto; scrollbar-width: none; }
+                     position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: none; }
 .sidebar-wide      { min-width: 360px; width: 32%;  }
 .adm-sidebar::-webkit-scrollbar { display: none; }
 .adm-sidebar-nav   { padding: var(--sp-4) 0; }
@@ -11,7 +12,8 @@
                      font-size: var(--font-size-mdm); color: var(--text-secondary);
                      cursor: pointer; transition: all .15s; border-left: 3px solid transparent;
                      text-decoration: none; }
-.adm-nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+@media (hover: hover) {
+    .adm-nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); } }
 .adm-nav-item.active { color: var(--accent-color); border-left-color: var(--accent-color);
                         background: var(--bg-accent-color); font-weight: 600; }
 .adm-nav-icon      { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
@@ -39,11 +41,8 @@
 .adm-table td { padding:12px 14px; border-bottom:1px solid var(--border-color);
     font-size:var(--font-size-mdm); color:var(--text-primary); vertical-align:middle; }
 .adm-table tr:last-child td { border-bottom:none; }
-.adm-table tr:hover td { background:var(--bg-tertiary); }
-.adm-btn-success { background:var(--bg-success); color:var(--text-success); border:1px solid var(--success-color); }
-.adm-btn-success:hover { filter:brightness(1.1); }
-.adm-btn-warning { background:var(--bg-warning); color:var(--text-warning); border:1px solid var(--warning-color); }
-.adm-btn-warning:hover { filter:brightness(1.1); }
+@media (hover: hover) {
+    .adm-table tr:hover td { background:var(--bg-tertiary); } }
 .adm-modal-title { font-size:var(--font-size-mxxl); font-weight:700; color:var(--text-accent-color); }
 .adm-items-list { display:flex; flex-direction:column; gap:1px;
     border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
@@ -69,9 +68,9 @@
 .adm-expiry-inline label { font-size:var(--font-size-sm); color:var(--text-success); font-weight:600; white-space:nowrap; }
 .adm-expiry-sel { padding:6px 10px; border-radius:var(--border-radius-size-md);
     border:1px solid var(--success-color); background:var(--bg-secondary);
-    color:var(--text-primary); font-size:var(--font-size-mdm); outline:none; cursor:pointer; }
+    color:var(--text-primary); font-size:var(--font-size-mdm);cursor:pointer; }
 .adm-input { width:100%; border:0; background:var(--bg-secondary); color:var(--text-primary);
-    font-size:var(--font-size-mdm); outline:none; box-sizing:border-box; font-family:inherit; }
+    font-size:var(--font-size-mdm);box-sizing:border-box; font-family:inherit; }
 .adm-input-text { font-weight:600; text-align:right; }
 .adm-input-select { font-weight:600; text-align:right; max-width:200px; }
 .adm-input:focus { border-bottom:1px solid var(--accent-color); }
@@ -102,7 +101,7 @@
 .adm-amount-prefix { font-size: var(--font-size-mdm); color: var(--text-secondary); font-weight: 600; }
 .adm-amount-input { width: 90px; border: 0; border-bottom: 1px solid var(--border-color);
     background: transparent; color: var(--text-primary); font-size: var(--font-size-mdm);
-    font-weight: 700; outline: none; font-family: inherit; padding: 2px 4px; text-align: right; }
+    font-weight: 700;font-family: inherit; padding: 2px 4px; text-align: right; }
 .adm-amount-input:focus { border-bottom-color: var(--accent-color); }
 
 /* Pill de status de pagamento */
@@ -119,12 +118,12 @@
 .section-divider { margin: var(--sp-6) 0; }
 
 /* ── Toggle switch ─────────────────────────────── */
-.adm-toggle { width: 40px; height: 22px; border-radius: 11px; background: var(--border-color);
+.adm-toggle { display: block; padding: 0; appearance: none; -webkit-appearance: none; width: 40px; height: 22px; border-radius: 11px; background: var(--border-color);
     border: 1px solid var(--border-color); cursor: pointer; transition: background .2s, border-color .2s;
     position: relative; flex-shrink: 0; }
 .adm-toggle.on { background: var(--accent-color); border-color: var(--accent-color); }
 .adm-toggle-knob { width: 16px; height: 16px; border-radius: 50%; background-color: var(--text-primary);
-    position: absolute; top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+    position: absolute; top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 3px var(--black-a20); }
 .adm-toggle.on .adm-toggle-knob { left: 20px; background: var(--text-accent-color);; }
 
 .adm-item-header {
@@ -132,21 +131,38 @@
     justify-content: space-between;
 }
 
+.header-title-row {
+    display: flex;
+    gap: 4px;
+}
+
 @media (max-width: 768px) {
-    .adm-main { margin: 0; }
+    .adm-main { margin: 0; padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-5)); }
     .adm-layout { flex-direction: column; gap: var(--sp-4); }
     .layout-inverted { flex-direction: column-reverse; }
     .adm-sidebar, .adm-sidebar-right { width: 100%; height: auto; position: static; border: none;
-                   border-bottom: 1px solid var(--border-color); min-height: 0px; }
-    .adm-sidebar-nav { display: flex; flex-direction: row; overflow-x: auto; padding: var(--sp-2) 0 0 0; }
-    .sidebar-wide      { min-width: 360px; width: 100%;  }
+                   border-bottom: 1px solid var(--border-color); min-height: 0px; overflow: visible; }
+    .sidebar-wide      { min-width: 0; width: 100%; }
 
-    .adm-nav-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap;
-                    padding: var(--sp-2) var(--sp-4); }
-    .adm-nav-item.active { border-left: none; border-bottom-color: var(--accent-color); }
+    /* Navegação do admin: barra inferior fixa (mesmo padrão do webapp) */
+    .page-admin .adm-sidebar-nav {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+        display: flex; flex-direction: row; justify-content: space-around; align-items: stretch;
+        padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+        height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+        background: var(--bg-secondary); border-top: 1px solid var(--border-color);
+    }
+    .page-admin .adm-nav-item {
+        flex: 1; flex-direction: column; justify-content: center; gap: 2px; text-align: center;
+        border-left: none; border-top: 3px solid transparent; padding: var(--sp-2);
+        font-size: var(--font-size-xs); white-space: nowrap; margin: 0;
+    }
+    .page-admin .adm-nav-item.active { border-left: none; border-top-color: var(--accent-color); }
     .adm-nav-divider, .adm-nav-section { display: none; }
     .adm-item-link-url { max-width: 160px; }
+    .adm-item-header { flex-direction: column; gap: var(--sp-2); }
     .filter-options { display: block; }
+    .adm-amount-status, .adm-row-actions { justify-content: flex-start; }
 }
 
 .prog {
@@ -224,3 +240,27 @@
 }
 .prog-dot-svg2.active { background: var(--accent-color); }
 .prog-dot-svg2.done   { background: var(--text-success); }
+
+/* Página de administração: sem margem lateral no container */
+body.page-admin .container { margin: 0; }
+
+/* ── Telas de login / painel (troca por classe, sem display inline) ── */
+.is-hidden { display: none !important; }
+.adm-auth { display: flex; flex-direction: column; align-items: center; gap: var(--sp-6); padding: 80px var(--sp-6); text-align: center; min-height: 75vh; }
+.adm-auth h2 { color: var(--text-primary); }
+.adm-auth p  { color: var(--text-secondary); }
+
+/* ── Bloco de valor do pedido ────────────────────────────────── */
+.adm-amount-status { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; justify-content: flex-end; }
+.adm-amount-status .pill { font-size: var(--font-size-xs); }
+.adm-amount-hint { font-size: var(--font-size-xs); color: var(--text-tertiary); text-align: right; margin-top: var(--sp-1); }
+.adm-amount-msg  { font-size: var(--font-size-xs); font-weight: 600; min-height: 1.2em; }
+.adm-amount-msg.ok  { color: var(--success-color); }
+.adm-amount-msg.err { color: var(--error-color); }
+.adm-access-note { font-size: var(--font-size-sm); color: var(--text-secondary); padding: var(--sp-3) 0; }
+.adm-row-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; flex-wrap: wrap; }
+.adm-toggle:disabled { opacity: .6; cursor: progress; }
+
+/* Itens de navegação agora são <button>: reseta o estilo nativo */
+button.adm-nav-item { width: 100%; background: none; border-top: 0; border-right: 0; border-bottom: 0;
+    font-family: inherit; text-align: left; cursor: pointer; }

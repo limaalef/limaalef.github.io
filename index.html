@@ -2,72 +2,61 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131313" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sports Archive">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Sports Archive</title>
     <meta name="description" content="Arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes.">
     <meta name="robots" content="noindex">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-    <!-- Meta Tags Básicas -->
-    <meta name="description" content="Arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes.">
     <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
     <meta name="author" content="@limaalef">
-
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://archive.limaalef.com/">
+    <meta property="og:url" content="https://archive.limaalef.com/">
     <meta property="og:title" content="Sports Archive">
     <meta property="og:description" content="Arquivo pessoal de jogos e eventos esportivos.">
-    <meta property="og:image" content="http://archive.limaalef.com/banner.png">
+    <meta property="og:image" content="https://archive.limaalef.com/banner.png">
     <meta property="og:image:width" content="763">
     <meta property="og:image:height" content="241">
     <meta property="og:site_name" content="Sports Archive">
     <meta property="og:locale" content="pt_BR">
-
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="http://archive.limaalef.com/">
+    <meta name="twitter:url" content="https://archive.limaalef.com/">
     <meta name="twitter:title" content="Sports Archive">
     <meta name="twitter:description" content="Arquivo pessoal de jogos e eventos esportivos.">
-    <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
+    <meta name="twitter:image" content="https://archive.limaalef.com/banner.png">
     <meta name="twitter:creator" content="@limaalef">
     <meta name="twitter:site" content="@limaalef">
-
-    <!-- Favicon -->
+    <!-- Ícones / manifest -->
     <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="shortcut icon" href="/icons/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/icons/site.webmanifest" />
-
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JJZTBEGJ91');
+    </script>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-JJZTBEGJ91');
-</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877"
-crossorigin="anonymous"></script>
 <body>
     <header>
         <div class="header-frame" id="header"
             data-title="Homepage"
-            data-back="false"
-            '>        
+            data-back="false">
         </div>
         
-        <div class="control-group">
-            <button id="langToggle" class="lang-btn" style="display: none;"
-                    title="Change language / Mudar idioma">
-                <span id="langFlag">🇧🇷</span>
-            </button>
-        </div>
     </header>
 
     <div class="container">
@@ -151,7 +140,7 @@ crossorigin="anonymous"></script>
                             </div>
                             <div class="browse-scroll-wrapper">
                                 <div class="browse-scroll-list" id="cupList">
-                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+Feminina+Sub-20+FIFA Polônia+2026" class="browse-badge-card">
+                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+Feminina+Sub-20+FIFA+Polônia+2026" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="competition_logos/copa_do_mundo_feminina_sub-20_fifa_polonia_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
@@ -173,7 +162,7 @@ crossorigin="anonymous"></script>
                                         <div class="browse-badge-circle">
                                             <img src="competition_logos/copa_do_mundo_feminina_fifa_australia/nova_zelandia_2023_2023.png" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
-                                        <span class="browse-badge-name" data-i18n="sectioncompetition-wcfem2023">AUS&NZ 2026</span>
+                                        <span class="browse-badge-name" data-i18n="sectioncompetition-wcfem2023">AUS&NZ 2023</span>
                                     </a>
                                     <a href="/detail.html?type=competition&q=Copa+do+Mundo+FIFA+Catar+2022" class="browse-badge-card">
                                         <div class="browse-badge-circle">
@@ -230,29 +219,41 @@ crossorigin="anonymous"></script>
                                         </div>
                                         <span class="browse-badge-name">Brasil</span>
                                     </a>
+                                    <a href="/detail.html?type=team&q=Argentina" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/argentina.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Argentina</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Espanha" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/espanha.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Espanha</span>
+                                    </a>
                                     <a href="/detail.html?type=team&q=Atlético-MG" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="teams_logos/atletico-mg.svg" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
                                         <span class="browse-badge-name">Atlético-MG</span>
                                     </a>
-                                    <a href="/detail.html?type=team&q=Athletico" class="browse-badge-card">
+                                    <a href="/detail.html?type=team&q=Athletico-PR" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="teams_logos/athletico.svg" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
                                         <span class="browse-badge-name">Athletico</span>
-                                    </a>
-                                    <a href="/detail.html?type=team&q=Botafogo" class="browse-badge-card">
-                                        <div class="browse-badge-circle">
-                                            <img src="teams_logos/botafogo.svg" class="browse-team-logo" onerror="this.style.display='none'">
-                                        </div>
-                                        <span class="browse-badge-name">Botafogo</span>
                                     </a>
                                     <a href="/detail.html?type=team&q=Bahia" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="teams_logos/bahia.svg" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
                                         <span class="browse-badge-name">Bahia</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=Botafogo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/botafogo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">Botafogo</span>
                                     </a>
                                     <a href="/detail.html?type=team&q=Chapecoense" class="browse-badge-card">
                                         <div class="browse-badge-circle">
@@ -325,17 +326,17 @@ crossorigin="anonymous"></script>
                                         </div>
                                         <span class="browse-badge-name">Remo</span>
                                     </a>
-                                    <a href="/detail.html?type=team&q=São+Paulo" class="browse-badge-card">
-                                        <div class="browse-badge-circle">
-                                            <img src="teams_logos/são_paulo.svg" class="browse-team-logo" onerror="this.style.display='none'">
-                                        </div>
-                                        <span class="browse-badge-name">São Paulo</span>
-                                    </a>
                                     <a href="/detail.html?type=team&q=Santos" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="teams_logos/santos.svg" class="browse-team-logo" onerror="this.style.display='none'">
                                         </div>
                                         <span class="browse-badge-name">Santos</span>
+                                    </a>
+                                    <a href="/detail.html?type=team&q=São+Paulo" class="browse-badge-card">
+                                        <div class="browse-badge-circle">
+                                            <img src="teams_logos/são_paulo.svg" class="browse-team-logo" onerror="this.style.display='none'">
+                                        </div>
+                                        <span class="browse-badge-name">São Paulo</span>
                                     </a>
                                     <a href="/detail.html?type=team&q=Vasco" class="browse-badge-card">
                                         <div class="browse-badge-circle">

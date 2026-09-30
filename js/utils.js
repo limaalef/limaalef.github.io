@@ -72,11 +72,14 @@ const Utils = {
     },
     
     getMatchStatus(match) {
-        const hasData = match.Mandante && match.Visitante;
-        const hasScores = (match['Gols mandante'] !== undefined && match['Gols mandante'] !== '' && match['Gols mandante'] !== null) &&
-                        (match['Gols visitante'] !== undefined && match['Gols visitante'] !== '' && match['Gols visitante'] !== null);
-        if (match.Data) {
-            const matchDate = this.parseDate(match.Data);
+        const filled = v => v !== undefined && v !== null && v !== '';
+        const homeGoals = match.home_team?.goals ?? match.score?.fullTime?.home ?? match['Gols mandante'];
+        const awayGoals = match.away_team?.goals ?? match.score?.fullTime?.away ?? match['Gols visitante'];
+        const hasData = (match.home_team?.name && match.away_team?.name) || (match.Mandante && match.Visitante);
+        const hasScores = filled(homeGoals) && filled(awayGoals);
+        const dateValue = match.utcDate || match.Data;
+        if (dateValue) {
+            const matchDate = this.parseDate(dateValue);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const yesterday = new Date(today);
@@ -85,6 +88,86 @@ const Utils = {
             if (hasData && !hasScores && (matchDate >= yesterday && matchDate <= today)) return 'pending';
         }
         return 'completed';
+    },
+
+    // Achata valores primitivos de objetos aninhados (usado na busca do carnaval).
+    flattenValues(obj, depth = 0) {
+        if (obj === null || obj === undefined || depth > 4) return [];
+        if (typeof obj !== 'object') return [obj];
+        return Object.values(obj).flatMap(v => this.flattenValues(v, depth + 1));
+    },
+
+    // Esporte de um item da listagem. A API "all" mistura esportes, então o item
+    // manda; o esporte da página é só o fallback.
+    getItemSport(item, fallback = CONFIG.currentSport) {
+        const s = item?.sport;
+        return this.VALID_SPORTS.includes(s) ? s : fallback;
+    },
+
+    // Normaliza para comparação: minúsculas, sem acentos, espaços simples.
+    normalizeSearch(value) {
+        return String(value ?? '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase().replace(/\s+/g, ' ').trim();
+    },
+
+    // Índice de busca de um item: todos os textos (inclusive de objetos aninhados),
+    // no original E traduzidos para o idioma atual. Assim "Alemanha" e "Germany"
+    // encontram o mesmo jogo, independente do idioma exibido.
+    _searchCache: new WeakMap(),
+    getSearchIndex(item) {
+        const lang = typeof LanguageManager !== 'undefined' ? LanguageManager.currentLang : 'pt-BR';
+        const cached = this._searchCache.get(item);
+        if (cached && cached.lang === lang) return cached.text;
+
+        const SKIP_KEY = /logo|image|img|url|embed|thumb|flag|href|src/i;
+        const SKIP_VAL = /^(https?:)?\/\/|\.(svg|png|jpe?g|webp|gif)(\?|$)/i;
+        const parts = new Set();
+        const walk = (val, key, depth) => {
+            if (val === null || val === undefined || depth > 5) return;
+            if (typeof val === 'object') {
+                Object.entries(val).forEach(([k, v]) => walk(v, k, depth + 1));
+                return;
+            }
+            if (SKIP_KEY.test(key || '')) return;
+            const str = String(val);
+            if (!str || SKIP_VAL.test(str)) return;
+            parts.add(str);
+            if (typeof LanguageManager !== 'undefined') {
+                const translated = LanguageManager.translateText(str);
+                if (translated && translated !== str) parts.add(translated);
+            }
+        };
+        walk(item, '', 0);
+
+        const text = this.normalizeSearch([...parts].join(' | '));
+        this._searchCache.set(item, { lang, text });
+        return text;
+    },
+
+    // Todos os termos digitados precisam aparecer (em qualquer campo).
+    matchesSearch(item, query) {
+        const terms = this.normalizeSearch(query).split(' ').filter(Boolean);
+        if (!terms.length) return true;
+        const index = this.getSearchIndex(item);
+        return terms.every(term => index.includes(term));
+    },
+
+    // Status de eventos sem placar (carnaval): futuro ou concluído.
+    getEventStatus(dateStr) {
+        const d = this.parseDate(dateStr);
+        if (!d) return 'completed';
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return d > today ? 'future' : 'completed';
+    },
+
+    // Campo de data principal de cada tipo de item vindo da API.
+    getItemDate(item) {
+        const sport = this.getItemSport(item);
+        if (sport === 'motor') return item.start_date;
+        if (sport === 'carnaval') return item.date;
+        return item.utcDate;
     },
 
     parseGoals(value) {
@@ -112,7 +195,7 @@ const Utils = {
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = 'notification';
-        const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+        const colors = { success: 'var(--success-color)', error: 'var(--error-color)', warning: 'var(--warning-color)', info: 'var(--info-color)' };
         const icons = { success: '', error: '', warning: '⚠', info: 'ℹ' };
         notification.style.border = `1px solid ${colors[type]}`;
         
@@ -261,12 +344,29 @@ const Elements = {
         `).join('');
     },
 
-    setStorageBadges(local, cloud) {
-        return `
-            ${local ? `<span class="storage-badge badge-success">${local}</span>` : ''}
-            ${cloud || String(cloud).toLowerCase() === 'nuvem' ? `<span class="storage-badge badge-info">${LanguageManager.t('cloud')}</span>` : ''}
-            ${!local && (!cloud || cloud.toLowerCase() !== 'nuvem') ? `<span class="badge" style="background: var(--border-color); color: var(--text-secondary);">${LanguageManager.t('noStorage') || 'Nenhum armazenamento registrado'}</span>` : ''}
-        `
+    // Nuvem: o campo da API é technical_details.cloud (aceita "nuvem" legado).
+    // Aceita boolean, número ou texto ("Nuvem", "true").
+    isCloud(techOrValue) {
+        const raw = (techOrValue && typeof techOrValue === 'object')
+            ? (techOrValue.cloud ?? techOrValue.nuvem)
+            : techOrValue;
+        if (typeof raw === 'string') return ['nuvem', 'cloud', 'true', '1', 'sim'].includes(raw.trim().toLowerCase());
+        return !!raw;
+    },
+
+    // Badges de armazenamento. Recebe o technical_details completo, ou (local, cloud) por compatibilidade.
+    setStorageBadges(localOrTech, cloud) {
+        const isTech = localOrTech && typeof localOrTech === 'object';
+        const local  = isTech ? localOrTech.local : localOrTech;
+        const inCloud = this.isCloud(isTech ? localOrTech : cloud);
+
+        const badges = [];
+        if (local)   badges.push(`<span class="storage-badge storage-local">${Utils.escapeHtml ? Utils.escapeHtml(local) : local}</span>`);
+        if (inCloud) badges.push(`<span class="storage-badge storage-cloud">${LanguageManager.t('cloud')}</span>`);
+        if (!badges.length) {
+            badges.push(`<span class="storage-badge storage-none">${LanguageManager.t('noStorage')}</span>`);
+        }
+        return badges.join('');
     },
 
     getTeamColorsStyle(colors) {
@@ -354,9 +454,9 @@ const Elements = {
     },
 
     renderImages(match, dir = null, containerId = 'image-carousel') {
-        const carouselId = `carousel-match-${match.id || match.ID || Date.now()}`;
+        const carouselId = `carousel-match-${match.id || Date.now()}`;
 
-        let images = match.Imagem || match.media?.image;
+        let images = match.image || match.media?.image;
 
         if (dir) {
             const prefix = img => img.startsWith(dir) ? CONFIG.IMAGE_CONTENT_URL + img : CONFIG.IMAGE_CONTENT_URL + dir + img;
@@ -409,7 +509,7 @@ const Elements = {
             { label: 'ID',          value: match.id,                                            svg: '<svg viewBox="0 0 512 532" fill="currentcolor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><g><g><g><path d="M362.669,42.671h-50.815l5.896-11.793c5.269-10.538,0.998-23.353-9.541-28.622s-23.353-0.998-28.622,9.541 l-15.437,30.874h-16.297l-15.437-30.874c-5.269-10.538-18.083-14.81-28.622-9.541s-14.81,18.083-9.541,28.622l5.896,11.793 h-50.815c-35.355,0-64,28.645-64,64v341.333c0,35.355,28.645,64,64,64h213.333c35.355,0,64-28.645,64-64V106.671 C426.669,71.316,398.024,42.671,362.669,42.671z M384.002,448.005c0,11.791-9.542,21.333-21.333,21.333H149.336 c-11.791,0-21.333-9.542-21.333-21.333V106.671c0-11.791,9.542-21.333,21.333-21.333h72.149l15.437,30.874 c0.071,0.143,0.159,0.272,0.233,0.413c0.19,0.36,0.39,0.713,0.6,1.062c0.159,0.263,0.32,0.523,0.489,0.777 c0.214,0.323,0.439,0.637,0.671,0.949c0.193,0.26,0.388,0.516,0.592,0.765c0.23,0.281,0.471,0.554,0.716,0.824 c0.231,0.254,0.463,0.505,0.704,0.746c0.242,0.242,0.493,0.474,0.748,0.706c0.27,0.245,0.542,0.485,0.823,0.715 c0.249,0.204,0.506,0.399,0.766,0.593c0.311,0.232,0.625,0.456,0.948,0.67c0.255,0.169,0.515,0.331,0.779,0.49 c0.348,0.21,0.701,0.409,1.06,0.599c0.141,0.074,0.27,0.162,0.414,0.234c0.135,0.068,0.275,0.116,0.411,0.18 c0.35,0.166,0.704,0.319,1.062,0.465c0.315,0.129,0.629,0.254,0.947,0.367c0.316,0.112,0.635,0.212,0.956,0.309 c0.361,0.109,0.721,0.215,1.083,0.305c0.293,0.072,0.589,0.131,0.885,0.19c0.385,0.077,0.768,0.153,1.154,0.208 c0.302,0.044,0.605,0.072,0.908,0.103c0.374,0.038,0.747,0.075,1.121,0.092c0.337,0.016,0.675,0.015,1.014,0.015 c0.339,0,0.676,0.001,1.013-0.015c0.374-0.018,0.747-0.055,1.121-0.092c0.304-0.031,0.607-0.059,0.908-0.103 c0.386-0.056,0.769-0.131,1.154-0.208c0.296-0.06,0.592-0.118,0.885-0.191c0.363-0.089,0.723-0.195,1.083-0.304 c0.321-0.097,0.641-0.197,0.957-0.309c0.317-0.113,0.632-0.237,0.946-0.366c0.358-0.146,0.712-0.3,1.062-0.466 c0.136-0.064,0.275-0.112,0.41-0.18c0.143-0.072,0.272-0.159,0.413-0.233c0.359-0.189,0.712-0.389,1.061-0.599 c0.264-0.159,0.523-0.32,0.778-0.489c0.323-0.214,0.637-0.439,0.949-0.67c0.26-0.193,0.516-0.388,0.765-0.592 c0.281-0.23,0.554-0.471,0.824-0.716c0.254-0.231,0.505-0.463,0.747-0.704c0.242-0.242,0.474-0.493,0.705-0.747 c0.245-0.27,0.485-0.542,0.715-0.823c0.204-0.249,0.399-0.506,0.592-0.766c0.232-0.311,0.456-0.626,0.67-0.949 c0.169-0.254,0.33-0.514,0.489-0.778c0.21-0.349,0.41-0.702,0.599-1.061c0.074-0.141,0.162-0.27,0.233-0.413l15.437-30.874 h72.149c11.791,0,21.333,9.542,21.333,21.333V448.005z"/><path d="M320.002,149.338h-128c-11.782,0-21.333,9.551-21.333,21.333c0,11.782,9.551,21.333,21.333,21.333h128 c11.782,0,21.333-9.551,21.333-21.333C341.336,158.889,331.784,149.338,320.002,149.338z"/></g></g></g></svg>' },
             { label: 'quality',     value: match.technical_details?.video_quality,               svg: '<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 5V19M17 5V19M3 8H7M17 8H21M3 16H7M17 16H21M3 12H7M17 12H21M6.2 20H17.8C18.9201 20 19.4802 20 19.908 19.782C20.2843 19.5903 20.5903 19.2843 20.782 18.908C21 18.4802 21 17.9201 21 16.8V7.2C21 6.0799 21 5.51984 20.782 5.09202C20.5903 4.71569 20.2843 4.40973 19.908 4.21799C19.4802 4 18.9201 4 17.8 4H6.2C5.0799 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.07989 3 7.2V16.8C3 17.9201 3 18.4802 3.21799 18.908C3.40973 19.2843 3.71569 19.5903 4.09202 19.782C4.51984 20 5.07989 20 6.2 20Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
             { label: 'audioFormat', value: match.technical_details?.audio_format, svg: '<svg viewBox="0 0 22 22" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><polyline class="cls-1" points="23.45 11.04 21.55 11.04 18.68 17.73 17.73 17.73 17.73 6.27 16.77 6.27 12.96 22.5 12 22.5 12 1.5 11.04 1.5 7.23 17.73 6.27 17.73 6.27 6.27 6.27 6.27 5.32 6.27 2.46 11.04 0.55 11.04"  stroke="currentcolor" stroke-width="2" stroke-linecap="round"/></svg>' },
-            { label: 'bitrate',     value: (match.technical_details?.video_bitrate + ' Mbps'),   svg: '<svg viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 11V8.5C17 7.67157 16.3284 7 15.5 7H5.5C4.67157 7 4 7.67157 4 8.5V16.5C4 17.3284 4.67157 18 5.5 18H15.5C16.3284 18 17 17.3284 17 16.5V14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round"/><path d="M17 11L20.2764 9.3618C20.6088 9.19558 21 9.43733 21 9.80902V15.2785C21 15.6276 20.6513 15.8692 20.3244 15.7467L17 14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round"/></svg>' },
+            { label: 'bitrate',     value: (match.technical_details?.video_bitrate != null ? match.technical_details.video_bitrate + ' Mbps' : 'N/A'),   svg: '<svg viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 11V8.5C17 7.67157 16.3284 7 15.5 7H5.5C4.67157 7 4 7.67157 4 8.5V16.5C4 17.3284 4.67157 18 5.5 18H15.5C16.3284 18 17 17.3284 17 16.5V14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round"/><path d="M17 11L20.2764 9.3618C20.6088 9.19558 21 9.43733 21 9.80902V15.2785C21 15.6276 20.6513 15.8692 20.3244 15.7467L17 14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round"/></svg>' },
             { label: 'duration',    value: match.technical_details?.duration,                    svg: '<svg viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM3.00683 12C3.00683 16.9668 7.03321 20.9932 12 20.9932C16.9668 20.9932 20.9932 16.9668 20.9932 12C20.9932 7.03321 16.9668 3.00683 12 3.00683C7.03321 3.00683 3.00683 7.03321 3.00683 12Z" fill="currentcolor"/><path d="M12 5C11.4477 5 11 5.44771 11 6V12.4667C11 12.4667 11 12.7274 11.1267 12.9235C11.2115 13.0898 11.3437 13.2343 11.5174 13.3346L16.1372 16.0019C16.6155 16.278 17.2271 16.1141 17.5032 15.6358C17.7793 15.1575 17.6155 14.5459 17.1372 14.2698L13 11.8812V6C13 5.44772 12.5523 5 12 5Z" fill="currentcolor"/></svg>' },
             { label: 'fileSize',    value: Utils.formatSize(match.technical_details?.file_size), svg: '<svg viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 9V17.8C19 18.9201 19 19.4802 18.782 19.908C18.5903 20.2843 18.2843 20.5903 17.908 20.782C17.4802 21 16.9201 21 15.8 21H8.2C7.07989 21 6.51984 21 6.09202 20.782C5.71569 20.5903 5.40973 20.2843 5.21799 19.908C5 19.4802 5 18.9201 5 17.8V6.2C5 5.07989 5 4.51984 5.21799 4.09202C5.40973 3.71569 5.71569 3.40973 6.09202 3.21799C6.51984 3 7.0799 3 8.2 3H13M19 9L13 3M19 9H14C13.4477 9 13 8.55228 13 8V3" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
         ];
@@ -454,12 +554,8 @@ const Elements = {
         }
     },
 
-    renderStorage(local, nuvem, divId) {
-        const badges = [];
-        if (local) badges.push(`<span class="storage-badge badge-success">${local}</span>`);
-        if (nuvem) badges.push(`<span class="storage-badge badge-info">Cloud</span>`);
-        document.getElementById(divId).innerHTML = badges.join('') ||
-            '<span style="color:var(--text-tertiary);font-size:var(--font-size-md)">Nenhuma informação de storage</span>';
+    renderStorage(techOrLocal, cloud, divId) {
+        document.getElementById(divId).innerHTML = this.setStorageBadges(techOrLocal, cloud);
     },
 
     renderAttRev(detail, divId) {
@@ -547,7 +643,7 @@ const Elements = {
                             }
                         )}` + ` nominal`,
                         noNewLine: true,
-                        smallColored: '#25b148',
+                        smallColored: 'var(--success-color)',
                     }
                 ]
                 : [])
@@ -864,7 +960,7 @@ const Elements = {
             ${substitute.length ? `
                 <div class="me-lineup-sub-header">
                     <button class="me-lineup-sub-label" type="button">
-                        <span>${LanguageManager.t('subtitutes')}</span>
+                        <span>${LanguageManager.t('substitutes')}</span>
                         <span>▼</span>
                     </button>
                 </div>
@@ -886,7 +982,7 @@ const Elements = {
                 const list = col.querySelector('.me-lineup-sub-list');
                 const open = !list.hidden;
                 list.hidden = open;
-                toggle.innerHTML = `<span>${LanguageManager.t('subtitutes')}</span><span>${open ? '▼' : '▲'}</span>`;
+                toggle.innerHTML = `<span>${LanguageManager.t('substitutes')}</span><span>${open ? '▼' : '▲'}</span>`;
             });
         }
 

@@ -2,7 +2,7 @@ const translations = {
     'pt-BR': {
         'Copa das Confederações FIFA Brasil': 'Copa das Confederações FIFA Brasil 2013',
         'Copa do Mundo FIFA África do Sul': 'Copa do Mundo FIFA África do Sul 2010',
-        title: 'Sport Archive',
+        title: 'Sports Archive',
         subtitle: 'Me encontre no Telegram @limaalef e no Discord @limaalef',
         football: 'Futebol',
         otherSports: 'Outros esportes',
@@ -131,6 +131,15 @@ const translations = {
         homeTitle: 'Confira a coleção por categoria',
         dirsoament: 'Coleção do Dirso Ament',
         myrequests: 'Meus pedidos',
+        navHome: 'Início',
+        authDenied: 'Acesso negado.',
+        authSessionExpired: 'Sessão expirada. Entre novamente.',
+        navCollection: 'Acervo',
+        footerContact: 'Contato',
+        rightsText: 'Todos os direitos reservados',
+        noStorage: 'Nenhum armazenamento registrado',
+        viewDetails: 'Ver detalhes',
+        substitutes: 'Reservas',
         adminCard: 'Administração',
         penalties: "Pênaltis",
 
@@ -416,7 +425,7 @@ const translations = {
         'Corrida Sprint': 'Sprint Race',
         'Treino Classificatório': 'Qualifying',
         'Corrida': 'Race',
-        title: 'Sport Archive',
+        title: 'Sports Archive',
         subtitle: 'Contact me on Telegram or Discord @limaalef',
         football: 'Football',
         otherSports: 'Other sports',
@@ -426,7 +435,7 @@ const translations = {
         event: 'event',
         events: 'events',
         games: 'Events',
-        totalfiles: 'Items total',
+        totalfiles: 'Total items',
         pending: 'Pending',
         future: 'Future',
         totalSize: 'Total archive size',
@@ -535,8 +544,18 @@ const translations = {
         homeTitle: 'Select a category',
         dirsoament: 'Dirso Ament`s Collection',
         myrequests: 'My requests',
+        navHome: 'Home',
+        authDenied: 'Access denied.',
+        authSessionExpired: 'Session expired. Please sign in again.',
+        navCollection: 'Collection',
+        footerContact: 'Contact',
+        rightsText: 'All rights reserved',
+        noStorage: 'No storage recorded',
+        viewDetails: 'View details',
+        evento: 'event',
+        eventos: 'events',
         adminCard: 'Admin',
-        enalties: "Penalty Shootout",
+        penalties: "Penalty Shootout",
         País: 'Country',
         Fundação: 'Est.',
         Apelido: 'Nickname',
@@ -825,39 +844,53 @@ const translations = {
 
 const LanguageManager = {
     currentLang: 'pt-BR',
+    STORAGE_KEY: 'sa_lang',
+    SUPPORTED: ['pt-BR', 'en'],
 
-    init() {
-        // Detectar idioma do navegador/sistema
-        const browserLang = navigator.language || navigator.userLanguage;
-        
-        // Verificar se há idioma salvo anteriormente
-        const savedLang = window.appLang;
-        
-        let defaultLang = 'pt-BR';
-        
-        // Se não há idioma salvo, usar detecção automática
-        if (!savedLang) {
-            // Se o idioma do navegador começa com 'pt' (pt-BR, pt-PT, etc), usar português
-            // Caso contrário, usar inglês
-            defaultLang = browserLang.toLowerCase().startsWith('pt') ? 'pt-BR' : 'en';
-        } else {
-            // Usar idioma salvo
-            defaultLang = savedLang;
-        }
-        
-        this.setLanguage(defaultLang, false); // false = não re-renderizar ainda
-        
-        document.getElementById('langToggle').addEventListener('click', () => {
-            const newLang = this.currentLang === 'pt-BR' ? 'en' : 'pt-BR';
-            this.setLanguage(newLang);
-        });
+    _readSaved() {
+        try { return localStorage.getItem(this.STORAGE_KEY); } catch { return null; }
     },
 
-    setLanguage(lang, rerender = true) {
+    _save(lang) {
+        try { localStorage.setItem(this.STORAGE_KEY, lang); } catch { /* storage indisponível */ }
+    },
+
+    // Ordem de decisão: idioma travado pela página (ex.: admin = pt-BR)
+    // → idioma salvo → idioma do navegador (pt* = português, demais = inglês).
+    init() {
+        const lock = document.documentElement.dataset.langLock;
+        let lang;
+
+        if (lock && this.SUPPORTED.includes(lock)) {
+            lang = lock;
+        } else {
+            const saved = this._readSaved();
+            if (this.SUPPORTED.includes(saved)) {
+                lang = saved;
+            } else {
+                const browserLang = (navigator.language || navigator.userLanguage || 'pt-BR').toLowerCase();
+                lang = browserLang.startsWith('pt') ? 'pt-BR' : 'en';
+            }
+        }
+
+        this.setLanguage(lang, false, false); // sem re-render e sem gravar (não foi escolha do usuário)
+    },
+
+    // persist=true grava a escolha para as próximas páginas.
+    setLanguage(lang, rerender = true, persist = true) {
+        if (!this.SUPPORTED.includes(lang)) lang = 'pt-BR';
         this.currentLang = lang;
         window.appLang = lang;
-        document.getElementById('langFlag').textContent = lang === 'pt-BR' ? '🇧🇷' : '🇺🇸';
+        document.documentElement.lang = lang;
+        if (persist && !document.documentElement.dataset.langLock) this._save(lang);
+
+        const flag = document.getElementById('langFlag');
+        if (flag) flag.textContent = lang === 'pt-BR' ? '🇧🇷' : '🇺🇸';
+
         this.updateAllTexts(rerender);
+        if (rerender) {
+            document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
+        }
     },
 
     getLanguage() {
@@ -896,17 +929,17 @@ const LanguageManager = {
         // Atualiza info de página
         this.updatePageInfo();
 
-        // Re-renderiza apenas se tiver dados E rerender for true
-        if (rerender && window.AppState && AppState.filteredMatches && AppState.filteredMatches.length > 0) {
-            if (window.UI && UI.renderMatches) {
-                UI.renderMatches();
-            }
+        // Re-renderiza a listagem atual (se houver) quando o idioma muda
+        if (rerender && typeof AppState !== 'undefined' && typeof Renderer !== 'undefined'
+            && AppState.filteredMatches && AppState.filteredMatches.length > 0
+            && document.getElementById('matchesContainer')) {
+            Renderer.render();
         }
     },
 
     updatePageInfo() {
         const pageInfo = document.getElementById('pageInfo');
-        if (pageInfo && window.AppState) {
+        if (pageInfo && typeof AppState !== 'undefined') {
             pageInfo.textContent = `${this.t('page')} ${AppState.currentPage} ${this.t('of')} ${AppState.totalPages}`;
         }
     },

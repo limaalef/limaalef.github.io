@@ -4,7 +4,7 @@
    com os jogos agregados por Local (CF_API_URLS)
    ============================================= */
 
-const VOLUME_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
+const VOLUME_COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)', 'var(--chart-6)'];
 
 // Nomes de "discos" que são apenas categorias da planilha, não hardware real
 const PSEUDO_DISKS = new Set(['local', 'nuvem', 'para baixar', 'desconhecido']);
@@ -430,6 +430,15 @@ async function loadVolumeMatches(vol) {
     }
 }
 
+// ─── Acesso aos campos dos jogos do volume (modelo v2, com fallback ao legado) ───
+const vm = {
+    date:    m => m.utcDate || m.Data,
+    quality: m => m.technical_details?.video_quality || m.Qualidade || '',
+    cloud:   m => Elements.isCloud(m.technical_details) || !!m.Nuvem,
+    duration:m => m.technical_details?.duration || m.Duração,
+    comp:    m => m.competition?.name || m.Competição || '',
+};
+
 // Atualiza os stats da sidebar (Jogos / Duração) com base nos jogos carregados
 function renderVolumeStats(matches) {
     const gamesEl = document.getElementById('volStatGames');
@@ -442,14 +451,14 @@ function renderVolumeStats(matches) {
         return;
     }
 
-    const totalDuration = matches.reduce((a, m) => a + parseDuration(m.Duração), 0);
+    const totalDuration = matches.reduce((a, m) => a + parseDuration(vm.duration(m)), 0);
     gamesEl.textContent = matches.length.toLocaleString('pt-BR');
     durEl.textContent   = formatHours(totalDuration);
 }
 
 function buildYearFilter(matches) {
     const years = [...new Set(matches.map(m => {
-        const d = Utils.parseDate(m.Data);
+        const d = Utils.parseDate(vm.date(m));
         return d ? d.getFullYear() : null;
     }).filter(Boolean))].sort((a, b) => b - a);
  
@@ -480,30 +489,26 @@ function applyFiltersAndRender() {
 
     if (activeYearFilter !== 'all') {
         filtered = filtered.filter(m => {
-            const d = Utils.parseDate(m.Data);
+            const d = Utils.parseDate(vm.date(m));
             return d && d.getFullYear().toString() === activeYearFilter;
         });
     }
 
     if (activeQualFilter === '4k') {
-        filtered = filtered.filter(m => /2160|4k/i.test(m.Qualidade || ''));
+        filtered = filtered.filter(m => /2160|4k/i.test(vm.quality(m)));
     } else if (activeQualFilter === '1080') {
-        filtered = filtered.filter(m => /1080/i.test(m.Qualidade || ''));
+        filtered = filtered.filter(m => /1080/i.test(vm.quality(m)));
     } else if (activeQualFilter === 'no-cloud') {
-        filtered = filtered.filter(m => !m.Nuvem);
+        filtered = filtered.filter(m => !vm.cloud(m));
     }
 
     if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(m =>
-            (m.Mandante   || '').toLowerCase().includes(q) ||
-            (m.Visitante  || '').toLowerCase().includes(q) ||
-            (m.Competição || '').toLowerCase().includes(q)
-        );
+        // Mesmo índice das demais páginas: campos aninhados + texto traduzido + sem acentos
+        filtered = filtered.filter(m => Utils.matchesSearch(m, searchQuery));
     }
 
     filtered.sort((a, b) => {
-        const da = Utils.parseDate(a.Data), db = Utils.parseDate(b.Data);
+        const da = Utils.parseDate(vm.date(a)), db = Utils.parseDate(vm.date(b));
         return (db || 0) - (da || 0);
     });
 
@@ -545,7 +550,7 @@ CardManager.create = function (match) {
     const compInfo = card.querySelector('.competition-info');
     if (compInfo) {
         const phaseEl = compInfo.querySelector('.match-phase');
-        const dateDisplay = Utils.formatMatchDate(match.Data);
+        const dateDisplay = Utils.formatMatchDate(vm.date(match));
         const competitionEl = compInfo.querySelector('.match-competition');
         compInfo.innerHTML = `
             ${competitionEl ? competitionEl.outerHTML : ''}
@@ -559,7 +564,7 @@ CardManager.create = function (match) {
     const teamsEl = card.querySelector('.match-teams');
     if (teamsEl) {
         const { homeGoals, homeWinner, awayGoals, awayWinner } =
-            Utils.parseWinner(match['Gols mandante'], match['Gols visitante']);
+            Utils.parseWinner(match.home_team?.goals ?? match['Gols mandante'], match.away_team?.goals ?? match['Gols visitante']);
 
         const scoreCenter = document.createElement('div');
         scoreCenter.className = 'match-score-center';
@@ -660,12 +665,12 @@ function parseDuration(str) {
 
 function topCompetition(matches) {
     const count = {};
-    matches.forEach(m => { const k = m.Competição || 'Outros'; count[k] = (count[k] || 0) + 1; });
+    matches.forEach(m => { const k = vm.comp(m) || 'Outros'; count[k] = (count[k] || 0) + 1; });
     return Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0]?.split(' ').slice(0, 3).join(' ') || '—';
 }
 
 function topQuality(matches) {
     const count = {};
-    matches.forEach(m => { const k = m.Qualidade || '—'; count[k] = (count[k] || 0) + 1; });
+    matches.forEach(m => { const k = vm.quality(m) || '—'; count[k] = (count[k] || 0) + 1; });
     return Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
 }

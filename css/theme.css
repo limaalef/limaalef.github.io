@@ -2,6 +2,8 @@
    VARIÁVEIS DE TEMA - LIGHT MODE
    ======================================== */
 :root {
+    color-scheme: light dark;
+
     /* Backgrounds */
     --bg-primary: #f5f4f0;
     --bg-secondary: #eeece7;
@@ -73,6 +75,48 @@
 
     --logo-size: 50px;
 
+    /* Neutros e transparências fixos (texto/overlays sobre imagem, vídeo e botões de mídia) */
+    --white: #ffffff;
+    --black: #000000;
+    --on-media-muted: #dddddd;
+    --black-a20: rgba(0, 0, 0, 0.2);
+    --black-a30: rgba(0, 0, 0, 0.3);
+    --black-a35: rgba(0, 0, 0, 0.35);
+    --black-a40: rgba(0, 0, 0, 0.4);
+    --black-a45: rgba(0, 0, 0, 0.45);
+    --black-a50: rgba(0, 0, 0, 0.5);
+    --black-a65: rgba(0, 0, 0, 0.65);
+    --black-a72: rgba(0, 0, 0, 0.72);
+    --white-a15: rgba(255, 255, 255, 0.15);
+    --white-a20: rgba(255, 255, 255, 0.2);
+    --white-a25: rgba(255, 255, 255, 0.25);
+
+    /* Destaque "premium" (partidas com vídeo) */
+    --premium-gold: #FFD700;
+    --premium-orange: #FFA500;
+    --premium-border: #af9500;
+    --premium-gold-a35: rgba(255, 215, 0, 0.35);
+    --premium-gold-a50: rgba(255, 215, 0, 0.5);
+
+    /* Paleta de gráficos (armazenamento) */
+    --chart-1: #3b82f6;
+    --chart-2: #10b981;
+    --chart-3: #f59e0b;
+    --chart-4: #8b5cf6;
+    --chart-5: #ef4444;
+    --chart-6: #ec4899;
+
+    /* Marcas de terceiros (login) */
+    --brand-google: #EA4335;
+    --brand-microsoft: #00a4ef;
+
+    /* Layout de webapp */
+    --bottom-nav-h: 60px;
+    --float-bottom: 30px;              /* posição vertical dos controles flutuantes (busca e carrinho) */
+    --float-side: 1.75rem;
+    --float-gap: 12px;
+    --black-a25: rgba(0, 0, 0, 0.25);
+
     /* Espaçamentos */
     --sp-1: 0.25rem;
     --sp-2: 0.375rem;
@@ -139,6 +183,7 @@
 
 /* TEMA: OUTROS FUTEBOL */
 body.theme-football {
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
     --accent-color: rgb(59, 130, 246);
     --accent-color-rgb: 59, 130, 246;
     --accent-hover: rgb(87, 149, 248);
@@ -147,6 +192,7 @@ body.theme-football {
 
 /* TEMA: OUTROS ESPORTES */
 body.theme-multisport {
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
     --accent-color: rgb(245, 158, 11);
     --accent-color-rgb: 245, 158, 11;
     --accent-hover: rgb(247, 173, 46);
@@ -155,6 +201,7 @@ body.theme-multisport {
 
 /* TEMA: AUTOMOBILISMO */
 body.theme-motor {
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
     --accent-color: rgb(239, 68, 68);
     --accent-color-rgb: 239, 68, 68;
     --accent-hover: rgb(247, 103, 103);
@@ -163,6 +210,7 @@ body.theme-motor {
 
 /* TEMA: CARNAVAL */
 body.theme-carnaval {
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
     --accent-color: rgb(165, 38, 154);
     --accent-color-rgb: 165, 38, 154;
     --accent-hover: rgb(223, 90, 212);

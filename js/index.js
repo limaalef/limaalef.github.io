@@ -348,9 +348,8 @@ function applyI18n() {
 window.addEventListener('DOMContentLoaded', async () => {
     await window._headerPromise;
 
-    document.getElementById('langToggle').addEventListener('click', () => {
-        const newLang = LanguageManager.currentLang === 'pt-BR' ? 'en' : 'pt-BR';
-        LanguageManager.setLanguage(newLang, false);
+    // Reage a qualquer troca de idioma disparada pelo LanguageManager
+    document.addEventListener('languagechange', () => {
         applyI18n();
         loadRecentChanges();
         TodayInHistory.load();

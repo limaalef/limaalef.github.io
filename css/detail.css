@@ -15,6 +15,7 @@
     position: sticky;
     top: 0;
     height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
     border-right: 1px solid var(--border-color);
     scrollbar-width: none;
@@ -173,14 +174,16 @@
     transition: all 0.2s;
     white-space: nowrap;
 }
-.year-btn:hover {
+@media (hover: hover) {
+    .year-btn:hover {
     border-color: var(--text-primary);
     color: var(--text-primary);
+}
 }
 .year-btn.active {
     background: var(--accent-color);
     border-color: var(--accent-color);
-    color: #fff;
+    color: var(--white);
 }
 
 /* ── CARD NOVO: linha única "Casa 0 x 0 Visitante" ── */

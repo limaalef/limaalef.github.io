@@ -79,7 +79,9 @@
     overflow: hidden;
     transition: border-color 0.2s;
 }
-.volume-card:hover { border-color: var(--accent-color); }
+@media (hover: hover) {
+    .volume-card:hover { border-color: var(--accent-color); }
+}
 .volume-card.critical { border-color: var(--error-color); }
 .volume-card.warning  { border-color: var(--warning-color); }
 
@@ -246,7 +248,9 @@
     border-right: 1px solid var(--border-color);
 }
 .volume-action-btn:last-child { border-right: none; }
-.volume-action-btn:hover { background: var(--bg-tertiary); }
+@media (hover: hover) {
+    .volume-action-btn:hover { background: var(--bg-tertiary); }
+}
 .volume-action-btn.danger { color: var(--error-color); }
 
 /* ── Cloud card ── */
@@ -310,7 +314,9 @@
     border-right: 1px solid var(--border-color);
 }
 .cloud-action-btn:last-child { border-right: none; }
-.cloud-action-btn:hover { background: var(--bg-tertiary); }
+@media (hover: hover) {
+    .cloud-action-btn:hover { background: var(--bg-tertiary); }
+}
 
 /* ── DETALHE DO VOLUME ── */
 .volume-group {
@@ -385,9 +391,11 @@
     transition: all 0.2s;
     white-space: nowrap;
 }
-.storage-filter-btn:hover {
+@media (hover: hover) {
+    .storage-filter-btn:hover {
     border-color: var(--text-primary);
     color: var(--text-primary);
+}
 }
 .storage-filter-btn.active {
     background: var(--accent-color);

@@ -32,7 +32,7 @@ function renderMatch(match, sport) {
     Elements.renderTechInfo(match, 'meTechInfo');
     Elements.renderRefereeInfo(match, 'meRefereeInfo', 'meRefereeSection');
     Elements.renderAttRev(match, 'meAttRevInfo');
-    Elements.renderStorage(match.technical_details?.local, match.technical_details?.nuvem, 'meStorageBadges');
+    Elements.renderStorage(match.technical_details, null, 'meStorageBadges');
     Elements.renderObsAndTags(match);
     Elements.renderLineups(match.home_team, match.away_team);
     Elements.renderStatistics(match);

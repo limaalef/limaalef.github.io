@@ -87,9 +87,11 @@ async function loadChangelog() {
     try {
         const page = State.page
         const limit = State.limit
-        const data = await APIService.fetchChangelog(page, limit);
+        const data = await APIService.fetchChangelog(page, limit, { mode: State.mode });
 
-        const items = data.data || [];
+        // O filtro é enviado à API; o filtro local garante o resultado mesmo que ela o ignore.
+        let items = data.data || [];
+        if (State.mode) items = items.filter(entry => entry.mode === State.mode);
         State.totalPages = data.pagination?.total_pages || 1;
 
         if (items.length === 0) {

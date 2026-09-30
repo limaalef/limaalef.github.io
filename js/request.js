@@ -26,6 +26,9 @@ const RequestModule = (() => {
     // ── Estado ────────────────────────────────────────────────
     let cart   = JSON.parse(localStorage.getItem('sa_cart') || '[]');
     let user   = null;
+    if (Auth.site.restore()) {
+        user = { ...Auth.site.user, provider: 'google', token: Auth.site.token };
+    }
     let _panel = null;
 
     // ── Persistência ─────────────────────────────────────────
@@ -39,8 +42,9 @@ const RequestModule = (() => {
     // ══════════════════════════════════════════════════════════
     const API = {
         addItem(match) {
-            const sport = CONFIG?.currentSport || 'football';
-            if (cart.find(c => c.id === match.id && c.sport === sport)) {
+            const sport = _sportOf(match);
+            const id    = _requestId(match);
+            if (API.isInCart(id, sport)) {
                 Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'warning');
                 return;
             }
@@ -68,7 +72,8 @@ const RequestModule = (() => {
         },
 
         isInCart(id, sport) {
-            return !!cart.find(c => c.id === id && c.sport === sport);
+            // ids chegam como número (API) ou string (dataset do DOM)
+            return !!cart.find(c => String(c.id) === String(id) && c.sport === sport);
         },
 
         openPanel() {
@@ -95,10 +100,36 @@ const RequestModule = (() => {
     // ══════════════════════════════════════════════════════════
     //  CONSTRUÇÃO DO ITEM
     // ══════════════════════════════════════════════════════════
+    // Esporte do item (a listagem "all" mistura esportes); o da página é só o fallback.
+    function _sportOf(match) {
+        return Utils.getItemSport(match, CONFIG?.currentSport || 'football');
+    }
+
+    // Um item de listagem com UMA fonte é pedido pelo id dessa fonte — o mesmo id que o
+    // modal detalhado usa. Assim card e modal enxergam o mesmo pedido no carrinho.
+    function _requestId(match) {
+        const sources = Array.isArray(match.sources) ? match.sources : null;
+        return (sources && sources.length === 1) ? sources[0].id : match.id;
+    }
+
+    // Item com mais de uma fonte não tem botão de pedido no card (o usuário escolhe a fonte antes).
+    function _hasMultipleSources(match) {
+        return Array.isArray(match?.sources) && match.sources.length > 1;
+    }
+
+    // Placar: a listagem traz home_team.goals; o detalhe (modal) traz score.fullTime.
+    function _scoreOf(match) {
+        const pick = (...vals) => vals.find(v => v !== undefined && v !== null && v !== '');
+        const home = pick(match.home_team?.goals, match.score?.fullTime?.home, match.score?.home, match.home_team?.score);
+        const away = pick(match.away_team?.goals, match.score?.fullTime?.away, match.score?.away, match.away_team?.score);
+        return { home, away, has: home !== undefined && away !== undefined };
+    }
+
     function _buildItem(match, sport) {
+        const itemId = _requestId(match);
         if (sport === 'motor') {
             return {
-                id:    match.id,
+                id:    itemId,
                 sport,
                 label: `${match.competition?.name} · ${match.competition?.phase}`,
                 date:  Utils.formatMotorDateRange?.(match.start_date, match.end_date) || '',
@@ -107,24 +138,23 @@ const RequestModule = (() => {
         }
         if (sport === 'carnaval') {
             return {
-                id:    match.id,
+                id:    itemId,
                 sport,
-                label: `${match.Escola + '· ' + match.Enredo}`.trim(),
-                date:  Utils.formatMatchDate?.(match.Data) || match.Data || '',
-                meta:  `${match.Cidade} · ${match.Divisão}`,
-                station: `${match.Emissora}`,
+                label: `${match.samba_school?.name} · ${match.samba_school?.plot}`.trim(),
+                date:  Utils.formatMatchDate?.(match.date) || match.date || '',
+                meta:  `${match.championship?.city} · ${match.championship?.division}`,
+                station: `${match.station?.name || ''}`,
             };
         }
         
         const home  = match.home_team?.name  || '?';
         const away  = match.away_team?.name  || '?';
-        const gh    = match.home_team?.goals ?? '';
-        const ga    = match.away_team?.goals ?? '';
-        const score = (gh !== '' && ga !== '') ? ` ${gh} x ${ga}` : ' x ';
+        const sc    = _scoreOf(match);
+        const score = sc.has ? ` ${Utils.parseGoals(sc.home)} x ${Utils.parseGoals(sc.away)}` : ' x ';
         const tv    = match.station?.name || '';
 
         return {
-            id:    match.id,
+            id:    itemId,
             sport,
             label: `${home} ${score} ${away}`,
             date:  Utils.formatMatchDate?.(match.utcDate) || match.utcDate || '',
@@ -147,6 +177,7 @@ const RequestModule = (() => {
 
     function _injectCartButton() {
         if (document.getElementById('om-cart-btn')) return;
+        document.body.classList.add('has-cart-fab');
         const btn = document.createElement('button');
         btn.id        = 'om-cart-btn';
         btn.className = 'om-cart-fab';
@@ -459,39 +490,18 @@ const RequestModule = (() => {
     async function _loginGoogle() {
         // Fallback: se GSI não carregou, usa popup OAuth redirect
         if (!window.google?.accounts?.id) { _openOAuthPopup('google'); return; }
-        google.accounts.id.initialize({
-            client_id:             CFG.googleClientId,
-            cancel_on_tap_outside: false,
-            callback: async (response) => {
-                try {
-                    // Troca o credential do Google pelo JWT próprio do backend (assinado com JWT_SECRET)
-                    const res = await fetch(`${CFG.apiBase}/auth/verify`, {
-                        method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body:    JSON.stringify({ credential: response.credential }),
-                    });
-                    if (!res.ok) {
-                        const e = await res.json().catch(() => ({}));
-                        Utils.showNotification(e.error || 'Erro ao autenticar com Google', 'error');
-                        return;
-                    }
-                    const data = await res.json();
-                    const p = _decodeJwt(response.credential);
-                    user = {
-                        name:     p.name    || p.email,
-                        email:    p.email,
-                        picture:  p.picture || '',
-                        provider: 'google',
-                        token:    data.token,   // JWT próprio, validado pelo backend
-                        isAdmin:  data.isAdmin,
-                    };
-                    _renderContactStep();
-                } catch (err) {
-                    Utils.showNotification('Erro ao autenticar com Google', 'error');
-                }
+        Auth.site.login({
+            onSuccess: (profile, data) => {
+                user = {
+                    ...profile,
+                    provider: 'google',
+                    token:    data.token,   // JWT próprio, validado pelo backend
+                    isAdmin:  data.isAdmin,
+                };
+                _renderContactStep();
             },
+            onError: message => Utils.showNotification(message || 'Erro ao autenticar com Google', 'error'),
         });
-        google.accounts.id.prompt();
     }
 
     // ── OAuth popup fallback (Google redirect flow) ───────────
@@ -511,30 +521,46 @@ const RequestModule = (() => {
         });
     }
 
-    function _injectRequestButtons() {
-        const sport = CONFIG?.currentSport || 'football';
-        document.querySelectorAll('.match-card[data-match-id]').forEach(card => {
-            if (card.querySelector('.om-add-btn')) return; // já injetado
+    // Localiza o item da listagem a partir do data-match-id do card
+    // (id do grupo OU id da fonte, quando o card tem uma única fonte).
+    function _findListItem(id) {
+        const list = AppState?.matches || [];
+        return list.find(m => String(m.id) === String(id))
+            || list.find(m => Array.isArray(m.sources) && m.sources.some(s => String(s.id) === String(id)));
+    }
 
-            const id     = card.dataset.matchId;
+    function _cardButtonLabel(inCart) {
+        return LanguageManager.t(inCart ? 'requestAdded' : 'requestAddBtn');
+    }
+
+    function _injectRequestButtons() {
+        document.querySelectorAll('.match-card[data-match-id]').forEach(card => {
+            const match = _findListItem(card.dataset.matchId);
+            const stale = card.querySelector('.om-add-btn');
+
+            // Cards com mais de uma fonte não têm botão: o pedido é feito no modal, depois de escolher a fonte.
+            if (!match || _hasMultipleSources(match)) { stale?.remove(); return; }
+            if (stale) return; // já injetado
+
+            const sport  = _sportOf(match);
+            const id     = _requestId(match);
             const inCart = API.isInCart(id, sport);
 
             const btn = document.createElement('button');
+            btn.type      = 'button';
             btn.className = `om-add-btn${inCart ? ' om-added' : ''}`;
             btn.title     = inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtn');
-            btn.setAttribute('aria-label', inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtn'));
-            btn.textContent = inCart ? `${LanguageManager.t('requestAdded')}` : `${LanguageManager.t('requestAddBtn')}`;
+            btn.setAttribute('aria-label', btn.title);
+            btn.textContent = _cardButtonLabel(inCart);
 
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const match = AppState?.matches?.find(m => String(m.id) === String(id));
-                if (!match) return;
-                if (API.isInCart(match.id, sport)) {
+                if (API.isInCart(id, sport)) {
                     Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
                     return;
                 }
                 API.addItem(match);
-                btn.textContent = `${LanguageManager.t('requestAdded')}`;
+                btn.textContent = _cardButtonLabel(true);
                 btn.title       = LanguageManager.t('requestAlreadyAdded');
                 btn.classList.add('om-added');
             });
@@ -547,7 +573,7 @@ const RequestModule = (() => {
         const scoreEl = document.getElementById('modalScore');
         if (!scoreEl) return;
 
-        const sport = CONFIG?.currentSport || 'football';
+        const sport = _sportOf(match);
 
         // Reaproveita/cria o mesmo container usado por "Statistics" e "Assistir jogo"
         let buttonsRow = scoreEl.querySelector('.score-header-buttons');
@@ -573,7 +599,7 @@ const RequestModule = (() => {
         _updateModalButtonState(btn, match, sport);
 
         btn.onclick = () => {
-            if (API.isInCart(match.id, sport)) {
+            if (API.isInCart(_requestId(match), sport)) {
                 Utils.showNotification(LanguageManager.t('requestAlreadyInCart'), 'info');
                 return;
             }
@@ -583,7 +609,7 @@ const RequestModule = (() => {
     }
 
     function _updateModalButtonState(btn, match, sport) {
-        const inCart = API.isInCart(match.id, sport);
+        const inCart = API.isInCart(_requestId(match), sport);
         const label  = inCart ? LanguageManager.t('requestAlreadyAdded') : LanguageManager.t('requestAddBtnText');
         btn.querySelector('span').textContent = label;
         btn.title = label;
@@ -592,13 +618,12 @@ const RequestModule = (() => {
 
     // Atualiza estado visual dos botões sem reinjetar (ex: troca de esporte)
     function _refreshButtonStates() {
-        const sport = CONFIG?.currentSport || 'football';
         document.querySelectorAll('.match-card[data-match-id] .om-add-btn').forEach(btn => {
             const card   = btn.closest('.match-card');
-            const id     = card?.dataset.matchId;
-            const inCart = id ? API.isInCart(id, sport) : false;
+            const match  = card ? _findListItem(card.dataset.matchId) : null;
+            const inCart = match ? API.isInCart(_requestId(match), _sportOf(match)) : false;
             btn.classList.toggle('om-added', inCart);
-            btn.textContent = inCart ? `${LanguageManager.t('requestAdded')}` : `+ ${LanguageManager.t('requestAddBtn')}`;
+            btn.textContent = _cardButtonLabel(inCart);
         });
     }
 
@@ -613,19 +638,14 @@ const RequestModule = (() => {
     //  dispara internamente — sem modificar managers.js.
     // ══════════════════════════════════════════════════════════
     function _patchManagers() {
-        // Patch CardManager.create
+        // Patch CardManager.create — marca cards com várias fontes (sem botão de pedido)
         if (typeof CardManager !== 'undefined' && !CardManager._rmPatched) {
             const orig = CardManager.create.bind(CardManager);
             CardManager.create = function (match) {
                 const card = orig(match);
-                const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
-
-                if (sources && sources.length > 1) {
-                    card.dataset.groupId = match.id;
-                    card.dataset.sourceCount = String(sources.length);
-                    delete card.dataset.matchId;
-                } else {
-                    card.dataset.matchId = (sources && sources.length === 1) ? sources[0].id : match.id;
+                if (_hasMultipleSources(match)) {
+                    card.dataset.groupId     = match.id;
+                    card.dataset.sourceCount = String(match.sources.length);
                 }
                 return card;
             };
@@ -726,13 +746,6 @@ const RequestModule = (() => {
     }
 
     // ── Utilitários ───────────────────────────────────────────
-    function _decodeJwt(token) {
-        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(
-            atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        ));
-    }
-
     function _esc(str) {
         return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }

@@ -86,6 +86,9 @@ const App = {
         document.getElementById('motorBtn').addEventListener('click', () => this.switchSport('motor'));
         document.getElementById('carnavalBtn').addEventListener('click', () => this.switchSport('carnaval'));
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());
+        document.addEventListener('languagechange', () => {
+            if (document.getElementById('searchInput')?.value) FilterManager.apply();
+        });
         document.getElementById('yearFilter').addEventListener('change', () => FilterManager.apply());
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', () => this.switchView(btn.dataset.view));

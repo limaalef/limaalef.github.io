@@ -1,0 +1,64 @@
+/* ============================================================
+   UTILITÁRIOS — substituem estilos inline nas páginas de
+   pedidos e administração. Só usam variáveis do theme.css.
+   ============================================================ */
+.is-hidden { display: none !important; }
+
+/* Layout */
+.d-flex { display: flex; }
+.d-inline-block { display: inline-block; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.flex-1 { flex: 1; }
+.min-w-0 { min-width: 0; }
+.shrink-0 { flex-shrink: 0; }
+.w-full { width: 100%; }
+.w-inset-4 { width: calc(100% - (2 * var(--sp-4))); margin: 0 var(--sp-4) var(--sp-4) var(--sp-4); }
+.gap-0 { gap: 0; }
+
+/* Espaçamento */
+.mt-1px { margin-top: 2px; }
+.mt-3 { margin-top: var(--sp-3); }
+.mt-5 { margin-top: var(--sp-5); }
+.mt-auto { margin-top: auto; }
+.mb-4 { margin-bottom: var(--sp-4); }
+.mb-5 { margin-bottom: var(--sp-5); }
+.ml-auto { margin-left: auto; }
+.px-5 { padding-left: var(--sp-5); padding-right: var(--sp-5); }
+.p-5 { padding: var(--sp-5); }
+
+/* Texto */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-mdm { font-size: var(--font-size-mdm); }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.mono { font-family: monospace; }
+.nowrap { white-space: nowrap; }
+.no-underline { text-decoration: none; }
+.icon-lg { font-size: 3rem; }
+
+/* Cores semânticas */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-accent { color: var(--accent-color); }
+.text-success { color: var(--success-color); }
+.text-error { color: var(--error-color); }
+.bg-primary-fill { background-color: var(--bg-primary); }
+.bg-error-fill { background: var(--bg-error); }
+.bc-error { border-color: var(--error-color); }
+
+/* Tabelas do admin: coluna que se ajusta ao conteúdo */
+.col-fit { width: 1px; white-space: nowrap; }
+
+/* Componentes pequenos que antes eram inline */
+.adm-toggle-label { display: flex; align-items: center; gap: var(--sp-3); cursor: pointer; justify-content: flex-end; }
+.prog-conn-min { min-width: 30px; }
+.prog-pad { padding: var(--sp-5) var(--sp-5) 0 var(--sp-5); }
+.dot-6 { width: 6px; height: 6px; border-radius: 50%; }
+.rq-notice { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4);
+    background: var(--bg-warning); border-radius: var(--border-radius-size-mlg);
+    border: 1px solid var(--warning-color); }

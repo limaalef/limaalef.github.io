@@ -2,152 +2,41 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131313" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sports Archive">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Pedido — Sports Archive</title>
     <meta name="robots" content="noindex">
+    <meta name="author" content="@limaalef">
+    <!-- Ícones / manifest -->
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
-<style>
-.rd-wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
-
-/* Auth */
-#rd-auth { display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
-    padding:var(--sp-9) var(--sp-5); text-align:center; }
-#rd-auth h2 { color:var(--text-primary); margin:0; font-size:var(--font-size-xxl); }
-#rd-auth p  { color:var(--text-secondary); margin:0; font-size:var(--font-size-mdm); }
-.rd-loading { text-align:center; padding:var(--sp-9) var(--sp-5);
-    color:var(--text-secondary); font-size:var(--font-size-mdm); }
-
-    /* Progress bar */
-.rd-progress { display:flex; border-radius:var(--border-radius-size-md);
-    overflow:hidden; border:1px solid var(--border-color); margin-bottom:var(--sp-6); }
-.rd-progress-step { flex:1; text-align:center; padding:var(--sp-3) var(--sp-2);
-    font-size:var(--font-size-xs); font-weight:600; text-transform:uppercase;
-    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary); transition:all .2s; }
-.rd-progress-step + .rd-progress-step { border-left:1px solid var(--border-color); }
-.rd-progress-step.done    { background:var(--bg-success); color:var(--text-success); }
-.rd-progress-step.current { background:var(--accent-color); color:var(--text-accent-color); }
-
-/* Sections */
-.rd-section { margin-bottom:var(--sp-6); }
-.rd-section-title { font-size:var(--font-size-xs); text-transform:uppercase;
-    letter-spacing:.07em; color:var(--accent-color); margin-bottom:var(--sp-3); }
-
-/* Download cards */
-.rd-dl-list { display:flex; flex-direction:column; gap:var(--sp-4); }
-.rd-dl-card { border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); overflow:hidden; }
-.rd-dl-card-head { display:flex; align-items:center; gap:var(--sp-4);
-    padding:var(--sp-4) var(--sp-5); background:var(--bg-secondary); }
-.rd-dl-icon { font-size:1.5rem; flex-shrink:0; }
-.rd-dl-info { flex:1; min-width:0; }
-.rd-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
-.rd-dl-sub   { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:var(--sp-1); }
-.rd-dl-card-body { padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-color); background:var(--bg-primary); }
-.rd-dl-status-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-3); }
-.rd-dl-exp { font-size:var(--font-size-sm); }
-.rd-dl-exp.valid     { color:var(--text-success); }
-.rd-dl-exp.expired   { color:var(--error-color); }
-.rd-dl-exp.indefinite { color:var(--text-secondary); }
-.rd-dl-exp.disabled  { color:var(--text-tertiary); }
-.rd-dl-pending { padding:var(--sp-4) var(--sp-5); background:var(--bg-primary);
-    color:var(--text-tertiary); font-size:var(--font-size-sm);
-    border-top:1px solid var(--border-color); text-align:center; }
-
-/* Info list */
-.rd-info-list { display:flex; flex-direction:column; gap:1px;
-    border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
-.rd-info-item { background:var(--bg-secondary); padding:var(--sp-3) var(--sp-4);
-    display:flex; align-items:center; justify-content:space-between; }
-.rd-info-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
-.rd-info-label { font-size:var(--font-size-sm); color:var(--text-secondary); width:35%; }
-.rd-info-value { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); text-align:right; width:65%; }
-.rd-notes { padding:var(--sp-3) var(--sp-4); background:var(--bg-secondary);
-    border-radius:var(--border-radius-size-md); border-left:3px solid var(--accent-color);
-    font-size:var(--font-size-sm); color:var(--text-secondary); }
-
-/* ═══════════════════════════════════════════════
-   PAGAMENTO — card Pix
-═══════════════════════════════════════════════ */
-.rd-pay-card { border: 1px solid var(--border-color); border-radius: var(--border-radius-size-xl);
-    overflow: hidden; margin-bottom: var(--sp-6); }
-.rd-pay-card.pay-required { border-color: var(--warning-color); }
-.rd-pay-card.pay-pending  { border-color: var(--accent-color); }
-.rd-pay-card.pay-done     { border-color: var(--success-color); }
-
-.rd-pay-head { display: flex; align-items: center; gap: var(--sp-4);
-    padding: var(--sp-4) var(--sp-5); }
-.rd-pay-card.pay-required .rd-pay-head { background: var(--bg-warning); }
-.rd-pay-card.pay-pending  .rd-pay-head { background: var(--bg-accent-color); }
-.rd-pay-card.pay-done     .rd-pay-head { background: var(--bg-success); }
-.rd-pay-icon  { font-size: 1.6rem; flex-shrink: 0; }
-.rd-pay-title { font-size: var(--font-size-mdm); font-weight: 700; color: var(--text-primary); }
-.rd-pay-sub   { font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px; }
-.rd-pay-amount { font-size: var(--font-size-mxxl); font-weight: 700;
-    color: var(--accent-color); margin-left: auto; flex-shrink: 0; }
-
-.rd-pay-body  { padding: 0; background: var(--bg-primary);
-    border-top: 1px solid var(--border-color); }
-
-/* CPF step */
-.rd-cpf-field { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
-.rd-cpf-label { font-size: var(--font-size-sm); color: var(--text-secondary); font-weight: 600;
-    text-transform: uppercase; letter-spacing: .05em; }
-.rd-cpf-input { width: 100%; padding: var(--sp-3) var(--sp-4);
-    border: 1px solid var(--border-color); border-radius: var(--border-radius-size-md);
-    background: var(--bg-secondary); color: var(--text-primary); font-size: var(--font-size-mdm);
-    font-family: inherit; outline: none; transition: border-color .15s; }
-.rd-cpf-input:focus { border-color: var(--accent-color); }
-.rd-cpf-hint { padding: 0 var(--sp-4); font-size: var(--font-size-xs); color: var(--text-tertiary); }
-.rd-cpf-err  { padding: 0 var(--sp-4); font-size: var(--font-size-sm); color: var(--error-color); display: none; margin-top: var(--sp-2); }
-
-/* QR Code */
-.rd-qr-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
-.rd-qr-img  { width: 200px; height: 200px; border-radius: var(--border-radius-size-md);
-    border: 1px solid var(--border-color); background: #fff; padding: 8px; }
-.rd-qr-copy-wrap { width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); }
-.rd-qr-code-text { font-size: var(--font-size-xs); font-family: monospace; word-break: break-all;
-    background: var(--bg-secondary); border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-md); padding: var(--sp-3); color: var(--text-secondary);
-    max-height: 80px; overflow-y: auto; line-height: 1.5; }
-.rd-qr-timer { font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; }
-.rd-qr-timer span { color: var(--accent-color); font-weight: 700; }
-.rd-poll-status { text-align: center; font-size: var(--font-size-sm); color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin: var(--sp-3) 0; }
-.rd-poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color);
-    animation: rd-blink 1.2s ease-in-out infinite; }
-@keyframes rd-blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-/* Spinner inline */
-.rd-spinner { display: inline-block; width: 18px; height: 18px;
-    border: 2px solid var(--border-color); border-top-color: var(--accent-color);
-    border-radius: 50%; animation: rd-spin .7s linear infinite; }
-@keyframes rd-spin { to { transform: rotate(360deg); } }
-
-/* Locks on items when payment is required */
-.rd-locked-notice { display: flex; align-items: center; gap: var(--sp-3);
-    padding: var(--sp-4) var(--sp-5); background: var(--bg-warning);
-    border-top: 1px solid var(--border-color); font-size: var(--font-size-sm);
-    color: var(--text-warning); }
-</style>
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/request-detail.css">
 </head>
 <body>
     <header>
         <div class="header-frame" id="header" data-title="" data-back="true" data-reqbtn="false"></div>
-        <div class="control-group">
-            <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
-                <span id="langFlag">🇧🇷</span>
-            </button>
-        </div>
     </header>
 
     <!-- Auth -->
     <div id="rd-auth">
-        <div style="font-size:3rem">🔒</div>
+        <div class="icon-lg">🔒</div>
         <h2 data-i18n="requestLoginRequired">Identificação necessária</h2>
         <p data-i18n="requestLoginRequiredDesc">Faça login para visualizar os detalhes do pedido.</p>
-        <button class="om-oauth-btn om-google" id="rd-login-google" style="margin-top:var(--sp-3)">
+        <button class="om-oauth-btn om-google mt-3" id="rd-login-google">
             <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -158,17 +47,17 @@
         </button>
     </div>
         
-    <div id="rd-content" style="display:none">
+    <div class="is-hidden" id="rd-content">
         <div class="adm-layout narrow-width layout-inverted">
             <!-- Conteúdo -->
-            <div class="adm-main" style="padding:0 var(--sp-5)">
+            <div class="adm-main px-5">
                 <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
                 <div id="rd-order-body"></div>
             </div>
 
             <!-- Sidebar -->
             <aside class="adm-sidebar-right sidebar-wide">
-                <div id="rd-order-sidebar" style="padding:0 var(--sp-5)"></div>
+                <div class="px-5" id="rd-order-sidebar"></div>
             </aside>
         </div>
     </div>
@@ -178,17 +67,14 @@
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.service.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
 const RD_CFG = {
     apiBase:      CONFIG.REQUEST_API_BASE,
     paymentsBase: CONFIG.PAYMENTS_API_BASE || 'https://payments.limaalef.com',
-    googleClientId: CONFIG.GOOGLE_CLIENT_ID,
 };
-
-let rdToken = null;
-let rdUser  = null;
 
 // Estado de pagamento (preservado durante polling e entre sessões via KV)
 let _payState = {
@@ -202,60 +88,21 @@ let _payState = {
     restored:     false,  // true = QR veio do servidor (não gerado nesta sessão)
 };
 
-LanguageManager.init();
 
 function t(key) { return (LanguageManager ? LanguageManager.t(key) : null) || key; }
 
 const orderId = new URLSearchParams(window.location.search).get('id');
 
-// ── Sessão ─────────────────────────────────────────────────────────────────
-function saveRdSession(token, user) {
-    rdToken = token; rdUser = user;
-    localStorage.setItem('rq_token', token);
-    localStorage.setItem('rq_user',  JSON.stringify(user));
-}
-function restoreRdSession() {
-    const token = localStorage.getItem('rq_token');
-    const user  = localStorage.getItem('rq_user');
-    if (!token) return false;
-    try {
-        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-        if (p.exp && p.exp < Math.floor(Date.now()/1000)) {
-            localStorage.removeItem('rq_token'); localStorage.removeItem('rq_user'); return false;
-        }
-        rdToken = token;
-        rdUser  = user ? JSON.parse(user) : { name: p.name || p.email, email: p.email, picture: p.picture || '' };
-        return true;
-    } catch { return false; }
-}
+const session = Auth.site;
 
 // ── Auth ───────────────────────────────────────────────────────────────────
 document.getElementById('rd-login-google').addEventListener('click', () => {
-    if (!window.google?.accounts?.id) { alert(t('requestGSINotLoaded')); return; }
-    google.accounts.id.initialize({
-        client_id: RD_CFG.googleClientId,
-        cancel_on_tap_outside: false,
-        callback: async (response) => {
-            try {
-                const res = await fetch(`${RD_CFG.apiBase}/auth/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential }),
-                });
-                if (!res.ok) { alert(t('requestLoginError')); return; }
-                const data = await res.json();
-                const p    = decodeJwt(response.credential);
-                saveRdSession(data.token, { name: p.name || p.email, email: p.email, picture: p.picture || '' });
-                showContent();
-            } catch { alert(t('requestLoginError')); }
-        },
-    });
-    google.accounts.id.prompt();
+    session.login({ onSuccess: showContent });
 });
 
 async function showContent() {
-    document.getElementById('rd-auth').style.display    = 'none';
-    document.getElementById('rd-content').style.display = 'block';
+    document.getElementById('rd-auth').classList.add('is-hidden');
+    document.getElementById('rd-content').classList.remove('is-hidden');
     if (!orderId) { document.getElementById('rd-loading').textContent = t('requestNoOrderId'); return; }
     await loadOrder();
     // Inicia polling e countdown uma única vez, após o primeiro carregamento
@@ -264,22 +111,20 @@ async function showContent() {
         if (_payState.expiresAt) startCountdown(_payState.expiresAt);
     }
 }
-if (restoreRdSession()) showContent();
+if (session.restore()) showContent();
 
 // ── Carregar pedido ────────────────────────────────────────────────────────
 async function loadOrder() {
-    document.getElementById('rd-loading').style.display    = 'block';
+    document.getElementById('rd-loading').classList.remove('is-hidden');
     document.getElementById('rd-order-body').innerHTML      = '';
     try {
-        const res = await fetch(`${RD_CFG.apiBase}/orders/${encodeURIComponent(orderId)}`, {
-            headers: { Authorization: `Bearer ${rdToken}` },
-        });
-        if (res.status === 401) { localStorage.removeItem('rq_token'); location.reload(); return; }
+        const res = await session.fetch(`${RD_CFG.apiBase}/orders/${encodeURIComponent(orderId)}`);
+        if (res.status === 401) return; // sessão encerrada pelo Auth
         if (res.status === 403) { document.getElementById('rd-loading').textContent = t('requestOrderForbidden'); return; }
         if (res.status === 404) { document.getElementById('rd-loading').textContent = t('requestOrderNotFound'); return; }
 
         const order = await res.json();
-        document.getElementById('rd-loading').style.display = 'none';
+        document.getElementById('rd-loading').classList.add('is-hidden');
 
         const hdr = document.getElementById('header');
         if (hdr) hdr.dataset.title = order.id;
@@ -321,14 +166,6 @@ function buildOrderDetail(o) {
     const stepIdx = { pending:0, processing:1, ready:2, completed:3, expired:2, cancelled:2 };
     const curIdx  = stepIdx[o.status] ?? 0;
 
-    const teste = `<div class="prog" style="gap:0;">
-            <div class="prog-step"><div class="prog-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span class="prog-lbl done">Recebido</span></div>
-            <div class="prog-conn done" style="min-width:30px;"></div>
-            <div class="prog-step"><div class="prog-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span class="prog-lbl done">Em análise</span></div>
-            <div class="prog-conn done" style="min-width:30px;"></div>
-            <div class="prog-step"><div class="prog-dot active"></div></div><span class="prog-lbl active" style="color:#e8ff4a;">Pronto</span></div>
-        </div>`
-
     const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
         <div class="rd-section-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</div>
         <div class="prog">
@@ -336,8 +173,8 @@ function buildOrderDetail(o) {
                 let cls = '';
                 if (i < curIdx)  cls = 'done';
                 if (i === curIdx) cls = 'active';
-                return `<div class="prog-conn ${cls}" style="min-width:30px;"></div><div class="prog-step">
-                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls}" style="width:6px;height:6px;border-radius:50%;"></div>`}</div>
+                return `<div class="prog-conn ${cls} prog-conn-min"></div><div class="prog-step">
+                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls} dot-6"></div>`}</div>
                             <span class="prog-lbl ${cls}">${s.label}</span>
                         </div>`;
             }).join('')}
@@ -359,11 +196,11 @@ function buildOrderDetail(o) {
             </div>
             <div class="detail-list-item">
                 <span class="detail-list-label">${t('requestFee')} (${o.platformFeePercent}%)</span>
-                <span class="detail-list-value" style="color:var(--text-secondary)">${fmt(taxaVal)}</span>
+                <span class="detail-list-value text-secondary">${fmt(taxaVal)}</span>
             </div>
-            <div class="detail-list-item" style="background-color:var(--bg-primary);">
-                <span class="detail-list-label" style="color:var(--accent-color);font-weight:700">${t('requestTotalValue')}</span>
-                <span class="detail-list-value" style="color:var(--accent-color);font-weight:700">${fmt(total)}</span>
+            <div class="detail-list-item bg-primary-fill">
+                <span class="detail-list-label text-accent fw-700">${t('requestTotalValue')}</span>
+                <span class="detail-list-value text-accent fw-700">${fmt(total)}</span>
             </div>
         </div>`;
     })() : ''
@@ -418,8 +255,8 @@ function buildOrderDetail(o) {
                         <div class="rd-dl-status-row">
                             <span class="rd-dl-exp ${expCls}">${expText}</span>
                             ${(!blocked && url)
-                                ? `<a href="${url}" class="action-btn btn-primary" target="_blank" rel="noopener" download
-                                    style="text-decoration:none">${t('requestDownload')}</a>`
+                                ? `<a href="${url}" class="action-btn btn-primary no-underline" target="_blank" rel="noopener" download
+                                   >${t('requestDownload')}</a>`
                                 : ''}
                         </div>
                        </div>`
@@ -451,7 +288,7 @@ function buildOrderDetail(o) {
                 <span class="detail-list-value"><span class="pill st-${o.status}">${statusPtBR(o.status)}</span></span>
             </div>
         </div>
-        ${o.notes ? `<div class="rd-notes" style="margin-top:var(--sp-3)">📝 ${esc(o.notes)}</div>` : ''}
+        ${o.notes ? `<div class="rd-notes mt-3">📝 ${esc(o.notes)}</div>` : ''}
         
         <div class="section-divider-transparent"></div>
 
@@ -500,7 +337,7 @@ function buildPaymentSection(o) {
                 <div class="detail-list">
                     <div class="detail-list-item">
                         <span class="detail-list-label">Status</span>
-                        <span class="detail-list-value" style="color:var(--text-success)">Aprovado</span>
+                        <span class="detail-list-value text-success">Aprovado</span>
                     </div>
                     ${pay?.mpPaymentId ? `
                     <div class="detail-list-item">
@@ -522,8 +359,8 @@ function buildPaymentSection(o) {
         return `
         <div class="rd-section">
             <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-            <div class="rd-pay-card" style="border-color:var(--error-color)">
-                <div class="rd-pay-head" style="background:var(--bg-error)">
+            <div class="rd-pay-card bc-error">
+                <div class="rd-pay-head bg-error-fill">
                     <span class="rd-pay-icon">❌</span>
                     <div>
                         <div class="rd-pay-title">Pagamento cancelado</div>
@@ -568,9 +405,9 @@ function renderCpfStep() {
         </div>
         
         <div class="rd-cpf-hint">${t('requestFiscalRequirement')}</div>
-        <div class="rd-cpf-err" id="rd-cpf-err"></div>
+        <div class="rd-cpf-err is-hidden" id="rd-cpf-err"></div>
     </div>
-    <button class="action-btn btn-primary" style="width: calc(100% - (2 * var(--sp-4)));margin: 0 var(--sp-4) var(--sp-4) var(--sp-4)"
+    <button class="action-btn btn-primary w-inset-4"
         onclick="submitCpf()">
         Gerar QR Code Pix →
     </button>`;
@@ -582,12 +419,12 @@ function renderQrStep() {
     <div class="rd-qr-wrap">
         ${ps.pixQrBase64
             ? `<img class="rd-qr-img" src="data:image/png;base64,${ps.pixQrBase64}" alt="QR Code Pix">`
-            : `<div class="rd-qr-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-tertiary)">QR Code indisponível</div>`
+            : `<div class="rd-qr-img d-flex items-center justify-center text-tertiary">QR Code indisponível</div>`
         }
         <div class="rd-qr-copy-wrap">
             ${ps.pixCopyPaste ? `
             <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
-            <button class="action-btn btn-ghost" style="width:100%;justify-content:center"
+            <button class="action-btn btn-ghost w-full justify-center"
                 onclick="copyCodigo()">
                 Pix copia e cola
             </button>` : ''}
@@ -629,26 +466,26 @@ async function submitCpf() {
 
     if (!cpfValid(cpf)) {
         errEl.textContent    = t('requestCPFError');
-        errEl.style.display  = 'block';
+        errEl.classList.remove('is-hidden');
         input?.focus();
         return;
     }
-    errEl.style.display = 'none';
+    errEl.classList.add('is-hidden');
 
     const body = document.getElementById('rd-pay-body');
-    body.innerHTML = `<div style="text-align:center;padding:var(--sp-5)"><div class="rd-spinner"></div><div style="margin-top:var(--sp-3);color:var(--text-secondary);font-size:var(--font-size-sm)">Gerando Pix...</div></div>`;
+    body.innerHTML = `<div class="text-center p-5"><div class="rd-spinner"></div><div class="mt-3 text-secondary text-sm">Gerando Pix...</div></div>`;
 
     try {
-        const res  = await fetch(`${RD_CFG.paymentsBase}/payments/create`, {
+        const res  = await session.fetch(`${RD_CFG.paymentsBase}/payments/create`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${rdToken}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId, cpf: cpf.replace(/\D/g, '') }),
         });
         const data = await res.json();
 
         if (!res.ok) {
             body.innerHTML = `
-                <div style="color:var(--error-color);margin-bottom:var(--sp-4)">
+                <div class="text-error mb-4">
                     ⚠ ${esc(data.error || 'Erro ao gerar pagamento')}
                 </div>
                 ${renderCpfStep()}`;
@@ -667,7 +504,7 @@ async function submitCpf() {
 
     } catch(e) {
         body.innerHTML = `
-            <div style="color:var(--error-color);margin-bottom:var(--sp-4)">⚠ ${esc(e.message)}</div>
+            <div class="text-error mb-4">⚠ ${esc(e.message)}</div>
             ${renderCpfStep()}`;
     }
 }
@@ -713,9 +550,7 @@ function startPolling(mpPaymentId) {
 
     async function poll() {
         try {
-            const res  = await fetch(`${RD_CFG.paymentsBase}/payments/${mpPaymentId}/status`, {
-                headers: { Authorization: `Bearer ${rdToken}` },
-            });
+            const res  = await session.fetch(`${RD_CFG.paymentsBase}/payments/${mpPaymentId}/status`);
             const data = await res.json();
 
             if (data.paid || data.status === 'approved' || data.status === 'completed') {
@@ -752,12 +587,6 @@ function statusPtBR(s) {
         expired:   t('requestStatusExpired'),
         cancelled: t('requestStatusCancelled'),
     }[s] || s;
-}
-
-function decodeJwt(token) {
-    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
-    return JSON.parse(decodeURIComponent(
-        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
 }
 
 function esc(s) {

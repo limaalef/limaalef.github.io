@@ -31,7 +31,7 @@ function renderWatch(match, sport) {
     Elements.renderRefereeInfo(match, 'meRefereeInfo', 'meRefereeSection');
     Elements.renderAttRev(match, 'meAttRevInfo');
     Elements.renderStatistics(match);
-    Elements.renderStorage(match.technical_details?.local, match.technical_details?.nuvem, 'meStorageBadges');
+    Elements.renderStorage(match.technical_details, null, 'meStorageBadges');
     Elements.renderPlays(match, match.home_team.tla);
     Elements.renderLastResults(match.last_results, match.home_team?.name, match.away_team?.name);
     updateWatchMetaTags(match);

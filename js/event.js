@@ -26,13 +26,15 @@ const MatchPage = {
         const container = document.getElementById('matchPageContent');
 
         // Atualiza o <title> da página
-        if (sport !== 'motor') {
-            const homeGoals = Utils.parseGoals(match['Gols mandante']);
-            const awayGoals = Utils.parseGoals(match['Gols visitante']);
+        if (sport === 'carnaval') {
+            document.title = `${match.samba_school?.name || ''} — ${match.championship?.city || ''} — Sports Archive`;
+        } else if (sport !== 'motor') {
+            const homeGoals = Utils.parseGoals(match.home_team?.goals ?? match.score?.fullTime?.home);
+            const awayGoals = Utils.parseGoals(match.away_team?.goals ?? match.score?.fullTime?.away);
             const score = homeGoals !== '' ? ` ${homeGoals}x${awayGoals} ` : ' x ';
-            document.title = `${match.Mandante}${score}${match.Visitante} — Sports Archive`;
+            document.title = `${match.home_team?.name || ''}${score}${match.away_team?.name || ''} — Sports Archive`;
         } else {
-            document.title = `${match.Campeonato} — ${match.Fase} — Sports Archive`;
+            document.title = `${match.competition?.name || ''} — ${match.competition?.phase || ''} — Sports Archive`;
         }
 
         // Reutiliza exatamente o mesmo HTML que o modal geraria,

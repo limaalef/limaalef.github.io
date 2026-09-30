@@ -134,8 +134,7 @@ const _origPopulateYearFilter = Renderer.populateYearFilter.bind(Renderer);
 Renderer.populateYearFilter = function () {
     const years = new Set();
     AppState.matches.forEach(match => {
-        const dateField = CONFIG.currentSport === 'motor' ? match.start_date : match.utcDate;
-        const date = Utils.parseDate(dateField);
+        const date = Utils.parseDate(Utils.getItemDate(match));
         if (date) years.add(date.getFullYear());
     });
 
@@ -253,6 +252,20 @@ const CollectionApp = {
         }
     },
 
+    async resolveSport() {
+        const fromUrl = new URLSearchParams(location.search).get('sport');
+        if (Utils.VALID_SPORTS.includes(fromUrl)) { this.applyTheme(fromUrl); return; }
+        try {
+            if (typeof CollectionsDB !== 'undefined') {
+                await CollectionsDB.ready();
+                const entry = CollectionsDB.find(CollectionState.query);
+                if (entry?.sport && Utils.VALID_SPORTS.includes(entry.sport)) this.applyTheme(entry.sport);
+            }
+        } catch (err) {
+            console.warn('resolveSport:', err.message);
+        }
+    },
+
     readUrlParams() {
         const { id, sport, page, raw: params } = Utils.getUrlParams();
 
@@ -301,10 +314,8 @@ const CollectionApp = {
 
         const _origFilterApply = FilterManager.apply.bind(FilterManager);
         FilterManager.apply = function() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            AppState.filteredMatches = AppState.matches.filter(match =>
-                Object.values(match).some(val => String(val).toLowerCase().includes(query))
-            );
+            const query = document.getElementById('searchInput').value;
+            AppState.filteredMatches = AppState.matches.filter(match => Utils.matchesSearch(match, query));
             Renderer.render();
         };
 
@@ -312,9 +323,18 @@ const CollectionApp = {
 
         if (!CollectionState.query) return;
 
-        // Busca sidebar e lista em paralelo
-        SidebarManager.load(CollectionState.query);
-        this.loadData();
+        // Descobre o esporte ANTES de buscar a lista: a URL (?sport=) manda; senão vale o
+        // esporte cadastrado no collections.json. Sem isso a busca saía no endpoint de
+        // futebol e os cards abriam sempre os dados de futebol.
+        this.resolveSport().then(() => {
+            SidebarManager.load(CollectionState.query);
+            this.loadData();
+        });
+
+        // Se o idioma mudar, refaz o filtro (a busca também considera o texto traduzido)
+        document.addEventListener('languagechange', () => {
+            if (document.getElementById('searchInput')?.value) FilterManager.apply();
+        });
 
         // Eventos
         document.getElementById('searchInput').addEventListener('input', () => FilterManager.apply());

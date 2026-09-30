@@ -2,59 +2,55 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131313" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sports Archive">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Acervo — Sports Archive</title>
     <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
     <meta name="robots" content="noindex">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
- 
-    <!-- Meta Tags Básicas -->
-    <meta name="description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
     <meta name="keywords" content="futebol, esportes, automobilismo, jogos, coleção, arquivo, vídeos">
     <meta name="author" content="@limaalef">
-    
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://archive.limaalef.com/">
+    <meta property="og:url" content="https://archive.limaalef.com/">
     <meta property="og:title" content="Sports Archive">
     <meta property="og:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
-    <meta property="og:image" content="http://archive.limaalef.com/banner.png">
+    <meta property="og:image" content="https://archive.limaalef.com/banner.png">
     <meta property="og:image:width" content="763">
     <meta property="og:image:height" content="241">
     <meta property="og:site_name" content="Sports Archive">
     <meta property="og:locale" content="pt_BR">
-    
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="http://archive.limaalef.com/">
+    <meta name="twitter:url" content="https://archive.limaalef.com/">
     <meta name="twitter:title" content="Sports Archive">
     <meta name="twitter:description" content="Esta é uma listagem do meu arquivo pessoal de jogos e eventos esportivos. Futebol, automobilismo e outros esportes catalogados com os melhores detalhes que eu poderia listar.">
-    <meta name="twitter:image" content="http://archive.limaalef.com/banner.png">
+    <meta name="twitter:image" content="https://archive.limaalef.com/banner.png">
     <meta name="twitter:creator" content="@limaalef">
     <meta name="twitter:site" content="@limaalef">
-    
-    <!-- Favicon -->
+    <!-- Ícones / manifest -->
     <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="shortcut icon" href="/icons/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/icons/site.webmanifest" />
-
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/request.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JJZTBEGJ91');
+    </script>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-JJZTBEGJ91');
-</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2751752344986877"
-crossorigin="anonymous"></script>
 <body>
     <header>
         <div class="header-frame" id="header"
@@ -153,9 +149,6 @@ crossorigin="anonymous"></script>
                             <span data-i18n="withVideo">Com Vídeo</span>
                         </div> -->
 
-                        <div class="lang-btn" id="langToggle" title="Change language / Mudar idioma">
-                            <span id="langFlag">🇧🇷</span>
-                        </div>
                     </div>
                 </div>
                 <div class="filter-sub-group">
@@ -207,6 +200,7 @@ crossorigin="anonymous"></script>
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/request.js"></script>
 </body>
 </html>

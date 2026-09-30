@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-lang-lock="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131313" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sports Archive">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Admin | Sports Archive</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="@limaalef">
+    <!-- Ícones / manifest -->
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/detail.css">
+    <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
-<style>
-    .container { margin: 0; }
-</style>
-<body>
+<body class="page-admin">
     <header>
         <div class="header-frame" id="header" data-title="Administração" data-back="true" data-admin="true" data-forced="true" data-reqbtn="false"></div>
-        <div class="control-group">
-            <button id="langToggle" class="lang-btn" style="display:none" title="Change language / Mudar idioma">
-                <span id="langFlag">🇧🇷</span>
-            </button>
-        </div>
     </header>
 
     <!-- Auth -->
-    <div id="adm-auth" style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:80px 20px">
-        <h2 style="color:var(--text-primary);margin:0">Área Administrativa</h2>
-        <p style="color:var(--text-secondary);margin:0">Acesso restrito ao administrador</p>
-        <button style="display:flex;align-items:center;gap:10px;padding:12px 24px;
-            border-radius:var(--border-radius-size-mlg);border:1px solid var(--border-color);
-            background:var(--bg-secondary);color:var(--text-primary);font-size:var(--font-size-md);
-            font-weight:600;cursor:pointer;transition:all .15s" id="adm-login-google">
+    <div class="adm-auth" id="adm-auth">
+        <h2>Área Administrativa</h2>
+        <p>Acesso restrito ao administrador</p>
+        <button class="om-oauth-btn om-google" id="adm-login-google">
             <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -42,13 +47,13 @@
     </div>
 
     <!-- Dashboard -->
-    <div id="adm-dashboard" style="display:none">
+    <div class="is-hidden" id="adm-dashboard">
         <div class="adm-layout">
             <!-- Sidebar -->
             <aside class="adm-sidebar">
                 <div class="profile-box">
                     <div class="profile-avatar" id="adm-avatar-initials"></div>
-                    <img id="adm-avatar" class="adm-avatar" src="" onerror="this.style.display='none'" alt="">
+                    <img id="adm-avatar" class="adm-avatar" src="" onerror="this.hidden=true" alt="">
                     <div>
                         <div class="profile-user-name" id="adm-user-name"></div>
                         <button class="action-btn btn-ghost btn-xs" id="adm-refresh">↺ Atualizar</button>
@@ -56,24 +61,24 @@
                 </div>
 
                 <div class="adm-sidebar-nav">
-                    <a class="adm-nav-item active" data-panel="orders" onclick="switchPanel('orders')">
+                    <button type="button" class="adm-nav-item active" data-panel="orders" onclick="switchPanel('orders')">
                         <span class="adm-nav-icon">
                             <svg viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4" height="4" rx="1"></rect><rect x="7" y="1" width="4" height="4" rx="1"></rect><rect x="1" y="7" width="4" height="4" rx="1"></rect><rect x="7" y="7" width="4" height="4" rx="1"></rect></svg>
                         </span> 
                         Pedidos
-                    </a>
-                    <a class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
+                    </button>
+                    <button type="button" class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
                         <span class="adm-nav-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
                         </span> Mercado Pago
-                    </a>
+                    </button>
 
                     <div class="adm-nav-divider"></div>
-                    <a class="adm-nav-item" onclick="admLogout()" style="margin-top:auto">
+                    <button type="button" class="adm-nav-item mt-auto" onclick="admLogout()">
                         <span class="adm-nav-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M288 64l64 0 0 416c0 17.7 14.3 32 32 32l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-384c0-35.3-28.7-64-64-64l-96 0 0 0-160 0C60.7 0 32 28.7 32 64l0 384c-17.7 0-32 14.3-32 32s14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-416zM160 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
                         </span> Sair
-                    </a>
+                    </button>
                 </div>
             </aside>
 
@@ -82,7 +87,7 @@
                 <!-- PAINEL: PEDIDOS -->
                 <div class="adm-panel active" id="panel-orders">
                     <!-- Stats -->
-                    <div class="stats" style="display:flex;margin-bottom:var(--sp-5)">
+                    <div class="stats d-flex mb-5">
                         <div class="stat"><div class="stat-value" id="st-total">—</div><div class="stat-label">Total</div></div>
                         <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
                         <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
@@ -93,17 +98,17 @@
 
                     <div class="section-divider"></div>
 
-                    <div class="controls" style="margin-bottom:var(--sp-4)">
+                    <div class="controls mb-4">
                         <div class="filter-options">
                             <div class="filter-sub-group">
                                 <div class="view-toggle">
-                                    <div class="adm-filter-btn active" data-status="">Todos</div>
-                                    <div class="adm-filter-btn" data-status="pending">Pendentes</div>
-                                    <div class="adm-filter-btn" data-status="processing">Em análise</div>
-                                    <div class="adm-filter-btn" data-status="ready">Prontos</div>
-                                    <div class="adm-filter-btn" data-status="completed">Finalizados</div>
-                                    <div class="adm-filter-btn" data-status="expired">Expirados</div>
-                                    <div class="adm-filter-btn" data-status="cancelled">Cancelados</div>
+                                    <button type="button" class="adm-filter-btn active" data-status="">Todos</button>
+                                    <button type="button" class="adm-filter-btn" data-status="pending">Pendentes</button>
+                                    <button type="button" class="adm-filter-btn" data-status="processing">Em análise</button>
+                                    <button type="button" class="adm-filter-btn" data-status="ready">Prontos</button>
+                                    <button type="button" class="adm-filter-btn" data-status="completed">Finalizados</button>
+                                    <button type="button" class="adm-filter-btn" data-status="expired">Expirados</button>
+                                    <button type="button" class="adm-filter-btn" data-status="cancelled">Cancelados</button>
                                 </div>
                             </div>
                             <div class="filter-sub-group">
@@ -119,15 +124,15 @@
                         <table class="adm-table">
                             <thead><tr>
                                 <th>ID</th><th>Usuário</th><th>Status</th>
-                                <th style="text-align:center">Itens</th>
-                                <th style="text-align:center">Links</th>
-                                <th style="text-align:center">Pagamento</th>
+                                <th class="text-center">Itens</th>
+                                <th class="text-center">Links</th>
+                                <th class="text-center">Pagamento</th>
                                 <th>Data</th><th>Ações</th>
                             </tr></thead>
                             <tbody id="adm-tbody"></tbody>
                         </table>
                         <div class="adm-loading" id="adm-loading">Carregando pedidos...</div>
-                        <div class="adm-empty" id="adm-empty" style="display:none">Nenhum pedido encontrado.</div>
+                        <div class="adm-empty is-hidden" id="adm-empty">Nenhum pedido encontrado.</div>
                     </div>
                     </div>
                 </div>
@@ -214,7 +219,7 @@
                                     <div class="mp-settings-head-title">Health check</div>
                                 </span>
                                 <span class="detail-list-value">
-                                    <div id="mp-save-msg" style="display:none"></div>
+                                    <div class="is-hidden" id="mp-save-msg"></div>
                                 </span>
                             </div>
                             <div class="detail-list-item">
@@ -224,7 +229,7 @@
                         </div>
 
                         <div class="button-group">
-                            <button class="action-btn btn-primary" onclick="checkHealth()" style="margin-left:auto">Verificar</button>
+                            <button class="action-btn btn-primary ml-auto" onclick="checkHealth()">Verificar</button>
                         </div>
                     </div>
                 </div>
@@ -250,6 +255,7 @@
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.service.js"></script>
     <script src="js/managers.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
@@ -258,11 +264,9 @@
 const ADM_CFG = {
     apiBase:        CONFIG.REQUEST_API_BASE,
     paymentsBase:   CONFIG.PAYMENTS_API_BASE || 'https://payments.limaalef.com',
-    googleClientId: '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
 };
 
-let admToken     = null;
-let admUser      = null;
+const session   = Auth.admin;
 let allOrders    = [];
 let filterStatus = '';
 let filterQuery  = '';
@@ -280,58 +284,26 @@ function switchPanel(name) {
     }
 }
 
-// ── Sessão ─────────────────────────────────────────────────────────────────
-function saveSession(token) { admToken = token; localStorage.setItem('adm_token', token); }
-function clearSession() { admToken = null; admUser = null; localStorage.removeItem('adm_token'); }
-function restoreSession() {
-    const token = localStorage.getItem('adm_token');
-    if (!token) return false;
-    try {
-        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-        if (p.exp && p.exp < Math.floor(Date.now()/1000)) { clearSession(); return false; }
-        admToken = token;
-        admUser  = { name: p.name || p.email, email: p.email };
-        return true;
-    } catch { clearSession(); return false; }
-}
-
 // ── Auth ───────────────────────────────────────────────────────────────────
 document.getElementById('adm-login-google').addEventListener('click', () => {
-    if (!window.google?.accounts?.id) { alert('Google GSI não carregou.'); return; }
-    google.accounts.id.initialize({
-        client_id: ADM_CFG.googleClientId,
-        callback: async (res) => {
-            let r, d;
-            try {
-                r = await fetch(`${ADM_CFG.apiBase}/auth/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: res.credential }),
-                });
-                d = await r.json();
-            } catch { alert('Erro ao conectar com o servidor.'); return; }
-            if (!r.ok || !d.isAdmin) { alert(d?.error || 'Acesso negado.'); return; }
-            const p = JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-            admUser = { name: p.name || p.email, email: p.email };
-            saveSession(d.token);
-            showDashboard();
-        },
-        auto_select: false,
-    });
-    google.accounts.id.prompt();
+    session.login({ onSuccess: showDashboard });
 });
 
 function admLogout() {
-    clearSession();
-    document.getElementById('adm-auth').style.display = 'flex';
-    document.getElementById('adm-dashboard').style.display = 'none';
+    session.logout(() => {
+        document.getElementById('adm-auth').classList.remove('is-hidden');
+        document.getElementById('adm-dashboard').classList.add('is-hidden');
+    });
 }
 
-function showDashboard() {
-    const name = admUser?.name || '';
+// Requisição autenticada: expiração/403 encerram a sessão de forma única.
+const admFetch = (url, options) => session.fetch(url, options);
 
-    document.getElementById('adm-auth').style.display = 'none';
-    document.getElementById('adm-dashboard').style.display = 'block';
+function showDashboard() {
+    const name = session.user?.name || '';
+
+    document.getElementById('adm-auth').classList.add('is-hidden');
+    document.getElementById('adm-dashboard').classList.remove('is-hidden');
     document.getElementById('adm-user-name').textContent = name;
 
     const initials = name
@@ -344,25 +316,25 @@ function showDashboard() {
         : '';
 
     const av = document.getElementById('adm-avatar');
-    if (admUser?.picture) {
-        av.src = admUser.picture;
+    if (session.user?.picture) {
+        av.src = session.user.picture;
     } else {
-        av.style.display = 'none';
+        av.hidden = true;
         document.getElementById('adm-avatar-initials').textContent = avatarText;
     }
 
     loadOrders();
 }
-if (restoreSession()) showDashboard();
+if (session.restore()) showDashboard();
 
 // ── Carregar pedidos ───────────────────────────────────────────────────────
 async function loadOrders() {
-    document.getElementById('adm-loading').style.display = 'block';
-    document.getElementById('adm-empty').style.display   = 'none';
+    document.getElementById('adm-loading').classList.remove('is-hidden');
+    document.getElementById('adm-empty').classList.add('is-hidden');
     document.getElementById('adm-tbody').innerHTML       = '';
     try {
-        const res = await fetch(`${ADM_CFG.apiBase}/orders`, { headers: { Authorization: `Bearer ${admToken}` } });
-        if (res.status === 401 || res.status === 403) { alert('Sessão expirada.'); location.reload(); return; }
+        const res = await admFetch(`${ADM_CFG.apiBase}/orders`);
+        if (res.status === 401 || res.status === 403) return; // sessão encerrada pelo Auth
         const d = await res.json();
         allOrders = d.orders || [];
         renderTable(); updateStats();
@@ -382,7 +354,7 @@ document.getElementById('adm-search').addEventListener('input', e => {
 // ── Render tabela ──────────────────────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('adm-tbody');
-    document.getElementById('adm-loading').style.display = 'none';
+    document.getElementById('adm-loading').classList.add('is-hidden');
     let orders = allOrders;
     if (filterStatus) orders = orders.filter(o => o.status === filterStatus);
     if (filterQuery)  orders = orders.filter(o =>
@@ -391,10 +363,10 @@ function renderTable() {
         (o.user?.email||'').toLowerCase().includes(filterQuery));
     if (!orders.length) {
         tbody.innerHTML = '';
-        document.getElementById('adm-empty').style.display = 'block';
+        document.getElementById('adm-empty').classList.remove('is-hidden');
         return;
     }
-    document.getElementById('adm-empty').style.display = 'none';
+    document.getElementById('adm-empty').classList.add('is-hidden');
     const now = new Date();
     tbody.innerHTML = orders.map(o => {
         const dt     = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
@@ -404,31 +376,31 @@ function renderTable() {
         ).length;
         const hasAny = (o.items||[]).some(it => it.link);
         const linksCell = hasAny
-            ? `<span style="font-weight:700;color:${active>0?'var(--success-color)':'var(--error-color)'}">${active}</span><span style="color:var(--text-secondary);font-size:var(--font-size-xs)">/${total}</span>`
-            : `<span style="color:var(--text-secondary)">—</span>`;
+            ? `<span class="fw-700 ${active>0?'text-success':'text-error'}">${active}</span><span class="text-xs text-secondary">/${total}</span>`
+            : `<span class="text-secondary">—</span>`;
 
         // Pagamento
         const pay = o.payment;
-        let payCell = `<span style="color:var(--text-tertiary)">—</span>`;
+        let payCell = `<span class="text-tertiary">—</span>`;
         if (pay) {
             const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
             payCell = `<span class="pill ${cls}">${lbl}</span>`;
-        } else if (o.status === 'completed') {
+        } else if (o.paymentAccessGranted || o.status === 'completed') {
             payCell = `<span class="pill st-paid">Liberado</span>`;
         }
 
         return `<tr>
-            <td style="width:1px"><code style="font-size:var(--font-size-xs);color:var(--text-secondary);white-space:nowrap">${o.id.replace('ORD-','')}</code></td>
-            <td><div style="font-weight:600;white-space:nowrap">${esc(o.user?.name||'—')}</div></td>
-            <td style="width:1px;white-space:nowrap"><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td>
-            <td style="text-align:center;font-weight:700;color:var(--accent-color);width:1px;white-space:nowrap">${total}</td>
-            <td style="text-align:center;width:1px;white-space:nowrap">${linksCell}</td>
-            <td style="text-align:center;width:1px;white-space:nowrap">${payCell}</td>
-            <td style="font-size:var(--font-size-sm);white-space:nowrap;color:var(--text-secondary);width:1px">${dt}</td>
-            <td style="width:1px;white-space:nowrap">
+            <td class="col-fit"><code class="text-xs text-secondary nowrap">${o.id.replace('ORD-','')}</code></td>
+            <td><div class="fw-600 nowrap">${esc(o.user?.name||'—')}</div></td>
+            <td class="col-fit"><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td>
+            <td class="col-fit text-center fw-700 text-accent">${total}</td>
+            <td class="col-fit text-center">${linksCell}</td>
+            <td class="col-fit text-center">${payCell}</td>
+            <td class="col-fit text-sm text-secondary">${dt}</td>
+            <td class="col-fit">
                 <button class="action-btn btn-primary btn-xs" onclick="openOrder('${o.id}')">Abrir</button>
-                <button class="action-btn btn-danger btn-xs"  onclick="deleteOrder('${o.id}')">✕</button>
+                <button type="button" class="action-btn btn-danger btn-xs" aria-label="Apagar pedido" onclick="deleteOrder('${o.id}')">✕</button>
             </td>
         </tr>`;
     }).join('');
@@ -452,7 +424,7 @@ async function openOrder(id) {
     document.getElementById('adm-modal-title').textContent = 'Carregando...';
     document.getElementById('modal-body').innerHTML = '<div class="adm-loading">Buscando pedido...</div>';
     document.getElementById('adm-modal').classList.add('active');
-    const res   = await fetch(`${ADM_CFG.apiBase}/orders/${id}/admin`, { headers: { Authorization: `Bearer ${admToken}` } });
+    const res   = await admFetch(`${ADM_CFG.apiBase}/orders/${id}/admin`);
     const order = await res.json();
     document.getElementById('adm-modal-title').textContent = order.id;
     document.getElementById('modal-body').innerHTML = buildOrderDetail(order);
@@ -465,25 +437,28 @@ async function calcAndShowDefaultAmount(order) {
     const el = document.getElementById(`order-default-amount-val-${order.id}`);
     if (!el) return;
     try {
-        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
-            headers: { Authorization: `Bearer ${admToken}` },
-        });
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`);
         const data = await res.json();
-        const base     = parseFloat(data.base_amount) || 0;
-        const fee      = parseFloat(data.fee_percent)  || 0;
+        const base      = parseFloat(data.base_amount) || 0;
+        const fee       = parseFloat(data.fee_percent)  || 0;
         const itemCount = (order.items || []).length || 1;
-        if (base <= 0) { el.textContent = 'não configurado'; return; }
+        if (base <= 0) { el.textContent = 'não configurado'; admAmountState.def = null; renderAppliedAmount(order.id); return; }
         const baseTotal = base * itemCount;
         const r = fee / 100;
         const total = r >= 1 ? baseTotal : baseTotal / (1 - r);
-        el.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+        admAmountState.def = total;
+        el.textContent = brl(total);
 
-        // Preenche o input com o valor padrão se o pedido ainda não tem valor definido
+        // Preenche o campo com o valor padrão se o pedido ainda não tem valor salvo
         if (!order.paymentAmount) {
             const input = document.getElementById('order-amount-input');
             if (input) input.value = total.toFixed(2);
         }
-    } catch { el.textContent = '—'; }
+        renderAppliedAmount(order.id);
+    } catch {
+        el.textContent = '—';
+        renderAppliedAmount(order.id);
+    }
 }
 
 function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
@@ -510,12 +485,12 @@ function buildOrderDetail(o) {
         const linkRow = link
             ? `<div class="adm-item-link-row">
                 <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
-                ${disabled ? '<span class="pill st-expired" style="font-size:var(--font-size-xs)">OFF</span>' : ''}
-                <button class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
+                ${disabled ? '<span class="pill st-expired text-xs">OFF</span>' : ''}
+                <button type="button" class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
                     onclick="toggleItemLink('${o.id}',${idx},${!disabled})">
                     ${disabled ? '▶ Ligar' : '⏸ Pausar'}
                 </button>
-                <button class="action-btn btn-danger btn-xs" onclick="removeItemLink('${o.id}',${idx})">✕</button>
+                <button type="button" class="action-btn btn-danger btn-xs" aria-label="Remover link" onclick="removeItemLink('${o.id}',${idx})">✕</button>
                </div>`
             : `<div class="adm-item-no-link">Sem link</div>`;
 
@@ -530,7 +505,7 @@ function buildOrderDetail(o) {
                     ${linkRow}
                 </div>
             </div>
-            <div class="detail-list" style="margin-top:var(--sp-3)">
+            <div class="detail-list mt-3">
                 <div class="detail-list-item">
                     <span class="detail-list-label">URL</span>
                     <span class="detail-list-value"><input class="adm-input adm-input-text" id="lnk-url-${idx}" placeholder="https://..." value="${esc(link?.url||'')}"></span>
@@ -552,22 +527,22 @@ function buildOrderDetail(o) {
                 <div class="detail-list-item">
                     <span class="detail-list-label"></span>
                     <span class="detail-list-value">
-                        <button class="action-btn btn-primary btn-xs" onclick="saveItemLink('${o.id}',${idx})">Salvar link</button>
+                        <button type="button" class="action-btn btn-primary btn-xs" onclick="saveItemLink('${o.id}',${idx}, this)">Salvar link</button>
                     </span>
                 </div>
             </div>
         </div>`;
-    }).join('') || `<div style="color:var(--text-secondary);font-size:var(--font-size-mdm)">Nenhum item.</div>`;
+    }).join('') || `<div class="text-secondary text-mdm">Nenhum item.</div>`;
 
     const bulkHtml = total > 0 ? `
         <div class="adm-links-bulk">
             <div class="adm-links-bulk-info">
-                <strong style="color:${active>0?'var(--success-color)':'var(--error-color)'}">${active}</strong>
+                <strong class="${active>0?'text-success':'text-error'}">${active}</strong>
                 de ${total} link(s) ativo(s)
             </div>
             <div class="adm-bulk-actions">
-                <button class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">⏸ Desativar todos</button>
-                <button class="action-btn adm-btn-success" onclick="toggleActivatePanel()">▶ Ativar todos...</button>
+                <button type="button" class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">⏸ Desativar todos</button>
+                <button type="button" class="action-btn adm-btn-success" onclick="toggleActivatePanel()">▶ Ativar todos...</button>
             </div>
         </div>
         <div class="adm-expiry-inline" id="activate-panel">
@@ -580,8 +555,8 @@ function buildOrderDetail(o) {
                 <option value="2160">90 dias</option>
                 <option value="0">Indefinidamente</option>
             </select>
-            <button class="action-btn adm-btn-success" onclick="activateAllLinks('${o.id}')">Confirmar</button>
-            <button class="action-btn btn-ghost"       onclick="toggleActivatePanel()">Cancelar</button>
+            <button type="button" class="action-btn adm-btn-success" onclick="activateAllLinks('${o.id}')">Confirmar</button>
+            <button type="button" class="action-btn btn-ghost" onclick="toggleActivatePanel()">Cancelar</button>
         </div>` : '';
 
     // Seção de pagamento
@@ -590,49 +565,84 @@ function buildOrderDetail(o) {
     const payLabels = { approved: 'Pago', pending: 'Aguardando pagamento', cancelled: 'Cancelado' };
     const payCls    = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' };
 
+    const granted = !!o.paymentAccessGranted;
+    admAmountState = { saved: (o.paymentAmount ?? null) === '' ? null : (o.paymentAmount ?? null), def: null };
+
     const paymentHtml = `
     <div class="modal-division">
         <div class="detail-section">
             <div class="section-title modal-style">Pagamento</div>
             <div class="adm-payment-section">
-                <div class="detail-list" style="margin-bottom:var(--sp-4)">
+                <div class="detail-list mb-4">
                     <div class="detail-list-item">
-                        <span class="detail-list-label" style="font-size:var(--font-size-sm);color:var(--text-secondary)">
-                            Acesso manual
-                        </span>
+                        <span class="detail-list-label">Acesso manual</span>
                         <span class="detail-list-value">
-                            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;justify-content:flex-end">
-                                <span style="font-size:var(--font-size-sm);color:var(--text-secondary)" id="access-grant-label-${o.id}">
-                                    ${o.paymentAccessGranted ? 'Liberado' : 'Requer pagamento'}
+                            <span class="adm-toggle-label">
+                                <span class="text-sm text-secondary" id="access-grant-label-${o.id}">
+                                    ${granted ? 'Liberado' : 'Requer pagamento'}
                                 </span>
-                                <div class="adm-toggle ${o.paymentAccessGranted ? 'on' : ''}"
+                                <button type="button" role="switch" aria-checked="${granted}" aria-label="Acesso manual"
+                                    class="adm-toggle ${granted ? 'on' : ''}"
                                     id="access-grant-toggle-${o.id}"
                                     onclick="toggleAccessGrant('${o.id}', this)"
                                     title="Liberar acesso sem exigir pagamento">
-                                    <div class="adm-toggle-knob"></div>
+                                    <span class="adm-toggle-knob"></span>
+                                </button>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div id="order-access-note-${o.id}" class="adm-access-note ${granted ? '' : 'is-hidden'}">
+                    Acesso liberado sem cobrança: nenhum valor será exigido neste pedido.
+                </div>
+
+                <div id="order-amount-block-${o.id}" class="${granted ? 'is-hidden' : ''}">
+                    <div class="detail-list mb-4">
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Valor aplicado</span>
+                            <span class="detail-list-value">
+                                <span class="adm-amount-status" id="order-applied-${o.id}"></span>
+                            </span>
+                        </div>
+                        <div class="detail-list-item" id="order-default-amount-row-${o.id}">
+                            <span class="detail-list-label">
+                                Valor padrão (base × ${(o.items||[]).length} ${(o.items||[]).length === 1 ? 'item' : 'itens'})
+                            </span>
+                            <span class="detail-list-value" id="order-default-amount-val-${o.id}">calculando...</span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Valor personalizado</span>
+                            <span class="detail-list-value">
+                                <div class="adm-amount-wrap">
+                                    <span class="adm-amount-prefix">R$</span>
+                                    <input class="adm-amount-input" id="order-amount-input"
+                                        type="number" min="0" step="0.01" inputmode="decimal" placeholder="padrão"
+                                        value="${esc(String(o.paymentAmount || ''))}"
+                                        oninput="renderAppliedAmount('${o.id}')"
+                                        title="Deixe o valor padrão para usar base × itens">
                                 </div>
-                            </label>
-                        </span>
+                            </span>
+                        </div>
+                        ${pay ? '' : `
+                        <div class="detail-list-item">
+                            <span class="detail-list-label text-tertiary">Nenhum pagamento gerado ainda</span>
+                            <span class="detail-list-value"></span>
+                        </div>`}
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">
+                                <span class="adm-amount-msg" id="order-amount-msg-${o.id}" role="status" aria-live="polite"></span>
+                            </span>
+                            <span class="detail-list-value adm-row-actions">
+                                <button type="button" class="action-btn btn-primary btn-xs"
+                                    onclick="saveOrderAmount('${o.id}', this)">Salvar valor</button>
+                            </span>
+                        </div>
                     </div>
-                    <div class="detail-list-item" id="order-default-amount-row-${o.id}">
-                        <span class="detail-list-label">
-                            ${o.paymentAmount ? 'Valor padrão' : `Valor padrão (base × ${(o.items||[]).length} itens)`}
-                        </span>
-                        <span class="detail-list-value" id="order-default-amount-val-${o.id}">calculando...</span>
-                    </div>
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">Valor personalizado</span>
-                        <span class="detail-list-value">
-                            <div class="adm-amount-wrap">
-                                <span class="adm-amount-prefix">R$</span>
-                                <input class="adm-amount-input" id="order-amount-input"
-                                    type="number" min="0" step="0.01" placeholder="padrão"
-                                    value="${esc(String(o.paymentAmount || ''))}"
-                                    title="Deixe vazio para usar o valor padrão (base × itens)">
-                            </div>
-                        </span>
-                    </div>
-                    ${pay ? `
+                </div>
+
+                ${pay ? `
+                <div class="detail-list">
                     <div class="detail-list-item">
                         <span class="detail-list-label">Status do pagamento</span>
                         <span class="detail-list-value">
@@ -646,26 +656,17 @@ function buildOrderDetail(o) {
                     </div>` : ''}
                     <div class="detail-list-item">
                         <span class="detail-list-label">ID MP</span>
-                        <span class="detail-list-value" style="font-family:monospace;font-size:var(--font-size-xs)">${esc(pay.mpPaymentId||'—')}</span>
-                    </div>` : `
-                    <div class="detail-list-item">
-                        <span class="detail-list-label" style="color:var(--text-tertiary)">Nenhum pagamento gerado ainda</span>
-                        <span class="detail-list-value"></span>
-                    </div>`}
+                        <span class="detail-list-value mono text-xs">${esc(pay.mpPaymentId||'—')}</span>
+                    </div>
+                    ${payStatus === 'pending' ? `
                     <div class="detail-list-item">
                         <span class="detail-list-label"></span>
-                        <span class="detail-list-value" style="display:flex;gap:var(--sp-2);justify-content:flex-end;flex-wrap:wrap">
-                            ${pay?.status === 'pending' ? `
-                            <button class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
-                                onclick="cancelPayment('${o.id}')">
-                                ✕ Cancelar Pix
-                            </button>` : ''}
-                            <button class="action-btn btn-primary btn-xs" onclick="saveOrderAmount('${o.id}')">
-                                Salvar valor
-                            </button>
+                        <span class="detail-list-value adm-row-actions">
+                            <button type="button" class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
+                                onclick="cancelPayment('${o.id}', this)">✕ Cancelar Pix</button>
                         </span>
-                    </div>
-                </div>
+                    </div>` : ''}
+                </div>` : ''}
             </div>
         </div>
     </div>`;
@@ -715,49 +716,104 @@ function buildOrderDetail(o) {
     </div>
 
     <div class="modal-footer">
-        <button class="action-btn btn-ghost"  onclick="closeModal()">Fechar</button>
-        <button class="action-btn btn-primary" onclick="saveStatus('${o.id}')">Salvar status</button>
+        <button type="button" class="action-btn btn-ghost" onclick="closeModal()">Fechar</button>
+        <button type="button" class="action-btn btn-primary" onclick="saveStatus('${o.id}', this)">Salvar status</button>
     </div>`;
 }
 
-// ── Salvar valor do pedido ────────────────────────────────────────────────
-async function saveOrderAmount(id) {
-    const amount = parseFloat(document.getElementById('order-amount-input')?.value);
-    if (isNaN(amount) || amount < 0) { alert('Valor inválido'); return; }
-    const res = await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
-        body: JSON.stringify({ paymentAmount: amount }),
-    });
-    const d = await res.json();
-    if (d.success || res.ok) {
-        const btn = event.target;
-        btn.textContent = 'Salvo'; setTimeout(() => { btn.textContent = 'Salvar valor'; }, 1800);
-        loadOrders();
-    } else { alert('Erro: ' + JSON.stringify(d)); }
+// ── Valor do pedido ───────────────────────────────────────────────────────
+let admAmountState = { saved: null, def: null };
+const brl = v => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
+const notify = (message, type = 'error') => Utils.showNotification(message, type);
+
+function setAmountMsg(orderId, text, kind = '') {
+    const el = document.getElementById(`order-amount-msg-${orderId}`);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'adm-amount-msg' + (kind ? ' ' + kind : '');
+}
+
+// Mostra SEMPRE qual valor está valendo para o pedido e se há alteração não salva.
+function renderAppliedAmount(orderId) {
+    const el = document.getElementById(`order-applied-${orderId}`);
+    if (!el) return;
+    const { saved, def } = admAmountState;
+    const input = document.getElementById('order-amount-input');
+    const typed = input && input.value !== '' ? parseFloat(input.value) : null;
+    const effective = saved ?? def;
+    let pill;
+    let hint = '';
+
+    if (typed !== null && !isNaN(typed) && (effective === null || typed.toFixed(2) !== Number(effective).toFixed(2))) {
+        pill = `<span class="pill st-unpaid">Alteração não salva · ${brl(typed)}</span>`;
+    } else if (saved !== null) {
+        pill = `<span class="pill st-ready">Salvo · ${brl(saved)}</span>`;
+        hint = 'Valor personalizado';
+    } else if (def !== null && def > 0) {
+        pill = `<span class="pill">Padrão · ${brl(def)}</span>`;
+        hint = 'Nenhum valor personalizado salvo';
+    } else {
+        pill = `<span class="pill st-pay-cancelled">Nenhum valor definido</span>`;
+        hint = 'Configure o valor base em Mercado Pago';
+    }
+    el.innerHTML = pill + (hint ? `<span class="text-xs text-tertiary">${hint}</span>` : '');
+}
+
+async function saveOrderAmount(id, btn) {
+    const input  = document.getElementById('order-amount-input');
+    const amount = parseFloat(input?.value);
+    setAmountMsg(id, '');
+    if (isNaN(amount) || amount < 0) {
+        setAmountMsg(id, 'Informe um valor válido (0 ou maior).', 'err');
+        input?.focus();
+        return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Salvando...';
+    try {
+        const res = await admFetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentAmount: amount }),
+        });
+        const d = await res.json().catch(() => ({}));
+        if (res.ok) {
+            admAmountState.saved = amount;
+            renderAppliedAmount(id);
+            setAmountMsg(id, `Valor salvo: ${brl(amount)}`, 'ok');
+            notify('Valor do pedido salvo.', 'success');
+            loadOrders();
+        } else {
+            setAmountMsg(id, d.error || `Não foi possível salvar (HTTP ${res.status}).`, 'err');
+        }
+    } catch (e) {
+        setAmountMsg(id, 'Falha de conexão: ' + e.message, 'err');
+    } finally {
+        btn.disabled = false; btn.textContent = label;
+    }
 }
 
 // ── Operações de link ─────────────────────────────────────────────────────
-async function saveItemLink(orderId, itemIdx) {
+async function saveItemLink(orderId, itemIdx, btn) {
     const url    = document.getElementById(`lnk-url-${itemIdx}`)?.value.trim();
     const gdrive = document.getElementById(`lnk-gdrive-${itemIdx}`)?.value.trim();
     const hours  = parseInt(document.getElementById(`lnk-expiry-${itemIdx}`)?.value || '720');
-    if (!url && !gdrive) { alert('Informe URL ou Google Drive File ID'); return; }
-    const btn = event.target; btn.disabled = true; btn.textContent = 'Salvando...';
-    const res = await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+    if (!url && !gdrive) { notify('Informe a URL ou o ID do arquivo no Google Drive.', 'warning'); return; }
+    btn.disabled = true; btn.textContent = 'Salvando...';
+    const res = await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url||null, gdrive_id: gdrive||null, expiry_hours: hours||null }),
     });
     const data = await res.json();
-    if (data.success) { openOrder(orderId); loadOrders(); }
-    else { alert('Erro: ' + JSON.stringify(data)); btn.disabled = false; btn.textContent = 'Salvar link'; }
+    if (data.success) { notify('Link salvo.', 'success'); openOrder(orderId); loadOrders(); }
+    else { notify(data.error || 'Erro ao salvar o link.'); btn.disabled = false; btn.textContent = 'Salvar link'; }
 }
 
 async function toggleItemLink(orderId, itemIdx, enable) {
-    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+    await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ disabled: !enable }),
     });
     openOrder(orderId); loadOrders();
@@ -765,9 +821,9 @@ async function toggleItemLink(orderId, itemIdx, enable) {
 
 async function removeItemLink(orderId, itemIdx) {
     if (!confirm('Remover o link deste item?')) return;
-    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+    await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ remove: true }),
     });
     openOrder(orderId); loadOrders();
@@ -777,36 +833,45 @@ function toggleActivatePanel() { document.getElementById('activate-panel').class
 
 async function disableAllLinks(orderId) {
     if (!confirm('Desativar todos os links?')) return;
-    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/disable-all`, {
-        method: 'PUT', headers: { Authorization: `Bearer ${admToken}` },
+    await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/disable-all`, {
+        method: 'PUT',
     });
     openOrder(orderId); loadOrders();
 }
 
 async function activateAllLinks(orderId) {
     const hours = parseInt(document.getElementById('activate-expiry').value);
-    await fetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/activate-all`, {
+    await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/links/activate-all`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ expiry_hours: hours || null }),
     });
     openOrder(orderId); loadOrders();
 }
 
-async function saveStatus(id) {
+async function saveStatus(id, btn) {
     const status = document.getElementById('order-status-sel').value;
-    await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
-        body: JSON.stringify({ status }),
-    });
-    closeModal(); loadOrders();
+    btn.disabled = true;
+    try {
+        const res = await admFetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status }),
+        });
+        if (!res.ok) { const d = await res.json().catch(() => ({})); notify(d.error || `Erro ao salvar o status (HTTP ${res.status}).`); return; }
+        notify('Status salvo.', 'success');
+        closeModal(); loadOrders();
+    } catch (e) {
+        notify('Falha de conexão: ' + e.message);
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 async function deleteOrder(id) {
     if (!confirm(`Apagar permanentemente o pedido ${id}?`)) return;
-    await fetch(`${ADM_CFG.apiBase}/orders/${id}`, {
-        method: 'DELETE', headers: { Authorization: `Bearer ${admToken}` },
+    await admFetch(`${ADM_CFG.apiBase}/orders/${id}`, {
+        method: 'DELETE',
     });
     loadOrders();
 }
@@ -814,8 +879,7 @@ async function deleteOrder(id) {
 // ── Configurações do Mercado Pago ─────────────────────────────────────────
 async function loadMpSettings() {
     try {
-        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
-            headers: { Authorization: `Bearer ${admToken}` },
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
         });
         const data = await res.json();
 
@@ -848,26 +912,26 @@ async function saveMpSettings() {
     if (fp !== '') body.fee_percent = parseFloat(fp);
 
     const msg = document.getElementById('mp-save-msg');
-    msg.style.display = 'none';
+    msg.classList.add('is-hidden');
 
     try {
-        const res  = await fetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/payment-settings`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         });
         const data = await res.json();
         if (res.ok && data.success) {
-            msg.style.display = 'block';
+            msg.classList.remove('is-hidden');
             msg.innerHTML = `<span class="pill st-ready">Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
             document.getElementById('mp-access-token').value = '';
             loadMpSettings();
         } else {
-            msg.style.display = 'block';
+            msg.classList.remove('is-hidden');
             msg.innerHTML = `<span class="pill st-cancelled">⚠ Erro: ${esc(data.error||'desconhecido')}</span>`;
         }
     } catch(e) {
-        msg.style.display = 'block';
+        msg.classList.remove('is-hidden');
         msg.innerHTML = `<span class="pill st-cancelled">⚠ ${esc(e.message)}</span>`;
     }
 }
@@ -903,58 +967,62 @@ async function checkHealth() {
 }
 
 // ── Toggle de acesso manual ───────────────────────────────────────────────
-async function toggleAccessGrant(orderId, toggleEl) {
-    const isOn    = toggleEl.classList.contains('on');
-    const newVal  = !isOn;
+function applyAccessGrantUI(orderId, toggleEl, granted) {
+    toggleEl.classList.toggle('on', granted);
+    toggleEl.setAttribute('aria-checked', String(granted));
     const labelEl = document.getElementById(`access-grant-label-${orderId}`);
+    if (labelEl) labelEl.textContent = granted ? 'Liberado' : 'Requer pagamento';
+    // Liberado: nenhuma informação de valor faz sentido, então some.
+    document.getElementById(`order-amount-block-${orderId}`)?.classList.toggle('is-hidden', granted);
+    document.getElementById(`order-access-note-${orderId}`)?.classList.toggle('is-hidden', !granted);
+}
 
-    // Feedback imediato
-    toggleEl.classList.toggle('on', newVal);
-    if (labelEl) labelEl.textContent = newVal ? 'Liberado' : 'Requer pagamento';
+async function toggleAccessGrant(orderId, toggleEl) {
+    const wasOn  = toggleEl.classList.contains('on');
+    const newVal = !wasOn;
+    applyAccessGrantUI(orderId, toggleEl, newVal);   // feedback imediato
+    toggleEl.disabled = true;
 
     try {
-        const res = await fetch(`${ADM_CFG.apiBase}/orders/${orderId}`, {
+        const res = await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admToken}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentAccessGranted: newVal }),
         });
-        const d = await res.json();
+        const d = await res.json().catch(() => ({}));
         if (!res.ok) {
-            // Reverte em caso de erro
-            toggleEl.classList.toggle('on', isOn);
-            if (labelEl) labelEl.textContent = isOn ? 'Liberado sem pagamento' : 'Requer pagamento';
-            alert('Erro ao salvar: ' + (d.error || res.status));
+            applyAccessGrantUI(orderId, toggleEl, wasOn);   // reverte
+            notify('Erro ao salvar o acesso: ' + (d.error || `HTTP ${res.status}`));
         } else {
+            notify(newVal ? 'Acesso liberado sem pagamento.' : 'Pagamento voltou a ser exigido.', 'success');
             loadOrders();
         }
-    } catch(e) {
-        toggleEl.classList.toggle('on', isOn);
-        if (labelEl) labelEl.textContent = isOn ? 'Liberado sem pagamento' : 'Requer pagamento';
-        alert('Erro: ' + e.message);
+    } catch (e) {
+        applyAccessGrantUI(orderId, toggleEl, wasOn);
+        notify('Falha de conexão: ' + e.message);
+    } finally {
+        toggleEl.disabled = false;
     }
 }
 
 // ── Cancelar pagamento pendente ───────────────────────────────────────────
-async function cancelPayment(orderId) {
+async function cancelPayment(orderId, btn) {
     if (!confirm('Cancelar o Pix pendente deste pedido?\nO usuário precisará gerar um novo QR Code.')) return;
-    const btn = document.getElementById(`cancel-pay-btn-${orderId}`);
-    if (btn) { btn.disabled = true; btn.textContent = 'Cancelando...'; }
+    btn.disabled = true; btn.textContent = 'Cancelando...';
     try {
-        const res = await fetch(`${ADM_CFG.paymentsBase}/payments/${orderId}/cancel`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${admToken}` },
-        });
-        const d = await res.json();
+        const res = await admFetch(`${ADM_CFG.paymentsBase}/payments/${orderId}/cancel`, { method: 'DELETE' });
+        const d = await res.json().catch(() => ({}));
         if (res.ok && d.success) {
+            notify('Pix cancelado.', 'success');
             openOrder(orderId);
             loadOrders();
         } else {
-            if (btn) { btn.disabled = false; btn.textContent = '✕ Cancelar Pix'; }
-            alert('Erro: ' + (d.error || res.status));
+            btn.disabled = false; btn.textContent = '✕ Cancelar Pix';
+            notify('Erro: ' + (d.error || `HTTP ${res.status}`));
         }
-    } catch(e) {
-        if (btn) { btn.disabled = false; btn.textContent = '✕ Cancelar Pix'; }
-        alert('Erro: ' + e.message);
+    } catch (e) {
+        btn.disabled = false; btn.textContent = '✕ Cancelar Pix';
+        notify('Falha de conexão: ' + e.message);
     }
 }
 
