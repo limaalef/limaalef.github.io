@@ -12,6 +12,14 @@ const CONFIG = {
         motor: 'https://api-archive.limaalef.com/v2/motorsport/',
         carnaval: 'https://api-archive.limaalef.com/matches/carnaval'
     },
+    // Edição de nomes de jogadores (administração): PATCH /v2/matches/{sport}/{id}/players
+    // com { edits: [...] } e "Authorization: Bearer <token da API>" (o mesmo da sessão admin).
+    // {id} é o mesmo id usado em CF_API_URLS (id da fonte aberta no modal).
+    MATCH_EDIT: {
+        endpoint: 'https://api-archive.limaalef.com/v2/matches/{sport}/{id}/players',
+        method: 'PATCH',
+    },
+
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
     GOOGLE_CLIENT_ID:  '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',

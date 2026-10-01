@@ -247,37 +247,45 @@ const CarnavalCardManager = {
     }
 };
 
-// REVISADO
+// Seletor de emissoras: modal PRÓPRIO (#source-modal), separado do #modal da partida.
+// Ao escolher uma emissora, o modal da partida abre por cima e este continua aberto por trás
+// (o mesmo esquema usado no admin: pedido atrás, jogo na frente).
 const SourcePicker = {
+    _ensureModal() {
+        let modal = document.getElementById('source-modal');
+        if (modal) return modal;
+        modal = document.createElement('div');
+        modal.className = 'modal modal-broadcasters';
+        modal.id = 'source-modal';
+        modal.innerHTML = `
+            <div class="modal-content modal-down-effect">
+                <div class="modal-header modal-down">
+                    <button type="button" class="btn close-btn" aria-label="Fechar" onclick="SourcePicker.close()">×</button>
+                    <h2 class="modal-title" id="sourceModalTitle"></h2>
+                </div>
+                <div class="modal-body" id="sourceModalBody"></div>
+            </div>`;
+        // Clique no fundo fecha este modal (o #modal, quando aberto, está por cima e trata o próprio clique)
+        modal.addEventListener('click', e => { if (e.target === modal) SourcePicker.close(); });
+        document.body.appendChild(modal);
+        return modal;
+    },
+
+    isOpen() {
+        return !!document.getElementById('source-modal')?.classList.contains('active');
+    },
+
     open(match) {
-        document.body.style.overflow = 'hidden';
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const score = document.getElementById('modalScore');
-        const body  = document.getElementById('modalBody');
-        if (!modal || !title || !score || !body) return;
-
-        modal.classList.add('modal-broadcasters');
-        document.querySelector('#modal .modal-header').classList.add('modal-down');
-        document.querySelector('#modal .modal-content').classList.add('modal-down-effect');
-
-        modal.querySelector('.modal-content').style.minHeight = '1px'
-
-        const existingShareBtn = document.getElementById('modalShareBtn');
-        if (existingShareBtn) existingShareBtn.remove();
-
-        const competition = LanguageManager.translateText(match.competition?.name);
-        const phase = LanguageManager.translateText(match.competition?.phase);
-
+        const modal = this._ensureModal();
+        const title = document.getElementById('sourceModalTitle');
+        const body  = document.getElementById('sourceModalBody');
+        const sport = Utils.getItemSport(match);
         const sources = Array.isArray(match.sources) ? match.sources : [];
-        const chooseSourceTitle = LanguageManager.t('chooseSource');
 
-        title.innerHTML = `<div class="section-title modal-title-competition">${chooseSourceTitle}</div>`;
-
-        score.innerHTML = `<div class="score-header-buttons"></div>`;
+        title.innerHTML = `<div class="section-title modal-title-competition">${LanguageManager.t('chooseSource')}</div>`;
 
         body.innerHTML = `
-            <div class="detail-section" style="margin-bottom:5rem;">
+            <div class="detail-section source-picker-section">
                 <div class="source-picker-list" id="sourcePickerList">
                     ${sources.map(src => `
                         <button class="source-picker-item" data-source-id="${src.id}">
@@ -293,27 +301,25 @@ const SourcePicker = {
         `;
 
         body.querySelectorAll('.source-picker-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                modal.querySelector('.modal-content').style.removeProperty('min-height');
-                MatchModal.fetchAndShow(btn.dataset.sourceId, Utils.getItemSport(match));
-            });
+            btn.addEventListener('click', () => MatchModal.fetchAndShow(btn.dataset.sourceId, sport));
         });
 
+        document.body.style.overflow = 'hidden';
         modal.classList.add('active');
+    },
+
+    close() {
+        document.getElementById('source-modal')?.classList.remove('active');
+        // O scroll da página só volta se o modal da partida também estiver fechado
+        if (!document.getElementById('modal')?.classList.contains('active')) document.body.style.overflow = '';
     }
 };
 
 // REVISADO
 const MatchModal = {
-    // Remove qualquer variação visual deixada por outro modal (ex.: o seletor de
-    // emissoras/SourcePicker, que sobe da parte inferior). O #modal é reutilizado
-    // por futebol, motorsport e carnaval — sem este reset a variação "vaza".
+    // O #modal é reutilizado por futebol, motorsport e carnaval: limpa o que um deles
+    // deixa para o próximo.
     resetVariant() {
-        document.getElementById('modal')?.classList.remove('modal-broadcasters');
-        const content = document.querySelector('#modal .modal-content');
-        content?.classList.remove('modal-down-effect');
-        content?.style.removeProperty('min-height');
-        document.querySelector('#modal .modal-header')?.classList.remove('modal-down');
         document.getElementById('modalBody')?.classList.remove('motor-division');
     },
 
@@ -511,6 +517,7 @@ const MatchModal = {
                 const items = apiResponse.data;
                 if (!items.length) throw new Error('Item não encontrado');
                 MatchModal.show({ ...items[0], sport });
+                MatchModal.loaded = { id, sport, data: items[0] };
             }
             if (options.requestHtml) body.insertAdjacentHTML('afterbegin', options.requestHtml);
         } catch (err) {
@@ -531,7 +538,7 @@ const MatchModal = {
         const modal = document.getElementById('modal');
         if (!modal || !modal.classList.contains('active') || modal.classList.contains('closing')) return;
 
-        document.body.style.overflow = '';
+        document.body.style.overflow = SourcePicker.isOpen() ? 'hidden' : '';
         modal.classList.add('closing');
 
         const finish = () => {
@@ -564,8 +571,10 @@ const MatchModal = {
             if (e.key !== 'Escape' || e.defaultPrevented) return;
             // O painel do carrinho fica por cima do modal e fecha primeiro
             if (document.getElementById('om-panel')?.classList.contains('om-open')) return;
+            // Camadas, de cima para baixo: modal da partida → seletor de emissoras
             const modal = document.getElementById('modal');
-            if (modal?.classList.contains('active')) { e.preventDefault(); MatchModal.close(); }
+            if (modal?.classList.contains('active')) { e.preventDefault(); MatchModal.close(); return; }
+            if (SourcePicker.isOpen()) { e.preventDefault(); SourcePicker.close(); }
         });
     }
 };

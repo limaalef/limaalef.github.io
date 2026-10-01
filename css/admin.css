@@ -127,6 +127,9 @@
 }
 
 @media (max-width: 768px) {
+    /* Barra de busca e modais respeitam a barra de navegação do admin (que fica por cima de tudo) */
+    body.page-admin { --float-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-4)); }
+    body.page-admin .modal { padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px)); }
     .adm-main { margin: 0; padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-5)); }
     .adm-layout { flex-direction: column; gap: var(--sp-4); }
     .layout-inverted { flex-direction: column-reverse; }
@@ -136,7 +139,7 @@
 
     /* Navegação do admin: barra inferior fixa (mesmo padrão do webapp) */
     .page-admin .adm-sidebar-nav {
-        position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-nav);
         display: flex; flex-direction: row; justify-content: space-around; align-items: stretch;
         padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
         height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));

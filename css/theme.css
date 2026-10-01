@@ -112,6 +112,11 @@
 
     /* Layout de webapp */
     --bottom-nav-h: 60px;
+    /* Camadas (z-index): conteúdo flutuante < modais < barra de navegação < avisos */
+    --z-modal: 1000;
+    --z-modal-top: 1010;
+    --z-modal-editor: 1020;
+    --z-nav: 1100;
     --float-bottom: 30px;              /* posição vertical dos controles flutuantes (busca e carrinho) */
     --float-side: 1.75rem;
     --float-gap: 12px;

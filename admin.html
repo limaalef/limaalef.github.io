@@ -26,6 +26,17 @@
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
 </head>
+<style>
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --accent-color: #8b5cf6;
+            --accent-color-rgb: 139, 92, 246;
+            --accent-hover: #7c3aed;
+            --bg-accent-color: #2c2244;
+            --text-accent-color: #ffffff;
+        }
+    }
+</style>
 <body class="page-admin">
     <header>
         <div class="header-frame" id="header" data-title="Administração" data-back="true" data-admin="true" data-forced="true" data-reqbtn="false"></div>
@@ -245,6 +256,7 @@
                 <button class="btn close-btn" onclick="closeModal()">×</button>
                 <div class="section-title modal-title-competition">Pedido</div>
                 <h3 class="adm-modal-title" id="adm-modal-title"></h3>
+                <div class="score-header-buttons"></div>
             </div>
             <div id="modal-body"></div>
         </div>
@@ -497,8 +509,8 @@ function buildRequestSection(order, item) {
         { label: '',                       value: esc(ADM_SPORT_LABEL[item.sport] || item.sport), noNewLine: true },
         { label: 'Evento',                 value: esc(item.meta) },
         { label: '',                       value: esc(item.label), noNewLine: true },
-        { label: 'Data',         value: esc(item.date) },
-        { label: 'Emissora',     value: esc(item.station) },
+        { label: 'Data',                   value: esc(item.date) },
+        { label: 'Emissora',               value: esc(item.station) },
         { label: 'Link entregue',          value: esc(linkText) },
     ];
     return `<div class="modal-division" style="margin-bottom:var(--sp-4)">${Elements.section('Dados coletados no pedido', Elements.setDetailList(rows))}</div>`;
@@ -595,8 +607,8 @@ function buildOrderDetail(o) {
                 de ${total} link(s) ativo(s)
             </div>
             <div class="adm-bulk-actions">
-                <button type="button" class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">Desativar todos</button>
-                <button type="button" class="action-btn adm-btn-success" onclick="toggleActivatePanel()">Ativar todos...</button>
+                <button type="button" class="action-btn btn-xs adm-btn-warning" onclick="disableAllLinks('${o.id}')">Desativar todos</button>
+                <button type="button" class="action-btn btn-xs adm-btn-success" onclick="toggleActivatePanel()">Ativar todos...</button>
             </div>
         </div>
         <div class="adm-expiry-inline" id="activate-panel">
@@ -683,7 +695,7 @@ function buildOrderDetail(o) {
                             <span class="detail-list-label text-tertiary">Nenhum pagamento gerado ainda</span>
                             <span class="detail-list-value"></span>
                         </div>`}
-                        <div class="detail-list-item">
+                        <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
                             <span class="detail-list-label">
                                 <span class="adm-amount-msg" id="order-amount-msg-${o.id}" role="status" aria-live="polite"></span>
                             </span>
@@ -696,6 +708,7 @@ function buildOrderDetail(o) {
                 </div>
 
                 ${pay ? `
+                <div class="section-title modal-style">Dados de pagamento do Mercado Pago</div>
                 <div class="detail-list">
                     <div class="detail-list-item">
                         <span class="detail-list-label">Status do pagamento</span>
