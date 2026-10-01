@@ -663,12 +663,6 @@ function parseDuration(str) {
     return 0;
 }
 
-function topCompetition(matches) {
-    const count = {};
-    matches.forEach(m => { const k = vm.comp(m) || 'Outros'; count[k] = (count[k] || 0) + 1; });
-    return Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0]?.split(' ').slice(0, 3).join(' ') || '—';
-}
-
 function topQuality(matches) {
     const count = {};
     matches.forEach(m => { const k = vm.quality(m) || '—'; count[k] = (count[k] || 0) + 1; });

@@ -14,10 +14,6 @@ const APIService = {
         const url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
-        
-        if (CONFIG.videoFilter) {
-            url.searchParams.append('embed', 'true');
-        }
 
         return this._fetchJson(url.toString());
     },
@@ -68,18 +64,6 @@ const APIService = {
         url.searchParams.append('max_items', 100);
         url.searchParams.append('page', page);
         url.searchParams.append(CollectionState.type, CollectionState.query);
-
-        // if (CONFIG.currentSport === 'football' && CollectionState.type !== 'commentor') {
-        //     url.searchParams.append('type', 'group');
-        // }
-
-        // if (CollectionState.yearFilter) {
-        //     url.searchParams.append('year', CollectionState.yearFilter);
-        // }
-
-        // if (CONFIG.videoFilter) {
-        //     url.searchParams.append('embed', 'true');
-        // }
 
         return this._fetchJson(url.toString());
     },

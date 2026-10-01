@@ -1,5 +1,3 @@
-.rd-wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--sp-5) var(--sp-9); }
-
 /* Auth */
 #rd-auth { display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
     padding:var(--sp-9) var(--sp-5); text-align:center; }
@@ -9,14 +7,6 @@
     color:var(--text-secondary); font-size:var(--font-size-mdm); }
 
 /* Progress bar */
-.rd-progress { display:flex; border-radius:var(--border-radius-size-md);
-    overflow:hidden; border:1px solid var(--border-color); margin-bottom:var(--sp-6); }
-.rd-progress-step { flex:1; text-align:center; padding:var(--sp-3) var(--sp-2);
-    font-size:var(--font-size-xs); font-weight:600; text-transform:uppercase;
-    letter-spacing:.04em; color:var(--text-secondary); background:var(--bg-primary); transition:all .2s; }
-.rd-progress-step + .rd-progress-step { border-left:1px solid var(--border-color); }
-.rd-progress-step.done    { background:var(--bg-success); color:var(--text-success); }
-.rd-progress-step.current { background:var(--accent-color); color:var(--text-accent-color); }
 
 /* Sections */
 .rd-section { margin-bottom:var(--sp-6); }
@@ -28,7 +18,6 @@
 .rd-dl-card { border-radius:var(--border-radius-size-xl); border:1px solid var(--border-color); overflow:hidden; }
 .rd-dl-card-head { display:flex; align-items:center; gap:var(--sp-4);
     padding:var(--sp-4) var(--sp-5); background:var(--bg-secondary); }
-.rd-dl-icon { font-size:1.5rem; flex-shrink:0; }
 .rd-dl-info { flex:1; min-width:0; }
 .rd-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
 .rd-dl-sub   { font-size:var(--font-size-mds); color:var(--text-secondary); margin-top:var(--sp-1); }
@@ -44,13 +33,6 @@
     border-top:1px solid var(--border-color); text-align:center; }
 
 /* Info list */
-.rd-info-list { display:flex; flex-direction:column; gap:1px;
-    border:1px solid var(--border-color); border-radius:var(--border-radius-size-xl); overflow:hidden; }
-.rd-info-item { background:var(--bg-secondary); padding:var(--sp-3) var(--sp-4);
-    display:flex; align-items:center; justify-content:space-between; }
-.rd-info-item:not(:last-child) { border-bottom:1px solid var(--border-color); }
-.rd-info-label { font-size:var(--font-size-sm); color:var(--text-secondary); width:35%; }
-.rd-info-value { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); text-align:right; width:65%; }
 .rd-notes { padding:var(--sp-3) var(--sp-4); background:var(--bg-secondary);
     border-radius:var(--border-radius-size-md); border-left:3px solid var(--accent-color);
     font-size:var(--font-size-sm); color:var(--text-secondary); }
@@ -62,26 +44,20 @@
     overflow: hidden; margin-bottom: var(--sp-6); }
 .rd-pay-card.pay-required { border-color: var(--warning-color); }
 .rd-pay-card.pay-pending  { border-color: var(--accent-color); }
-.rd-pay-card.pay-done     { border-color: var(--success-color); }
 
 .rd-pay-head { display: flex; align-items: center; gap: var(--sp-4);
     padding: var(--sp-4) var(--sp-5); }
 .rd-pay-card.pay-required .rd-pay-head { background: var(--bg-warning); }
 .rd-pay-card.pay-pending  .rd-pay-head { background: var(--bg-accent-color); }
-.rd-pay-card.pay-done     .rd-pay-head { background: var(--bg-success); }
 .rd-pay-icon  { font-size: 1.6rem; flex-shrink: 0; }
 .rd-pay-title { font-size: var(--font-size-mdm); font-weight: 700; color: var(--text-primary); }
 .rd-pay-sub   { font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px; }
-.rd-pay-amount { font-size: var(--font-size-mxxl); font-weight: 700;
-    color: var(--accent-color); margin-left: auto; flex-shrink: 0; }
 
 .rd-pay-body  { padding: 0; background: var(--bg-primary);
     border-top: 1px solid var(--border-color); }
 
 /* CPF step */
 .rd-cpf-field { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
-.rd-cpf-label { font-size: var(--font-size-sm); color: var(--text-secondary); font-weight: 600;
-    text-transform: uppercase; letter-spacing: .05em; }
 .rd-cpf-input { width: 100%; padding: var(--sp-3) var(--sp-4);
     border: 1px solid var(--border-color); border-radius: var(--border-radius-size-md);
     background: var(--bg-secondary); color: var(--text-primary); font-size: var(--font-size-mdm);

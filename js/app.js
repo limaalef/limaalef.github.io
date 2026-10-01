@@ -26,14 +26,6 @@ const App = {
         }
     },
 
-    switchView(view) {
-        AppState.currentView = view;
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.view === view);
-        });
-        Renderer.render();
-    },
-
     switchSport(sport) {
         CONFIG.currentSport = sport;
         AppState.currentPage = 1;
@@ -63,14 +55,6 @@ const App = {
 
         if (page > 0) AppState.currentPage = page;
 
-        const view = params.get('view');
-        if (view && ['grid', 'list'].includes(view)) {
-            AppState.currentView = view;
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.view === view);
-            });
-        }
-
         const search = params.get('search');
         if (search) {
             const searchInput = document.getElementById('searchInput');
@@ -90,9 +74,6 @@ const App = {
             if (document.getElementById('searchInput')?.value) FilterManager.apply();
         });
         document.getElementById('yearFilter').addEventListener('change', () => FilterManager.apply());
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.switchView(btn.dataset.view));
-        });
         document.getElementById('itemsPerPage').addEventListener('change', (e) => {
             AppState.itemsPerPage = parseInt(e.target.value);
             AppState.currentPage = 1;
@@ -103,25 +84,6 @@ const App = {
         document.getElementById('nextPage').addEventListener('click', () => PaginationManager.goToNext());
         document.getElementById('lastPage').addEventListener('click', () => PaginationManager.goToLast());
         
-        /* document.getElementById('videoFilterBtn').addEventListener('click', () => {
-            CONFIG.videoFilter = !CONFIG.videoFilter;
-            const btn = document.getElementById('videoFilterBtn');
-            btn.classList.toggle('active', CONFIG.videoFilter);
-            AppState.currentPage = 1;
-            this.loadData();
-        }); */
-    
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') MatchModal.close();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            const modalOpen = document.getElementById('modal').classList.contains('active');
-            if (e.key === 'Escape' && modalOpen) {
-                MatchModal.close();
-            }
-        });
-
         this.loadData();
     }
 };

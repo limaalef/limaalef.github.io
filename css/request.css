@@ -22,7 +22,7 @@
     --om-avatar-size:   38px;
     --om-z-overlay:     9010;
     --om-z-panel:       9020;
-    --om-z-fab:         1000;
+    --om-z-fab:         900;
     --om-z-add-btn:     10;
 }
 
@@ -398,7 +398,6 @@
     text-align: center;
     padding: 30px 10px;
 }
-.om-success-icon { font-size: 3rem; margin-bottom: 10px; }
 .om-success h3   { margin: 0 0 8px; color: var(--text-primary); font-size: var(--font-size-lg); }
 .om-success p    { color: var(--text-secondary); font-size: var(--font-size-mdm); margin: 4px 0; }
 

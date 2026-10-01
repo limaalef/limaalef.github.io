@@ -143,13 +143,6 @@
 .volume-bar-meta .free-label.warning  { color: var(--warning-color); }
 
 /* Detalhes do card do volume */
-.volume-card-detail {
-    border-top: 1px solid var(--border-color);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 10px 16px;
-    gap: 10px;
-}
 .vol-det-item { }
 .vol-det-label {
     font-size: var(--font-size-sm);
@@ -251,7 +244,6 @@
 @media (hover: hover) {
     .volume-action-btn:hover { background: var(--bg-tertiary); }
 }
-.volume-action-btn.danger { color: var(--error-color); }
 
 /* ── Cloud card ── */
 .cloud-volume-card {
@@ -282,10 +274,6 @@
     background: var(--bg-success);
     color: var(--text-success);
 }
-.cloud-status-badge.offline {
-    background: var(--bg-error);
-    color: var(--text-error);
-}
 
 .cloud-volume-detail {
     border-top: 1px solid var(--border-color);
@@ -293,29 +281,6 @@
     grid-template-columns: 1fr 1fr;
     padding: 10px 16px;
     gap: 10px;
-}
-
-.cloud-volume-actions {
-    border-top: 1px solid var(--border-color);
-    display: flex;
-}
-.cloud-action-btn {
-    flex: 1;
-    padding: 10px;
-    font-size: var(--font-size-md);
-    color: var(--accent-color);
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: inherit;
-    font-weight: 500;
-    transition: background 0.2s;
-    border-right: 1px solid var(--border-color);
-}
-.cloud-action-btn:last-child { border-right: none; }
-@media (hover: hover) {
-    .cloud-action-btn:hover { background: var(--bg-tertiary); }
 }
 
 /* ── DETALHE DO VOLUME ── */
@@ -372,43 +337,9 @@
 }
 
 /* ── Filtros rápidos de qualidade/cloud ── */
-.storage-quick-filters {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    width: 100%;
-}
-.storage-filter-btn {
-    padding: 5px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-md);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    font-size: var(--font-size-md);
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-@media (hover: hover) {
-    .storage-filter-btn:hover {
-    border-color: var(--text-primary);
-    color: var(--text-primary);
-}
-}
-.storage-filter-btn.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--text-accent-color);
-}
 
 /* ── Responsivo ── */
 @media (max-width: 496px) {
-    .volume-card-detail {
-        grid-template-columns: 1fr;
-        gap: 6px;
-    }
     .storage-overview .stats {
         flex-wrap: wrap;
     }

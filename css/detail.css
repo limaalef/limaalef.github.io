@@ -146,45 +146,6 @@
 }
 
 /* ── YEAR FILTER BAR ── */
-.year-filter-bar {
-    display: flex;
-    gap: 6px;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    flex-wrap: wrap;
-}
-.year-filter-bar::-webkit-scrollbar { display: none; }
-
-.year-btn {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    padding: 5px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-md);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    font-size: var(--font-size-md);
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-@media (hover: hover) {
-    .year-btn:hover {
-    border-color: var(--text-primary);
-    color: var(--text-primary);
-}
-}
-.year-btn.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--white);
-}
 
 /* ── CARD NOVO: linha única "Casa 0 x 0 Visitante" ── */
 .match-card {

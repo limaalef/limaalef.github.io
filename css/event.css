@@ -11,12 +11,6 @@ header {
     margin: 0 auto;
     padding: 0rem;
 }
-
-.header-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
 .modal-header {
     border-radius: 0rem !important;
 }

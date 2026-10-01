@@ -20,7 +20,6 @@ const CONFIG = {
     IMAGE_CONTENT_URL: 'https://img.limaalef.com/',
     DEFAULT_ITEMS_PER_PAGE: 200,
     currentSport: 'football',
-    videoFilter: false
 };
 
 // ── Navegação inferior (modo webapp / celular) ─────────────────────────────
@@ -138,4 +137,3 @@ CONFIG._setupHeader = function (container, isMobile) {
         document.getElementById('header-actions').insertAdjacentHTML('afterbegin', actions);
     }
 };
-

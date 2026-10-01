@@ -1,7 +1,6 @@
 const AppState = {
     matches: [],
     filteredMatches: [],
-    currentView: 'cards',
     currentPage: 1,
     totalPages: 1,
     itemsPerPage: CONFIG.DEFAULT_ITEMS_PER_PAGE
@@ -248,87 +247,6 @@ const CarnavalCardManager = {
     }
 };
 
-// DESCONTINUADO
-const ListManager = {
-    create(match) {
-        const item = document.createElement('div');
-        const status = Utils.getMatchStatus(match);
-        const sources = Array.isArray(match.Fontes) ? match.Fontes : null;
-        item.className = `list-item ${status}`;
-        item.onclick = () => {
-            if (sources && sources.length > 1) {
-                SourcePicker.open(match);
-            } else {
-                const singleId = (sources && sources.length === 1) ? sources[0].id : match.ID;
-                MatchModal.fetchAndShow(singleId, CONFIG.currentSport);
-            }
-        };
-        
-        const homeGoals = Utils.parseGoals(match['Gols mandante']);
-        const awayGoals = Utils.parseGoals(match['Gols visitante']);
-        const scoreText = `${homeGoals} x ${awayGoals}`;
-        
-        const statusText = LanguageManager.t('pendingMatch');
-        const statusBadge = status === 'pending' ? `<span class="badge badge-warning" style="font-size: 0.7em; margin-left: 8px;">${statusText}</span>` : '';
-
-        const competition = LanguageManager.translateText(match.Competição);
-        const phase = LanguageManager.translateText(match.Fase);
-
-        const broadcasterCell = (sources && sources.length > 1)
-            ? `<span style="font-size: 0.85em; color: var(--text-secondary);">${sources.length} ${LanguageManager.t('sourcesCount') || 'fontes'}</span>`
-            : (match['Logo emissora'] ? `<img src="${match['Logo emissora']}" alt="${match.Emissora}" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">${match.Emissora || 'N/A'}</span>`);
-
-        item.innerHTML = `
-            <div><strong>${Utils.formatMatchDate(match.Data, true)}</strong></div>
-            <div>
-                <strong>${LanguageManager.t(match.home_team?.name)} ${scoreText} ${LanguageManager.t(match.away_team?.name)}</strong> ${statusBadge}
-                <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
-                    ${competition} - ${phase}
-                </div>
-            </div>
-            <div style="text-align: center; font-size: 0.85em;">${match.Qualidade || 'N/A'}</div>
-            <div style="text-align: right;">
-                ${broadcasterCell}
-            </div>
-        `;
-        return item;
-    }
-};
-
-// DESCONTINUADO
-const MotorListManager = {
-    create(event) {
-        const item = document.createElement('div');
-        item.className = 'list-item motor-event';
-        item.onclick = () => MatchModal.fetchAndShow(event.ID, 'motor');
-        
-        const dateRange = Utils.formatMotorDateRange(event.DataInicio, event.DataFim);
-        
-        const competition = LanguageManager.translateText(event.Campeonato);
-        const phase = LanguageManager.translateText(event.Fase);
-        
-        const eventCount = event.Eventos?.length || 0;
-        const eventLabel = LanguageManager.currentLang === 'en' 
-            ? (eventCount === 1 ? 'event' : 'events')
-            : (eventCount === 1 ? 'evento' : 'eventos');
-
-        item.innerHTML = `
-            <div><strong>${dateRange}</strong></div>
-            <div>
-                <strong>${phase}</strong>
-                <div style="color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
-                    ${competition}
-                </div>
-            </div>
-            <div style="text-align: center; font-size: 0.85em;">${eventCount} ${eventLabel}</div>
-            <div style="text-align: right;">
-                ${event['Logo emissora'] ? `<img src="${event['Logo emissora']}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(match['Logo emissora']) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : `<span style="font-size: 0.85em; color: var(--text-secondary);">N/A</span>`}
-            </div>
-        `;
-        return item;
-    }
-};
-
 // REVISADO
 const SourcePicker = {
     open(match) {
@@ -340,8 +258,8 @@ const SourcePicker = {
         if (!modal || !title || !score || !body) return;
 
         modal.classList.add('modal-broadcasters');
-        document.querySelector('.modal-header').classList.add('modal-down');
-        document.querySelector('.modal-content').classList.add('modal-down-effect');
+        document.querySelector('#modal .modal-header').classList.add('modal-down');
+        document.querySelector('#modal .modal-content').classList.add('modal-down-effect');
 
         modal.querySelector('.modal-content').style.minHeight = '1px'
 
@@ -359,7 +277,7 @@ const SourcePicker = {
         score.innerHTML = `<div class="score-header-buttons"></div>`;
 
         body.innerHTML = `
-            <div class="detail-section" style="margin-bottom:10rem;">
+            <div class="detail-section" style="margin-bottom:5rem;">
                 <div class="source-picker-list" id="sourcePickerList">
                     ${sources.map(src => `
                         <button class="source-picker-item" data-source-id="${src.id}">
@@ -513,47 +431,12 @@ const MatchModal = {
             ${html}
             
             <div class="modal-division">
-            <div class="detail-section">
-                <div class="section-title modal-style">${matchInfoTitle}</div>
-                <div class="detail-list">
-                    ${match_info}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="section-title modal-style">${tvInfoTitle}</div>
-                <div class="detail-list">
-                    ${tv_info}
-                </div>                
-            </div>
-            
-            <div class="detail-section">
-                <div class="section-title modal-style">${technicalInfoTitle}</div>
-                <div class="detail-list">
-                    ${tech_info}
-                </div>
-            </div>
-
-            ${referee_info ? `<div class="detail-section">
-                <div class="section-title modal-style">${refereeTitle}</div>
-                <div class="detail-list">
-                    ${referee_info}
-                </div>
-            </div>` : ''}
-            
-            ${attrev_info ? `<div class="detail-section">
-                <div class="section-title modal-style">${attRevTitle}</div>
-                <div class="detail-list">
-                    ${attrev_info}
-                </div>
-            </div>` : ''}
-            
-            <div class="detail-section">
-                <div class="section-title modal-style">${storageTitle}</div>
-                <div class="storage-badges">
-                    ${Elements.setStorageBadges(match.technical_details)}
-                </div>
-            </div>
+            ${Elements.section(matchInfoTitle, match_info)}
+            ${Elements.section(tvInfoTitle, tv_info)}
+            ${Elements.section(technicalInfoTitle, tech_info)}
+            ${Elements.section(refereeTitle, referee_info)}
+            ${Elements.section(attRevTitle, attrev_info)}
+            ${Elements.section(storageTitle, Elements.setStorageBadges(match.technical_details), 'storage-badges')}
             
             ${match.additional_info ? `
                 <div class="detail-section">
@@ -571,7 +454,8 @@ const MatchModal = {
         }
         modal?.classList.add('active');
     },
-    async fetchAndShow(id, sport = 'football') {
+    // options.requestHtml: bloco HTML extra (ex.: dados coletados no pedido do usuário), exibido no topo do modal.
+    async fetchAndShow(id, sport = 'football', options = {}) {
         const modal = document.getElementById('modal');
         const body  = document.getElementById('modalBody');
         const score = document.getElementById('modalScore');
@@ -601,7 +485,10 @@ const MatchModal = {
                 Utils.showNotification('Erro ao copiar link', 'error');
             });
         };
-        document.querySelector('.modal-header .close-btn').insertAdjacentElement('afterend', shareBtn);
+        // Na administração o link público de compartilhamento não é necessário
+        if (!document.body.classList.contains('page-admin')) {
+            document.querySelector('#modal .modal-header .close-btn').insertAdjacentElement('afterend', shareBtn);
+        }
         
         MatchModal.resetVariant();
         title.innerHTML = `<div class="section-title modal-title-competition">${LanguageManager.t('loadingData') || 'Carregando...'}</div>`;
@@ -625,28 +512,64 @@ const MatchModal = {
                 if (!items.length) throw new Error('Item não encontrado');
                 MatchModal.show({ ...items[0], sport });
             }
+            if (options.requestHtml) body.insertAdjacentHTML('afterbegin', options.requestHtml);
         } catch (err) {
             title.innerHTML = '';
             body.innerHTML = `
+                ${options.requestHtml || ''}
                 <div class="empty-state">
                     <h2>Erro ao carregar</h2>
-                    <p>${err.message}</p>
+                    <p>${Utils.escapeHtml ? Utils.escapeHtml(err.message) : err.message}</p>
                 </div>`;
         }
     },
+    // Fecha o modal. O #modal não tem transição própria (só os filhos têm), então o antigo
+    // "espera o transitionend" dependia de um evento que subia de um filho qualquer — por exemplo
+    // do hover do botão — e em telas de toque nunca disparava, deixando o modal preso.
+    // Agora o fechamento é imediato, ou aguarda a animação do próprio #modal se houver uma.
     close() {
-        document.body.style.overflow = '';
-
         const modal = document.getElementById('modal');
+        if (!modal || !modal.classList.contains('active') || modal.classList.contains('closing')) return;
 
+        document.body.style.overflow = '';
         modal.classList.add('closing');
 
-        modal.addEventListener('transitionend', () => {
+        const finish = () => {
+            if (!modal.classList.contains('closing')) return;
             modal.classList.remove('active', 'closing');
             MatchModal.resetVariant();
-        }, { once: true });
+        };
+
+        const style = getComputedStyle(modal);
+        const ms = v => Math.max(...String(v).split(',').map(s => (parseFloat(s) || 0) * (s.includes('ms') ? 1 : 1000)));
+        const duration = Math.max(ms(style.transitionDuration), ms(style.animationDuration));
+
+        if (duration <= 0) { finish(); return; }
+
+        const onEnd = e => { if (e.target === modal) { modal.removeEventListener('transitionend', onEnd); modal.removeEventListener('animationend', onEnd); finish(); } };
+        modal.addEventListener('transitionend', onEnd);
+        modal.addEventListener('animationend', onEnd);
+        setTimeout(finish, duration + 100);   // garantia
+    },
+
+    // Fechamento por Escape e por clique no fundo: um único conjunto de listeners (delegação em
+    // document), válido para todas as páginas que usam o modal.
+    _bindEscape() {
+        if (this._escapeBound) return;
+        this._escapeBound = true;
+        document.addEventListener('click', e => {
+            if (e.target?.id === 'modal') MatchModal.close();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape' || e.defaultPrevented) return;
+            // O painel do carrinho fica por cima do modal e fecha primeiro
+            if (document.getElementById('om-panel')?.classList.contains('om-open')) return;
+            const modal = document.getElementById('modal');
+            if (modal?.classList.contains('active')) { e.preventDefault(); MatchModal.close(); }
+        });
     }
 };
+MatchModal._bindEscape();
 
 const CarnavalModal = {
     show(match) {
@@ -759,15 +682,15 @@ const CarnavalModal = {
         ];
         
         const rows_competition_info = [
-            { label: 'finalPos',    value: LanguageManager.translateOrdinary(result.final_position, 'fem') + ' ' + placeText },
-            { label: 'finalScore',  value: (result.total || '') + ' ' + pointsText },
+            { label: 'finalPos',    value: result.final_position ? LanguageManager.translateOrdinary(result.final_position, 'fem') + ' ' + placeText : '' },
+            { label: 'finalScore',  value: result.total ? result.total + ' ' + pointsText : '' },
         ];
         
         const rows_tech_info = [
             { label: 'ID',          value: match.id },
             { label: 'quality',     value: tech.video_quality },
             { label: 'audioFormat', value: audioFormat },
-            { label: 'bitrate',     value: (tech.video_bitrate != null ? tech.video_bitrate + ' Mbps' : 'N/A') },
+            { label: 'bitrate',     value: (tech.video_bitrate ? tech.video_bitrate + ' Mbps' : '') },
             { label: 'duration',    value: tech.duration },
             { label: 'fileSize',    value: Utils.formatSize(tech.file_size) },
         ];
@@ -783,41 +706,11 @@ const CarnavalModal = {
             ${html}
             
             <div class="modal-division">
-            <div class="detail-section">
-                <div class="section-title modal-style">${carnavalInfoTitle}</div>
-                <div class="detail-list">
-                    ${carnaval_info}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="section-title modal-style">${competitionInfoTitle}</div>
-                <div class="detail-list">
-                    ${competition_info}
-                    ${result_info}
-                </div>                
-            </div>
-
-            <div class="detail-section">
-                <div class="section-title modal-style">${tvInfoTitle}</div>
-                <div class="detail-list">
-                    ${tv_info}
-                </div>                
-            </div>
-            
-            <div class="detail-section">
-                <div class="section-title modal-style">${technicalInfoTitle}</div>
-                <div class="detail-grid technical">
-                    ${tech_info}
-                </div>
-            </div>
-            
-            <div class="detail-section">
-                <div class="section-title modal-style">${storageTitle}</div>
-                <div class="storage-badges">
-                    ${Elements.setStorageBadges(tech)}
-                </div>
-            </div>
+            ${Elements.section(carnavalInfoTitle, carnaval_info)}
+            ${Elements.section(competitionInfoTitle, competition_info + (result_info || ''))}
+            ${Elements.section(tvInfoTitle, tv_info)}
+            ${Elements.section(technicalInfoTitle, tech_info, 'detail-grid technical')}
+            ${Elements.section(storageTitle, Elements.setStorageBadges(tech), 'storage-badges')}
             
             ${match.additional_info ? `
                 <div class="detail-section">
@@ -867,9 +760,9 @@ const MotorModal = {
         
         const startDate = Utils.formatMatchDate(event.start_date);
         const endDate = Utils.formatMatchDate(event.end_date);
-        const dateRange = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+        const dateRange = [startDate, endDate].filter(d => !Utils.isBlank(d)).filter((d, i, arr) => arr.indexOf(d) === i).join(' - ');
         
-        score.innerHTML = `<div style="text-align: center; font-weight: 600;">${dateRange}</div><div class="score-header-buttons"></div>`;
+        score.innerHTML = `${dateRange ? `<div style="text-align: center; font-weight: 600;">${dateRange}</div>` : ''}<div class="score-header-buttons"></div>`;
 
         const _motorCarousels = [];
         const eventsHtml = (event.events || []).map((evt, index) => {
@@ -897,26 +790,9 @@ const MotorModal = {
                             return ImageCarousel.renderHTML(CONFIG.IMAGE_CONTENT_URL + evt.media?.image, cid);
                         })()}
                         
-                    <div class="detail-section">
-                            <div class="section-title modal-style">${LanguageManager.t('eventInfo')}</div>
-                            <div class="detail-list">
-                                ${tv_info}
-                            </div>
-                        </div>
-                        
-                        <div class="detail-section">
-                            <div class="section-title modal-style">${LanguageManager.t('technicalInfo')}</div>
-                            <div class="detail-list">
-                                ${tech_info}
-                            </div>
-                        </div>
-                        
-                        <div class="detail-section">
-                            <div class="section-title modal-style">${LanguageManager.t('storageInfo')}</div>
-                            <div class="storage-badges">
-                                ${Elements.setStorageBadges(evt.technical_details)}
-                            </div>
-                        </div>
+                        ${Elements.section(LanguageManager.t('eventInfo'), tv_info)}
+                        ${Elements.section(LanguageManager.t('technicalInfo'), tech_info)}
+                        ${Elements.section(LanguageManager.t('storageInfo'), Elements.setStorageBadges(evt.technical_details), 'storage-badges')}
                         
                         ${evt.additional_info ? `
                             <div class="detail-section">
@@ -956,8 +832,7 @@ const MotorModal = {
     },
     
     close() {
-        document.body.style.overflow = '';
-        document.getElementById('modal').classList.remove('active');
+        MatchModal.close();
     }
 };
 
@@ -977,31 +852,18 @@ const Renderer = {
             return;
         }
         
-        if (AppState.currentView === 'cards') {
-            container.innerHTML = '<div class="matches-grid" id="grid"></div>';
-            const grid = document.getElementById('grid');
-            AppState.filteredMatches.forEach(match => {
-                // Cada item usa o card do PRÓPRIO esporte (a listagem "all" mistura esportes)
-                const itemSport = Utils.getItemSport(match);
-                const card = itemSport === 'motor'
-                    ? MotorCardManager.create(match)
-                    : itemSport === 'carnaval'
-                    ? CarnavalCardManager.create(match)
-                    : CardManager.create(match);
-                grid.appendChild(card);
-            });
-        } else {
-            container.innerHTML = '<div class="matches-list" id="list"></div>';
-            const list = document.getElementById('list');
-            AppState.filteredMatches.forEach(match => {
-                const item = CONFIG.currentSport === 'motor'
-                    ? MotorListManager.create(match)
-                    : CONFIG.currentSport === 'carnaval'
-                    ? ListManager.create(match)
-                    : ListManager.create(match);
-                list.appendChild(item);
-            });
-        }
+        container.innerHTML = '<div class="matches-grid" id="grid"></div>';
+        const grid = document.getElementById('grid');
+        AppState.filteredMatches.forEach(match => {
+            // Cada item usa o card do PRÓPRIO esporte (a listagem "all" mistura esportes)
+            const itemSport = Utils.getItemSport(match);
+            const card = itemSport === 'motor'
+                ? MotorCardManager.create(match)
+                : itemSport === 'carnaval'
+                ? CarnavalCardManager.create(match)
+                : CardManager.create(match);
+            grid.appendChild(card);
+        });
 
         document.dispatchEvent(new CustomEvent('matchesRendered'));
     },
@@ -1009,14 +871,6 @@ const Renderer = {
         if (AppState.matches.length === 0) return;
         document.getElementById('stats').style.display = 'flex';
         
-        let pendingCount = 0, futureCount = 0;
-        
-        AppState.matches.forEach(match => {
-            const status = Utils.getMatchStatus(match);
-            if (status === 'pending') pendingCount++;
-            if (status === 'future') futureCount++;
-        });
-
         const totalGames = apiResponse?.pagination?.total_items || 
                           apiResponse?.total_registros || 
                           apiResponse?.total_records || 
@@ -1028,8 +882,6 @@ const Renderer = {
         
         document.getElementById('totalGames').textContent = totalGames;
         document.getElementById('totalFiles').textContent = totalFiles;
-        document.getElementById('totalSize').textContent = pendingCount;
-
         if (totalFileSize < 1099511627776) {
             document.getElementById('totalSize').textContent = (totalFileSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         } else {
@@ -1099,13 +951,6 @@ const ImageCarousel = {
                 <button class="carousel-btn carousel-btn-next" onclick="ImageCarousel.next('${carouselId}')">&#8250;</button>
                 <div class="carousel-counter"><span class="carousel-current">1</span> / ${images.length}</div>
             </div>`;
-    },
-
-    _getImages(carouselEl) {
-        const id = carouselEl.id;
-        if (this._carousels[id]) return this._carousels[id];
-        // fallback: re-derive from rendered src (only works for first image loaded)
-        return null;
     },
 
     init(carouselId, images) {

@@ -250,6 +250,18 @@
         </div>
     </div>
 
+    <!-- ── Modal de detalhes do jogo (mesmo componente das páginas públicas) ───── -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn close-btn" aria-label="Fechar" onclick="MatchModal.close()">×</button>
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <div id="modalScore" class="modal-score"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
     <div id="footer"></div>
 
     <script src="js/config.js"></script>
@@ -426,6 +438,7 @@ async function openOrder(id) {
     document.getElementById('adm-modal').classList.add('active');
     const res   = await admFetch(`${ADM_CFG.apiBase}/orders/${id}/admin`);
     const order = await res.json();
+    admCurrentOrder = order;
     document.getElementById('adm-modal-title').textContent = order.id;
     document.getElementById('modal-body').innerHTML = buildOrderDetail(order);
 
@@ -462,6 +475,46 @@ async function calcAndShowDefaultAmount(order) {
 }
 
 function closeModal() { document.getElementById('adm-modal').classList.remove('active'); }
+
+// ── Detalhes do jogo (por id) + dados coletados no pedido ─────────────────
+const ADM_SPORT_LABEL = { football: 'Futebol', multisport: 'Outros esportes', motor: 'Automobilismo', carnaval: 'Carnaval' };
+
+function buildRequestSection(order, item) {
+    const link = item.link;
+    const now  = new Date();
+    let linkText = 'Sem link';
+    if (link) {
+        const expired = link.expiresAt && new Date(link.expiresAt) < now;
+        linkText = link.disabled ? 'Pausado'
+                 : expired       ? 'Expirado'
+                 : link.expiresAt ? 'Ativo até ' + new Date(link.expiresAt).toLocaleString('pt-BR')
+                 : 'Ativo, sem expiração';
+    }
+    // Tudo isto veio do navegador do usuário: escapa antes de montar HTML.
+    const rows = [
+        { label: 'Pedido',                 value: esc(order.id) },
+        { label: 'ID solicitado',          value: esc(item.id) },
+        { label: '',                       value: esc(ADM_SPORT_LABEL[item.sport] || item.sport), noNewLine: true },
+        { label: 'Evento',                 value: esc(item.meta) },
+        { label: '',                       value: esc(item.label), noNewLine: true },
+        { label: 'Data',         value: esc(item.date) },
+        { label: 'Emissora',     value: esc(item.station) },
+        { label: 'Link entregue',          value: esc(linkText) },
+    ];
+    return `<div class="modal-division" style="margin-bottom:var(--sp-4)">${Elements.section('Dados coletados no pedido', Elements.setDetailList(rows))}</div>`;
+}
+
+function openItemDetails(idx) {
+    const item = admCurrentOrder?.items?.[idx];
+    if (!item?.id) { Utils.showNotification('Este item não tem ID de jogo.', 'warning'); return; }
+    const sport = Utils.VALID_SPORTS.includes(item.sport) ? item.sport : 'football';
+    MatchModal.fetchAndShow(item.id, sport, { requestHtml: buildRequestSection(admCurrentOrder, item) });
+}
+
+// Escape fecha o modal do pedido (o do jogo, quando aberto, fecha primeiro pelo próprio MatchModal)
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !e.defaultPrevented) closeModal();
+});
 document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
 
 // ── Render detalhe do pedido ───────────────────────────────────────────────
@@ -488,7 +541,7 @@ function buildOrderDetail(o) {
                 ${disabled ? '<span class="pill st-expired text-xs">OFF</span>' : ''}
                 <button type="button" class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
                     onclick="toggleItemLink('${o.id}',${idx},${!disabled})">
-                    ${disabled ? '▶ Ligar' : '⏸ Pausar'}
+                    ${disabled ? 'Ligar' : 'Pausar'}
                 </button>
                 <button type="button" class="action-btn btn-danger btn-xs" aria-label="Remover link" onclick="removeItemLink('${o.id}',${idx})">✕</button>
                </div>`
@@ -500,6 +553,7 @@ function buildOrderDetail(o) {
                 <div>
                     <div class="adm-item-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
                     <div class="adm-item-meta">${esc(item.meta||'')}${item.date?' · '+esc(item.date):''}</div>
+                    ${item.id ? `<button type="button" class="action-btn btn-ghost btn-xs mt-3" onclick="openItemDetails(${idx})">Ver detalhes do jogo</button>` : ''}
                 </div>
                 <div>
                     ${linkRow}
@@ -541,8 +595,8 @@ function buildOrderDetail(o) {
                 de ${total} link(s) ativo(s)
             </div>
             <div class="adm-bulk-actions">
-                <button type="button" class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">⏸ Desativar todos</button>
-                <button type="button" class="action-btn adm-btn-success" onclick="toggleActivatePanel()">▶ Ativar todos...</button>
+                <button type="button" class="action-btn adm-btn-warning" onclick="disableAllLinks('${o.id}')">Desativar todos</button>
+                <button type="button" class="action-btn adm-btn-success" onclick="toggleActivatePanel()">Ativar todos...</button>
             </div>
         </div>
         <div class="adm-expiry-inline" id="activate-panel">
@@ -723,6 +777,7 @@ function buildOrderDetail(o) {
 
 // ── Valor do pedido ───────────────────────────────────────────────────────
 let admAmountState = { saved: null, def: null };
+let admCurrentOrder = null;
 const brl = v => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
 const notify = (message, type = 'error') => Utils.showNotification(message, type);
 

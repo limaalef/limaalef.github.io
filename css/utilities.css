@@ -14,7 +14,6 @@
 .shrink-0 { flex-shrink: 0; }
 .w-full { width: 100%; }
 .w-inset-4 { width: calc(100% - (2 * var(--sp-4))); margin: 0 var(--sp-4) var(--sp-4) var(--sp-4); }
-.gap-0 { gap: 0; }
 
 /* Espaçamento */
 .mt-1px { margin-top: 2px; }

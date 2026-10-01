@@ -130,7 +130,6 @@ const SidebarManager = {
    Patch no Renderer para filtro por ano via API
    (não filtra localmente — dispara nova requisição)
 ───────────────────────────────────────── */
-const _origPopulateYearFilter = Renderer.populateYearFilter.bind(Renderer);
 Renderer.populateYearFilter = function () {
     const years = new Set();
     AppState.matches.forEach(match => {
@@ -344,15 +343,10 @@ const CollectionApp = {
         document.getElementById('nextPage').addEventListener('click',  () => PaginationManager.goToNext());
         document.getElementById('lastPage').addEventListener('click',  () => PaginationManager.goToLast());
 
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') MatchModal.close();
-        });
-
         document.addEventListener('keydown', (e) => {
             const modalOpen    = document.getElementById('modal').classList.contains('active');
             const searchFocused = document.activeElement === document.getElementById('searchInput');
 
-            if (e.key === 'Escape' && modalOpen) { MatchModal.close(); return; }
             if (e.key === 'f' && !modalOpen && !searchFocused) {
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
