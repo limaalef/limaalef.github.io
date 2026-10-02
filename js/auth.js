@@ -90,7 +90,9 @@ const Auth = (() => {
                             if (requireAdmin && !data.isAdmin) { fail(data.error || t('authDenied')); return; }
 
                             const p = decodeJwt(response.credential);
-                            const profile = { name: p.name || p.email, email: p.email, picture: p.picture || '' };
+                            // isAdmin vem do servidor e fica na sessão só para decidir o que MOSTRAR;
+                            // quem autoriza cada operação é sempre o servidor.
+                            const profile = { name: p.name || p.email, email: p.email, picture: p.picture || '', isAdmin: !!data.isAdmin };
                             session.save(data.token, profile);
                             onSuccess?.(profile, data);
                         } catch {
@@ -121,10 +123,16 @@ const Auth = (() => {
         return session;
     }
 
-    return {
-        decodeJwt,
-        create,
-        site:  create({ tokenKey: 'rq_token',  userKey: 'rq_user' }),
-        admin: create({ tokenKey: 'adm_token', userKey: 'adm_user', requireAdmin: true }),
-    };
+    const site  = create({ tokenKey: 'rq_token',  userKey: 'rq_user' });
+    const admin = create({ tokenKey: 'adm_token', userKey: 'adm_user', requireAdmin: true });
+
+    // Sessão com permissão de administrador, venha ela do login do admin ou do login do site
+    // (a resposta do servidor marca isAdmin). Retorna null se não houver.
+    function adminSession() {
+        if (admin.restore()) return admin;
+        if (site.restore() && site.user?.isAdmin) return site;
+        return null;
+    }
+
+    return { decodeJwt, create, site, admin, adminSession };
 })();

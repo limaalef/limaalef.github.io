@@ -1,0 +1,48 @@
+/* ============================================================
+   EDITOR DE JOGADORES — usado a partir de match.html por quem está
+   logado com permissão de administrador (js/match-editor.js)
+   ============================================================ */
+#edit-modal { z-index: var(--z-modal-editor); }
+/* O .modal já reserva o espaço da barra inferior; sem padding extra no conteúdo do editor */
+#edit-modal .modal-content { padding-bottom: 0; }
+.ed-content { display: flex; flex-direction: column; overflow: hidden; }
+.ed-subtitle { font-size: var(--font-size-sm); opacity: .9; margin-top: var(--sp-1); }
+.ed-toolbar { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-color); }
+.ed-toolbar input { flex: 1; min-width: 0; }
+.ed-count { font-size: var(--font-size-sm); color: var(--text-secondary); white-space: nowrap; }
+.ed-body { flex: 1; overflow-y: auto; padding: var(--sp-4) var(--sp-5); }
+.ed-section { margin-bottom: var(--sp-5); }
+.ed-section > summary { cursor: pointer; font-weight: 700; color: var(--accent-color); padding: var(--sp-2) 0; }
+.ed-section-count { font-weight: 400; color: var(--text-tertiary); margin-left: var(--sp-2); }
+.ed-row { display: grid; grid-template-columns: minmax(110px, 160px) 1fr; gap: var(--sp-4); padding: var(--sp-3) 0; border-top: 1px solid var(--border-color); }
+.ed-row[hidden] { display: none; }
+.ed-row-title { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary); }
+.ed-row-meta { display: block; font-weight: 400; color: var(--text-tertiary); }
+.ed-fields { display: grid; grid-template-columns: 1fr 2fr; gap: var(--sp-3); }
+.ed-field { flex: 1 1 180px; min-width: 0; }
+.ed-field label { display: block; }
+.ed-label { display: block; font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: 2px; }
+.ed-field input { width: 100%; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-md); padding: var(--sp-2) var(--sp-3); }
+.ed-field.ed-changed input { border-color: var(--warning-color); background: var(--bg-warning); }
+.ed-field.ed-invalid input { border-color: var(--error-color); background: var(--bg-error); }
+.ed-link { background: none; border: 0; padding: 0; margin: 2px var(--sp-3) 0 0; font: inherit; font-size: var(--font-size-xs); color: var(--accent-color); cursor: pointer; }
+.ed-error { font-size: var(--font-size-xs); color: var(--error-color); }
+.ed-footer { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap;
+    padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--border-color); background: var(--bg-secondary); }
+.ed-status { font-size: var(--font-size-sm); color: var(--text-secondary); flex: 1 1 200px; }
+.ed-status.ok { color: var(--success-color); }
+.ed-status.err { color: var(--error-color); }
+.ed-status.warn { color: var(--warning-color); }
+@media (max-width: 768px) { .ed-row { grid-template-columns: 1fr; gap: var(--sp-2); } }
+
+/* Campo de filtro e botões do rodapé (antes dependiam de classes do admin) */
+.ed-input { flex: 1; min-width: 0; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-md); padding: var(--sp-2) var(--sp-3); font: inherit; }
+.ed-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; flex-wrap: wrap; }
+
+/* Botão que abre o editor, nos títulos de seção de match.html */
+.ed-launch { margin-left: var(--sp-3); background: none; border: 1px solid var(--border-color); color: var(--accent-color);
+    border-radius: var(--border-radius-size-circle); padding: 1px var(--sp-3); font: inherit; font-size: var(--font-size-xs);
+    font-weight: 600; letter-spacing: 0; text-transform: none; cursor: pointer; }
+@media (hover: hover) { .ed-launch:hover { background: var(--bg-accent-color); } }
