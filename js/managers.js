@@ -517,7 +517,6 @@ const MatchModal = {
                 const items = apiResponse.data;
                 if (!items.length) throw new Error('Item não encontrado');
                 MatchModal.show({ ...items[0], sport });
-                MatchModal.loaded = { id, sport, data: items[0] };
             }
             if (options.requestHtml) body.insertAdjacentHTML('afterbegin', options.requestHtml);
         } catch (err) {
