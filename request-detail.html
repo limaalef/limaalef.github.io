@@ -77,6 +77,7 @@ const RD_CFG = {
 };
 
 // Estado de pagamento (preservado durante polling e entre sessões via KV)
+let _lastOrder = null;   // último pedido carregado (para re-render ao trocar de idioma)
 let _payState = {
     mpPaymentId:  null,
     pixCopyPaste: null,
@@ -90,6 +91,7 @@ let _payState = {
 
 
 function t(key) { return (LanguageManager ? LanguageManager.t(key) : null) || key; }
+function loc() { return (LanguageManager && LanguageManager.getLanguage) ? LanguageManager.getLanguage() : 'pt-BR'; }
 
 const orderId = new URLSearchParams(window.location.search).get('id');
 
@@ -124,6 +126,7 @@ async function loadOrder() {
         if (res.status === 404) { document.getElementById('rd-loading').textContent = t('requestOrderNotFound'); return; }
 
         const order = await res.json();
+        _lastOrder = order;
         document.getElementById('rd-loading').classList.add('is-hidden');
 
         const hdr = document.getElementById('header');
@@ -154,7 +157,7 @@ async function loadOrder() {
 // ── Render detalhe ─────────────────────────────────────────────────────────
 function buildOrderDetail(o) {
     const now   = new Date();
-    const dt    = new Date(o.createdAt).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
+    const dt    = new Date(o.createdAt).toLocaleString(loc(), { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
 
     // Progress bar (inclui passo "Pagamento" quando o pedido está pronto)
@@ -181,12 +184,12 @@ function buildOrderDetail(o) {
         </div>` : ``;
 
     // ── Seção de valores de pagamento ──────────────────────────────────────
-    const paymentValueHtml = (o.paymentAmount > 0 && o.platformFeePercent != null) ? (() => {
+    const mpValueHtml = (o.paymentAmount > 0 && o.platformFeePercent != null && !o.paymentExternal) ? (() => {
         const fee     = o.platformFeePercent / 100;
         const total   = parseFloat(o.paymentAmount);
         const taxaVal = total * fee;
         const netVal  = total - taxaVal;
-        const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const fmt = v => fmtMoney(v, 'BRL');
         return `
         <div class="rd-section-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</div>
         <div class="detail-list">
@@ -205,14 +208,43 @@ function buildOrderDetail(o) {
         </div>`;
     })() : ''
 
+    // Pagamento externo: mesmo resumo do Mercado Pago (valor, taxa e total), enquanto não pago
+    const paymentValueHtml = (o.paymentExternal && o.externalDueEffective && !o.externalPayment) ? (() => {
+        const due     = o.externalDueEffective;
+        const feePct  = o.externalFeePercent || 0;
+        const total   = parseFloat(due.amount);
+        const taxaVal = total * (feePct / 100);
+        const netVal  = total - taxaVal;
+        const fmt = v => fmtMoney(v, due.currency);
+        return `
+        <div class="rd-section-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</div>
+        <div class="detail-list">
+            ${feePct > 0 ? `
+            <div class="detail-list-item">
+                <span class="detail-list-label">${t('requestValue')}</span>
+                <span class="detail-list-value">${fmt(netVal)}</span>
+            </div>
+            <div class="detail-list-item">
+                <span class="detail-list-label">${t('requestFee')} (${feePct}%)</span>
+                <span class="detail-list-value text-secondary">${fmt(taxaVal)}</span>
+            </div>` : ''}
+            <div class="detail-list-item bg-primary-fill">
+                <span class="detail-list-label text-accent fw-700">${t('requestTotalValue')}</span>
+                <span class="detail-list-value text-accent fw-700">${fmt(total)}</span>
+            </div>
+        </div>`;
+    })() : mpValueHtml;
+
     // ── Seção de pagamento Pix ─────────────────────────────────────────────
     const paymentHtml = buildPaymentSection(o);
 
     // ── Cards de download ──────────────────────────────────────────────────
     // Trava os downloads se pagamento for obrigatório e não estiver pago
     const pay     = o.payment;
-    const payDone = pay?.status === 'approved' || o.status === 'completed' || o.paymentAccessGranted === true;
-    const payRequired = o.paymentAmount > 0 && !payDone;
+    const payDone = pay?.status === 'approved' || o.status === 'completed' || o.paymentAccessGranted === true
+        || !!o.externalPayment?.paidAt;
+    // Pagamento externo (PayPal) também exige pagamento, mesmo sem valor em R$
+    const payRequired = (o.paymentAmount > 0 || o.paymentExternal === true) && !payDone;
 
     const dlCardsHtml = items.map(item => {
         const link    = item.link;
@@ -223,13 +255,13 @@ function buildOrderDetail(o) {
 
         let expText = '', expCls = '';
         if (payRequired && !payDone) {
-            expText = '🔒 Aguardando confirmação do pagamento'; expCls = 'disabled';
+            expText = '🔒 ' + t('requestLockedAwaiting'); expCls = 'disabled';
         } else if (!link) {
             expText = t('requestLinkPending'); expCls = 'disabled';
         } else if (link.disabled) {
             expText = t('requestLinkDisabled'); expCls = 'disabled';
         } else if (link.expiresAt && new Date(link.expiresAt) < now) {
-            expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString('pt-BR');
+            expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString(loc());
             expCls  = 'expired';
         } else if (!link.expiresAt) {
             expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
@@ -249,7 +281,7 @@ function buildOrderDetail(o) {
             </div>
             ${o.status === 'cancelled' ? '' :
             (payRequired && !payDone)
-                ? `<div class="rd-locked-notice">⚠ Realize o pagamento acima para liberar este conteúdo.</div>`
+                ? `<div class="rd-locked-notice">⚠ ${t('requestLockedNotice')}</div>`
                 : link
                     ? `<div class="rd-dl-card-body">
                         <div class="rd-dl-status-row">
@@ -319,14 +351,76 @@ function buildOrderDetail(o) {
 }
 
 // ── Seção de pagamento Pix ─────────────────────────────────────────────────
+function fmtMoney(amount, currency) {
+    try {
+        return new Intl.NumberFormat(loc(), { style: 'currency', currency }).format(amount);
+    } catch (e) {
+        return `${esc(currency)} ${Number(amount).toFixed(2)}`;
+    }
+}
+
+// Pagamento externo (PayPal): registrado manualmente pelo admin
+function buildExternalPaymentSection(o) {
+    const ep = o.externalPayment;
+    if (ep) {
+        return `
+        <div class="rd-section">
+            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
+            <div class="detail-list">
+                <div class="detail-list-item">
+                    <span class="detail-list-label">${t('requestStatusLabel')}</span>
+                    <span class="detail-list-value text-success">${t('requestPaymentApproved')}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">${t('requestPaymentMethod')}</span>
+                    <span class="detail-list-value">${t('requestPaymentMethodPayPal')}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">${t('requestValue')}</span>
+                    <span class="detail-list-value">${fmtMoney(ep.amount, ep.currency)}</span>
+                </div>
+                <div class="detail-list-item">
+                    <span class="detail-list-label">${t('requestPaidAt')}</span>
+                    <span class="detail-list-value">${new Date(ep.paidAt).toLocaleString(loc())}</span>
+                </div>
+                ${ep.reference ? `
+                <div class="detail-list-item">
+                    <span class="detail-list-label">ID</span>
+                    <span class="detail-list-value">${esc(ep.reference)}</span>
+                </div>` : ''}
+            </div>
+        </div>`;
+    }
+    if (o.paymentAccessGranted === true) return '';
+    return `
+    <div class="rd-section">
+        <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
+        <div class="rd-pay-card pay-required">
+            <div class="rd-pay-head">
+                <div>
+                    <div class="rd-pay-title">${t('requestPaymentExternalTitle')}</div>
+                    <div class="rd-pay-sub">${t('requestPaymentExternalDesc')}</div>
+                </div>
+            </div>
+            ${o.externalDueEffective ? `
+            <div class="rd-pay-body">
+                <div class="detail-list-item">
+                    <span class="detail-list-label">${t('requestAmountDue')}</span>
+                    <span class="detail-list-value fw-700 text-accent">${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</span>
+                </div>
+            </div>` : ''}
+        </div>
+    </div>`;
+}
+
 function buildPaymentSection(o) {
+    if (o.externalPayment || o.paymentExternal === true) return buildExternalPaymentSection(o);
     // Só exibe se o pedido estiver "ready" e tiver valor configurado
     if (!o.paymentAmount || o.paymentAmount <= 0) return '';
     // Acesso liberado manualmente pelo admin — não exibe seção de pagamento
     if (o.paymentAccessGranted === true) return '';
 
     const pay    = o.payment;
-    const amount = 'R$ ' + parseFloat(o.paymentAmount).toLocaleString('pt-BR', { minimumFractionDigits:2 });
 
     // Pago / pedido concluído
     if (pay?.status === 'approved' || o.status === 'completed') {
@@ -336,8 +430,8 @@ function buildPaymentSection(o) {
             <div class="detail-list">
                 <div class="detail-list">
                     <div class="detail-list-item">
-                        <span class="detail-list-label">Status</span>
-                        <span class="detail-list-value text-success">Aprovado</span>
+                        <span class="detail-list-label">${t('requestStatusLabel')}</span>
+                        <span class="detail-list-value text-success">${t('requestPaymentApproved')}</span>
                     </div>
                     ${pay?.mpPaymentId ? `
                     <div class="detail-list-item">
@@ -346,8 +440,8 @@ function buildPaymentSection(o) {
                     </div>` : ''}
                     ${pay?.paidAt ? `
                     <div class="detail-list-item">
-                        <span class="detail-list-label">Pago em</span>
-                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString('pt-BR')}</span>
+                        <span class="detail-list-label">${t('requestPaidAt')}</span>
+                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString(loc())}</span>
                     </div>` : ''}
                 </div>
             </div>
@@ -363,8 +457,8 @@ function buildPaymentSection(o) {
                 <div class="rd-pay-head bg-error-fill">
                     <span class="rd-pay-icon">❌</span>
                     <div>
-                        <div class="rd-pay-title">Pagamento cancelado</div>
-                        <div class="rd-pay-sub">O tempo para pagamento expirou. Entre em contato para reativar.</div>
+                        <div class="rd-pay-title">${t('requestPaymentCancelled')}</div>
+                        <div class="rd-pay-sub">${t('requestPaymentCancelledDesc')}</div>
                     </div>
                 </div>
             </div>
@@ -380,8 +474,8 @@ function buildPaymentSection(o) {
         <div class="rd-pay-card ${hasPendingQr ? 'pay-pending' : 'pay-required'}" id="rd-pay-card">
             <div class="rd-pay-head">
                 <div>
-                    <div class="rd-pay-title">${hasPendingQr ? 'Aguardando pagamento' : 'Pagamento necessário'}</div>
-                    <div class="rd-pay-sub">${hasPendingQr ? 'Escaneie o QR Code ou copie o código Pix' : 'Realize o pagamento via Pix para receber os conteúdos'}</div>
+                    <div class="rd-pay-title">${hasPendingQr ? t('requestPaymentWaiting') : t('requestPaymentRequired')}</div>
+                    <div class="rd-pay-sub">${hasPendingQr ? t('requestPaymentScanQr') : t('requestPaymentViaPix')}</div>
                 </div>
             </div>
             <div class="rd-pay-body" id="rd-pay-body">
@@ -409,7 +503,7 @@ function renderCpfStep() {
     </div>
     <button class="action-btn btn-primary w-inset-4"
         onclick="submitCpf()">
-        Gerar QR Code Pix →
+        ${t('requestGenerateQr')}
     </button>`;
 }
 
@@ -419,20 +513,20 @@ function renderQrStep() {
     <div class="rd-qr-wrap">
         ${ps.pixQrBase64
             ? `<img class="rd-qr-img" src="data:image/png;base64,${ps.pixQrBase64}" alt="QR Code Pix">`
-            : `<div class="rd-qr-img d-flex items-center justify-center text-tertiary">QR Code indisponível</div>`
+            : `<div class="rd-qr-img d-flex items-center justify-center text-tertiary">${t('requestQrUnavailable')}</div>`
         }
         <div class="rd-qr-copy-wrap">
             ${ps.pixCopyPaste ? `
             <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
             <button class="action-btn btn-ghost w-full justify-center"
                 onclick="copyCodigo()">
-                Pix copia e cola
+                ${t('requestPixCopyPaste')}
             </button>` : ''}
         </div>
-        <div class="rd-qr-timer" id="rd-qr-timer">⏱ Válido por <span id="rd-countdown">—</span></div>
+        <div class="rd-qr-timer" id="rd-qr-timer">⏱ ${t('requestValidFor')} <span id="rd-countdown">—</span></div>
         <div class="rd-poll-status">
             <div class="rd-poll-dot"></div>
-            Verificando pagamento automaticamente...
+            ${t('requestCheckingPayment')}
         </div>
     </div>`;
 }
@@ -473,7 +567,7 @@ async function submitCpf() {
     errEl.classList.add('is-hidden');
 
     const body = document.getElementById('rd-pay-body');
-    body.innerHTML = `<div class="text-center p-5"><div class="rd-spinner"></div><div class="mt-3 text-secondary text-sm">Gerando Pix...</div></div>`;
+    body.innerHTML = `<div class="text-center p-5"><div class="rd-spinner"></div><div class="mt-3 text-secondary text-sm">${t('requestGeneratingPix')}</div></div>`;
 
     try {
         const res  = await session.fetch(`${RD_CFG.paymentsBase}/payments/create`, {
@@ -486,7 +580,7 @@ async function submitCpf() {
         if (!res.ok) {
             body.innerHTML = `
                 <div class="text-error mb-4">
-                    ⚠ ${esc(data.error || 'Erro ao gerar pagamento')}
+                    ⚠ ${esc(data.error || t('requestPaymentError'))}
                 </div>
                 ${renderCpfStep()}`;
             return;
@@ -514,8 +608,8 @@ function copyCodigo() {
     if (!code) return;
     navigator.clipboard.writeText(code).then(() => {
         const btn = event.target;
-        btn.textContent = 'Copiado!';
-        setTimeout(() => { btn.textContent = '📋 Copiar código Pix'; }, 2000);
+        btn.textContent = t('requestCopied');
+        setTimeout(() => { btn.textContent = t('requestPixCopyPaste'); }, 2000);
     });
 }
 
@@ -529,7 +623,7 @@ function startCountdown(expiresAt) {
         if (!el) { clearInterval(_payState.countdownTimer); return; }
         const ms  = new Date(expiresAt) - Date.now();
         if (ms <= 0) {
-            el.textContent = 'expirado';
+            el.textContent = t('requestCountdownExpired');
             clearInterval(_payState.countdownTimer);
             return;
         }
@@ -576,6 +670,15 @@ function startPolling(mpPaymentId) {
     _payState.pollingTimer = setInterval(poll, 5000);
     poll(); // imediato
 }
+
+// Re-renderiza ao trocar de idioma
+document.addEventListener('languagechange', () => {
+    if (!_lastOrder) return;
+    const detail = buildOrderDetail(_lastOrder);
+    document.getElementById('rd-order-body').innerHTML   = detail.body;
+    document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
+    if (_payState.expiresAt && _payState.mpPaymentId) startCountdown(_payState.expiresAt);
+});
 
 // ── Utils ──────────────────────────────────────────────────────────────────
 function statusPtBR(s) {

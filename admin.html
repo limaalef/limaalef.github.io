@@ -81,7 +81,7 @@
                     <button type="button" class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
                         <span class="adm-nav-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
-                        </span> Mercado Pago
+                        </span> Pagamentos
                     </button>
 
                     <div class="adm-nav-divider"></div>
@@ -220,6 +220,62 @@
                         </div>
                     </div>
                     
+                    <!-- Pagamento externo (PayPal): mesmo modelo do Mercado Pago -->
+                    <div class="two-columns">
+                        <div class="mp-settings-card">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Pagamento externo (PayPal) — valor e taxa</div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Moeda</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-amount-input" id="ext-currency-setting" list="ext-currencies" maxlength="3"
+                                            placeholder="USD" autocomplete="off" style="text-transform:uppercase"
+                                            oninput="recalcExtTotal()">
+                                        <datalist id="ext-currencies">
+                                            <option value="USD"><option value="EUR"><option value="GBP">
+                                            <option value="CAD"><option value="AUD"><option value="BRL">
+                                        </datalist>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Valor base</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <span class="adm-amount-prefix" id="ext-base-prefix">USD</span>
+                                            <input class="adm-amount-input" id="ext-base-amount"
+                                                type="number" min="0" step="0.01" placeholder="0,00"
+                                                oninput="recalcExtTotal()">
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Taxa de processamento (%)</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <input class="adm-amount-input" id="ext-fee-percent"
+                                                type="number" min="0" max="99" step="0.01" placeholder="0,00"
+                                                oninput="recalcExtTotal()">
+                                            <span class="adm-amount-prefix">%</span>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item mp-total-preview">
+                                    <span class="detail-list-label mp-total-label">Valor total</span>
+                                    <span class="detail-list-value mp-total-value" id="ext-total-preview"></span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <span id="ext-save-msg" class="is-hidden"></span>
+                                <button class="action-btn btn-ghost" onclick="loadExternalSettings()">↺ Recarregar</button>
+                                <button class="action-btn btn-primary" onclick="saveExternalSettings()">Salvar configurações</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="adm-nav-divider"></div>
 
                     <!-- Health do worker -->
@@ -304,6 +360,7 @@ function switchPanel(name) {
 
     if (name === 'mp-settings') {
         loadMpSettings();
+        loadExternalSettings();
         checkHealth();
     }
 }
@@ -406,7 +463,13 @@ function renderTable() {
         // Pagamento
         const pay = o.payment;
         let payCell = `<span class="text-tertiary">—</span>`;
-        if (pay) {
+        if (o.externalPayment) {
+            payCell = `<span class="pill st-paid" title="PayPal">Pago · Ext.</span>`;
+        } else if (o.paymentExternal) {
+            payCell = o.paymentAccessGranted
+                ? `<span class="pill st-paid">Liberado</span>`
+                : `<span class="pill st-unpaid" title="PayPal">Ext. pendente</span>`;
+        } else if (pay) {
             const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
             payCell = `<span class="pill ${cls}">${lbl}</span>`;
@@ -456,6 +519,7 @@ async function openOrder(id) {
 
     // Calcula e exibe o valor padrão (base × itens) na linha informativa
     calcAndShowDefaultAmount(order);
+    calcAndShowExtDefault(order);
 }
 
 async function calcAndShowDefaultAmount(order) {
@@ -631,7 +695,17 @@ function buildOrderDetail(o) {
     const payLabels = { approved: 'Pago', pending: 'Aguardando pagamento', cancelled: 'Cancelado' };
     const payCls    = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' };
 
-    const granted = !!o.paymentAccessGranted;
+    const granted  = !!o.paymentAccessGranted;
+    const external = !!o.paymentExternal;
+    const ep       = o.externalPayment || null;
+    const due      = o.externalDueEffective || null;   // valor aplicado (personalizado ou padrão) — pré-preenche o registro
+    const dueSaved = o.externalDue || null;            // valor personalizado salvo
+    admExtState = { saved: dueSaved ? dueSaved.amount : null, def: null, currency: dueSaved?.currency || due?.currency || 'USD' };
+    const toLocalInput = iso => {
+        const d = iso ? new Date(iso) : new Date();
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        return d.toISOString().slice(0, 16);
+    };
     admAmountState = { saved: (o.paymentAmount ?? null) === '' ? null : (o.paymentAmount ?? null), def: null };
 
     const paymentHtml = `
@@ -659,11 +733,126 @@ function buildOrderDetail(o) {
                     </div>
                 </div>
 
+                <div class="detail-list mb-4">
+                    <div class="detail-list-item">
+                        <span class="detail-list-label">Pagamento externo (PayPal)</span>
+                        <span class="detail-list-value">
+                            <span class="adm-toggle-label">
+                                <span class="text-sm text-secondary" id="external-label-${o.id}">
+                                    ${external ? 'Ativo' : 'Desativado'}
+                                </span>
+                                <button type="button" role="switch" aria-checked="${external}" aria-label="Pagamento externo"
+                                    class="adm-toggle ${external ? 'on' : ''}"
+                                    id="external-toggle-${o.id}"
+                                    onclick="toggleExternal('${o.id}', this)"
+                                    title="O pagamento é feito fora da integração (PayPal) e registrado manualmente">
+                                    <span class="adm-toggle-knob"></span>
+                                </button>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div id="ext-block-${o.id}" class="${external ? '' : 'is-hidden'}">
+                    <div class="detail-list mb-4">
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Valor aplicado</span>
+                            <span class="detail-list-value">
+                                <span class="adm-amount-status" id="ext-applied-${o.id}"></span>
+                            </span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">
+                                Valor padrão (base × ${(o.items||[]).length} ${(o.items||[]).length === 1 ? 'item' : 'itens'})
+                            </span>
+                            <span class="detail-list-value" id="ext-default-val-${o.id}">calculando...</span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Valor personalizado</span>
+                            <span class="detail-list-value">
+                                <div class="adm-amount-wrap">
+                                    <span class="adm-amount-prefix" id="ext-cur-prefix">${esc(admExtState.currency)}</span>
+                                    <input class="adm-amount-input" id="ext-due-amount" type="number" min="0" step="0.01"
+                                        inputmode="decimal" placeholder="padrão" value="${dueSaved ? esc(String(dueSaved.amount)) : ''}"
+                                        oninput="renderExtApplied('${o.id}')"
+                                        title="Deixe vazio e salve para voltar ao valor padrão (base × itens)">
+                                </div>
+                            </span>
+                        </div>
+                        <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
+                            <span class="detail-list-label">
+                                <span class="adm-amount-msg" id="ext-due-msg-${o.id}" role="status" aria-live="polite"></span>
+                            </span>
+                            <span class="detail-list-value adm-row-actions">
+                                <button type="button" class="action-btn btn-primary btn-xs"
+                                    onclick="saveExternalDue('${o.id}', this)">Salvar valor</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="section-title modal-style">Pagamento externo (PayPal)</div>
+                    <div class="detail-list mb-4">
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Status</span>
+                            <span class="detail-list-value">
+                                ${ep ? `<span class="pill st-paid">Pago</span>` : `<span class="pill st-unpaid">Aguardando registro</span>`}
+                            </span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Moeda</span>
+                            <span class="detail-list-value">
+                                <input class="adm-amount-input" id="ext-currency" list="ext-currencies" maxlength="3"
+                                    placeholder="USD" value="${esc(ep?.currency || due?.currency || '')}" autocomplete="off"
+                                    style="text-transform:uppercase">
+                            </span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Valor recebido</span>
+                            <span class="detail-list-value">
+                                <input class="adm-amount-input" id="ext-amount" type="number" min="0" step="0.01"
+                                    inputmode="decimal" placeholder="0,00" value="${ep ? esc(String(ep.amount)) : (due ? esc(String(due.amount)) : '')}">
+                            </span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">Data e hora do pagamento</span>
+                            <span class="detail-list-value">
+                                <input class="adm-amount-input" id="ext-paid-at" type="datetime-local"
+                                    style="width:auto" value="${toLocalInput(ep?.paidAt)}">
+                            </span>
+                        </div>
+                        <div class="detail-list-item">
+                            <span class="detail-list-label">ID da transação (opcional)</span>
+                            <span class="detail-list-value">
+                                <input class="adm-amount-input" id="ext-ref" type="text" maxlength="100"
+                                    style="width:180px" value="${esc(ep?.reference || '')}">
+                            </span>
+                        </div>
+                        ${ep ? `
+                        <div class="detail-list-item">
+                            <span class="detail-list-label text-tertiary">Registrado em</span>
+                            <span class="detail-list-value text-xs text-secondary">
+                                ${new Date(ep.recordedAt).toLocaleString('pt-BR')}${ep.recordedBy ? ' · ' + esc(ep.recordedBy) : ''}
+                            </span>
+                        </div>` : ''}
+                        <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
+                            <span class="detail-list-label">
+                                <span class="adm-amount-msg" id="ext-msg-${o.id}" role="status" aria-live="polite"></span>
+                            </span>
+                            <span class="detail-list-value adm-row-actions">
+                                ${ep ? `<button type="button" class="action-btn btn-danger btn-xs"
+                                    onclick="clearExternalPayment('${o.id}', this)">Remover registro</button>` : ''}
+                                <button type="button" class="action-btn btn-primary btn-xs"
+                                    onclick="saveExternalPayment('${o.id}', this)">${ep ? 'Atualizar pagamento' : 'Registrar pagamento'}</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="order-access-note-${o.id}" class="adm-access-note ${granted ? '' : 'is-hidden'}">
                     Acesso liberado sem cobrança: nenhum valor será exigido neste pedido.
                 </div>
 
-                <div id="order-amount-block-${o.id}" class="${granted ? 'is-hidden' : ''}">
+                <div id="order-amount-block-${o.id}" class="${(granted || external) ? 'is-hidden' : ''}">
                     <div class="detail-list mb-4">
                         <div class="detail-list-item">
                             <span class="detail-list-label">Valor aplicado</span>
@@ -1041,7 +1230,8 @@ function applyAccessGrantUI(orderId, toggleEl, granted) {
     const labelEl = document.getElementById(`access-grant-label-${orderId}`);
     if (labelEl) labelEl.textContent = granted ? 'Liberado' : 'Requer pagamento';
     // Liberado: nenhuma informação de valor faz sentido, então some.
-    document.getElementById(`order-amount-block-${orderId}`)?.classList.toggle('is-hidden', granted);
+    const ext = document.getElementById(`external-toggle-${orderId}`)?.classList.contains('on');
+    document.getElementById(`order-amount-block-${orderId}`)?.classList.toggle('is-hidden', granted || !!ext);
     document.getElementById(`order-access-note-${orderId}`)?.classList.toggle('is-hidden', !granted);
 }
 
@@ -1070,6 +1260,258 @@ async function toggleAccessGrant(orderId, toggleEl) {
         notify('Falha de conexão: ' + e.message);
     } finally {
         toggleEl.disabled = false;
+    }
+}
+
+// ── Pagamento externo (PayPal) ────────────────────────────────────────────
+function extMsg(orderId, text, kind = '') {
+    const el = document.getElementById(`ext-msg-${orderId}`);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'adm-amount-msg' + (kind ? ' ' + kind : '');
+}
+
+function applyExternalUI(orderId, toggleEl, on) {
+    toggleEl.classList.toggle('on', on);
+    toggleEl.setAttribute('aria-checked', String(on));
+    const labelEl = document.getElementById(`external-label-${orderId}`);
+    if (labelEl) labelEl.textContent = on ? 'Ativo' : 'Desativado';
+    document.getElementById(`ext-block-${orderId}`)?.classList.toggle('is-hidden', !on);
+    const granted = document.getElementById(`access-grant-toggle-${orderId}`)?.classList.contains('on');
+    document.getElementById(`order-amount-block-${orderId}`)?.classList.toggle('is-hidden', on || !!granted);
+}
+
+async function putOrder(orderId, body) {
+    const res = await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    const d = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data: d };
+}
+
+async function toggleExternal(orderId, toggleEl) {
+    const wasOn  = toggleEl.classList.contains('on');
+    const newVal = !wasOn;
+    applyExternalUI(orderId, toggleEl, newVal);
+    toggleEl.disabled = true;
+    try {
+        const r = await putOrder(orderId, { paymentExternal: newVal });
+        if (!r.ok) {
+            applyExternalUI(orderId, toggleEl, wasOn);
+            notify('Erro ao salvar: ' + (r.data.error || `HTTP ${r.status}`));
+        } else {
+            notify(newVal ? 'Pagamento externo ativado.' : 'Pagamento externo desativado.', 'success');
+            loadOrders();
+        }
+    } catch (e) {
+        applyExternalUI(orderId, toggleEl, wasOn);
+        notify('Falha de conexão: ' + e.message);
+    } finally {
+        toggleEl.disabled = false;
+    }
+}
+
+// ── Valor do pagamento externo (mesmo modelo do Mercado Pago) ─────────────
+let admExtState = { saved: null, def: null, currency: 'USD' };
+const extMoney = (v, cur) => {
+    try { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: cur }).format(v); }
+    catch { return `${cur} ${Number(v).toFixed(2)}`; }
+};
+
+function extDueMsg(orderId, text, kind = '') {
+    const el = document.getElementById(`ext-due-msg-${orderId}`);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'adm-amount-msg' + (kind ? ' ' + kind : '');
+}
+
+async function calcAndShowExtDefault(order) {
+    const el = document.getElementById(`ext-default-val-${order.id}`);
+    if (!el) return;
+    try {
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/external-settings`);
+        const data = await res.json();
+        const base = parseFloat(data.base_amount) || 0;
+        const fee  = parseFloat(data.fee_percent)  || 0;
+        const cur  = data.currency || 'USD';
+        if (!order.externalDue) {
+            admExtState.currency = cur;
+            const pre = document.getElementById('ext-cur-prefix');
+            if (pre) pre.textContent = cur;
+        }
+        const itemCount = (order.items || []).length || 1;
+        if (base <= 0) { el.textContent = 'não configurado'; admExtState.def = null; renderExtApplied(order.id); return; }
+        const baseTotal = base * itemCount;
+        const r = fee / 100;
+        const total = Math.round((r >= 1 ? baseTotal : baseTotal / (1 - r)) * 100) / 100;
+        admExtState.def = total;
+        el.textContent = extMoney(total, cur);
+
+        // Preenche o campo com o valor padrão se o pedido ainda não tem valor salvo
+        if (!order.externalDue) {
+            const input = document.getElementById('ext-due-amount');
+            if (input) input.value = total.toFixed(2);
+        }
+        renderExtApplied(order.id);
+    } catch {
+        el.textContent = '—';
+        renderExtApplied(order.id);
+    }
+}
+
+function renderExtApplied(orderId) {
+    const el = document.getElementById(`ext-applied-${orderId}`);
+    if (!el) return;
+    const { saved, def, currency } = admExtState;
+    const input = document.getElementById('ext-due-amount');
+    const typed = input && input.value !== '' ? parseFloat(input.value) : null;
+    const effective = saved ?? def;
+    let pill, hint = '';
+
+    if (typed !== null && !isNaN(typed) && (effective === null || typed.toFixed(2) !== Number(effective).toFixed(2))) {
+        pill = `<span class="pill st-unpaid">Alteração não salva · ${extMoney(typed, currency)}</span>`;
+    } else if (saved !== null) {
+        pill = `<span class="pill st-ready">Salvo · ${extMoney(saved, currency)}</span>`;
+        hint = 'Valor personalizado';
+    } else if (def !== null && def > 0) {
+        pill = `<span class="pill">Padrão · ${extMoney(def, currency)}</span>`;
+        hint = 'Nenhum valor personalizado salvo';
+    } else {
+        pill = `<span class="pill st-pay-cancelled">Nenhum valor definido</span>`;
+        hint = 'Configure o valor base em Pagamentos';
+    }
+    el.innerHTML = pill + (hint ? `<span class="text-xs text-tertiary">${hint}</span>` : '');
+}
+
+async function saveExternalDue(orderId, btn) {
+    const raw = (document.getElementById('ext-due-amount')?.value || '').trim();
+    extDueMsg(orderId, '');
+    let payload = null;                       // vazio = volta ao valor padrão
+    if (raw !== '') {
+        const amount = parseFloat(raw);
+        if (isNaN(amount) || amount <= 0) return extDueMsg(orderId, 'Informe um valor maior que zero.', 'err');
+        payload = { amount, currency: admExtState.currency };
+    }
+    btn.disabled = true;
+    try {
+        const r = await putOrder(orderId, { externalDue: payload });
+        if (r.ok) {
+            notify(payload ? `Valor salvo: ${extMoney(payload.amount, payload.currency)}` : 'Voltou ao valor padrão.', 'success');
+            openOrder(orderId);
+            loadOrders();
+        } else {
+            extDueMsg(orderId, r.data.error || `Não foi possível salvar (HTTP ${r.status}).`, 'err');
+        }
+    } catch (e) {
+        extDueMsg(orderId, 'Falha de conexão: ' + e.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ── Configurações do pagamento externo (valor base, taxa, moeda) ──────────
+function recalcExtTotal() {
+    const base = parseFloat(document.getElementById('ext-base-amount')?.value) || 0;
+    const fee  = parseFloat(document.getElementById('ext-fee-percent')?.value) || 0;
+    const cur  = (document.getElementById('ext-currency-setting')?.value || '').trim().toUpperCase() || 'USD';
+    const pre  = document.getElementById('ext-base-prefix');
+    if (pre) pre.textContent = cur;
+    const el = document.getElementById('ext-total-preview');
+    if (!el) return;
+    if (base <= 0) { el.textContent = '—'; return; }
+    const r = fee / 100;
+    el.textContent = extMoney(r >= 1 ? base : base / (1 - r), /^[A-Z]{3}$/.test(cur) ? cur : 'USD');
+}
+
+async function loadExternalSettings() {
+    try {
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/external-settings`);
+        const data = await res.json();
+        document.getElementById('ext-base-amount').value      = data.base_amount || '';
+        document.getElementById('ext-fee-percent').value      = data.fee_percent || '';
+        document.getElementById('ext-currency-setting').value = data.currency || 'USD';
+        recalcExtTotal();
+    } catch (e) {
+        console.error('[loadExternalSettings]', e);
+    }
+}
+
+async function saveExternalSettings() {
+    const ba  = document.getElementById('ext-base-amount').value;
+    const fp  = document.getElementById('ext-fee-percent').value;
+    const cur = document.getElementById('ext-currency-setting').value.trim().toUpperCase();
+    const body = {};
+    if (ba !== '')  body.base_amount = parseFloat(ba);
+    if (fp !== '')  body.fee_percent = parseFloat(fp);
+    if (cur !== '') body.currency    = cur;
+
+    const msg = document.getElementById('ext-save-msg');
+    try {
+        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/external-settings`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        msg.classList.remove('is-hidden');
+        if (res.ok && data.success) {
+            msg.innerHTML = `<span class="pill st-ready">Salvo. Valor total: ${extMoney(data.total_amount || 0, data.currency)}</span>`;
+            loadExternalSettings();
+        } else {
+            msg.innerHTML = `<span class="pill st-cancelled">⚠ Erro: ${esc(data.error || 'desconhecido')}</span>`;
+        }
+    } catch (e) {
+        msg.classList.remove('is-hidden');
+        msg.innerHTML = `<span class="pill st-cancelled">⚠ ${esc(e.message)}</span>`;
+    }
+}
+
+async function saveExternalPayment(orderId, btn) {
+    const amount   = parseFloat(document.getElementById('ext-amount')?.value);
+    const currency = (document.getElementById('ext-currency')?.value || '').trim().toUpperCase();
+    const paidRaw  = document.getElementById('ext-paid-at')?.value;
+    const ref      = (document.getElementById('ext-ref')?.value || '').trim();
+    extMsg(orderId, '');
+    if (isNaN(amount) || amount <= 0)      return extMsg(orderId, 'Informe um valor maior que zero.', 'err');
+    if (!/^[A-Z]{3}$/.test(currency))      return extMsg(orderId, 'Informe a moeda (ex.: USD).', 'err');
+    if (!paidRaw)                          return extMsg(orderId, 'Informe a data e hora do pagamento.', 'err');
+
+    const paidAt = new Date(paidRaw);       // datetime-local é interpretado no fuso do navegador
+    btn.disabled = true;
+    try {
+        const r = await putOrder(orderId, { externalPayment: { amount, currency, paidAt: paidAt.toISOString(), reference: ref } });
+        if (r.ok) {
+            notify('Pagamento externo registrado.', 'success');
+            openOrder(orderId);
+            loadOrders();
+        } else {
+            extMsg(orderId, r.data.error || `Não foi possível salvar (HTTP ${r.status}).`, 'err');
+        }
+    } catch (e) {
+        extMsg(orderId, 'Falha de conexão: ' + e.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function clearExternalPayment(orderId, btn) {
+    if (!confirm('Remover o registro de pagamento externo deste pedido?\nO pedido voltará a exigir pagamento.')) return;
+    btn.disabled = true;
+    try {
+        const r = await putOrder(orderId, { externalPayment: null });
+        if (r.ok) {
+            notify('Registro removido.', 'success');
+            openOrder(orderId);
+            loadOrders();
+        } else {
+            btn.disabled = false;
+            notify('Erro: ' + (r.data.error || `HTTP ${r.status}`));
+        }
+    } catch (e) {
+        btn.disabled = false;
+        notify('Falha de conexão: ' + e.message);
     }
 }
 
