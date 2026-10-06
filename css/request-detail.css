@@ -94,3 +94,11 @@
     padding: var(--sp-4) var(--sp-5); background: var(--bg-warning);
     border-top: 1px solid var(--border-color); font-size: var(--font-size-sm);
     color: var(--text-warning); }
+
+/* PayPal — botão de checkout por redirecionamento */
+.rd-pp-wrap { display:flex; flex-direction:column; gap:var(--sp-3);
+    padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-color); background:var(--bg-primary); }
+.rd-pp-btn  { width:100%; justify-content:center; }
+.rd-pp-btn:disabled { opacity:.6; cursor:default; }
+.rd-pp-hint { font-size:var(--font-size-xs); color:var(--text-tertiary); text-align:center; }
+.rd-pp-err  { font-size:var(--font-size-sm); color:var(--error-color); }

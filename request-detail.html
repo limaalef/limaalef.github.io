@@ -106,6 +106,7 @@ async function showContent() {
     document.getElementById('rd-auth').classList.add('is-hidden');
     document.getElementById('rd-content').classList.remove('is-hidden');
     if (!orderId) { document.getElementById('rd-loading').textContent = t('requestNoOrderId'); return; }
+    await handlePaypalReturn();   // volta do PayPal: captura antes de carregar o pedido
     await loadOrder();
     // Inicia polling e countdown uma única vez, após o primeiro carregamento
     if (_payState.mpPaymentId) {
@@ -399,7 +400,7 @@ function buildExternalPaymentSection(o) {
             <div class="rd-pay-head">
                 <div>
                     <div class="rd-pay-title">${t('requestPaymentExternalTitle')}</div>
-                    <div class="rd-pay-sub">${t('requestPaymentExternalDesc')}</div>
+                    <div class="rd-pay-sub">${o.paypalEnabled ? t('requestPaymentViaPayPal') : t('requestPaymentExternalDesc')}</div>
                 </div>
             </div>
             ${o.externalDueEffective ? `
@@ -409,7 +410,22 @@ function buildExternalPaymentSection(o) {
                     <span class="detail-list-value fw-700 text-accent">${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</span>
                 </div>
             </div>` : ''}
+            ${buildPaypalAction(o)}
         </div>
+    </div>`;
+}
+
+// Botão "Pagar com PayPal" (só quando o Worker tem credenciais; senão mantém o fluxo manual)
+function buildPaypalAction(o) {
+    if (!o.paypalEnabled) return '';
+    if (o.status !== 'ready') {
+        return `<div class="rd-pp-wrap"><div class="rd-pp-hint">${t('requestPaypalWhenReady')}</div></div>`;
+    }
+    return `
+    <div class="rd-pp-wrap">
+        <div class="rd-pp-err is-hidden" id="rd-pp-err"></div>
+        <button class="action-btn btn-primary rd-pp-btn" id="rd-pp-btn" onclick="startPaypal()">${t('requestPayWithPayPal')}</button>
+        <div class="rd-pp-hint">${t('requestPaypalRedirectHint')}</div>
     </div>`;
 }
 
@@ -637,6 +653,62 @@ function startCountdown(expiresAt) {
     tick();
     _payState.countdownTimer = setInterval(tick, 1000);
 }
+
+// ── PayPal: redirecionamento e retorno ─────────────────────────────────────
+async function startPaypal() {
+    const btn   = document.getElementById('rd-pp-btn');
+    const errEl = document.getElementById('rd-pp-err');
+    if (!btn || btn.disabled) return;
+    errEl.classList.add('is-hidden');
+    btn.disabled    = true;
+    btn.textContent = t('requestPaypalRedirecting');
+    try {
+        const res  = await session.fetch(`${RD_CFG.paymentsBase}/paypal/create`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ orderId }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.approveUrl) throw new Error(data.error || t('requestPaypalError'));
+        window.location.href = data.approveUrl;
+    } catch (e) {
+        errEl.textContent = '⚠ ' + e.message;
+        errEl.classList.remove('is-hidden');
+        btn.disabled    = false;
+        btn.textContent = t('requestPayWithPayPal');
+    }
+}
+
+// O PayPal volta em ?id=..&paypal=return&token=<ordem> (ou paypal=cancel)
+async function handlePaypalReturn() {
+    const params = new URLSearchParams(location.search);
+    const flag   = params.get('paypal');
+    if (!flag) return;
+    const token = params.get('token');
+    // limpa a URL para um F5 não tentar capturar de novo
+    history.replaceState(null, '', `${location.pathname}?id=${encodeURIComponent(orderId)}`);
+
+    if (flag === 'cancel') { Utils.showNotification(t('requestPaypalCancelled'), 'info'); return; }
+    if (flag !== 'return' || !token) return;
+
+    document.getElementById('rd-loading').textContent = t('requestPaypalConfirming');
+    try {
+        const res  = await session.fetch(`${RD_CFG.paymentsBase}/paypal/capture`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ token }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (data.paid)                      Utils.showNotification(t('requestPaypalApproved'), 'success');
+        else if (data.status === 'pending') Utils.showNotification(t('requestPaypalPending'), 'info');
+        else                                Utils.showNotification(data.error || t('requestPaypalError'), 'error');
+    } catch (e) {
+        Utils.showNotification(t('requestPaypalError'), 'error');
+    }
+}
+
+// Voltar (botão do navegador) a partir do PayPal pode restaurar a página do cache com o botão travado
+window.addEventListener('pageshow', e => { if (e.persisted && _lastOrder) loadOrder(); });
 
 // ── Polling de status ──────────────────────────────────────────────────────
 function startPolling(mpPaymentId) {
