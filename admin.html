@@ -464,11 +464,11 @@ function renderTable() {
         const pay = o.payment;
         let payCell = `<span class="text-tertiary">—</span>`;
         if (o.externalPayment) {
-            payCell = `<span class="pill st-paid" title="PayPal">Pago · Ext.</span>`;
+            payCell = `<span class="pill st-paid" title="PayPal">Pago · PP</span>`;
         } else if (o.paymentExternal) {
             payCell = o.paymentAccessGranted
                 ? `<span class="pill st-paid">Liberado</span>`
-                : `<span class="pill st-unpaid" title="PayPal">Ext. pendente</span>`;
+                : `<span class="pill st-unpaid" title="PayPal">Pendente · PP</span>`;
         } else if (pay) {
             const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
@@ -594,6 +594,74 @@ document.addEventListener('keydown', e => {
 document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') closeModal(); });
 
 // ── Render detalhe do pedido ───────────────────────────────────────────────
+// Dados de pagamento de QUALQUER fonte: Mercado Pago (Pix), PayPal automático ou PayPal registrado manualmente
+function buildPaymentData(o) {
+    const pay = o.payment, ep = o.externalPayment;
+    const payLabels = { approved: 'Pago', pending: 'Aguardando pagamento', cancelled: 'Cancelado' };
+    const payCls    = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' };
+    const blocks = [];
+
+    // Pagamento da integração. PayPal aprovado já vem consolidado em externalPayment (evita duplicar).
+    if (pay && !(pay.provider === 'paypal' && pay.status === 'approved' && ep)) {
+        const pp = pay.provider === 'paypal';
+        blocks.push({
+            method:  pp ? 'PayPal (automático)' : 'Mercado Pago (Pix)',
+            status:  pay.status, paidAt: pay.paidAt,
+            amount:  pay.amount, currency: pay.currency,
+            idLabel: pp ? 'ID PayPal' : 'ID MP',
+            id:      pp ? (pay.captureId || pay.paypalOrderId) : pay.mpPaymentId,
+            cancelLabel: pay.status === 'pending' ? (pp ? '✕ Cancelar pagamento' : '✕ Cancelar Pix') : null,
+        });
+    }
+    if (ep) {
+        blocks.push({
+            method:  ep.recordedBy === 'paypal:auto' ? 'PayPal (automático)' : 'PayPal (registro manual)',
+            status:  'approved', paidAt: ep.paidAt,
+            amount:  ep.amount, currency: ep.currency,
+            idLabel: 'ID da transação', id: ep.reference,
+        });
+    }
+    if (!blocks.length) return '';
+
+    return `
+    <div class="section-title modal-style">Dados de pagamento</div>
+    ${blocks.map(b => `
+    <div class="detail-list mb-4">
+        <div class="detail-list-item">
+            <span class="detail-list-label">Método</span>
+            <span class="detail-list-value">${esc(b.method)}</span>
+        </div>
+        <div class="detail-list-item">
+            <span class="detail-list-label">Status do pagamento</span>
+            <span class="detail-list-value">
+                <span class="pill ${payCls[b.status] || ''}">${payLabels[b.status] || esc(b.status)}</span>
+            </span>
+        </div>
+        ${(b.amount != null && b.currency) ? `
+        <div class="detail-list-item">
+            <span class="detail-list-label">Valor</span>
+            <span class="detail-list-value">${extMoney(b.amount, b.currency)}</span>
+        </div>` : ''}
+        ${b.paidAt ? `
+        <div class="detail-list-item">
+            <span class="detail-list-label">Pago em</span>
+            <span class="detail-list-value">${new Date(b.paidAt).toLocaleString('pt-BR')}</span>
+        </div>` : ''}
+        <div class="detail-list-item">
+            <span class="detail-list-label">${esc(b.idLabel)}</span>
+            <span class="detail-list-value mono text-xs">${esc(b.id || '—')}</span>
+        </div>
+        ${b.cancelLabel ? `
+        <div class="detail-list-item">
+            <span class="detail-list-label"></span>
+            <span class="detail-list-value adm-row-actions">
+                <button type="button" class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
+                    onclick="cancelPayment('${o.id}', this)">${b.cancelLabel}</button>
+            </span>
+        </div>` : ''}
+    </div>`).join('')}`;
+}
+
 function buildOrderDetail(o) {
     const now    = new Date();
     const items  = o.items || [];
@@ -698,9 +766,10 @@ function buildOrderDetail(o) {
     const granted  = !!o.paymentAccessGranted;
     const external = !!o.paymentExternal;
     const ep       = o.externalPayment || null;
+    const autoPaid = ep?.recordedBy === 'paypal:auto';   // identificado automaticamente → sem formulário manual
     const due      = o.externalDueEffective || null;   // valor aplicado (personalizado ou padrão) — pré-preenche o registro
     const dueSaved = o.externalDue || null;            // valor personalizado salvo
-    admExtState = { saved: dueSaved ? dueSaved.amount : null, def: null, currency: dueSaved?.currency || due?.currency || 'USD' };
+    admExtState = { saved: dueSaved ? dueSaved.amount : null, savedCur: dueSaved?.currency || null, def: null, defCur: due?.currency || 'USD', currency: dueSaved?.currency || due?.currency || 'USD' };
     const toLocalInput = iso => {
         const d = iso ? new Date(iso) : new Date();
         d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -771,7 +840,11 @@ function buildOrderDetail(o) {
                             <span class="detail-list-label">Valor personalizado</span>
                             <span class="detail-list-value">
                                 <div class="adm-amount-wrap">
-                                    <span class="adm-amount-prefix" id="ext-cur-prefix">${esc(admExtState.currency)}</span>
+                                    <input class="adm-amount-input" id="ext-due-currency" list="ext-currencies" maxlength="3" placeholder="USD"
+                                        value="${esc(admExtState.currency)}" autocomplete="off"
+                                        style="width:4.5rem;text-transform:uppercase;text-align:center"
+                                        oninput="onExtDueCurrency('${o.id}')"
+                                        title="Moeda do valor personalizado (código ISO: USD, EUR, BRL...). O valor não é convertido automaticamente.">
                                     <input class="adm-amount-input" id="ext-due-amount" type="number" min="0" step="0.01"
                                         inputmode="decimal" placeholder="padrão" value="${dueSaved ? esc(String(dueSaved.amount)) : ''}"
                                         oninput="renderExtApplied('${o.id}')"
@@ -790,6 +863,7 @@ function buildOrderDetail(o) {
                         </div>
                     </div>
 
+                    ${autoPaid ? '' : `
                     <div class="section-title modal-style">Pagamento externo (PayPal)</div>
                     <div class="detail-list mb-4">
                         <div class="detail-list-item">
@@ -846,6 +920,7 @@ function buildOrderDetail(o) {
                             </span>
                         </div>
                     </div>
+                    `}
                 </div>
 
                 <div id="order-access-note-${o.id}" class="adm-access-note ${granted ? '' : 'is-hidden'}">
@@ -896,33 +971,7 @@ function buildOrderDetail(o) {
                     </div>
                 </div>
 
-                ${pay ? `
-                <div class="section-title modal-style">Dados de pagamento do Mercado Pago</div>
-                <div class="detail-list">
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">Status do pagamento</span>
-                        <span class="detail-list-value">
-                            <span class="pill ${payCls[payStatus]||''}">${payLabels[payStatus]||payStatus}</span>
-                        </span>
-                    </div>
-                    ${pay.paidAt ? `
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">Pago em</span>
-                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString('pt-BR')}</span>
-                    </div>` : ''}
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">ID MP</span>
-                        <span class="detail-list-value mono text-xs">${esc(pay.mpPaymentId||'—')}</span>
-                    </div>
-                    ${payStatus === 'pending' ? `
-                    <div class="detail-list-item">
-                        <span class="detail-list-label"></span>
-                        <span class="detail-list-value adm-row-actions">
-                            <button type="button" class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
-                                onclick="cancelPayment('${o.id}', this)">✕ Cancelar Pix</button>
-                        </span>
-                    </div>` : ''}
-                </div>` : ''}
+                ${buildPaymentData(o)}
             </div>
         </div>
     </div>`;
@@ -1314,7 +1363,7 @@ async function toggleExternal(orderId, toggleEl) {
 }
 
 // ── Valor do pagamento externo (mesmo modelo do Mercado Pago) ─────────────
-let admExtState = { saved: null, def: null, currency: 'USD' };
+let admExtState = { saved: null, savedCur: null, def: null, defCur: 'USD', currency: 'USD' };
 const extMoney = (v, cur) => {
     try { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: cur }).format(v); }
     catch { return `${cur} ${Number(v).toFixed(2)}`; }
@@ -1336,10 +1385,11 @@ async function calcAndShowExtDefault(order) {
         const base = parseFloat(data.base_amount) || 0;
         const fee  = parseFloat(data.fee_percent)  || 0;
         const cur  = data.currency || 'USD';
+        admExtState.defCur = cur;
         if (!order.externalDue) {
             admExtState.currency = cur;
-            const pre = document.getElementById('ext-cur-prefix');
-            if (pre) pre.textContent = cur;
+            const curInput = document.getElementById('ext-due-currency');
+            if (curInput) curInput.value = cur;
         }
         const itemCount = (order.items || []).length || 1;
         if (base <= 0) { el.textContent = 'não configurado'; admExtState.def = null; renderExtApplied(order.id); return; }
@@ -1361,22 +1411,40 @@ async function calcAndShowExtDefault(order) {
     }
 }
 
+// Moeda digitada no valor personalizado (só vale se tiver 3 letras)
+function extDueCurrencyTyped() {
+    return (document.getElementById('ext-due-currency')?.value || '').trim().toUpperCase();
+}
+function onExtDueCurrency(orderId) {
+    const v = extDueCurrencyTyped();
+    if (/^[A-Z]{3}$/.test(v)) admExtState.currency = v;
+    renderExtApplied(orderId);
+}
+
 function renderExtApplied(orderId) {
     const el = document.getElementById(`ext-applied-${orderId}`);
     if (!el) return;
-    const { saved, def, currency } = admExtState;
+    const { saved, savedCur, def, defCur, currency } = admExtState;
     const input = document.getElementById('ext-due-amount');
     const typed = input && input.value !== '' ? parseFloat(input.value) : null;
-    const effective = saved ?? def;
+    const effective    = saved ?? def;
+    const effectiveCur = saved !== null ? (savedCur || defCur) : defCur;
+    const curValid     = /^[A-Z]{3}$/.test(extDueCurrencyTyped());
+    const amountDiff   = effective === null || (typed !== null && typed.toFixed(2) !== Number(effective).toFixed(2));
+    const curDiff      = currency !== effectiveCur;
     let pill, hint = '';
 
-    if (typed !== null && !isNaN(typed) && (effective === null || typed.toFixed(2) !== Number(effective).toFixed(2))) {
+    if (!curValid) {
+        pill = `<span class="pill st-pay-cancelled">Moeda inválida</span>`;
+        hint = 'Use o código ISO de 3 letras (ex.: USD, EUR, BRL)';
+    } else if (typed !== null && !isNaN(typed) && (amountDiff || curDiff)) {
         pill = `<span class="pill st-unpaid">Alteração não salva · ${extMoney(typed, currency)}</span>`;
+        if (curDiff) hint = 'Moeda alterada — o valor não é convertido automaticamente';
     } else if (saved !== null) {
-        pill = `<span class="pill st-ready">Salvo · ${extMoney(saved, currency)}</span>`;
+        pill = `<span class="pill st-ready">Salvo · ${extMoney(saved, savedCur || currency)}</span>`;
         hint = 'Valor personalizado';
     } else if (def !== null && def > 0) {
-        pill = `<span class="pill">Padrão · ${extMoney(def, currency)}</span>`;
+        pill = `<span class="pill">Padrão · ${extMoney(def, defCur)}</span>`;
         hint = 'Nenhum valor personalizado salvo';
     } else {
         pill = `<span class="pill st-pay-cancelled">Nenhum valor definido</span>`;
@@ -1392,7 +1460,9 @@ async function saveExternalDue(orderId, btn) {
     if (raw !== '') {
         const amount = parseFloat(raw);
         if (isNaN(amount) || amount <= 0) return extDueMsg(orderId, 'Informe um valor maior que zero.', 'err');
-        payload = { amount, currency: admExtState.currency };
+        const currency = extDueCurrencyTyped();
+        if (!/^[A-Z]{3}$/.test(currency)) return extDueMsg(orderId, 'Moeda inválida: use o código ISO de 3 letras (ex.: USD, EUR, BRL).', 'err');
+        payload = { amount, currency };
     }
     btn.disabled = true;
     try {
@@ -1517,21 +1587,22 @@ async function clearExternalPayment(orderId, btn) {
 
 // ── Cancelar pagamento pendente ───────────────────────────────────────────
 async function cancelPayment(orderId, btn) {
-    if (!confirm('Cancelar o Pix pendente deste pedido?\nO usuário precisará gerar um novo QR Code.')) return;
+    if (!confirm('Cancelar o pagamento pendente deste pedido?\nO usuário precisará iniciar um novo pagamento.')) return;
+    const label = btn.textContent;
     btn.disabled = true; btn.textContent = 'Cancelando...';
     try {
         const res = await admFetch(`${ADM_CFG.paymentsBase}/payments/${orderId}/cancel`, { method: 'DELETE' });
         const d = await res.json().catch(() => ({}));
         if (res.ok && d.success) {
-            notify('Pix cancelado.', 'success');
+            notify('Pagamento cancelado.', 'success');
             openOrder(orderId);
             loadOrders();
         } else {
-            btn.disabled = false; btn.textContent = '✕ Cancelar Pix';
+            btn.disabled = false; btn.textContent = label;
             notify('Erro: ' + (d.error || `HTTP ${res.status}`));
         }
     } catch (e) {
-        btn.disabled = false; btn.textContent = '✕ Cancelar Pix';
+        btn.disabled = false; btn.textContent = label;
         notify('Falha de conexão: ' + e.message);
     }
 }

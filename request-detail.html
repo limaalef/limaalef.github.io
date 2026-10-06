@@ -150,6 +150,10 @@ async function loadOrder() {
         document.getElementById('rd-order-body').innerHTML = detail.body;
         document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
 
+        // PayPal aprovado mas ainda não capturado (usuário não voltou / webhook atrasou): reconcilia sozinho
+        if (order.payment?.provider === 'paypal' && order.payment.status === 'pending' && order.payment.paypalOrderId)
+            startPaypalWatch(order.payment.paypalOrderId);
+
     } catch(e) {
         document.getElementById('rd-loading').textContent = '⚠ ' + e.message;
     }
@@ -705,6 +709,31 @@ async function handlePaypalReturn() {
     } catch (e) {
         Utils.showNotification(t('requestPaypalError'), 'error');
     }
+}
+
+// Consulta periódica: /paypal/capture é idempotente e só conclui se o usuário já aprovou no PayPal.
+// Funciona mesmo sem webhook configurado. Para após 10 min (a página recomeça ao recarregar).
+let _ppWatch = null;
+function stopPaypalWatch() { if (_ppWatch) { clearInterval(_ppWatch); _ppWatch = null; } }
+function startPaypalWatch(ppOrderId) {
+    if (_ppWatch) return;
+    const started = Date.now();
+    _ppWatch = setInterval(async () => {
+        if (Date.now() - started > 10 * 60_000) return stopPaypalWatch();
+        try {
+            const res  = await session.fetch(`${RD_CFG.paymentsBase}/paypal/capture`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ token: ppOrderId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data.paid) {
+                stopPaypalWatch();
+                Utils.showNotification(t('requestPaypalApproved'), 'success');
+                loadOrder();
+            }
+        } catch (e) { console.warn('[paypal-watch]', e.message); }
+    }, 8000);
 }
 
 // Voltar (botão do navegador) a partir do PayPal pode restaurar a página do cache com o botão travado
