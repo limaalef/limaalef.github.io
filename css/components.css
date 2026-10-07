@@ -2321,6 +2321,10 @@ input[type="text"]:focus {
 
     .sport-nav { grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }   
     .sync-entry-header { flex-direction: column; align-items: flex-start; }
+
+    .two-columns {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 496px) {

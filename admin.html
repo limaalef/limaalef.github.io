@@ -81,7 +81,12 @@
                     <button type="button" class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
                         <span class="adm-nav-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
-                        </span> Pagamentos
+                        </span> Mercado Pago
+                    </button>
+                    <button type="button" class="adm-nav-item" data-panel="paypal-settings" onclick="switchPanel('paypal-settings')">
+                        <span class="adm-nav-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
+                        </span> PayPal
                     </button>
 
                     <div class="adm-nav-divider"></div>
@@ -146,6 +151,205 @@
                         <div class="adm-empty is-hidden" id="adm-empty">Nenhum pedido encontrado.</div>
                     </div>
                     </div>
+                </div>
+
+                <!-- PAINEL: PAYPAL -->
+                <div class="adm-panel 3-colums" id="panel-paypal-settings">
+                    <div class="two-columns">
+                        <!-- Credenciais Sandbox (testes) -->
+                        <div class="mp-settings-card" id="pp-card-sandbox">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Credenciais de sandbox</div>
+                                    </span>
+                                    <span class="detail-list-value" id="pp-dot-sandbox" title="Não configurado"></span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Client ID</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-sandbox-client-id" placeholder="Client ID"
+                                            autocomplete="off" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Client Secret</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-sandbox-secret" type="password" placeholder="Client Secret"
+                                            autocomplete="new-password" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Webhook ID</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-sandbox-webhook" placeholder="Webhook ID (sandbox)"
+                                            autocomplete="off" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
+                                    <span class="detail-list-label">
+                                        <span class="adm-amount-msg" id="pp-sandbox-msg" role="status" aria-live="polite"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="action-btn btn-danger btn-xs" onclick="removePaypalEnv('sandbox')">Remover</button>
+                                <button class="action-btn btn-ghost" onclick="testPaypal('sandbox')">Testar conexão</button>
+                                <button class="action-btn btn-primary" onclick="savePaypalEnv('sandbox')">Salvar</button>
+                            </div>
+                        </div>
+
+                        <div class="mp-settings-card">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Valor, moeda e taxa</div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Moeda</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-amount-input" id="ext-currency-setting" list="ext-currencies" maxlength="3"
+                                            placeholder="USD" autocomplete="off" style="text-transform:uppercase"
+                                            oninput="recalcExtTotal()">
+                                        <datalist id="ext-currencies">
+                                            <option value="USD"><option value="EUR"><option value="GBP">
+                                            <option value="CAD"><option value="AUD"><option value="BRL">
+                                        </datalist>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Valor base</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <span class="adm-amount-prefix" id="ext-base-prefix">USD</span>
+                                            <input class="adm-amount-input" id="ext-base-amount"
+                                                type="number" min="0" step="0.01" placeholder="0,00"
+                                                oninput="recalcExtTotal()">
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Taxa de processamento (%)</span>
+                                    <span class="detail-list-value">
+                                        <div class="adm-amount-wrap">
+                                            <input class="adm-amount-input" id="ext-fee-percent"
+                                                type="number" min="0" max="99" step="0.01" placeholder="0,00"
+                                                oninput="recalcExtTotal()">
+                                            <span class="adm-amount-prefix">%</span>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item mp-total-preview">
+                                    <span class="detail-list-label mp-total-label">Valor total</span>
+                                    <span class="detail-list-value mp-total-value" id="ext-total-preview"></span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <span id="ext-save-msg" class="is-hidden"></span>
+                                <button class="action-btn btn-ghost" onclick="loadExternalSettings()">↺ Recarregar</button>
+                                <button class="action-btn btn-primary" onclick="saveExternalSettings()">Salvar configurações</button>
+                            </div>
+                        </div>
+
+                        <!-- Credenciais Live (produção) -->
+                        <div class="mp-settings-card" id="pp-card-live">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Credenciais de produção</div>
+                                    </span>
+                                    <span class="detail-list-value" id="pp-dot-live" title="Não configurado"></span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Client ID</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-live-client-id" placeholder="Client ID"
+                                            autocomplete="off" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Client Secret</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-live-secret" type="password" placeholder="Client Secret"
+                                            autocomplete="new-password" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Webhook ID</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-live-webhook" placeholder="Webhook ID (live)"
+                                            autocomplete="off" spellcheck="false">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
+                                    <span class="detail-list-label">
+                                        <span class="adm-amount-msg" id="pp-live-msg" role="status" aria-live="polite"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="action-btn btn-danger btn-xs" onclick="removePaypalEnv('live')">Remover</button>
+                                <button class="action-btn btn-ghost" onclick="testPaypal('live')">Testar conexão</button>
+                                <button class="action-btn btn-primary" onclick="savePaypalEnv('live')">Salvar</button>
+                            </div>
+                        </div>
+
+                        <!-- Ambiente em operação -->
+                        <div class="mp-settings-card">
+                            <div class="detail-list">
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">
+                                        <div class="mp-settings-head-title">Configuração do ambiente</div>
+                                    </span>
+                                    <span class="detail-list-value" id="pp-mode-pill"></span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">Alternar ambiente</span>
+                                    <span class="detail-list-value adm-row-actions">
+                                        <button type="button" class="action-btn btn-xs" id="pp-mode-sandbox" onclick="setPaypalMode('sandbox')">Sandbox</button>
+                                        <button type="button" class="action-btn btn-xs" id="pp-mode-live" onclick="setPaypalMode('live')">Live</button>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">URL do site</span>
+                                    <span class="detail-list-value">
+                                        <input class="adm-input adm-input-text" id="pp-site-url" placeholder="https://seusite.com"
+                                            autocomplete="off" spellcheck="false"
+                                            title="Para onde o PayPal devolve o usuário após o pagamento (apenas a origem, ex.: https://seusite.com)">
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label">URL do webhook</span>
+                                    <span class="detail-list-value mono text-xs" id="pp-webhook-url">—</span>
+                                </div>
+                                <div class="detail-list-item" style="background-color:var(--bg-accent-color)">
+                                    <span class="detail-list-label">
+                                        <span class="adm-amount-msg" id="pp-msg" role="status" aria-live="polite"></span>
+                                    </span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label text-tertiary">Eventos do webhook</span>
+                                    <span class="detail-list-value text-xs">CHECKOUT.ORDER.APPROVED · PAYMENT.CAPTURE.COMPLETED</span>
+                                </div>
+                                <div class="detail-list-item">
+                                    <span class="detail-list-label text-tertiary">Última alteração</span>
+                                    <span class="detail-list-value text-xs text-secondary" id="pp-updated">—</span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="action-btn btn-ghost" onclick="loadPaypalSettings()">↺ Recarregar</button>
+                                <button class="action-btn btn-primary" onclick="savePaypalSite()">Salvar URL</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Pagamento externo (PayPal): mesmo modelo do Mercado Pago -->
+                    <div class="two-columns">
+                        
+                    </div>
+
                 </div>
 
                 <!-- PAINEL: CONFIGURAÇÕES MERCADO PAGO -->
@@ -220,62 +424,6 @@
                         </div>
                     </div>
                     
-                    <!-- Pagamento externo (PayPal): mesmo modelo do Mercado Pago -->
-                    <div class="two-columns">
-                        <div class="mp-settings-card">
-                            <div class="detail-list">
-                                <div class="detail-list-item">
-                                    <span class="detail-list-label">
-                                        <div class="mp-settings-head-title">Pagamento externo (PayPal) — valor e taxa</div>
-                                    </span>
-                                </div>
-                                <div class="detail-list-item">
-                                    <span class="detail-list-label">Moeda</span>
-                                    <span class="detail-list-value">
-                                        <input class="adm-amount-input" id="ext-currency-setting" list="ext-currencies" maxlength="3"
-                                            placeholder="USD" autocomplete="off" style="text-transform:uppercase"
-                                            oninput="recalcExtTotal()">
-                                        <datalist id="ext-currencies">
-                                            <option value="USD"><option value="EUR"><option value="GBP">
-                                            <option value="CAD"><option value="AUD"><option value="BRL">
-                                        </datalist>
-                                    </span>
-                                </div>
-                                <div class="detail-list-item">
-                                    <span class="detail-list-label">Valor base</span>
-                                    <span class="detail-list-value">
-                                        <div class="adm-amount-wrap">
-                                            <span class="adm-amount-prefix" id="ext-base-prefix">USD</span>
-                                            <input class="adm-amount-input" id="ext-base-amount"
-                                                type="number" min="0" step="0.01" placeholder="0,00"
-                                                oninput="recalcExtTotal()">
-                                        </div>
-                                    </span>
-                                </div>
-                                <div class="detail-list-item">
-                                    <span class="detail-list-label">Taxa de processamento (%)</span>
-                                    <span class="detail-list-value">
-                                        <div class="adm-amount-wrap">
-                                            <input class="adm-amount-input" id="ext-fee-percent"
-                                                type="number" min="0" max="99" step="0.01" placeholder="0,00"
-                                                oninput="recalcExtTotal()">
-                                            <span class="adm-amount-prefix">%</span>
-                                        </div>
-                                    </span>
-                                </div>
-                                <div class="detail-list-item mp-total-preview">
-                                    <span class="detail-list-label mp-total-label">Valor total</span>
-                                    <span class="detail-list-value mp-total-value" id="ext-total-preview"></span>
-                                </div>
-                            </div>
-                            <div class="button-group">
-                                <span id="ext-save-msg" class="is-hidden"></span>
-                                <button class="action-btn btn-ghost" onclick="loadExternalSettings()">↺ Recarregar</button>
-                                <button class="action-btn btn-primary" onclick="saveExternalSettings()">Salvar configurações</button>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="adm-nav-divider"></div>
 
                     <!-- Health do worker -->
@@ -360,8 +508,11 @@ function switchPanel(name) {
 
     if (name === 'mp-settings') {
         loadMpSettings();
-        loadExternalSettings();
         checkHealth();
+    }
+    if (name === 'paypal-settings') {
+        loadPaypalSettings();
+        loadExternalSettings();
     }
 }
 
@@ -464,11 +615,11 @@ function renderTable() {
         const pay = o.payment;
         let payCell = `<span class="text-tertiary">—</span>`;
         if (o.externalPayment) {
-            payCell = `<span class="pill st-paid" title="PayPal">Pago · PP</span>`;
+            payCell = `<span class="pill st-paid" title="PayPal">Pago · Ext.</span>`;
         } else if (o.paymentExternal) {
             payCell = o.paymentAccessGranted
                 ? `<span class="pill st-paid">Liberado</span>`
-                : `<span class="pill st-unpaid" title="PayPal">Pendente · PP</span>`;
+                : `<span class="pill st-unpaid" title="PayPal">Ext. pendente</span>`;
         } else if (pay) {
             const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             const cls = { approved: 'st-paid', pending: 'st-unpaid', cancelled: 'st-pay-cancelled' }[pay.status] || '';
@@ -1182,6 +1333,148 @@ async function deleteOrder(id) {
     loadOrders();
 }
 
+// ── Configurações do PayPal (credenciais por ambiente + modo ativo) ───────
+// O Client Secret só SAI daqui: o servidor nunca o devolve (só "configurado" e IDs mascarados).
+let admPp = null;   // última visão pública devolvida pelo servidor
+
+function ppSetMsg(id, text, kind = '') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'adm-amount-msg' + (kind ? ' ' + kind : '');
+}
+async function ppRequest(method, path, body) {
+    const res  = await admFetch(`${ADM_CFG.paymentsBase}${path}`, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
+function renderPaypalSettings(d) {
+    admPp = d;
+    const live = d.mode === 'live';
+    document.getElementById('pp-mode-pill').innerHTML =
+        `<span class="pill ${live ? 'st-ready' : 'st-unpaid'}">${live ? 'LIVE' : 'SANDBOX'}</span>`;
+    for (const m of ['sandbox', 'live']) {
+        const btn = document.getElementById(`pp-mode-${m}`);
+        const on  = d.mode === m;
+        btn.className = 'action-btn btn-xs ' + (on ? 'btn-primary' : 'btn-ghost');
+        btn.disabled  = on;
+        btn.title     = on ? 'Ambiente em operação' : (d[m].configured ? `Ativar ${m}` : `Configure as credenciais ${m} primeiro`);
+
+        const v = d[m];
+        const dot = document.getElementById(`pp-dot-${m}`);
+        dot.className = 'mp-status-dot ' + (v.configured ? 'ok' : 'err');
+        dot.title     = v.configured ? 'Configurado' : 'Não configurado';
+        // Campos de credencial NUNCA são preenchidos com valores do servidor — só placeholders.
+        const idEl = document.getElementById(`pp-${m}-client-id`);
+        const scEl = document.getElementById(`pp-${m}-secret`);
+        const whEl = document.getElementById(`pp-${m}-webhook`);
+        idEl.value = ''; scEl.value = ''; whEl.value = '';
+        idEl.placeholder = v.configured ? `${v.client_id_masked} (configurado)` : 'Client ID';
+        scEl.placeholder = v.configured ? '••••••• (configurado)' : 'Client Secret';
+        whEl.placeholder = v.webhook_id_set ? `${v.webhook_id_masked} (definido)` : `Webhook ID (${m})`;
+    }
+    const site = document.getElementById('pp-site-url');
+    site.value       = d.site_url || '';
+    site.placeholder = location.origin;
+    document.getElementById('pp-webhook-url').textContent = d.webhook_url || '—';
+    document.getElementById('pp-updated').textContent =
+        d.updated_at ? `${new Date(d.updated_at).toLocaleString('pt-BR')} · ${d.updated_by || ''}` : '—';
+}
+
+async function loadPaypalSettings() {
+    try {
+        const { res, data } = await ppRequest('GET', '/admin/paypal-settings');
+        if (!res.ok) return ppSetMsg('pp-msg', data.error || `Erro (HTTP ${res.status})`, 'err');
+        renderPaypalSettings(data);
+    } catch (e) {
+        ppSetMsg('pp-msg', 'Falha de conexão: ' + e.message, 'err');
+    }
+}
+
+async function savePaypalSite() {
+    const site = document.getElementById('pp-site-url').value.trim() || location.origin;
+    ppSetMsg('pp-msg', '');
+    try {
+        const { res, data } = await ppRequest('PUT', '/admin/paypal-settings', { site_url: site });
+        if (!res.ok) return ppSetMsg('pp-msg', data.error || `Erro (HTTP ${res.status})`, 'err');
+        renderPaypalSettings(data);
+        ppSetMsg('pp-msg', data.unchanged ? 'Nada a alterar.' : 'URL salva.', 'ok');
+    } catch (e) { ppSetMsg('pp-msg', 'Falha de conexão: ' + e.message, 'err'); }
+}
+
+async function savePaypalEnv(mode) {
+    const id = document.getElementById(`pp-${mode}-client-id`).value.trim();
+    const sc = document.getElementById(`pp-${mode}-secret`).value.trim();
+    const wh = document.getElementById(`pp-${mode}-webhook`).value.trim();
+    const msg = `pp-${mode}-msg`;
+    const env = {};
+    if (id) env.client_id     = id;
+    if (sc) env.client_secret = sc;
+    if (wh) env.webhook_id    = wh;
+    if (!Object.keys(env).length) return ppSetMsg(msg, 'Preencha algum campo para salvar.', 'err');
+
+    ppSetMsg(msg, sc ? 'Validando no PayPal...' : 'Salvando...');
+    try {
+        const { res, data } = await ppRequest('PUT', '/admin/paypal-settings', { [mode]: env });
+        if (!res.ok) return ppSetMsg(msg, data.error || `Erro (HTTP ${res.status})`, 'err');
+        renderPaypalSettings(data);                       // também limpa os campos (inclusive o secret)
+        ppSetMsg(msg, data.unchanged ? 'Nada a alterar.' : (sc ? 'Salvo — credenciais validadas no PayPal.' : 'Salvo.'), 'ok');
+    } catch (e) { ppSetMsg(msg, 'Falha de conexão: ' + e.message, 'err'); }
+}
+
+async function removePaypalEnv(mode) {
+    if (!admPp?.[mode]?.configured) return ppSetMsg(`pp-${mode}-msg`, 'Nada configurado neste ambiente.', 'err');
+    if (admPp.mode === mode) return ppSetMsg(`pp-${mode}-msg`, 'Este é o ambiente ativo: alterne para o outro antes de remover.', 'err');
+    if (!confirm(`Remover as credenciais do PayPal (${mode})?`)) return;
+    try {
+        const { res, data } = await ppRequest('PUT', '/admin/paypal-settings', { [mode]: { remove: true } });
+        if (!res.ok) return ppSetMsg(`pp-${mode}-msg`, data.error || `Erro (HTTP ${res.status})`, 'err');
+        renderPaypalSettings(data);
+        ppSetMsg(`pp-${mode}-msg`, 'Credenciais removidas.', 'ok');
+    } catch (e) { ppSetMsg(`pp-${mode}-msg`, 'Falha de conexão: ' + e.message, 'err'); }
+}
+
+async function testPaypal(mode) {
+    const msg = `pp-${mode}-msg`;
+    ppSetMsg(msg, 'Testando...');
+    try {
+        const { res, data } = await ppRequest('POST', '/admin/paypal-settings/test', { mode });
+        if (!res.ok) return ppSetMsg(msg, data.error || `Erro (HTTP ${res.status})`, 'err');
+        if (!data.ok) return ppSetMsg(msg, '⚠ ' + data.error, 'err');
+        const parts = ['✓ Credenciais aceitas pelo PayPal'];
+        if (data.webhook === 'ok') {
+            parts.push(data.missing_events?.length ? `⚠ webhook sem os eventos: ${data.missing_events.join(', ')}` : '✓ webhook encontrado');
+        } else if (data.webhook === 'not_found') {
+            parts.push(`⚠ Webhook ID não existe no ambiente ${mode} (foi criado no app/ambiente certo?)`);
+        } else {
+            parts.push('⚠ sem Webhook ID: o pagamento só é confirmado se o usuário voltar à página');
+        }
+        ppSetMsg(msg, parts.join(' · '), data.webhook === 'ok' && !data.missing_events?.length ? 'ok' : 'err');
+    } catch (e) { ppSetMsg(msg, 'Falha de conexão: ' + e.message, 'err'); }
+}
+
+async function setPaypalMode(mode) {
+    if (!admPp || admPp.mode === mode) return;
+    if (!admPp[mode].configured) return ppSetMsg('pp-msg', `Configure e salve as credenciais ${mode} antes de ativar.`, 'err');
+    const body = { mode };
+    if (mode === 'live') {
+        if (!confirm('ATIVAR O MODO LIVE?\n\nA partir de agora os pagamentos serão REAIS, com as credenciais de produção.')) return;
+        if ((prompt('Digite LIVE para confirmar:') || '').trim().toUpperCase() !== 'LIVE') return ppSetMsg('pp-msg', 'Ativação cancelada.', 'err');
+        body.confirm_live = true;
+    } else if (!confirm('Voltar para o modo SANDBOX? Novos pagamentos deixarão de ser reais.')) return;
+    try {
+        const { res, data } = await ppRequest('PUT', '/admin/paypal-settings', body);
+        if (!res.ok) return ppSetMsg('pp-msg', data.error || `Erro (HTTP ${res.status})`, 'err');
+        renderPaypalSettings(data);
+        ppSetMsg('pp-msg', `Ambiente ativo: ${mode}. Pagamentos já iniciados continuam no ambiente em que foram criados.`, 'ok');
+    } catch (e) { ppSetMsg('pp-msg', 'Falha de conexão: ' + e.message, 'err'); }
+}
+
 // ── Configurações do Mercado Pago ─────────────────────────────────────────
 async function loadMpSettings() {
     try {
@@ -1263,7 +1556,7 @@ async function checkHealth() {
         const res  = await fetch(`${ADM_CFG.paymentsBase}/health`);
         const data = await res.json();
         statusEl.textContent = res.ok ? 'Worker online' : '⚠ Worker com erro';
-        subEl.textContent    = `MP: ${data.mercadopago} · ${data.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : ''}`;
+        subEl.textContent    = `MP: ${data.mercadopago} · PayPal: ${data.paypal} · ${data.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR') : ''}`;
         document.getElementById('mp-health-card').style.borderColor = res.ok ? 'var(--success-color)' : 'var(--error-color)';
     } catch(e) {
         statusEl.textContent = 'Worker inacessível';
