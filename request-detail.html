@@ -164,6 +164,7 @@ function buildOrderDetail(o) {
     const now   = new Date();
     const dt    = new Date(o.createdAt).toLocaleString(loc(), { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
+    const A     = o.access || {};   // regras de exibição vindas do servidor (links / pagamento / valores)
 
     // Progress bar (inclui passo "Pagamento" quando o pedido está pronto)
     const steps = [
@@ -189,9 +190,9 @@ function buildOrderDetail(o) {
         </div>` : ``;
 
     // ── Seção de valores de pagamento ──────────────────────────────────────
-    const mpValueHtml = (o.paymentAmount > 0 && o.platformFeePercent != null && !o.paymentExternal) ? (() => {
+    const mpValueHtml = (A.showValues && !o.paymentExternal && o.valueEffective?.method === 'mercadopago' && o.platformFeePercent != null) ? (() => {
         const fee     = o.platformFeePercent / 100;
-        const total   = parseFloat(o.paymentAmount);
+        const total   = parseFloat(o.valueEffective.amount);
         const taxaVal = total * fee;
         const netVal  = total - taxaVal;
         const fmt = v => fmtMoney(v, 'BRL');
@@ -214,7 +215,7 @@ function buildOrderDetail(o) {
     })() : ''
 
     // Pagamento externo: mesmo resumo do Mercado Pago (valor, taxa e total), enquanto não pago
-    const paymentValueHtml = (o.paymentExternal && o.externalDueEffective && !o.externalPayment) ? (() => {
+    const paymentValueHtml = (A.showValues && o.paymentExternal && o.externalDueEffective && !o.externalPayment) ? (() => {
         const due     = o.externalDueEffective;
         const feePct  = o.externalFeePercent || 0;
         const total   = parseFloat(due.amount);
@@ -238,42 +239,55 @@ function buildOrderDetail(o) {
                 <span class="detail-list-value text-accent fw-700">${fmt(total)}</span>
             </div>
         </div>`;
-    })() : mpValueHtml;
+    })() : (o.paymentExternal ? '' : mpValueHtml);
 
     // ── Seção de pagamento Pix ─────────────────────────────────────────────
     const paymentHtml = buildPaymentSection(o);
 
     // ── Cards de download ──────────────────────────────────────────────────
-    // Trava os downloads se pagamento for obrigatório e não estiver pago
-    const pay     = o.payment;
-    const payDone = pay?.status === 'approved' || o.status === 'completed' || o.paymentAccessGranted === true
-        || !!o.externalPayment?.paidAt;
-    // Pagamento externo (PayPal) também exige pagamento, mesmo sem valor em R$
-    const payRequired = (o.paymentAmount > 0 || o.paymentExternal === true) && !payDone;
-
+    // Regras (servidor → o.access): links só com status Pronto/Concluído E pedido liberado (pago ou acesso manual).
     const dlCardsHtml = items.map(item => {
         const link    = item.link;
-        // Se pagamento obrigatório e não pago, bloqueia mesmo com link ativo
-        const blocked = payRequired || !link || link.disabled ||
-            (link.expiresAt && new Date(link.expiresAt) < now);
-        const url     = (!payRequired && link) ? (link.proxyUrl || link.url || '#') : null;
+        const show    = !!A.showLinks;
+        const expired = !!(link && link.expiresAt && new Date(link.expiresAt) < now);
+        const blocked = !show || !link || link.disabled || expired;
+        const url     = (show && link) ? (link.proxyUrl || link.url || null) : null;
 
         let expText = '', expCls = '';
-        if (payRequired && !payDone) {
-            expText = '🔒 ' + t('requestLockedAwaiting'); expCls = 'disabled';
-        } else if (!link) {
-            expText = t('requestLinkPending'); expCls = 'disabled';
-        } else if (link.disabled) {
-            expText = t('requestLinkDisabled'); expCls = 'disabled';
-        } else if (link.expiresAt && new Date(link.expiresAt) < now) {
-            expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString(loc());
-            expCls  = 'expired';
-        } else if (!link.expiresAt) {
-            expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
+        if (show && link) {
+            if (link.disabled) {
+                expText = t('requestLinkDisabled'); expCls = 'disabled';
+            } else if (expired) {
+                expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString(loc());
+                expCls  = 'expired';
+            } else if (!link.expiresAt) {
+                expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
+            } else {
+                const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
+                expText    = t('requestLinkValidDays').replace('{n}', days);
+                expCls     = 'valid';
+            }
+        }
+
+        let bodyHtml;
+        if (o.status === 'cancelled') {
+            bodyHtml = '';                                                         // cancelado: nada
+        } else if (show && link) {
+            bodyHtml = `<div class="rd-dl-card-body">
+                        <div class="rd-dl-status-row">
+                            <span class="rd-dl-exp ${expCls}">${expText}</span>
+                            ${(!blocked && url)
+                                ? `<a href="${url}" class="action-btn btn-primary no-underline" target="_blank" rel="noopener" download
+                                   >${t('requestDownload')}</a>`
+                                : ''}
+                        </div>
+                       </div>`;
+        } else if (A.showPayment) {
+            bodyHtml = `<div class="rd-locked-notice">⚠ ${t('requestLockedNotice')}</div>`;   // Pronto, aguardando pagamento
+        } else if (o.status === 'expired') {
+            bodyHtml = `<div class="rd-dl-pending">${t('requestLinkExpired')}</div>`;
         } else {
-            const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
-            expText    = t('requestLinkValidDays').replace('{n}', days);
-            expCls     = 'valid';
+            bodyHtml = `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`;     // pendente, em análise, sem liberação
         }
 
         return `
@@ -284,21 +298,7 @@ function buildOrderDetail(o) {
                     <div class="rd-dl-sub">${esc(item.meta||'')}${item.date ? ' · ' + esc(item.date) : ''}${item.station ? ' · ' + esc(item.station) : ''}</div>
                 </div>
             </div>
-            ${o.status === 'cancelled' ? '' :
-            (payRequired && !payDone)
-                ? `<div class="rd-locked-notice">⚠ ${t('requestLockedNotice')}</div>`
-                : link
-                    ? `<div class="rd-dl-card-body">
-                        <div class="rd-dl-status-row">
-                            <span class="rd-dl-exp ${expCls}">${expText}</span>
-                            ${(!blocked && url)
-                                ? `<a href="${url}" class="action-btn btn-primary no-underline" target="_blank" rel="noopener" download
-                                   >${t('requestDownload')}</a>`
-                                : ''}
-                        </div>
-                       </div>`
-                    : `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`
-            }
+            ${bodyHtml}
         </div>`;
     }).join('');
 
@@ -434,16 +434,16 @@ function buildPaypalAction(o) {
 }
 
 function buildPaymentSection(o) {
+    const A = o.access || {};
+    if (o.status === 'cancelled') return '';                 // cancelado: nenhum pagamento
+    // Caixa de pagamento: só em "Pronto", com valor e sem liberação. Pago: apenas o resumo.
+    if (!A.paid && !A.showPayment) return '';
     if (o.externalPayment || o.paymentExternal === true) return buildExternalPaymentSection(o);
-    // Só exibe se o pedido estiver "ready" e tiver valor configurado
-    if (!o.paymentAmount || o.paymentAmount <= 0) return '';
-    // Acesso liberado manualmente pelo admin — não exibe seção de pagamento
-    if (o.paymentAccessGranted === true) return '';
 
     const pay    = o.payment;
 
-    // Pago / pedido concluído
-    if (pay?.status === 'approved' || o.status === 'completed') {
+    // Pago
+    if (A.paid) {
         return `
         <div class="rd-section">
             <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>

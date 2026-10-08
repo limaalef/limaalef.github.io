@@ -182,8 +182,11 @@ function buildOrderCard(o) {
     const dt    = new Date(o.createdAt).toLocaleString(loc(), { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
 
-    // Links disponíveis = itens com link ativo e não expirado
-    const activeLinks = items.filter(it =>
+    // Regras de exibição vêm do servidor (o.access): links, caixa de pagamento e valores
+    const A = o.access || {};
+
+    // Links disponíveis = itens com link ativo e não expirado — só contam quando os links podem ser exibidos
+    const activeLinks = !A.showLinks ? 0 : items.filter(it =>
         it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
     ).length;
     const hasAnyLink = items.some(it => it.link);
@@ -191,8 +194,7 @@ function buildOrderCard(o) {
     // Pagamento: considera aprovado também quando admin liberou manualmente
     const pay        = o.payment;
     const ext        = o.externalPayment || null;
-    const payDone    = pay?.status === 'approved' || o.paymentAccessGranted === true || !!ext?.paidAt;
-    const payPending = (o.paymentAmount > 0 || o.paymentExternal === true) && !payDone;
+    const payPending = !!A.showPayment;   // só em "Pronto", com valor e ainda sem pagamento/liberação
 
     // Progress bar
     const steps = [
@@ -273,7 +275,7 @@ function buildOrderCard(o) {
         </div>` : '';
 
     // Pagamento externo confirmado
-    const extPaidHtml = ext ? `
+    const extPaidHtml = (ext && o.status !== 'cancelled') ? `
             <div class="rq-section">
                 <div class="text-sm text-secondary">
                     <span class="pill st-paid">${t('requestPaidViaPayPal')}</span>
@@ -290,7 +292,7 @@ function buildOrderCard(o) {
                         ${t('requestPaymentRequired')}
                     </div>
                     <div class="text-sm text-secondary mt-1px">
-                        ${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.paymentAmount, 'BRL')}</strong>
+                        ${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.valueEffective.amount, o.valueEffective.currency)}</strong>
                         &nbsp;· ${t('requestPaymentLinksAfter')}
                     </div>
                 </div>
@@ -300,6 +302,14 @@ function buildOrderCard(o) {
                 </a>
             </div>
         </div>` : '';
+
+    // Pendente / em análise (ou Pronto sem cobrança ativa): apenas o valor, sem pagamento e sem links
+    const valueOnlyHtml = (A.showValues && !A.unlocked && !A.showPayment && o.valueEffective) ? `
+            <div class="rq-section">
+                <div class="text-sm text-secondary">
+                    ${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.valueEffective.amount, o.valueEffective.currency)}</strong>
+                </div>
+            </div>` : '';
 
     // Nenhum link ainda
     const noLinks = !hasAnyLink ? `
@@ -331,7 +341,7 @@ function buildOrderCard(o) {
         <div class="rq-order-body">
             ${progressHtml}
 
-            ${payPending ? (o.paymentExternal ? extNoticeHtml : payNoticeHtml) : ``}
+            ${payPending ? (o.paymentExternal ? extNoticeHtml : payNoticeHtml) : valueOnlyHtml}
 
             ${extPaidHtml}
 

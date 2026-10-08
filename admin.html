@@ -835,7 +835,7 @@ function buildOrderDetail(o) {
                 <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
                 ${disabled ? '<span class="pill st-expired text-xs">OFF</span>' : ''}
                 <button type="button" class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
-                    onclick="toggleItemLink('${o.id}',${idx},${!disabled})">
+                    onclick="toggleItemLink('${o.id}',${idx},${disabled ? 'true' : 'false'})">
                     ${disabled ? 'Ligar' : 'Pausar'}
                 </button>
                 <button type="button" class="action-btn btn-danger btn-xs" aria-label="Remover link" onclick="removeItemLink('${o.id}',${idx})">✕</button>
@@ -863,13 +863,13 @@ function buildOrderDetail(o) {
                     <span class="detail-list-label">Expiração</span>
                     <span class="detail-list-value">
                         <select class="adm-input adm-input-select" id="lnk-expiry-${idx}">
-                            <option value="-1" selected>Nunca</option>
+                            ${link?.expiresAt ? '<option value="keep" selected>Manter atual</option>' : ''}
+                            <option value="0" ${link?.expiresAt ? '' : 'selected'}>Sem expiração</option>
                             <option value="168">7 dias</option>
                             <option value="360">15 dias</option>
                             <option value="720">30 dias</option>
                             <option value="1440">60 dias</option>
                             <option value="2160">90 dias</option>
-                            <option value="0">Indefinidamente</option>
                         </select>
                     </span>
                 </div>
@@ -902,7 +902,7 @@ function buildOrderDetail(o) {
                 <option value="720" selected>30 dias</option>
                 <option value="1440">60 dias</option>
                 <option value="2160">90 dias</option>
-                <option value="0">Indefinidamente</option>
+                <option value="0">Sem expiração</option>
             </select>
             <button type="button" class="action-btn adm-btn-success" onclick="activateAllLinks('${o.id}')">Confirmar</button>
             <button type="button" class="action-btn btn-ghost" onclick="toggleActivatePanel()">Cancelar</button>
@@ -1253,26 +1253,35 @@ async function saveOrderAmount(id, btn) {
 // ── Operações de link ─────────────────────────────────────────────────────
 async function saveItemLink(orderId, itemIdx, btn) {
     const url    = document.getElementById(`lnk-url-${itemIdx}`)?.value.trim();
-    const gdrive = document.getElementById(`lnk-gdrive-${itemIdx}`)?.value.trim();
-    const hours  = parseInt(document.getElementById(`lnk-expiry-${itemIdx}`)?.value || '720');
+    const gdriveEl = document.getElementById(`lnk-gdrive-${itemIdx}`);
+    const gdrive = gdriveEl?.value.trim();
+    const expSel = document.getElementById(`lnk-expiry-${itemIdx}`)?.value ?? '0';
     if (!url && !gdrive) { notify('Informe a URL ou o ID do arquivo no Google Drive.', 'warning'); return; }
+
+    // Expiração é independente do estado ligado/pausado: "Sem expiração" (0) = link que não vence, NÃO desativado.
+    // O estado (disabled) nunca é enviado aqui; só o botão Pausar/Ligar muda isso.
+    const body = { url: url||null };
+    if (gdriveEl) body.gdrive_id = gdrive||null;                       // sem campo na tela, preserva o existente
+    if (expSel !== 'keep') body.expiry_hours = Math.max(0, parseInt(expSel) || 0);   // 0 = sem expiração
     btn.disabled = true; btn.textContent = 'Salvando...';
     const res = await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url||null, gdrive_id: gdrive||null, expiry_hours: hours||null }),
+        body: JSON.stringify(body),
     });
     const data = await res.json();
     if (data.success) { notify('Link salvo.', 'success'); openOrder(orderId); loadOrders(); }
     else { notify(data.error || 'Erro ao salvar o link.'); btn.disabled = false; btn.textContent = 'Salvar link'; }
 }
 
+// enable = estado DESEJADO (true = ligar/ativar o compartilhamento, false = pausar)
 async function toggleItemLink(orderId, itemIdx, enable) {
-    await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
+    const res = await admFetch(`${ADM_CFG.apiBase}/orders/${orderId}/item/${itemIdx}/link`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ disabled: !enable }),
     });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); notify(d.error || `Erro ao ${enable ? 'ligar' : 'pausar'} o link.`); return; }
     openOrder(orderId); loadOrders();
 }
 
