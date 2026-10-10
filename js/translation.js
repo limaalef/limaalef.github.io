@@ -918,7 +918,9 @@ const translations = {
         'Grécia': 'Greece',
         'Eslováquia': 'Slovakia',
         'Eslovênia': 'Slovenia',
-        'Tanzãnia': 'Tanzania'
+        'Tanzãnia': 'Tanzania',
+        'Índia': 'India',
+        'Benim': 'Benin'
     }
 };
 
