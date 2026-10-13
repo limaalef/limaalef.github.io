@@ -9,11 +9,65 @@ body.mx-lock { overflow: hidden; }
 
 /* ── Topo ── */
 .mx-top { display: flex; flex-direction: column; gap: var(--sp-4); margin-bottom: var(--sp-5); align-items: flex-start; }
-.mx-summary { width: 100%; background: var(--accent-color); color: var(--text-accent-color);
-    border-radius: var(--border-radius-size-xl); padding: var(--sp-5) var(--sp-6); }
-.mx-sum-comp { font-size: var(--font-size-mdm); font-weight: 600; opacity: .9; }
-.mx-sum-match { font-size: var(--font-size-xl); font-weight: 700; margin: var(--sp-1) 0; overflow-wrap: anywhere; }
-.mx-sum-meta { font-size: var(--font-size-sm); opacity: .85; overflow-wrap: anywhere; }
+
+/* ── Hero editável (mesmo desenho do hero de match.html, com campos) ── */
+.mx-summary { --mx-on: var(--text-accent-color);
+    width: 100%; background: var(--accent-color); color: var(--mx-on);
+    border-radius: var(--border-radius-size-xl); padding: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-5); }
+.mx-summary .mx-input, .mx-summary .mx-pick-btn {
+    color: inherit; background: color-mix(in srgb, var(--mx-on) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mx-on) 28%, transparent); }
+.mx-summary .mx-input::placeholder, .mx-summary .mx-pick-btn.placeholder { color: color-mix(in srgb, var(--mx-on) 62%, transparent); }
+.mx-summary .mx-input:focus, .mx-summary .mx-pick-btn:focus-visible { border-color: var(--mx-on); outline: none; }
+@media (hover: hover) { .mx-summary .mx-pick-btn:hover { border-color: var(--mx-on); } }
+.mx-summary select.mx-input option { background: var(--bg-secondary); color: var(--text-primary); }
+.mx-summary .mx-icon-btn { color: inherit; background: transparent; border-color: color-mix(in srgb, var(--mx-on) 28%, transparent); }
+/* os rótulos dos campos ficam só para leitores de tela; o texto-guia é o placeholder */
+.mx-summary .mx-label { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.mx-summary .mx-field { gap: 0; }
+.mx-summary .mx-hint { display: none; }
+
+.mx-hero-top { display: flex; align-items: center; gap: var(--sp-5); }
+.mx-hero-logo { width: var(--sp-9); height: var(--sp-9); object-fit: contain; flex-shrink: 0; }
+.mx-hero-titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+.mx-hero-comp { font-size: var(--font-size-lg); font-weight: 700; }
+.mx-hero-sub { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.mx-hero-sub .mx-input { flex: 1 1 140px; width: auto; }
+.mx-hero-sub .mx-input:last-child { flex: 0 1 140px; }
+
+.mx-hero-score { display: grid; grid-template-columns: minmax(0, 1fr) 76px auto 76px minmax(0, 1fr);
+    grid-template-areas: "hp hs x as ap"; gap: var(--sp-3); align-items: center; }
+.mx-hero-team.hp { grid-area: hp; } .mx-hero-team.ap { grid-area: ap; }
+.mx-hero-score-input.hs { grid-area: hs; } .mx-hero-score-input.as { grid-area: as; }
+.mx-hero-x { grid-area: x; font-size: var(--font-size-xl); font-weight: 700; opacity: .8; }
+.mx-hero-score-input { text-align: center; font-size: var(--font-size-xl); font-weight: 700; padding-left: var(--sp-2); padding-right: var(--sp-2);
+    -moz-appearance: textfield; appearance: textfield; }
+.mx-hero-score-input::-webkit-outer-spin-button, .mx-hero-score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mx-hero-team .mx-pick-btn { font-weight: 600; }
+.mx-hero-team.hp .mx-pick-btn { text-align: right; }
+.mx-hero-team.hp .mx-pick { flex-direction: row-reverse; }
+
+.mx-hero-meta { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--sp-3); align-items: start; }
+.mx-hero-meta .mx-datetime { grid-template-columns: minmax(0, 1fr) minmax(92px, 112px); }
+.mx-hero-info { font-size: var(--font-size-xs); opacity: .8; overflow-wrap: anywhere; }
+
+/* barra de salvar dentro do hero: acompanha as cores do hero */
+.mx-summary .mx-savebar { position: static; background: transparent; padding: var(--sp-4) 0 0; border-radius: 0;
+    border-top: 1px solid color-mix(in srgb, var(--mx-on) 28%, transparent); }
+.mx-summary .mx-status, .mx-summary .mx-status.ok, .mx-summary .mx-status.err { color: inherit; }
+.mx-summary .mx-status.err { font-weight: 700; }
+.mx-summary .action-btn.btn-ghost { background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--mx-on) 40%, transparent); }
+.mx-summary .action-btn.btn-primary { background: var(--mx-on); color: var(--accent-color); border: 1px solid var(--mx-on); }
+.mx-summary .action-btn:disabled { opacity: .45; }
+
+@media (max-width: 720px) {
+    .mx-hero-score { grid-template-columns: minmax(0, 1fr) 84px; grid-template-areas: "hp hs" "ap as"; }
+    .mx-hero-x { display: none; }
+    .mx-hero-team.hp .mx-pick-btn { text-align: left; }
+    .mx-hero-team.hp .mx-pick { flex-direction: row; }
+    .mx-hero-meta { grid-template-columns: 1fr; }
+}
+@media (max-width: 496px) { .mx-summary { padding: var(--sp-5); } .mx-hero-top { gap: var(--sp-4); } }
 
 /* ── Aviso global ── */
 .mx-banner { padding: var(--sp-4) var(--sp-5); border-radius: var(--border-radius-size-lg); font-size: var(--font-size-mdm);
@@ -182,7 +236,6 @@ select.mx-input option { background: var(--bg-secondary); color: var(--text-prim
     .mx-bar-actions .action-btn { flex: 1; }
     .mx-page { padding: var(--sp-4) var(--sp-4) var(--sp-8); }
     .mx-panel-body { padding: var(--sp-5); }
-    .mx-summary { padding: var(--sp-4) var(--sp-5); }
 }
 
 /* ── Criação de matchdata (partida sem matchdata) ── */
@@ -192,3 +245,9 @@ select.mx-input option { background: var(--bg-secondary); color: var(--text-prim
 .mx-created-id { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--font-size-sxxl); font-weight: 700;
     letter-spacing: .08em; color: var(--accent-color); user-select: all; }
 .mx-create-actions { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; }
+
+/* ── Matchdata novo (formulário em branco; um único salvamento) ── */
+.mx-banner.info { background: var(--bg-info); color: var(--text-info); border-color: var(--info-color); }
+.mx-banner.info .mx-hint { color: inherit; opacity: .85; margin-top: var(--sp-2); }
+body.mx-new .mx-panel .mx-savebar, body.mx-new .mx-summary .mx-savebar { display: none; }
+.mx-newbar { margin-top: var(--sp-5); border: 1px solid var(--border-color); border-radius: var(--border-radius-size-xl); }

@@ -91,12 +91,21 @@
             </div>
 
             <div id="mxBanner" class="mx-banner" role="alert" hidden></div>
+            <div id="mxNewInfo" class="mx-banner info" hidden></div>
 
             <div class="mx-tabs-wrap">
                 <div id="mxTabs" class="mx-tabs" role="tablist" aria-label="Seções do matchdata"></div>
             </div>
 
             <div id="mxPanels"></div>
+
+            <!-- Matchdata novo: um único salvamento cria o registro -->
+            <div id="mxNewBar" class="mx-savebar mx-newbar" hidden>
+                <div id="mxNewStatus" class="mx-status" role="status" aria-live="polite"></div>
+                <div class="mx-bar-actions">
+                    <button id="mxNewSave" type="button" class="action-btn btn-primary" disabled>Salvar e criar matchdata</button>
+                </div>
+            </div>
         </div>
     </main>
 

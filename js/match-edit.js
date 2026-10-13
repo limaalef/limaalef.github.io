@@ -2,6 +2,7 @@
    MATCH EDIT — edição completa do matchdata de uma partida (somente administrador).
 
    Página: match-edit.html?id={id do evento}&sport={football|multisport}
+   O cabeçalho da página é a seção "general" (competição, times, placar, data, estádio) editável no próprio hero.
    API:    GET   {ADMIN_API_BASE}/matches/{sport}/{id}/matchdata            → dados crus, por seção
            PATCH {ADMIN_API_BASE}/matches/{sport}/{id}/matchdata/{seção}    → grava UMA seção { version, data }
            GET   {ADMIN_API_BASE}/lookup/{venues|teams|values}?q=           → buscas dos campos
@@ -56,6 +57,8 @@ const MatchEdit = (() => {
         active: 'general',
         labels: { venues: {}, teams: {} },   // id → rótulo (para exibir o que está selecionado)
         sessionLost: false,
+        newMode: false,        // matchdata novo: formulário em branco, só é gravado no primeiro salvamento
+        creating: false, saved: false, nextId: null, newError: null,
     };
 
     class ApiError extends Error {
@@ -91,6 +94,30 @@ const MatchEdit = (() => {
         ['YELLOW_CARD', 'Cartão amarelo'], ['RED_CARD', 'Cartão vermelho'], ['SUBSTITUTION', 'Substituição'],
     ];
     const playTypeLabel = t => (PLAY_TYPES.find(([v]) => v === t) || [])[1] || t || '—';
+    // Períodos padronizados. base = minuto real em que o período começa (menos 1); len = duração regulamentar.
+    // Tempos normais: 45 min. Prorrogação: 15 min por tempo (1T(P) começa no 91' real, 2T(P) no 106').
+    const PERIODS = {
+        1: { label: '1T', base: 0, len: 45 },
+        2: { label: '2T', base: 45, len: 45 },
+        3: { label: '1T (P)', base: 90, len: 15 },
+        4: { label: '2T (P)', base: 105, len: 15 },
+    };
+    // minuto real → minuto do período   (período 1, 46 → "45+1" · período 2, 46 → 1 · período 3, 93 → 3)
+    function minuteFromReal(period, real) {
+        const p = PERIODS[period];
+        if (!p || !Number.isInteger(real)) return null;
+        const m = real - p.base;
+        if (m < 1) return null;
+        return m <= p.len ? m : `${p.len}+${m - p.len}`;
+    }
+    // minuto do período → minuto real   (período 2, "45+3" → 93 · período 3, 3 → 93)
+    function realFromMinute(period, minute) {
+        const p = PERIODS[period];
+        const m = /^(\d{1,3})(?:\+(\d{1,2}))?$/.exec(String(minute ?? '').trim());
+        if (!p || !m) return null;
+        return p.base + Number(m[1]) + (m[2] ? Number(m[2]) : 0);
+    }
+
     const POSITIONS = [
         ['Goleiro', 'GOL'], ['Lateral-direito', 'LAD'], ['Lateral-esquerdo', 'LAE'], ['Zagueiro direito', 'ZAD'],
         ['Zagueiro esquerdo', 'ZAE'], ['Volante', 'VOL'], ['Meio-campo', 'MEC'], ['Atacante', 'ATA'],
@@ -140,11 +167,25 @@ const MatchEdit = (() => {
     };
     const anyDirty = () => Object.keys(state.sections).some(isDirty);
 
+    const SECTION_NAMES = { general: 'Cabeçalho', lineup_home: 'Escalação do mandante', lineup_away: 'Escalação do visitante', plays: 'Lances',
+        penalties: 'Pênaltis', statistics: 'Estatísticas', referees: 'Árbitros', attendance: 'Público e renda', last_results: 'Forma recente' };
+
+    function refreshNewBar() {
+        if (!state.newMode) return;
+        const filled = Object.keys(state.sections).filter(isDirty);
+        $('mxNewSave').disabled = !filled.length || state.creating || state.saved;
+        if (state.newError) return;
+        $('mxNewStatus').textContent = filled.length
+            ? `Preenchido: ${filled.map(k => SECTION_NAMES[k]).join(', ')}. Ainda não gravado no banco.`
+            : 'Preencha algum dado para poder salvar.';
+    }
+
     function refresh(key) {
         const sec = state.sections[key];
         const dirty = isDirty(key);
         const tab = $(`mx-tab-${key}`);
         if (tab) tab.classList.toggle('dirty', dirty);
+        refreshNewBar();
         const bar = $(`mx-bar-${key}`);
         if (!bar) return;
         bar.querySelector('[data-act="save"]').disabled = !dirty || sec.saving || sec.corrupt;
@@ -320,18 +361,72 @@ const MatchEdit = (() => {
         return wrap;
     }
 
-    // ── Painel: Geral ──────────────────────────────────────────────────────
-    function renderGeneral(body, sec) {
-        const d = sec.draft;
-        const grid = h('div', { class: 'mx-grid' });
+    // ── Cabeçalho editável (dados gerais) ──────────────────────────────────
+    // Visual do hero de match.html, mas com campos para alterar. É a seção "general" do matchdata.
+    function compLogoUrl(d) {
+        const slug = String(d.competition || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_');
+        const year = /^\d{4}/.test(d.utc_date || '') ? d.utc_date.slice(0, 4) : '';
+        return slug ? `competition_logos/${slug}_${year}.png` : '';
+    }
 
-        grid.append(
-            field('Competição', textControl(d, 'competition', { max: 120, list: valueDatalist('competition'), onChange: v => valueLists.competition.refresh(v) })),
-            field('Edição', textControl(d, 'edition', { max: 120, list: valueDatalist('edition'), onChange: v => valueLists.edition.refresh(v) })),
-            field('Rodada / fase', textControl(d, 'matchday', { max: 60, list: valueDatalist('matchday'), onChange: v => valueLists.matchday.refresh(v) })),
-            field('Status', textControl(d, 'status', { max: 40, list: valueDatalist('status'), onChange: v => valueLists.status.refresh(v) })),
-            dateTimeField(d),
-        );
+    function renderHero(box, sec) {
+        box.replaceChildren();
+        const d = sec.draft;
+
+        const logo = h('img', { class: 'mx-hero-logo', alt: '', hidden: true });
+        logo.addEventListener('load', () => { logo.hidden = false; });
+        logo.addEventListener('error', () => { logo.hidden = true; });
+        const syncLogo = () => {
+            const url = compLogoUrl(d);
+            if (!url) { logo.hidden = true; return; }
+            if (logo.getAttribute('src') !== url) { logo.hidden = true; logo.setAttribute('src', url); }
+        };
+
+        const text = (key, label, max, extra = {}) => {
+            const input = textControl(d, key, { max, placeholder: label, ...extra });
+            input.setAttribute('aria-label', label);
+            return input;
+        };
+        const comp = text('competition', 'Competição', 120, {
+            list: valueDatalist('competition'),
+            onChange: v => { valueLists.competition.refresh(v); syncLogo(); },
+        });
+        comp.classList.add('mx-hero-comp');
+        const phase = text('matchday', 'Rodada / fase', 60, { list: valueDatalist('matchday'), onChange: v => valueLists.matchday.refresh(v) });
+        const edition = text('edition', 'Edição', 120, { list: valueDatalist('edition'), onChange: v => valueLists.edition.refresh(v) });
+        const status = text('status', 'Status', 40, { list: valueDatalist('status'), onChange: v => valueLists.status.refresh(v) });
+
+        // Times
+        const teamPicker = (side, label, area) => {
+            const idKey = `${side}_team_id`, nameKey = `${side}_team_name`;
+            const label_ = () => {
+                if (d[idKey] == null) return d[nameKey] || '';
+                const t = state.labels.teams[d[idKey]];
+                return t ? `${t.nome}${t.tla ? ` (${t.tla})` : ''}` : `${d[nameKey] || 'Time'} (#${d[idKey]})`;
+            };
+            const set = (id, name) => { d[idKey] = id; d[nameKey] = name; f.update(label_()); refreshTabs(); touchActive(); };
+            const f = pickerField(label, {
+                text: label_(), empty: `Escolher ${label.toLowerCase()}…`,
+                onOpen: () => openPicker({
+                    title: `Escolher ${label.toLowerCase()}`, placeholder: 'Buscar por nome, sigla ou slug…',
+                    search: async q => (await api('GET', `/lookup/teams?q=${encodeURIComponent(q)}`)).data.map(t => ({
+                        ...t, primary: t.nome, secondary: [t.tla, t.pais_origem].filter(Boolean).join(' · '),
+                    })),
+                    onPick: t => { state.labels.teams[t.id] = t; set(t.id, t.nome); },
+                    onClear: d[idKey] != null ? () => set(null, null) : null,
+                    clearLabel: `Remover ${label.toLowerCase()}`,
+                }),
+                onClear: () => set(null, null),
+            });
+            f.classList.add('mx-hero-team', area);
+            return f;
+        };
+        const homePick = teamPicker('home', 'Mandante', 'hp');
+        const awayPick = teamPicker('away', 'Visitante', 'ap');
+        const homeScore = numControl(d, 'home_score', { min: 0, max: 99 });
+        const awayScore = numControl(d, 'away_score', { min: 0, max: 99 });
+        homeScore.setAttribute('aria-label', 'Gols do mandante'); homeScore.classList.add('mx-hero-score-input', 'hs');
+        awayScore.setAttribute('aria-label', 'Gols do visitante'); awayScore.classList.add('mx-hero-score-input', 'as');
 
         // Estádio
         const venueText = () => venueLabel(d.venue_id != null ? state.labels.venues[d.venue_id] : null);
@@ -348,44 +443,20 @@ const MatchEdit = (() => {
             }),
             onClear: () => { d.venue_id = null; venueF.update(''); touchActive(); },
         });
-        grid.append(venueF);
 
-        // Times
-        const teamPicker = (side, label) => {
-            const idKey = `${side}_team_id`, nameKey = `${side}_team_name`;
-            const text = () => {
-                if (d[idKey] == null) return d[nameKey] || '';
-                const t = state.labels.teams[d[idKey]];
-                return t ? `${t.nome}${t.tla ? ` (${t.tla})` : ''}` : `${d[nameKey] || 'Time'} (#${d[idKey]})`;
-            };
-            const f = pickerField(label, {
-                text: text(), empty: 'Escolher time…',
-                onOpen: () => openPicker({
-                    title: `Escolher ${label.toLowerCase()}`, placeholder: 'Buscar por nome, sigla ou slug…',
-                    search: async q => (await api('GET', `/lookup/teams?q=${encodeURIComponent(q)}`)).data.map(t => ({
-                        ...t, primary: t.nome, secondary: [t.tla, t.pais_origem].filter(Boolean).join(' · '),
-                    })),
-                    onPick: t => { state.labels.teams[t.id] = t; d[idKey] = t.id; d[nameKey] = t.nome; f.update(text()); touchActive(); },
-                    onClear: d[idKey] != null ? () => { d[idKey] = null; d[nameKey] = null; f.update(''); touchActive(); } : null,
-                    clearLabel: `Remover ${label.toLowerCase()}`,
-                }),
-                onClear: () => { d[idKey] = null; d[nameKey] = null; f.update(''); touchActive(); },
-            });
-            return f;
-        };
-        grid.append(teamPicker('home', 'Mandante'), teamPicker('away', 'Visitante'));
-        grid.append(
-            field('Gols do mandante', numControl(d, 'home_score', { min: 0, max: 99 })),
-            field('Gols do visitante', numControl(d, 'away_score', { min: 0, max: 99 })),
-        );
+        const dateField = dateTimeField(d, syncLogo);
 
-        body.append(
-            h('p', { class: 'mx-note' }, 'Trocar o time não altera os lances, pênaltis e escalações já gravados — ajuste-os nas respectivas abas se necessário.'),
-            grid,
-        );
+        box.append(
+            h('div', { class: 'mx-hero-top' }, logo,
+                h('div', { class: 'mx-hero-titles' }, comp, h('div', { class: 'mx-hero-sub' }, phase, edition, status))),
+            h('div', { class: 'mx-hero-score' }, homePick, homeScore, h('span', { class: 'mx-hero-x', 'aria-hidden': 'true' }, '×'), awayScore, awayPick),
+            h('div', { class: 'mx-hero-meta' }, dateField, venueF),
+            h('div', { class: 'mx-hero-info' }, `Evento #${state.id} · ${state.newMode ? 'novo matchdata (ainda não gravado)' : `matchdata ${state.matchDataId}`} — trocar o time não altera lances, pênaltis e escalações já gravados.`),
+            makeBar('general'));
+        syncLogo();
     }
 
-    function dateTimeField(d) {
+    function dateTimeField(d, onChange) {
         const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(:\d{2})?(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/.exec(d.utc_date || '');
         const offsets = m && !OFFSETS.includes(m[4]) ? [...OFFSETS, m[4]] : OFFSETS;
         const id = nextId('f');
@@ -396,7 +467,7 @@ const MatchEdit = (() => {
             let v = input.value;
             if (!v) d.utc_date = null;
             else { if (v.length === 16) v += ':00'; d.utc_date = `${v}${sel.value}`; }
-            touchActive();
+            onChange?.(); touchActive();
         };
         input.addEventListener('input', sync);
         sel.addEventListener('change', sync);
@@ -527,7 +598,8 @@ const MatchEdit = (() => {
                 }, { small: true }),
                 actionBtn('+ Lance', () => {
                     const last = plays[plays.length - 1];
-                    const p = { minute: last?.minute ?? 1, realMinute: last?.realMinute ?? 1, period: last?.period ?? 1, periodLabel: last?.periodLabel ?? '1T', playType: 'YELLOW_CARD', name: null, popularName: null, shirtNumber: null, slug: null, teamAbbr: null, teamId: null, teamSlug: null };
+                    const per = last?.period ?? 1;
+                    const p = { minute: last?.minute ?? 1, realMinute: last?.realMinute ?? 1, period: per, periodLabel: PERIODS[per]?.label ?? last?.periodLabel ?? '1T', playType: 'YELLOW_CARD', name: null, popularName: null, shirtNumber: null, slug: null, teamAbbr: null, teamId: null, teamSlug: null };
                     setSide(p, 'home');
                     plays.push(p); redraw();
                     listBox.lastElementChild?.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -544,10 +616,35 @@ const MatchEdit = (() => {
         const rowEl = h('div', { class: 'mx-row' });
         const rerenderRow = () => { rowEl.replaceWith(playRow(plays, i, redraw)); touchActive(); };
 
-        const minute = h('input', { type: 'text', class: 'mx-input', maxlength: 6, 'aria-label': 'Minuto', placeholder: 'ex.: 45+2', value: p.minute ?? '' });
-        minute.addEventListener('input', () => { p.minute = /^\d{1,3}$/.test(minute.value.trim()) ? Number(minute.value.trim()) : minute.value.trim(); touchActive(); });
-        const period = numControl(p, 'period', { min: 1, max: 9, onChange: v => { if (!p.periodLabel && v) { p.periodLabel = `${v}T`; label.value = p.periodLabel; } } });
-        const label = textControl(p, 'periodLabel', { max: 20 });
+        // Período (padronizado) + minuto + minuto real: um preenche o outro
+        const minuteIn = h('input', { type: 'text', class: 'mx-input', maxlength: 6, 'aria-label': 'Minuto', placeholder: 'ex.: 45+1', value: p.minute ?? '' });
+        const realIn = h('input', { type: 'number', class: 'mx-input', min: 0, max: 300, step: 1, inputmode: 'numeric', 'aria-label': 'Minuto real', placeholder: 'ex.: 46', value: p.realMinute ?? '' });
+        const hint = h('div', { class: 'mx-hint warn', hidden: true });
+        const setHint = msg => { hint.textContent = msg || ''; hint.hidden = !msg; };
+        const fromReal = () => {
+            if (p.realMinute == null) { setHint(''); return; }
+            const m = minuteFromReal(p.period, p.realMinute);
+            if (m === null) { setHint(PERIODS[p.period] ? `O minuto real ${p.realMinute} não pertence ao ${PERIODS[p.period].label}.` : ''); return; }
+            p.minute = m; minuteIn.value = String(m); setHint('');
+        };
+        const fromMinute = () => {
+            const r = realFromMinute(p.period, p.minute);
+            if (r === null) { setHint(''); return; }
+            p.realMinute = r; realIn.value = String(r); setHint('');
+        };
+        realIn.addEventListener('input', () => { p.realMinute = realIn.value === '' ? null : Number(realIn.value); fromReal(); touchActive(); });
+        minuteIn.addEventListener('input', () => {
+            const v = minuteIn.value.trim();
+            p.minute = /^\d{1,3}$/.test(v) ? Number(v) : v;
+            fromMinute(); touchActive();
+        });
+        const periodOpts = Object.entries(PERIODS).map(([n, per]) => [n, per.label]);
+        const periodSel = selectControl(periodOpts, p.period == null ? '' : String(p.period), v => {
+            p.period = Number(v);
+            if (PERIODS[v]) p.periodLabel = PERIODS[v].label;
+            if (p.realMinute != null) fromReal(); else fromMinute();
+        });
+        if (p.period != null && !PERIODS[p.period]) periodSel.querySelector(`option[value="${p.period}"]`).textContent = `Período ${p.period}${p.periodLabel ? ` (${p.periodLabel})` : ''}`;
         const typeOpts = [...PLAY_TYPES];
         const typeSel = selectControl(typeOpts, p.playType, v => { p.playType = v; if (v === 'SUBSTITUTION') { p.playerIn ??= { name: null, popularName: null }; p.playerOut ??= { name: null, popularName: null }; } rerenderRow(); });
 
@@ -562,8 +659,8 @@ const MatchEdit = (() => {
 
         const grid = h('div', { class: 'mx-grid sm' },
             field('Tipo', typeSel), field('Time', sideSelect(p, rerenderRow)),
-            field('Período', period), field('Rótulo', label),
-            field('Minuto', minute), field('Minuto real', numControl(p, 'realMinute', { min: 0, max: 300 })));
+            field('Período', periodSel), field('Minuto real', realIn),
+            field('Minuto', minuteIn), hint);
 
         const personBox = (title, obj, side) => {
             const popular = textControl(obj, 'popularName', { max: 100 });
@@ -810,7 +907,6 @@ const MatchEdit = (() => {
 
     // ── Registro de painéis ────────────────────────────────────────────────
     const PANELS = [
-        { key: 'general', label: () => 'Geral', render: renderGeneral },
         { key: 'lineup_home', label: () => `Escalação · ${teamInfo('home')?.tla || 'Mandante'}`, render: (b, s) => renderLineup(b, s, 'home') },
         { key: 'lineup_away', label: () => `Escalação · ${teamInfo('away')?.tla || 'Visitante'}`, render: (b, s) => renderLineup(b, s, 'away') },
         { key: 'plays', label: () => 'Lances', render: renderPlays },
@@ -821,10 +917,16 @@ const MatchEdit = (() => {
         { key: 'last_results', label: () => 'Forma recente', render: renderForm },
     ];
 
-    function touchActive() { refresh(state.active); }
+    function touchActive() { refresh(state.active); if (state.active !== 'general') refresh('general'); }
 
     function renderPanel(key) {
         const sec = state.sections[key];
+        if (key === 'general') {   // o cabeçalho editável é a seção "general"
+            renderHero($('mxSummary'), sec);
+            sec.rendered = true;
+            refresh(key);
+            return;
+        }
         const panel = $(`mx-panel-${key}`);
         const body = panel.querySelector('.mx-panel-body');
         body.replaceChildren();
@@ -862,14 +964,16 @@ const MatchEdit = (() => {
     function highlightError(key, message) {
         const m = /\[(\d+)\]/.exec(message || '');
         if (!m) return;
-        const rows = $(`mx-panel-${key}`).querySelectorAll('.mx-row');
+        const panel = $(`mx-panel-${key}`);
+        if (!panel) return;
+        const rows = panel.querySelectorAll('.mx-row');
         const row = rows[Number(m[1])];
         if (!row) return;
         row.classList.add('invalid');
         row.scrollIntoView({ block: 'center', behavior: 'smooth' });
         setTimeout(() => row.classList.remove('invalid'), 4000);
     }
-    const humanize = message => String(message || '').replace(/\[(\d+)\]/g, (_, n) => ` #${Number(n) + 1}`).replace(/^data\.?/, '');
+    const humanize = message => String(message || '').replace(/^data(?=[.[:])/, '').replace(/^\[(\d+)\]\.?/, (_, n) => `item ${Number(n) + 1} — `).replace(/\[(\d+)\]/g, (_, n) => ` #${Number(n) + 1}`).replace(/^\./, '').trim();
 
     async function save(key) {
         const sec = state.sections[key];
@@ -936,6 +1040,19 @@ const MatchEdit = (() => {
     }
 
     // ── Montagem da página ─────────────────────────────────────────────────
+    function makeBar(key) {
+        const bar = h('div', { id: `mx-bar-${key}`, class: 'mx-savebar' },
+            h('div', { class: 'mx-status', role: 'status', 'aria-live': 'polite' }),
+            h('div', { class: 'mx-bar-actions' },
+                actionBtn('Recarregar seção', () => reloadSection(key), { small: true }),
+                actionBtn('Descartar', () => discard(key), { small: true }),
+                actionBtn('Salvar seção', () => save(key), { kind: 'primary' })));
+        const [reload, discardBtn, saveBtn] = bar.querySelectorAll('button');
+        reload.dataset.act = 'reload'; reload.hidden = true;
+        discardBtn.dataset.act = 'discard'; saveBtn.dataset.act = 'save';
+        return bar;
+    }
+
     function buildShell() {
         const tabs = $('mxTabs'), panels = $('mxPanels');
         PANELS.forEach(p => {
@@ -944,15 +1061,7 @@ const MatchEdit = (() => {
                 onClick: () => activate(p.key),
             }, p.label(), h('span', { class: 'mx-dot', 'aria-hidden': 'true', title: 'Alterações não salvas' })));
 
-            const bar = h('div', { id: `mx-bar-${p.key}`, class: 'mx-savebar' },
-                h('div', { class: 'mx-status', role: 'status', 'aria-live': 'polite' }),
-                h('div', { class: 'mx-bar-actions' },
-                    actionBtn('Recarregar seção', () => reloadSection(p.key), { small: true }),
-                    actionBtn('Descartar', () => discard(p.key), { small: true }),
-                    actionBtn('Salvar seção', () => save(p.key), { kind: 'primary' })));
-            const [reload, discardBtn, saveBtn] = bar.querySelectorAll('button');
-            reload.dataset.act = 'reload'; reload.hidden = true;
-            discardBtn.dataset.act = 'discard'; saveBtn.dataset.act = 'save';
+            const bar = makeBar(p.key);
             panels.append(h('section', { id: `mx-panel-${p.key}`, class: 'mx-panel', role: 'tabpanel', 'aria-labelledby': `mx-tab-${p.key}`, hidden: true },
                 h('div', { class: 'mx-panel-body' }), bar));
         });
@@ -969,17 +1078,6 @@ const MatchEdit = (() => {
         });
     }
 
-    function renderHeader() {
-        const c = state.ctx.event;
-        const g = state.sections.general.original;
-        const date = Utils.formatMatchDate(g.utc_date || c.date);
-        $('mxSummary').replaceChildren(
-            h('div', { class: 'mx-sum-comp' }, [c.championship, c.phase].filter(Boolean).join(' · ') || g.competition || 'Partida'),
-            h('div', { class: 'mx-sum-match' }, `${state.ctx.home_team?.nome || c.homeName || '—'} ${g.home_score ?? ''} × ${g.away_score ?? ''} ${state.ctx.away_team?.nome || c.awayName || '—'}`),
-            h('div', { class: 'mx-sum-meta' }, [date, `Evento #${state.id}`, `matchdata ${state.matchDataId}`].filter(Boolean).join(' · ')));
-        $('mxBack').href = `match.html?id=${encodeURIComponent(state.id)}&sport=${encodeURIComponent(state.sport)}`;
-    }
-
     function showOnly(which) {
         ['mxLoading', 'mxDenied', 'mxError', 'mxCreate', 'mxContent'].forEach(id => { $(id).hidden = id !== which; });
     }
@@ -991,7 +1089,17 @@ const MatchEdit = (() => {
     }
 
     let started = false;
-    // ── Partida sem matchdata: criar (não vincula) ─────────────────────────
+    // ── Partida sem matchdata: criar (só grava ao salvar; não vincula) ─────────
+    const BLANK = {
+        general: { competition: null, edition: null, matchday: null, status: null, utc_date: null, venue_id: null,
+            home_team_id: null, home_team_name: null, away_team_id: null, away_team_name: null, home_score: null, away_score: null },
+        lineup_home: null, lineup_away: null, plays: [],
+        penalties: { home: null, away: null, shootout: [] },
+        statistics: null, referees: null,
+        attendance: { attendance: [], revenue: null },
+        last_results: null,
+    };
+
     function showCreated(matchDataId, text) {
         $('mxCreateText').textContent = text;
         $('mxCreateId').textContent = matchDataId;
@@ -1002,36 +1110,95 @@ const MatchEdit = (() => {
             try { await navigator.clipboard.writeText(matchDataId); Utils.showNotification('Id copiado.', 'success'); }
             catch { Utils.showNotification('Não foi possível copiar; selecione o id manualmente.', 'warning'); }
         };
+        showOnly('mxCreate');
     }
+    const savedText = id => `O matchdata ${id} foi criado e salvo, mas NÃO está vinculado a nenhuma partida. A vinculação é feita manualmente — e ele só poderá ser alterado depois de vinculado.`;
 
-    function showCreate(pendingId) {
+    function showCreate(pendingId, nextId, event) {
         $('mxCreateBack').href = `match.html?id=${encodeURIComponent(state.id)}&sport=${encodeURIComponent(state.sport)}`;
         showOnly('mxCreate');
+        if (pendingId) { showCreated(pendingId, savedText(pendingId)); return; }
         const btn = $('mxCreateBtn');
-        const fail = message => { const e = $('mxCreateError'); e.textContent = message; e.hidden = false; };
-        if (pendingId) {
-            showCreated(pendingId, `O matchdata ${pendingId} já foi criado para esta partida, mas ainda não está vinculado a ela. A vinculação é feita manualmente.`);
+        if (!nextId) {
+            $('mxCreateText').textContent = 'Esta partida não tem matchdata vinculado, mas os ids (a00001–a99999) acabaram: não é possível criar outro.';
+            btn.hidden = true;
             return;
         }
-        btn.onclick = async () => {
-            if (btn.disabled) return;
-            btn.disabled = true; btn.textContent = 'Criando…'; $('mxCreateError').hidden = true;
-            try {
-                const res = await api('POST', sectionPath());
-                showCreated(res.matchDataId, 'Matchdata criado em branco. Ele NÃO foi vinculado à partida — a vinculação é feita manualmente. Depois de vinculado, esta página abre o matchdata para edição.');
-                markCacheBust();
-            } catch (err) {
-                if (err.code === 'already_created' && err.data.matchDataId) {
-                    showCreated(err.data.matchDataId, `O matchdata ${err.data.matchDataId} já foi criado para esta partida, mas ainda não está vinculado a ela. A vinculação é feita manualmente.`);
-                } else if (err.code === 'already_linked') {
-                    location.reload();
-                } else {
-                    fail(err.message || 'Não foi possível criar o matchdata.');
-                    btn.disabled = false; btn.textContent = 'Criar matchdata';
+        $('mxCreateText').textContent = 'Esta partida não tem matchdata vinculado. Você pode criar um: abrirá um formulário em branco e o registro só é gravado no banco quando você salvar com algum dado preenchido. O id é atribuído nesse momento (previsto: ' + nextId + ') e a partida não é vinculada.';
+        btn.textContent = 'Criar matchdata';
+        btn.onclick = () => startNewMode(nextId, event);
+    }
+
+    function startNewMode(nextId, event) {
+        state.newMode = true; state.nextId = nextId;
+        state.ctx = { event: event || {}, venue: null, home_team: null, away_team: null };
+        state.matchDataId = '';
+        for (const [key, data] of Object.entries(BLANK)) {
+            state.sections[key] = { key, version: '', original: clone(data), draft: clone(data), corrupt: false, saving: false, rendered: false, error: null };
+        }
+        document.body.classList.add('mx-new');
+        buildShell();
+        refreshTabs();
+        const e = state.ctx.event || {};
+        const ref = [e.homeName && e.awayName ? `${e.homeName} ${e.homeGoals ?? ''} × ${e.awayGoals ?? ''} ${e.awayName}` : '', e.championship, e.phase, e.date].filter(Boolean).join(' · ');
+        const info = $('mxNewInfo');
+        info.replaceChildren(
+            h('strong', {}, 'Novo matchdata — ainda não gravado. '),
+            `Preencha os dados e salve: o registro só é criado no banco no salvamento, com o id atribuído nesse momento (previsto: ${nextId}). A partida não será vinculada e, depois de salvo, o matchdata só poderá ser alterado quando vinculado a uma partida.`,
+            ref ? h('div', { class: 'mx-hint' }, `Partida de referência: ${ref}`) : null);
+        info.hidden = false;
+        $('mxNewBar').hidden = false;
+        $('mxNewSave').onclick = saveNew;
+        renderPanel('general');
+        showOnly('mxContent');
+        activate(PANELS[0].key);
+        refreshNewBar();
+    }
+
+    async function saveNew() {
+        if (state.creating || state.saved) return;
+        const keys = Object.keys(state.sections).filter(isDirty);
+        if (!keys.length) return;
+        state.creating = true; state.newError = null; hideBanner();
+        const btn = $('mxNewSave');
+        btn.textContent = 'Salvando…';
+        $('mxNewStatus').textContent = '';
+        refreshNewBar();
+        const data = Object.fromEntries(keys.map(k => [k, payloadFor(k)]));
+        try {
+            const res = await api('POST', sectionPath(), { data });
+            state.saved = true;
+            document.body.classList.remove('mx-new');
+            showCreated(res.matchDataId, savedText(res.matchDataId));
+        } catch (err) {
+            if (err.code === 'already_created' && err.data.matchDataId) {
+                state.saved = true;
+                document.body.classList.remove('mx-new');
+                showCreated(err.data.matchDataId, savedText(err.data.matchDataId));
+            } else if (err.code === 'already_linked') {
+                location.reload();
+            } else {
+                const section = err.data && err.data.section;
+                const where = section && SECTION_NAMES[section] ? `${SECTION_NAMES[section]}: ` : '';
+                state.newError = true;
+                $('mxNewStatus').textContent = `${where}${humanize(err.message)}`;
+                $('mxNewStatus').className = 'mx-status err';
+                if (section && state.sections[section]) {
+                    if (section === 'general') $('mxSummary').scrollIntoView({ block: 'start', behavior: 'smooth' });
+                    else { activate(section); if (err.status === 400) highlightError(section, err.message); }
                 }
             }
-        };
+        } finally {
+            state.creating = false;
+            btn.textContent = 'Salvar e criar matchdata';
+            refreshNewBar();
+        }
     }
+
+    // Qualquer edição limpa o erro da última tentativa de criação
+    document.addEventListener('input', () => {
+        if (state.newMode && state.newError) { state.newError = null; $('mxNewStatus').className = 'mx-status'; refreshNewBar(); }
+    }, true);
 
     async function init() {
         if (started) return;   // evita montar a página duas vezes
@@ -1070,23 +1237,27 @@ const MatchEdit = (() => {
             if (data.context.away_team && g.away_team_id != null) state.labels.teams[g.away_team_id] = data.context.away_team;
 
             buildShell();
-            renderHeader();
             refreshTabs();
             showOnly('mxContent');
-            activate('general');
+            renderPanel('general');
+            activate(PANELS[0].key);
         } catch (err) {
             if (err.status === 401 || err.status === 403) showFailure('mxDenied', 'Acesso restrito', err.message);
-            else if (err.status === 404 && err.code === 'no_matchdata') showCreate(err.data.pendingMatchDataId || null);
+            else if (err.status === 404 && err.code === 'no_matchdata') showCreate(err.data.pendingMatchDataId || null, err.data.nextMatchDataId || null, err.data.event || null);
             else if (err.status === 404) showFailure('mxError', 'Nada para editar', err.message);
             else showFailure('mxError', 'Não foi possível carregar', err.message || 'Tente novamente em instantes.');
         }
     }
 
     // Avisa antes de sair com alterações não salvas
-    window.addEventListener('beforeunload', e => { if (state.ctx && anyDirty()) { e.preventDefault(); e.returnValue = ''; } });
+    window.addEventListener('beforeunload', e => { if (state.ctx && !state.saved && anyDirty()) { e.preventDefault(); e.returnValue = ''; } });
     // Ctrl/Cmd + S salva a seção aberta
     document.addEventListener('keydown', e => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && state.ctx) { e.preventDefault(); save(state.active); }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && state.ctx) {
+            e.preventDefault();
+            if (state.newMode) saveNew();
+            else save(isDirty(state.active) || !isDirty('general') ? state.active : 'general');
+        }
     });
 
     return { init, _state: state };
