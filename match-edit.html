@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131313" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sports Archive">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Editar partida — Sports Archive</title>
+    <meta name="description" content="Edição administrativa dos dados da partida.">
+    <meta name="robots" content="noindex">
+    <meta name="author" content="@limaalef">
+    <!-- Ícones / manifest -->
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/match-edit.css">
+    <meta name="referrer" content="same-origin">
+</head>
+<body class="page-match-edit">
+    <header>
+        <div class="header-frame" id="header"
+            data-title="Editar partida"
+            data-back="true">
+        </div>
+    </header>
+
+    <main class="container mx-page">
+
+        <!-- Carregando -->
+        <div id="mxLoading">
+            <div class="state-box">
+                <div class="icon">⏳</div>
+                <h2>Carregando dados da partida...</h2>
+            </div>
+        </div>
+
+        <!-- Sem permissão -->
+        <div id="mxDenied" hidden>
+            <div class="state-box">
+                <div class="icon">🔒</div>
+                <h2>Acesso restrito</h2>
+                <p></p>
+                <p class="mt-5"><a class="action-btn btn-ghost" href="index.html">Voltar ao início</a></p>
+            </div>
+        </div>
+
+        <!-- Erro -->
+        <div id="mxError" hidden>
+            <div class="state-box">
+                <div class="icon">❌</div>
+                <h2>Não foi possível carregar</h2>
+                <p></p>
+                <p class="mt-5"><a class="action-btn btn-ghost" href="index.html">Voltar ao início</a></p>
+            </div>
+        </div>
+
+        <!-- Partida sem matchdata: permite criar um (sem vincular) -->
+        <div id="mxCreate" hidden>
+            <div class="state-box">
+                <div class="icon">🗂️</div>
+                <h2>Partida sem matchdata</h2>
+                <p id="mxCreateText">Esta partida não tem matchdata vinculado.</p>
+                <div id="mxCreateResult" class="mx-created" hidden>
+                    <div class="mx-created-label">ID do matchdata</div>
+                    <code id="mxCreateId" class="mx-created-id"></code>
+                    <button id="mxCreateCopy" type="button" class="action-btn btn-ghost btn-xs">Copiar id</button>
+                </div>
+                <p id="mxCreateError" class="mx-status err" role="alert" hidden></p>
+                <p class="mt-5 mx-create-actions">
+                    <button id="mxCreateBtn" type="button" class="action-btn btn-primary">Criar matchdata</button>
+                    <a id="mxCreateBack" class="action-btn btn-ghost" href="match.html">‹ Voltar à partida</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Editor -->
+        <div id="mxContent" hidden>
+            <div class="mx-top">
+                <a id="mxBack" class="action-btn btn-ghost btn-xs" href="match.html">‹ Voltar à partida</a>
+                <div id="mxSummary" class="mx-summary"></div>
+            </div>
+
+            <div id="mxBanner" class="mx-banner" role="alert" hidden></div>
+
+            <div class="mx-tabs-wrap">
+                <div id="mxTabs" class="mx-tabs" role="tablist" aria-label="Seções do matchdata"></div>
+            </div>
+
+            <div id="mxPanels"></div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/translation.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/match-edit.js"></script>
+</body>
+</html>

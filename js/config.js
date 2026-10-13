@@ -12,13 +12,8 @@ const CONFIG = {
         motor: 'https://api-archive.limaalef.com/v2/motorsport/',
         carnaval: 'https://api-archive.limaalef.com/matches/carnaval'
     },
-    // Edição de nomes de jogadores (administração): PATCH /v2/matches/{sport}/{id}/players
-    // com { edits: [...] } e "Authorization: Bearer <token da API>" (o mesmo da sessão admin).
-    // {id} é o mesmo id usado em CF_API_URLS (id da fonte aberta no modal).
-    MATCH_EDIT: {
-        endpoint: 'https://api-archive.limaalef.com/v2/matches/{sport}/{id}/players',
-        method: 'PATCH',
-    },
+    // Edição administrativa do matchdata (match-edit.html). Exige "Authorization: Bearer <token da sessão admin>".
+    ADMIN_API_BASE:    'https://api-archive.limaalef.com/v2/admin',
 
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
@@ -39,7 +34,7 @@ const AppNav = {
     },
     ITEMS: [
         { id: 'home',       href: 'index.html',       key: 'navHome',       pages: ['index'] },
-        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'watch', 'event', 'storage', 'changelog'] },
+        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'match-edit', 'watch', 'event', 'storage', 'changelog'] },
         { id: 'requests',   href: 'my-requests.html', key: 'myrequests',    pages: ['my-requests', 'request-detail'] }
     ],
 

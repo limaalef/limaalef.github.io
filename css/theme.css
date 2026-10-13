@@ -222,6 +222,15 @@ body.theme-carnaval {
     --text-accent-color: #ffffff;
 }
 
+/* TEMA: ADMIN */
+body.theme-admin {
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --accent-color: rgb(139, 92, 246);
+    --accent-color-rgb: 139, 92, 246;
+    --accent-hover: rgb(124, 58, 237);
+    --text-accent-color: #ffffff;
+}
+
 /* DARK MODE - TEMA PADRÃO */
 @media (prefers-color-scheme: dark) {
     :root {

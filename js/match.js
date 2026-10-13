@@ -19,20 +19,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideLoading();
         showContent();
 
-        // Edição de nomes: só aparece para quem está logado com permissão de administrador
-        MatchEditor.attach({
-            match: data, sport, id,
-            onSaved: updated => {
-                Elements.renderLineups(updated.home_team, updated.away_team);
-                Elements.renderPlays(updated, updated.home_team.tla);
-                if (updated.penalties?.length) Elements.renderPenalties(updated, updated.home_team.tla);
-            },
-        });
+        // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
+        attachEditButton(id, sport);
     } catch (err) {
         console.error('Erro ao carregar partida:', err);
         showError();
     }
 });
+
+// ─── Botão de edição (admin) ─────────────────────
+function attachEditButton(id, sport) {
+    if (!Auth.adminSession()) return;
+    const header = document.querySelector('#meHero .logo-title-header');
+    if (!header || header.querySelector('.me-edit-link')) return;
+    const link = document.createElement('a');
+    link.className = 'me-edit-link';
+    link.href = `match-edit.html?id=${encodeURIComponent(id)}&sport=${encodeURIComponent(sport)}`;
+    link.textContent = 'Editar dados';
+    link.setAttribute('aria-label', 'Editar os dados desta partida');
+    header.appendChild(link);
+}
 
 // ─── Render principal ────────────────────────────
 function renderMatch(match, sport) {
