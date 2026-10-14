@@ -170,6 +170,38 @@ const MatchEdit = (() => {
     const SECTION_NAMES = { general: 'Cabeçalho', lineup_home: 'Escalação do mandante', lineup_away: 'Escalação do visitante', plays: 'Lances',
         penalties: 'Pênaltis', statistics: 'Estatísticas', referees: 'Árbitros', attendance: 'Público e renda', last_results: 'Forma recente' };
 
+    // quantidade mostrada ao lado de cada seção
+    function sectionCount(key) {
+        const d = state.sections[key]?.draft;
+        if (!d) return '';
+        const n = ({
+            lineup_home: () => (d.startingXI || []).length + (d.substitute || []).length,
+            lineup_away: () => (d.startingXI || []).length + (d.substitute || []).length,
+            plays: () => d.length,
+            penalties: () => (d.shootout || []).length,
+            statistics: () => new Set([...Object.keys(d.homeTeam || {}), ...Object.keys(d.awayTeam || {})]).size,
+            attendance: () => (d.attendance || []).length,
+        })[key]?.() || 0;
+        return n ? String(n) : '';
+    }
+
+    function goTo(key) {
+        if (key === 'general') { $('mxSummary').scrollIntoView({ block: 'start', behavior: 'smooth' }); $('mxSummary').querySelector('input')?.focus(); }
+        else activate(key, true);
+    }
+
+    function refreshAside() {
+        const ul = $('mxChanges');
+        if (!ul || !state.ctx) return;
+        const keys = ['general', ...PANELS.map(p => p.key)].filter(k => state.sections[k]);
+        ul.replaceChildren(...keys.map(k => {
+            const dirty = isDirty(k), saved = !!state.sections[k].savedAt;
+            return h('li', {}, h('button', { type: 'button', class: `mx-chg${dirty ? ' dirty' : saved ? ' saved' : ''}`, onClick: () => goTo(k) },
+                h('span', {}, SECTION_NAMES[k]),
+                h('span', { class: 'mx-chg-st' }, dirty ? (state.newMode ? 'preenchido' : 'alterado') : saved ? 'salvo' : '—')));
+        }));
+    }
+
     function refreshNewBar() {
         if (!state.newMode) return;
         const filled = Object.keys(state.sections).filter(isDirty);
@@ -184,7 +216,8 @@ const MatchEdit = (() => {
         const sec = state.sections[key];
         const dirty = isDirty(key);
         const tab = $(`mx-tab-${key}`);
-        if (tab) tab.classList.toggle('dirty', dirty);
+        if (tab) { tab.classList.toggle('dirty', dirty); const meta = tab.querySelector('.mx-tab-meta'); if (meta) meta.textContent = sectionCount(key); }
+        refreshAside();
         refreshNewBar();
         const bar = $(`mx-bar-${key}`);
         if (!bar) return;
@@ -346,10 +379,10 @@ const MatchEdit = (() => {
         run('');
     }
 
-    function pickerField(label, { text, empty, onOpen, onClear }) {
+    function pickerField(label, { text, empty, onOpen, onClear, invertButton = false }) {
         const id = nextId('f');
         const btn = h('button', { id, type: 'button', class: 'mx-pick-btn', onClick: onOpen });
-        const clear = h('button', { type: 'button', class: 'mx-icon-btn', 'aria-label': `Remover ${label.toLowerCase()}`, title: 'Remover', onClick: onClear }, '✕');
+        const clear = h('button', { type: 'button', class: `mx-icon-btn ${invertButton === true ? 'inverted-button' : ''}`, 'aria-label': `Remover ${label.toLowerCase()}`, title: 'Remover', onClick: onClear }, '✕');
         const update = value => {
             btn.textContent = value || empty;
             btn.classList.toggle('placeholder', !value);
@@ -402,7 +435,7 @@ const MatchEdit = (() => {
             const label_ = () => {
                 if (d[idKey] == null) return d[nameKey] || '';
                 const t = state.labels.teams[d[idKey]];
-                return t ? `${t.nome}${t.tla ? ` (${t.tla})` : ''}` : `${d[nameKey] || 'Time'} (#${d[idKey]})`;
+                return t ? `${t.nome}` : `${d[nameKey] || 'Time'} (#${d[idKey]})`;
             };
             const set = (id, name) => { d[idKey] = id; d[nameKey] = name; f.update(label_()); refreshTabs(); touchActive(); };
             const f = pickerField(label, {
@@ -417,6 +450,7 @@ const MatchEdit = (() => {
                     clearLabel: `Remover ${label.toLowerCase()}`,
                 }),
                 onClear: () => set(null, null),
+                invertButton: side === 'home' ? true : false,
             });
             f.classList.add('mx-hero-team', area);
             return f;
@@ -448,7 +482,7 @@ const MatchEdit = (() => {
 
         box.append(
             h('div', { class: 'mx-hero-top' }, logo,
-                h('div', { class: 'mx-hero-titles' }, comp, h('div', { class: 'mx-hero-sub' }, phase, edition, status))),
+                h('div', { class: 'mx-hero-titles' }, comp, h('div', { class: 'mx-hero-sub' }, edition, phase, status))),
             h('div', { class: 'mx-hero-score' }, homePick, homeScore, h('span', { class: 'mx-hero-x', 'aria-hidden': 'true' }, '×'), awayScore, awayPick),
             h('div', { class: 'mx-hero-meta' }, dateField, venueF),
             h('div', { class: 'mx-hero-info' }, `Evento #${state.id} · ${state.newMode ? 'novo matchdata (ainda não gravado)' : `matchdata ${state.matchDataId}`} — trocar o time não altera lances, pênaltis e escalações já gravados.`),
@@ -513,33 +547,34 @@ const MatchEdit = (() => {
             ? h('div', { class: 'mx-hint warn' }, `${list.length} titulares (o usual é 11).`) : null;
 
         const rows = list.map((p, i) => {
-            const posSlug = h('input', { type: 'text', class: 'mx-input mono', maxlength: 6, 'aria-label': 'Sigla da posição', value: p.posSlug ?? '' });
-            posSlug.addEventListener('input', () => { p.posSlug = posSlug.value; touchActive(); });
-            const pos = h('input', { type: 'text', class: 'mx-input', maxlength: 40, list: posList, 'aria-label': 'Posição', placeholder: 'Posição', value: p.position ?? '' });
-            pos.addEventListener('input', () => {
-                p.position = pos.value;
-                const known = POSITIONS.find(([n]) => n === pos.value);
-                if (known) { p.posSlug = known[1]; posSlug.value = known[1]; }
-                touchActive();
+            const input = (key, label, cls, extra = {}) => {
+                const el = h('input', { type: 'text', class: `mx-input ${cls}`.trim(), 'aria-label': label, placeholder: extra.placeholder || label, maxlength: extra.max, list: extra.list || null, inputmode: extra.inputmode || null, value: p[key] ?? '' });
+                el.addEventListener('input', () => { p[key] = el.value; extra.after?.(el.value); touchActive(); });
+                return el;
+            };
+            const posSlug = input('posSlug', 'Sigla da posição', 'mono', { max: 6, placeholder: 'Sigla' });
+            const pos = input('position', 'Posição', '', {
+                max: 40, list: posList,
+                after: v => { const known = POSITIONS.find(([n]) => n === v); if (known) { p.posSlug = known[1]; posSlug.value = known[1]; } },
             });
-            const num = h('input', { type: 'text', class: 'mx-input mx-num', maxlength: 4, inputmode: 'numeric', 'aria-label': 'Número da camisa', placeholder: '#', value: p.shirtNumber ?? '' });
-            num.addEventListener('input', () => { p.shirtNumber = num.value; touchActive(); });
-            const name = h('input', { type: 'text', class: 'mx-input', maxlength: 100, 'aria-label': 'Nome popular', placeholder: 'Nome popular', value: p.name ?? '' });
-            name.addEventListener('input', () => { p.name = name.value; touchActive(); });
-            const full = h('input', { type: 'text', class: 'mx-input', maxlength: 150, 'aria-label': 'Nome completo', placeholder: 'Nome completo', value: p.fullName ?? '' });
-            full.addEventListener('input', () => { p.fullName = full.value; touchActive(); });
-
-            return h('div', { class: 'mx-row mx-player' },
-                h('div', { class: 'mx-player-main' }, num, name, full),
-                h('div', { class: 'mx-player-pos' }, pos, posSlug),
+            return h('div', { class: 'mx-player' },
+                input('shirtNumber', 'Número da camisa', 'mx-num', { max: 4, inputmode: 'numeric', placeholder: '#' }),
+                input('name', 'Nome popular', '', { max: 100, placeholder: 'Nome popular' }),
+                input('fullName', 'Nome completo', '', { max: 150, placeholder: 'Nome completo' }),
+                pos, posSlug,
                 h('div', { class: 'mx-row-actions' },
                     iconBtn('Mover para cima', '↑', () => { if (move(list, i, -1)) rerender(); }, { disabled: i === 0 }),
                     iconBtn('Mover para baixo', '↓', () => { if (move(list, i, 1)) rerender(); }, { disabled: i === list.length - 1 }),
                     iconBtn(listName === 'startingXI' ? 'Mover para os reservas' : 'Mover para os titulares', '⇄', () => { lineup[otherName].push(list.splice(i, 1)[0]); rerender(); }),
                     iconBtn('Remover jogador', '✕', () => { list.splice(i, 1); rerender(); }, { danger: true })));
         });
+        const table = rows.length
+            ? h('div', { class: 'mx-pl-list' },
+                h('div', { class: 'mx-pl-head', 'aria-hidden': 'true' }, h('span', {}, '#'), h('span', {}, 'Nome'), h('span', {}, 'Nome completo'), h('span', {}, 'Posição'), h('span', {}, 'Sigla'), h('span', {})),
+                rows)
+            : null;
 
-        return h('section', { class: 'mx-list' }, head, warn, rows.length ? rows : h('div', { class: 'mx-empty small' }, 'Nenhum jogador.'));
+        return h('section', { class: 'mx-list' }, head, warn, table || h('div', { class: 'mx-empty small' }, 'Nenhum jogador.'));
     }
 
     // ── Painel: Lances ─────────────────────────────────────────────────────
@@ -579,12 +614,20 @@ const MatchEdit = (() => {
         });
     }
 
+    const OPEN_PLAYS = new WeakSet();   // lances com o formulário aberto (só visual; não vai para o banco)
+
     function renderPlays(body, sec) {
         const plays = sec.draft;
-        const listBox = h('div', { class: 'mx-rows' });
+        const listBox = h('div', { class: 'mx-tl' });
         const summary = h('div', { class: 'mx-hint' });
+        const periodTitle = n => ({ 1: '1º TEMPO', 2: '2º TEMPO', 3: 'PRORROGAÇÃO · 1º TEMPO', 4: 'PRORROGAÇÃO · 2º TEMPO' })[n] || (n == null ? 'SEM PERÍODO' : `PERÍODO ${n}`);
         const redraw = () => {
-            listBox.replaceChildren(...plays.map((p, i) => playRow(plays, i, redraw)));
+            const kids = []; let prev;
+            plays.forEach((p, i) => {
+                if (i === 0 || p.period !== prev) { kids.push(h('div', { class: 'mx-per' }, periodTitle(p.period))); prev = p.period; }
+                kids.push(playRow(plays, i, redraw));
+            });
+            listBox.replaceChildren(...kids);
             const goals = plays.filter(p => /GOAL/.test(p.playType || '')).length;
             summary.textContent = `${plays.length} lance(s) · ${goals} gol(s)`;
             touchActive();
@@ -601,7 +644,7 @@ const MatchEdit = (() => {
                     const per = last?.period ?? 1;
                     const p = { minute: last?.minute ?? 1, realMinute: last?.realMinute ?? 1, period: per, periodLabel: PERIODS[per]?.label ?? last?.periodLabel ?? '1T', playType: 'YELLOW_CARD', name: null, popularName: null, shirtNumber: null, slug: null, teamAbbr: null, teamId: null, teamSlug: null };
                     setSide(p, 'home');
-                    plays.push(p); redraw();
+                    plays.push(p); OPEN_PLAYS.add(p); redraw();
                     listBox.lastElementChild?.scrollIntoView({ block: 'center', behavior: 'smooth' });
                 }, { kind: 'primary', small: true }))),
             listBox);
@@ -613,8 +656,11 @@ const MatchEdit = (() => {
     function playRow(plays, i, redraw) {
         const p = plays[i];
         const isSub = p.playType === 'SUBSTITUTION';
-        const rowEl = h('div', { class: 'mx-row' });
-        const rerenderRow = () => { rowEl.replaceWith(playRow(plays, i, redraw)); touchActive(); };
+        const open = OPEN_PLAYS.has(p);
+        const rowEl = h('div', { class: `mx-row${open ? ' open' : ''}` });
+        const kind = /GOAL/.test(p.playType || '') ? 'g' : /YELLOW/.test(p.playType || '') ? 'y' : /RED/.test(p.playType || '') ? 'r' : 's';
+        const item = h('div', { class: 'mx-it' }, h('span', { class: `mx-nd ${kind}`, 'aria-hidden': 'true' }, `${p.minute ?? '?'}'`), rowEl);
+        const rerenderRow = () => { item.replaceWith(playRow(plays, i, redraw)); touchActive(); };
 
         // Período (padronizado) + minuto + minuto real: um preenche o outro
         const minuteIn = h('input', { type: 'text', class: 'mx-input', maxlength: 6, 'aria-label': 'Minuto', placeholder: 'ex.: 45+1', value: p.minute ?? '' });
@@ -648,9 +694,15 @@ const MatchEdit = (() => {
         const typeOpts = [...PLAY_TYPES];
         const typeSel = selectControl(typeOpts, p.playType, v => { p.playType = v; if (v === 'SUBSTITUTION') { p.playerIn ??= { name: null, popularName: null }; p.playerOut ??= { name: null, popularName: null }; } rerenderRow(); });
 
-        const summary = `${i + 1}. ${p.minute ?? '?'}' · ${playTypeLabel(p.playType)}${isSub ? '' : ` · ${p.popularName || p.name || '—'}`}`;
-        const head = h('div', { class: 'mx-row-head' },
-            h('div', { class: 'mx-row-title' }, summary),
+        const side = sideOf(p);
+        const teamTxt = side === 'home' ? teamName('home') : side === 'away' ? teamName('away') : (p.teamAbbr || '');
+        const who = isSub ? `entra ${p.playerIn?.popularName || p.playerIn?.name || '—'}, sai ${p.playerOut?.popularName || p.playerOut?.name || '—'}` : (p.popularName || p.name || '—');
+        const toggle = h('button', {
+            type: 'button', class: 'mx-row-toggle', 'aria-expanded': String(open),
+            onClick: () => { if (open) OPEN_PLAYS.delete(p); else OPEN_PLAYS.add(p); rerenderRow(); },
+        }, h('span', { class: 'mx-chev', 'aria-hidden': 'true' }, open ? '▾' : '▸'),
+        h('span', { class: 'mx-row-title' }, h('b', {}, playTypeLabel(p.playType)), ' · ', who, teamTxt ? h('span', { class: 'mx-muted' }, ` · ${teamTxt}`) : null));
+        const head = h('div', { class: 'mx-row-head' }, toggle,
             h('div', { class: 'mx-row-actions' },
                 iconBtn('Mover para cima', '↑', () => { if (move(plays, i, -1)) redraw(); }, { disabled: i === 0 }),
                 iconBtn('Mover para baixo', '↓', () => { if (move(plays, i, 1)) redraw(); }, { disabled: i === plays.length - 1 }),
@@ -678,6 +730,7 @@ const MatchEdit = (() => {
                 h('details', { class: 'mx-more' }, h('summary', {}, 'Mais campos'), h('div', { class: 'mx-grid sm' }, more)));
         };
 
+        if (!open) { rowEl.append(head); return item; }
         if (isSub) {
             p.playerIn ??= { name: null, popularName: null };
             p.playerOut ??= { name: null, popularName: null };
@@ -685,7 +738,7 @@ const MatchEdit = (() => {
         } else {
             rowEl.append(head, grid, h('div', { class: 'mx-persons' }, personBox('Jogador', p, 'home')));
         }
-        return rowEl;
+        return item;
     }
 
     // ── Painel: Pênaltis ───────────────────────────────────────────────────
@@ -986,6 +1039,7 @@ const MatchEdit = (() => {
         try {
             const res = await api('PATCH', sectionPath(key), { version: sec.version, data: payloadFor(key) });
             sec.version = res.version;
+            sec.savedAt = res.applied ? Date.now() : sec.savedAt;
             sec.original = clone(res.data);
             sec.draft = clone(res.data);
             if (res.applied) markCacheBust();
@@ -1036,7 +1090,12 @@ const MatchEdit = (() => {
     }
 
     function refreshTabs() {
-        PANELS.forEach(p => { $(`mx-tab-${p.key}`).firstChild.textContent = p.label(); });
+        PANELS.forEach(p => {
+            const tab = $(`mx-tab-${p.key}`);
+            tab.querySelector('.mx-tab-label').textContent = p.label();
+            tab.querySelector('.mx-tab-meta').textContent = sectionCount(p.key);
+        });
+        refreshAside();
     }
 
     // ── Montagem da página ─────────────────────────────────────────────────
@@ -1059,7 +1118,7 @@ const MatchEdit = (() => {
             tabs.append(h('button', {
                 id: `mx-tab-${p.key}`, type: 'button', class: 'mx-tab', role: 'tab', 'aria-controls': `mx-panel-${p.key}`, 'aria-selected': 'false', tabindex: '-1',
                 onClick: () => activate(p.key),
-            }, p.label(), h('span', { class: 'mx-dot', 'aria-hidden': 'true', title: 'Alterações não salvas' })));
+            }, h('span', { class: 'mx-tab-label' }, p.label()), h('span', { class: 'mx-tab-meta' }), h('span', { class: 'mx-dot', 'aria-hidden': 'true', title: 'Alterações não salvas' })));
 
             const bar = makeBar(p.key);
             panels.append(h('section', { id: `mx-panel-${p.key}`, class: 'mx-panel', role: 'tabpanel', 'aria-labelledby': `mx-tab-${p.key}`, hidden: true },
@@ -1070,8 +1129,8 @@ const MatchEdit = (() => {
         tabs.addEventListener('keydown', e => {
             const i = PANELS.findIndex(p => p.key === state.active);
             let n = null;
-            if (e.key === 'ArrowRight') n = (i + 1) % PANELS.length;
-            else if (e.key === 'ArrowLeft') n = (i - 1 + PANELS.length) % PANELS.length;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % PANELS.length;
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + PANELS.length) % PANELS.length;
             else if (e.key === 'Home') n = 0;
             else if (e.key === 'End') n = PANELS.length - 1;
             if (n !== null) { e.preventDefault(); activate(PANELS[n].key, true); }

@@ -93,18 +93,28 @@
             <div id="mxBanner" class="mx-banner" role="alert" hidden></div>
             <div id="mxNewInfo" class="mx-banner info" hidden></div>
 
-            <div class="mx-tabs-wrap">
-                <div id="mxTabs" class="mx-tabs" role="tablist" aria-label="Seções do matchdata"></div>
-            </div>
-
-            <div id="mxPanels"></div>
-
-            <!-- Matchdata novo: um único salvamento cria o registro -->
-            <div id="mxNewBar" class="mx-savebar mx-newbar" hidden>
-                <div id="mxNewStatus" class="mx-status" role="status" aria-live="polite"></div>
-                <div class="mx-bar-actions">
-                    <button id="mxNewSave" type="button" class="action-btn btn-primary" disabled>Salvar e criar matchdata</button>
+            <div class="mx-layout">
+                <div class="mx-tabs-wrap">
+                    <div id="mxTabs" class="mx-tabs" role="tablist" aria-label="Seções do matchdata"></div>
                 </div>
+
+                <div class="mx-main">
+                    <div id="mxPanels"></div>
+
+                    <!-- Matchdata novo: um único salvamento cria o registro -->
+                    <div id="mxNewBar" class="mx-savebar mx-newbar" hidden>
+                        <div id="mxNewStatus" class="mx-status" role="status" aria-live="polite"></div>
+                        <div class="mx-bar-actions">
+                            <button id="mxNewSave" type="button" class="action-btn btn-primary" disabled>Salvar e criar matchdata</button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside id="mxAside" class="mx-aside" aria-label="Resumo das alterações">
+                    <div class="mx-aside-title">Alterações</div>
+                    <ul id="mxChanges" class="mx-changes"></ul>
+                    <p class="mx-aside-tip">Cada seção é salva separadamente. Dica: digite o minuto real de um lance e o minuto é calculado a partir do período.</p>
+                </aside>
             </div>
         </div>
     </main>
