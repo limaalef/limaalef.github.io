@@ -134,9 +134,77 @@ CONFIG._setupHeader = function (container, isMobile) {
         document.getElementById('logo-header').prepend(backBtn);
     }
 
+    CONFIG._setupHeaderUser(container).catch(err => console.warn('Menu de usuário não carregado:', err));
+
     // Ações extras
     const actions = container.dataset.actions;
     if (actions) {
         document.getElementById('header-actions').insertAdjacentHTML('afterbegin', actions);
     }
+};
+
+// ── Menu do usuário logado (padrão de avatar + menu no header) ─────────────
+// A administração tem sessão e navegação próprias, então não recebe este menu.
+CONFIG._setupHeaderUser = async function (container) {
+    if (container.dataset.admin === 'true') return;
+    const slot = document.getElementById('header-user');
+    const requestBtn = document.getElementById('headerRequestBtn');
+    if (!slot) return;
+
+    if (typeof Auth === 'undefined') {
+        await new Promise(resolve => {
+            const s = document.createElement('script');
+            s.src = '/js/auth.js'; s.onload = resolve; s.onerror = resolve;
+            document.head.appendChild(s);
+        });
+    }
+    if (typeof Auth === 'undefined') return;
+
+    const esc = v => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const tr = k => LanguageManager.t(k);
+
+    function close() {
+        const menu = slot.querySelector('.hu-menu');
+        if (!menu) return;
+        menu.hidden = true;
+        slot.querySelector('.hu-trigger').setAttribute('aria-expanded', 'false');
+    }
+
+    function render() {
+        const session = Auth.site;
+        const logged = session.restore();
+        slot.hidden = !logged;
+        if (requestBtn) requestBtn.hidden = logged || container.dataset.reqbtn === 'false';
+        if (!logged) { slot.innerHTML = ''; return; }
+
+        const name = session.user?.name || session.user?.email || '';
+        const initials = name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+        const pic = session.user?.picture;
+        slot.innerHTML = `
+            <button type="button" class="hu-trigger" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(name)}">
+                <span class="hu-avatar">${esc(initials)}</span>
+                ${pic ? `<img class="hu-avatar hu-avatar-img" src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
+            </button>
+            <div class="hu-menu" role="menu" hidden>
+                <div class="hu-name">${esc(name)}</div>
+                <a role="menuitem" class="hu-item" href="my-requests.html">${tr('myrequests')}</a>
+                <button type="button" role="menuitem" class="hu-item hu-logout">${tr('requestLogout')}</button>
+            </div>`;
+
+        const trigger = slot.querySelector('.hu-trigger');
+        const menu = slot.querySelector('.hu-menu');
+        trigger.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = menu.hidden;
+            menu.hidden = !open;
+            trigger.setAttribute('aria-expanded', String(open));
+        });
+        slot.querySelector('.hu-logout').addEventListener('click', () => session.logout(() => location.reload()));
+    }
+
+    document.addEventListener('click', e => { if (!slot.contains(e.target)) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.addEventListener('authchange', render);
+    document.addEventListener('languagechange', render);
+    render();
 };

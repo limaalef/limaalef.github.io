@@ -2638,3 +2638,22 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
         scroll-behavior: auto !important;
     }
 }
+
+/* Menu do usuário no header */
+.header-user { position: relative; margin-left: auto; }
+.hu-trigger { position: relative; display: block; width: 36px; height: 36px; padding: 0; border: 0; cursor: pointer;
+    border-radius: var(--border-radius-size-circle); background: transparent; }
+.hu-avatar { width: 36px; height: 36px; border-radius: var(--border-radius-size-circle); display: grid; place-items: center;
+    background: var(--bg-tertiary); color: var(--text-primary); font-size: var(--font-size-mdm); font-weight: 600; }
+.hu-avatar-img { position: absolute; inset: 0; object-fit: cover; }
+.hu-trigger:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
+.hu-menu { position: absolute; right: 0; top: calc(100% + var(--sp-3)); min-width: 200px; z-index: var(--z-modal);
+    padding: var(--sp-2); border-radius: var(--border-radius-size-lg); background: var(--bg-secondary);
+    box-shadow: 0 8px 28px var(--black-a30); }
+.hu-name { padding: var(--sp-3) var(--sp-4); font-size: var(--font-size-mdm); font-weight: 600; color: var(--text-primary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
+.hu-item { display: block; width: 100%; padding: var(--sp-3) var(--sp-4); border: 0; border-radius: var(--border-radius-size-md);
+    background: transparent; color: var(--text-secondary); font: inherit; font-size: var(--font-size-mdm);
+    text-align: left; text-decoration: none; cursor: pointer; }
+@media (hover: hover) { .hu-item:hover { background: var(--bg-tertiary); color: var(--text-primary); } }
+.hu-logout { color: var(--error-color); }

@@ -53,21 +53,7 @@
     <!-- Dashboard -->
     <div class="is-hidden" id="rq-dashboard">
         <div class="adm-layout narrow-width">
-            <!-- Sidebar -->
-            <aside class="adm-sidebar">
-                <div class="profile-box">
-                    <img id="rq-avatar" class="profile-avatar" src="" onerror="this.hidden=true" alt="">
-                    <div>
-                        <div class="profile-user-name" id="rq-user-name"></div>
-                        <button class="action-btn btn-ghost btn-xs" id="rq-refresh">↺ <span data-i18n="requestRefresh">Atualizar</span></button>
-                        <button class="action-btn btn-ghost btn-xs text-error" id="rq-logout">
-                            <span data-i18n="requestLogout">Sair</span>
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Sidebar -->
+            <!-- Conteúdo -->
             <div class="adm-main px-5">
                 <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
                 <div class="is-hidden" id="rq-content"></div>
@@ -97,20 +83,10 @@ document.getElementById('rq-login-google').addEventListener('click', () => {
     session.login({ onSuccess: showDashboard });
 });
 
-document.getElementById('rq-logout').addEventListener('click', () => {
-    session.logout(() => {
-        document.getElementById('rq-auth').classList.remove('is-hidden');
-        document.getElementById('rq-dashboard').classList.add('is-hidden');
-    });
-});
-document.getElementById('rq-refresh').addEventListener('click', loadOrders);
-
 function showDashboard() {
     document.getElementById('rq-auth').classList.add('is-hidden');
     document.getElementById('rq-dashboard').classList.remove('is-hidden');
-    document.getElementById('rq-user-name').textContent   = session.user?.name || '';
-    const av = document.getElementById('rq-avatar');
-    if (session.user?.picture) av.src = session.user.picture; else av.hidden = true;
+    document.dispatchEvent(new Event('authchange'));   // header mostra o menu do usuário
 
     // Header title
     const hdr = document.getElementById('header');

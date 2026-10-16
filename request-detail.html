@@ -48,16 +48,17 @@
     </div>
         
     <div class="is-hidden" id="rd-content">
-        <div class="adm-layout narrow-width layout-inverted">
+        <div class="rd-layout">
             <!-- Conteúdo -->
-            <div class="adm-main px-5">
+            <div class="rd-head" id="rd-order-head"></div>
+            <main class="rd-main">
                 <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
                 <div id="rd-order-body"></div>
-            </div>
+            </main>
 
-            <!-- Sidebar -->
-            <aside class="adm-sidebar-right sidebar-wide">
-                <div class="px-5" id="rd-order-sidebar"></div>
+            <!-- Painel lateral: contato e pagamento -->
+            <aside class="rd-aside">
+                <div id="rd-order-sidebar"></div>
             </aside>
         </div>
     </div>
@@ -105,6 +106,7 @@ document.getElementById('rd-login-google').addEventListener('click', () => {
 async function showContent() {
     document.getElementById('rd-auth').classList.add('is-hidden');
     document.getElementById('rd-content').classList.remove('is-hidden');
+    document.dispatchEvent(new Event('authchange'));   // header mostra o menu do usuário
     if (!orderId) { document.getElementById('rd-loading').textContent = t('requestNoOrderId'); return; }
     await handlePaypalReturn();   // volta do PayPal: captura antes de carregar o pedido
     await loadOrder();
@@ -147,6 +149,7 @@ async function loadOrder() {
         }
 
         const detail = buildOrderDetail(order);
+        document.getElementById('rd-order-head').innerHTML = detail.head;
         document.getElementById('rd-order-body').innerHTML = detail.body;
         document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
 
@@ -159,6 +162,66 @@ async function loadOrder() {
     }
 }
 
+// ── Ícones (traço único, herdam a cor do texto) ────────────────────────────
+const RD_ICON = {
+    copy:     '<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/>',
+    check:    '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    download: '<path d="M12 4v11"/><path d="M7.5 11 12 15.5 16.5 11"/><path d="M5 19.5h14"/>',
+    lock:     '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
+    media:    '<rect x="3.5" y="5" width="17" height="14" rx="3.5"/><path d="M10.5 9.5v5l4.2-2.5z"/>',
+    back:     '<path d="M15 6l-6 6 6 6"/>',
+};
+function ico(name, size = 16) {
+    return `<svg class="rd-ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${RD_ICON[name]}</svg>`;
+}
+
+// Pílula de status: texto neutro + ponto discreto (a cor só sinaliza, não pinta o fundo)
+function pill(kind, label) {
+    return `<span class="rd-pill rd-pill--${kind}"><i></i>${label}</span>`;
+}
+// Miniatura gerada a partir do ID do item: matiz estável por ID, saturação baixa (combina com claro/escuro)
+function itemThumb(item) {
+    const id  = String(item.id ?? item.label ?? '');
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
+    const txt = id.length > 6 ? id.slice(-6) : id;
+    return `<span class="rd-item-ico rd-thumb" style="--h:${h}" aria-hidden="true"><span>${esc(txt)}</span></span>`;
+}
+const STATUS_KIND = { pending:'wait', processing:'wait', ready:'ok', completed:'ok', expired:'off', cancelled:'err' };
+
+function kv(label, valueHtml, extraCls = '') {
+    return `<div class="rd-kv ${extraCls}"><span class="rd-k">${label}</span><span class="rd-v">${valueHtml}</span></div>`;
+}
+
+// Métodos de pagamento. Os logotipos oficiais ficam em /icons/payments/ (ver README da pasta);
+// se o arquivo não existir, a linha continua legível apenas com o nome.
+const PAY_METHODS = {
+    pix:    { name: 'Pix',    logo: '/icons/payments/pix.svg'    },
+    paypal: { name: 'PayPal', logo: '/icons/payments/paypal.svg' },
+};
+function payMethodKey(o) {
+    return (o.externalPayment || o.paymentExternal === true || o.payment?.provider === 'paypal') ? 'paypal' : 'pix';
+}
+function methodRow(o) {
+    const m = PAY_METHODS[payMethodKey(o)];
+    return `
+    <div class="rd-method">
+        <span class="rd-k">${t('requestPaymentMethod')}</span>
+        <span class="rd-method-val">
+            <span>${m.name}</span>
+            <img class="rd-method-logo" src="${m.logo}" alt="" onerror="this.remove()">
+        </span>
+    </div>`;
+}
+
+function paySection(inner) {
+    return `
+    <section class="rd-sec">
+        <h3 class="rd-sec-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</h3>
+        ${inner}
+    </section>`;
+}
+
 // ── Render detalhe ─────────────────────────────────────────────────────────
 function buildOrderDetail(o) {
     const now   = new Date();
@@ -166,7 +229,7 @@ function buildOrderDetail(o) {
     const items = o.items || [];
     const A     = o.access || {};   // regras de exibição vindas do servidor (links / pagamento / valores)
 
-    // Progress bar (inclui passo "Pagamento" quando o pedido está pronto)
+    // Progresso do pedido
     const steps = [
         { label: t('requestProgressReceived') },
         { label: t('requestProgressAnalysis')  },
@@ -176,77 +239,61 @@ function buildOrderDetail(o) {
     const curIdx  = stepIdx[o.status] ?? 0;
 
     const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
-        <div class="rd-section-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</div>
-        <div class="prog">
-            ${steps.map((s, i) => {
-                let cls = '';
-                if (i < curIdx)  cls = 'done';
-                if (i === curIdx) cls = 'active';
-                return `<div class="prog-conn ${cls} prog-conn-min"></div><div class="prog-step">
-                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls} dot-6"></div>`}</div>
-                            <span class="prog-lbl ${cls}">${s.label}</span>
-                        </div>`;
-            }).join('')}
-        </div>` : ``;
+        <section class="rd-block">
+            <h2 class="rd-block-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</h2>
+            <ol class="rd-steps">
+                ${steps.map((s, i) => {
+                    const cls = i < curIdx ? 'done' : (i === curIdx ? 'active' : 'todo');
+                    return `<li class="rd-step ${cls}">
+                        <span class="rd-step-dot">${i < curIdx ? ico('check', 12) : ''}</span>
+                        <span class="rd-step-lbl">${s.label}</span>
+                    </li>`;
+                }).join('')}
+            </ol>
+        </section>` : '';
 
-    // ── Seção de valores de pagamento ──────────────────────────────────────
-    const mpValueHtml = (A.showValues && !o.paymentExternal && o.valueEffective?.method === 'mercadopago' && o.platformFeePercent != null) ? (() => {
-        const fee     = o.platformFeePercent / 100;
-        const total   = parseFloat(o.valueEffective.amount);
-        const taxaVal = total * fee;
-        const netVal  = total - taxaVal;
-        const fmt = v => fmtMoney(v, 'BRL');
+    // Pagamento: pílula de situação (só quando há cobrança relevante)
+    let payPill = '';
+    if (o.status !== 'cancelled') {
+        if (A.paid)                                  payPill = pill('ok',   t('requestPaymentApproved'));
+        else if (o.payment?.status === 'cancelled')  payPill = pill('err',  t('requestPaymentCancelled'));
+        else if (A.showPayment)                      payPill = pill('wait', t('requestPaymentWaiting'));
+    }
+
+    // ── Resumo de valores ──────────────────────────────────────────────────
+    function summaryHtml(netVal, feePct, taxaVal, total, fmt) {
         return `
-        <div class="rd-section-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</div>
-        <div class="detail-list">
-            <div class="detail-list-item">
-                <span class="detail-list-label">${t('requestValue')}</span>
-                <span class="detail-list-value">${fmt(netVal)}</span>
+        <section class="rd-sec">
+            <h3 class="rd-sec-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
+            ${feePct > 0 ? kv(t('requestValue'), fmt(netVal)) + kv(`${t('requestFee')} (${feePct}%)`, fmt(taxaVal), 'is-muted') : ''}
+            <div class="rd-total">
+                <span>${t('requestTotalValue')}</span>
+                <strong>${fmt(total)}</strong>
             </div>
-            <div class="detail-list-item">
-                <span class="detail-list-label">${t('requestFee')} (${o.platformFeePercent}%)</span>
-                <span class="detail-list-value text-secondary">${fmt(taxaVal)}</span>
-            </div>
-            <div class="detail-list-item bg-primary-fill">
-                <span class="detail-list-label text-accent fw-700">${t('requestTotalValue')}</span>
-                <span class="detail-list-value text-accent fw-700">${fmt(total)}</span>
-            </div>
-        </div>`;
-    })() : ''
+        </section>`;
+    }
 
-    // Pagamento externo: mesmo resumo do Mercado Pago (valor, taxa e total), enquanto não pago
+    const mpValueHtml = (A.showValues && !o.paymentExternal && o.valueEffective?.method === 'mercadopago' && o.platformFeePercent != null) ? (() => {
+        const feePct  = o.platformFeePercent;
+        const total   = parseFloat(o.valueEffective.amount);
+        const taxaVal = total * (feePct / 100);
+        return summaryHtml(total - taxaVal, feePct, taxaVal, total, v => fmtMoney(v, 'BRL'));
+    })() : '';
+
+    // Pagamento externo: mesmo resumo (valor, taxa e total), enquanto não pago
     const paymentValueHtml = (A.showValues && o.paymentExternal && o.externalDueEffective && !o.externalPayment) ? (() => {
         const due     = o.externalDueEffective;
         const feePct  = o.externalFeePercent || 0;
         const total   = parseFloat(due.amount);
         const taxaVal = total * (feePct / 100);
-        const netVal  = total - taxaVal;
-        const fmt = v => fmtMoney(v, due.currency);
-        return `
-        <div class="rd-section-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</div>
-        <div class="detail-list">
-            ${feePct > 0 ? `
-            <div class="detail-list-item">
-                <span class="detail-list-label">${t('requestValue')}</span>
-                <span class="detail-list-value">${fmt(netVal)}</span>
-            </div>
-            <div class="detail-list-item">
-                <span class="detail-list-label">${t('requestFee')} (${feePct}%)</span>
-                <span class="detail-list-value text-secondary">${fmt(taxaVal)}</span>
-            </div>` : ''}
-            <div class="detail-list-item bg-primary-fill">
-                <span class="detail-list-label text-accent fw-700">${t('requestTotalValue')}</span>
-                <span class="detail-list-value text-accent fw-700">${fmt(total)}</span>
-            </div>
-        </div>`;
+        return summaryHtml(total - taxaVal, feePct, taxaVal, total, v => fmtMoney(v, due.currency));
     })() : (o.paymentExternal ? '' : mpValueHtml);
 
-    // ── Seção de pagamento Pix ─────────────────────────────────────────────
     const paymentHtml = buildPaymentSection(o);
 
-    // ── Cards de download ──────────────────────────────────────────────────
+    // ── Itens ──────────────────────────────────────────────────────────────
     // Regras (servidor → o.access): links só com status Pronto/Concluído E pedido liberado (pago ou acesso manual).
-    const dlCardsHtml = items.map(item => {
+    const itemsHtml = items.map(item => {
         const link    = item.link;
         const show    = !!A.showLinks;
         const expired = !!(link && link.expiresAt && new Date(link.expiresAt) < now);
@@ -258,10 +305,10 @@ function buildOrderDetail(o) {
             if (link.disabled) {
                 expText = t('requestLinkDisabled'); expCls = 'disabled';
             } else if (expired) {
-                expText = '⛔ ' + t('requestLinkExpired') + ' — ' + new Date(link.expiresAt).toLocaleDateString(loc());
+                expText = t('requestLinkExpired') + ' · ' + new Date(link.expiresAt).toLocaleDateString(loc());
                 expCls  = 'expired';
             } else if (!link.expiresAt) {
-                expText = '∞ ' + t('requestLinkNoExpiry'); expCls = 'indefinite';
+                expText = t('requestLinkNoExpiry'); expCls = 'indefinite';
             } else {
                 const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
                 expText    = t('requestLinkValidDays').replace('{n}', days);
@@ -269,93 +316,89 @@ function buildOrderDetail(o) {
             }
         }
 
-        let bodyHtml;
+        let sideHtml = '';
         if (o.status === 'cancelled') {
-            bodyHtml = '';                                                         // cancelado: nada
+            sideHtml = '';                                                          // cancelado: nada
         } else if (show && link) {
-            bodyHtml = `<div class="rd-dl-card-body">
-                        <div class="rd-dl-status-row">
-                            <span class="rd-dl-exp ${expCls}">${expText}</span>
-                            ${(!blocked && url)
-                                ? `<a href="${url}" class="action-btn btn-primary no-underline" target="_blank" rel="noopener" download
-                                   >${t('requestDownload')}</a>`
-                                : ''}
-                        </div>
-                       </div>`;
+            sideHtml = `
+                <span class="rd-exp ${expCls}">${expText}</span>
+                ${(!blocked && url)
+                    ? `<a href="${url}" class="rd-btn" target="_blank" rel="noopener" download>${ico('download', 15)}${t('requestDownload')}</a>`
+                    : ''}`;
         } else if (A.showPayment) {
-            bodyHtml = `<div class="rd-locked-notice">⚠ ${t('requestLockedNotice')}</div>`;   // Pronto, aguardando pagamento
+            sideHtml = `<span class="rd-exp locked">${ico('lock', 14)}${t('requestLockedNotice')}</span>`;   // Pronto, aguardando pagamento
         } else if (o.status === 'expired') {
-            bodyHtml = `<div class="rd-dl-pending">${t('requestLinkExpired')}</div>`;
+            sideHtml = `<span class="rd-exp expired">${t('requestLinkExpired')}</span>`;
         } else {
-            bodyHtml = `<div class="rd-dl-pending">${t('requestLinkPending')}</div>`;     // pendente, em análise, sem liberação
+            sideHtml = `<span class="rd-exp">${t('requestLinkPending')}</span>`;      // pendente, em análise, sem liberação
         }
 
+        const sub = [item.meta, item.date, item.station].filter(Boolean).map(esc).join(' · ');
         return `
-        <div class="rd-dl-card ${(!blocked && link) ? 'available' : ''}">
-            <div class="rd-dl-card-head">
-                <div class="rd-dl-info">
-                    <div class="rd-dl-label">${esc(item.label)}</div>
-                    <div class="rd-dl-sub">${esc(item.meta||'')}${item.date ? ' · ' + esc(item.date) : ''}${item.station ? ' · ' + esc(item.station) : ''}</div>
-                </div>
+        <li class="rd-item ${(!blocked && link) ? 'available' : ''}">
+            ${itemThumb(item)}
+            <div class="rd-item-info">
+                <div class="rd-item-name">${esc(item.label)}</div>
+                ${sub ? `<div class="rd-item-sub">${sub}</div>` : ''}
             </div>
-            ${bodyHtml}
-        </div>`;
+            <div class="rd-item-side">${sideHtml}</div>
+        </li>`;
     }).join('');
 
-    // Info
-    const CONTACT_ICON = { email:'📧', whatsapp:'💬', telegram:'✈️', bluesky:'🦋', x:'𝕏' };
-    const infoHtml = `
-        <div class="detail-list">
-            <div class="detail-list-item">
-                <span class="detail-list-label" data-i18n="order">${t('order')}</span>
-                <span class="detail-list-value">${esc(o.id)}</span>
-            </div>
-            <div class="detail-list-item">
-                <span class="detail-list-label" data-i18n="date">${t('date')}</span>
-                <span class="detail-list-value">${dt}</span>
-            </div>
-            <div class="detail-list-item">
-                <span class="detail-list-label" data-i18n="requestContactInfo">${t('requestContactInfo')}</span>
-                <span class="detail-list-value">
-                    ${CONTACT_ICON[o.contact?.channel]||'📬'} ${esc(o.contact?.channel||'—')}: ${esc(o.contact?.value||'')}
-                </span>
-            </div>
-            <div class="detail-list-item">
-                <span class="detail-list-label" data-i18n="requestStatusLabel">${t('requestStatusLabel')}</span>
-                <span class="detail-list-value"><span class="pill st-${o.status}">${statusPtBR(o.status)}</span></span>
-            </div>
-        </div>
-        ${o.notes ? `<div class="rd-notes mt-3">📝 ${esc(o.notes)}</div>` : ''}
-        
-        <div class="section-divider-transparent"></div>
-
-        ${progressHtml}
-
-        <div class="section-divider"></div>
-
-        ${paymentValueHtml}
-
-        <div class="section-divider-transparent"></div>
-        
-        ${paymentHtml}`;
+    // ── Contato / observação (painel lateral) ──────────────────────────────
+    const channel = o.contact?.channel;
+    const channelLabel = { email:'E-mail', whatsapp:'WhatsApp', telegram:'Telegram', bluesky:'Bluesky', x:'𝕏' }[channel] || channel || '—';
+    const contactHtml = `
+        <section class="rd-sec">
+            <h3 class="rd-sec-title" data-i18n="requestContactInfo">${t('requestContactInfo')}</h3>
+            ${kv(channelLabel, esc(o.contact?.value || '—'))}
+            ${o.notes ? `<div class="rd-note"><span class="rd-k">${t('requestNotesLabel')}</span><p>${esc(o.notes)}</p></div>` : ''}
+        </section>`;
 
     return {
+        head: `
+            <nav class="rd-crumb" aria-label="breadcrumb">
+                <a href="my-requests.html">${ico('back', 14)}<span data-i18n="requestMyRequests">${t('requestMyRequests')}</span></a>
+            </nav>
+            <h1 class="rd-title"><span data-i18n="order">${t('order')}</span></h1>
+        `,
         body: `
-            <div class="rd-section">
-                <div class="rd-section-title" data-i18n="requestDownloads">${t('requestDownloads')}</div>
-                <div class="rd-dl-list">${dlCardsHtml}</div>
-            </div>
+            <section class="rd-block rd-details">
+                ${kv(t('order'), `<span class="rd-id">${esc(o.id)}</span><button type="button" class="rd-icon-btn" id="rd-copy-id" onclick="copyOrderId()" aria-label="${t('requestCopied')}">${ico('copy', 15)}</button>`)}
+                ${kv(t('date'), dt)}
+                ${kv(t('requestStatusLabel'), pill(STATUS_KIND[o.status] || 'off', statusPtBR(o.status)))}
+                ${payPill ? kv(t('requestPaymentLabel'), payPill) : ''}
+            </section>
+
+            ${progressHtml}
+
+            <section class="rd-block">
+                <h2 class="rd-block-title"><span data-i18n="requestDownloads">${t('requestDownloads')}</span> <span class="rd-count">${items.length}</span></h2>
+                <ul class="rd-items">${itemsHtml}</ul>
+            </section>
         `,
         sidebar: `
-            <div class="rd-section">
-                <div class="rd-section-title" data-i18n="requestOrderInfo">${t('requestOrderInfo')}</div>
-                ${infoHtml}
+            <div class="rd-aside-inner">
+                ${contactHtml}
+                ${paymentValueHtml}
+                ${paymentHtml}
             </div>
         `
     };
 }
 
-// ── Seção de pagamento Pix ─────────────────────────────────────────────────
+function copyOrderId() {
+    if (!_lastOrder) return;
+    navigator.clipboard.writeText(_lastOrder.id).then(() => {
+        const btn = document.getElementById('rd-copy-id');
+        if (!btn) return;
+        btn.innerHTML = ico('check', 15);
+        btn.classList.add('done');
+        setTimeout(() => { btn.innerHTML = ico('copy', 15); btn.classList.remove('done'); }, 1600);
+    });
+}
+
+// ── Seção de pagamento ─────────────────────────────────────────────────────
 function fmtMoney(amount, currency) {
     try {
         return new Intl.NumberFormat(loc(), { style: 'currency', currency }).format(amount);
@@ -364,72 +407,48 @@ function fmtMoney(amount, currency) {
     }
 }
 
-// Pagamento externo (PayPal): registrado manualmente pelo admin
+// Pagamento externo (PayPal): registrado manualmente pelo admin ou via checkout PayPal
 function buildExternalPaymentSection(o) {
     const ep = o.externalPayment;
     if (ep) {
-        return `
-        <div class="rd-section">
-            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-            <div class="detail-list">
-                <div class="detail-list-item">
-                    <span class="detail-list-label">${t('requestStatusLabel')}</span>
-                    <span class="detail-list-value text-success">${t('requestPaymentApproved')}</span>
-                </div>
-                <div class="detail-list-item">
-                    <span class="detail-list-label">${t('requestPaymentMethod')}</span>
-                    <span class="detail-list-value">${t('requestPaymentMethodPayPal')}</span>
-                </div>
-                <div class="detail-list-item">
-                    <span class="detail-list-label">${t('requestValue')}</span>
-                    <span class="detail-list-value">${fmtMoney(ep.amount, ep.currency)}</span>
-                </div>
-                <div class="detail-list-item">
-                    <span class="detail-list-label">${t('requestPaidAt')}</span>
-                    <span class="detail-list-value">${new Date(ep.paidAt).toLocaleString(loc())}</span>
-                </div>
-                ${ep.reference ? `
-                <div class="detail-list-item">
-                    <span class="detail-list-label">ID</span>
-                    <span class="detail-list-value">${esc(ep.reference)}</span>
-                </div>` : ''}
-            </div>
-        </div>`;
+        return paySection(`
+            ${kv(t('requestStatusLabel'), pill('ok', t('requestPaymentApproved')))}
+            ${kv(t('requestValue'), fmtMoney(ep.amount, ep.currency))}
+            ${kv(t('requestPaidAt'), new Date(ep.paidAt).toLocaleString(loc()))}
+            ${ep.reference ? kv('ID', esc(ep.reference), 'is-mono') : ''}
+            ${methodRow(o)}`);
     }
     if (o.paymentAccessGranted === true) return '';
-    return `
-    <div class="rd-section">
-        <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-        <div class="rd-pay-card pay-required">
+    return paySection(`
+        ${methodRow(o)}
+        <div class="rd-pay">
             <div class="rd-pay-head">
+                <i class="rd-dot rd-dot--wait"></i>
                 <div>
                     <div class="rd-pay-title">${t('requestPaymentExternalTitle')}</div>
                     <div class="rd-pay-sub">${o.paypalEnabled ? t('requestPaymentViaPayPal') : t('requestPaymentExternalDesc')}</div>
                 </div>
             </div>
-            ${o.externalDueEffective ? `
-            <div class="rd-pay-body">
-                <div class="detail-list-item">
-                    <span class="detail-list-label">${t('requestAmountDue')}</span>
-                    <span class="detail-list-value fw-700 text-accent">${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</span>
-                </div>
+            ${(o.externalDueEffective && !o.access?.showValues) ? `
+            <div class="rd-pay-due">
+                <span class="rd-k">${t('requestAmountDue')}</span>
+                <strong>${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</strong>
             </div>` : ''}
             ${buildPaypalAction(o)}
-        </div>
-    </div>`;
+        </div>`);
 }
 
 // Botão "Pagar com PayPal" (só quando o Worker tem credenciais; senão mantém o fluxo manual)
 function buildPaypalAction(o) {
     if (!o.paypalEnabled) return '';
     if (o.status !== 'ready') {
-        return `<div class="rd-pp-wrap"><div class="rd-pp-hint">${t('requestPaypalWhenReady')}</div></div>`;
+        return `<div class="rd-pp-wrap"><div class="rd-hint">${t('requestPaypalWhenReady')}</div></div>`;
     }
     return `
     <div class="rd-pp-wrap">
-        <div class="rd-pp-err is-hidden" id="rd-pp-err"></div>
-        <button class="action-btn btn-primary rd-pp-btn" id="rd-pp-btn" onclick="startPaypal()">${t('requestPayWithPayPal')}</button>
-        <div class="rd-pp-hint">${t('requestPaypalRedirectHint')}</div>
+        <div class="rd-err is-hidden" id="rd-pp-err"></div>
+        <button class="rd-cta" id="rd-pp-btn" onclick="startPaypal()">${t('requestPayWithPayPal')}</button>
+        <div class="rd-hint">${t('requestPaypalRedirectHint')}</div>
     </div>`;
 }
 
@@ -440,59 +459,39 @@ function buildPaymentSection(o) {
     if (!A.paid && !A.showPayment) return '';
     if (o.externalPayment || o.paymentExternal === true) return buildExternalPaymentSection(o);
 
-    const pay    = o.payment;
+    const pay = o.payment;
 
     // Pago
     if (A.paid) {
-        return `
-        <div class="rd-section">
-            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-            <div class="detail-list">
-                <div class="detail-list">
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">${t('requestStatusLabel')}</span>
-                        <span class="detail-list-value text-success">${t('requestPaymentApproved')}</span>
-                    </div>
-                    ${pay?.mpPaymentId ? `
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">ID</span>
-                        <span class="detail-list-value">${esc(String(pay.mpPaymentId))}</span>
-                    </div>` : ''}
-                    ${pay?.paidAt ? `
-                    <div class="detail-list-item">
-                        <span class="detail-list-label">${t('requestPaidAt')}</span>
-                        <span class="detail-list-value">${new Date(pay.paidAt).toLocaleString(loc())}</span>
-                    </div>` : ''}
-                </div>
-            </div>
-        </div>`;
+        return paySection(`
+            ${kv(t('requestStatusLabel'), pill('ok', t('requestPaymentApproved')))}
+            ${pay?.mpPaymentId ? kv('ID', esc(String(pay.mpPaymentId)), 'is-mono') : ''}
+            ${pay?.paidAt ? kv(t('requestPaidAt'), new Date(pay.paidAt).toLocaleString(loc())) : ''}
+            ${methodRow(o)}`);
     }
 
     // Cancelado/expirado
     if (pay?.status === 'cancelled') {
-        return `
-        <div class="rd-section">
-            <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-            <div class="rd-pay-card bc-error">
-                <div class="rd-pay-head bg-error-fill">
-                    <span class="rd-pay-icon">❌</span>
+        return paySection(`
+            <div class="rd-pay">
+                <div class="rd-pay-head">
+                    <i class="rd-dot rd-dot--err"></i>
                     <div>
                         <div class="rd-pay-title">${t('requestPaymentCancelled')}</div>
                         <div class="rd-pay-sub">${t('requestPaymentCancelledDesc')}</div>
                     </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`);
     }
 
     // Aguardando pagamento — QR pendente (gerado nesta sessão ou restaurado do servidor)
     const hasPendingQr = pay?.status === 'pending' && _payState.mpPaymentId;
 
-    return `
-    <div class="rd-section">
-        <div class="rd-section-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</div>
-        <div class="rd-pay-card ${hasPendingQr ? 'pay-pending' : 'pay-required'}" id="rd-pay-card">
+    return paySection(`
+        ${methodRow(o)}
+        <div class="rd-pay" id="rd-pay-card">
             <div class="rd-pay-head">
+                <i class="rd-dot ${hasPendingQr ? 'rd-dot--live' : 'rd-dot--wait'}"></i>
                 <div>
                     <div class="rd-pay-title">${hasPendingQr ? t('requestPaymentWaiting') : t('requestPaymentRequired')}</div>
                     <div class="rd-pay-sub">${hasPendingQr ? t('requestPaymentScanQr') : t('requestPaymentViaPix')}</div>
@@ -501,30 +500,21 @@ function buildPaymentSection(o) {
             <div class="rd-pay-body" id="rd-pay-body">
                 ${hasPendingQr ? renderQrStep() : renderCpfStep()}
             </div>
-        </div>
-    </div>`;
+        </div>`);
 }
 
 function renderCpfStep() {
     return `
-    <div class="rd-cpf-field">
-        <div class="detail-list-item">
-            <span class="detail-list-label">${t('requestCPFPayer')}</span>
-            <span class="detail-list-value">
-                <input id="rd-cpf-input" class="adm-input adm-input-text" maxlength="14"
-                    inputmode="numeric" placeholder="000.000.000-00"
-                    oninput="maskCpf(this)"
-                    onkeydown="if(event.key==='Enter') submitCpf()">
-            </span>
-        </div>
-        
-        <div class="rd-cpf-hint">${t('requestFiscalRequirement')}</div>
-        <div class="rd-cpf-err is-hidden" id="rd-cpf-err"></div>
+    <div class="rd-cpf">
+        <label class="rd-label" for="rd-cpf-input">${t('requestCPFPayer')}</label>
+        <input id="rd-cpf-input" class="rd-input" maxlength="14"
+            inputmode="numeric" placeholder="000.000.000-00"
+            oninput="maskCpf(this)"
+            onkeydown="if(event.key==='Enter') submitCpf()">
+        <div class="rd-hint">${t('requestFiscalRequirement')}</div>
+        <div class="rd-err is-hidden" id="rd-cpf-err"></div>
     </div>
-    <button class="action-btn btn-primary w-inset-4"
-        onclick="submitCpf()">
-        ${t('requestGenerateQr')}
-    </button>`;
+    <button class="rd-cta" onclick="submitCpf()">${t('requestGenerateQr')}</button>`;
 }
 
 function renderQrStep() {
@@ -535,15 +525,12 @@ function renderQrStep() {
             ? `<img class="rd-qr-img" src="data:image/png;base64,${ps.pixQrBase64}" alt="QR Code Pix">`
             : `<div class="rd-qr-img d-flex items-center justify-center text-tertiary">${t('requestQrUnavailable')}</div>`
         }
+        ${ps.pixCopyPaste ? `
         <div class="rd-qr-copy-wrap">
-            ${ps.pixCopyPaste ? `
             <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
-            <button class="action-btn btn-ghost w-full justify-center"
-                onclick="copyCodigo()">
-                ${t('requestPixCopyPaste')}
-            </button>` : ''}
-        </div>
-        <div class="rd-qr-timer" id="rd-qr-timer">⏱ ${t('requestValidFor')} <span id="rd-countdown">—</span></div>
+            <button class="rd-btn rd-btn--block" onclick="copyCodigo()">${t('requestPixCopyPaste')}</button>
+        </div>` : ''}
+        <div class="rd-qr-timer" id="rd-qr-timer">${t('requestValidFor')} <span id="rd-countdown">—</span></div>
         <div class="rd-poll-status">
             <div class="rd-poll-dot"></div>
             ${t('requestCheckingPayment')}
@@ -776,6 +763,7 @@ function startPolling(mpPaymentId) {
 document.addEventListener('languagechange', () => {
     if (!_lastOrder) return;
     const detail = buildOrderDetail(_lastOrder);
+    document.getElementById('rd-order-head').innerHTML   = detail.head;
     document.getElementById('rd-order-body').innerHTML   = detail.body;
     document.getElementById('rd-order-sidebar').innerHTML = detail.sidebar;
     if (_payState.expiresAt && _payState.mpPaymentId) startCountdown(_payState.expiresAt);
