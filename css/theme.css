@@ -18,6 +18,12 @@
     --header-color: var(--bg-primary);
     --border-color: #d8d6d0;
 
+    /* Superfícies, linhas e texto suaves derivados do texto atual (valem para claro e escuro) */
+    --soft-bg: color-mix(in srgb, var(--text-primary) 6%, transparent);
+    --soft-bg-hover: color-mix(in srgb, var(--text-primary) 11%, transparent);
+    --soft-line: color-mix(in srgb, var(--text-primary) 9%, transparent);
+    --text-muted: color-mix(in srgb, var(--text-primary) 58%, var(--bg-primary));
+
     --accent-color: #8b5cf6;
     --accent-color-rgb: 139, 92, 246;
     --accent-hover: #7c3aed;

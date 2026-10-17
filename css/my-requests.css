@@ -4,83 +4,45 @@
 #rq-auth h2 { color:var(--text-primary); margin:0; font-size:var(--font-size-xxl); }
 #rq-auth p  { color:var(--text-secondary); margin:0; font-size:var(--font-size-mdm); }
 
-/* User chip */
-.rq-avatar { width:26px; height:26px; border-radius:var(--border-radius-size-circle);
-    object-fit:cover; flex-shrink:0; }
-
-/* Empty / Loading */
 .rq-loading { text-align:center; padding:var(--sp-9) var(--sp-5);
     color:var(--text-secondary); font-size:var(--font-size-mdm); }
+.rq-title { font-size:var(--font-size-xxxl); font-weight:600; letter-spacing:-.035em;
+    color:var(--text-primary); margin:var(--sp-5) 0 var(--sp-6); }
 
-/* Order list */
-.rq-orders-list { display:flex; flex-direction:column; gap:var(--sp-5); }
+/* Lista: superfícies suaves, sem bordas */
+.rq-orders-list { display:flex; flex-direction:column; gap:var(--sp-4); padding-bottom:var(--sp-8); }
+.rq-order { background:var(--bg-secondary); border-radius:var(--border-radius-size-xl); overflow:hidden; }
 
-/* Order card */
-.rq-order-card { background:var(--bg-secondary); border:1px solid var(--border-color);
-    border-radius:var(--border-radius-size-xl); overflow:hidden; transition:border-color .2s; }
-@media (hover: hover) {
-    .rq-order-card:hover { border-color:var(--accent-color); } }
+/* Cabeçalho do pedido (abre/fecha) */
+.rq-head { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:var(--sp-5);
+    padding:var(--sp-5); cursor:pointer; user-select:none; transition:background .2s; }
+@media (hover:hover) { .rq-head:hover { background:var(--soft-bg); } }
+.rq-head:focus-visible { outline:2px solid var(--text-primary); outline-offset:-2px; }
+.rq-head-main { display:flex; flex-direction:column; gap:var(--sp-1); min-width:0; }
+.rq-id  { font-size:var(--font-size-md); font-weight:600; color:var(--text-primary); font-variant-numeric:tabular-nums;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rq-sub { font-size:var(--font-size-sm); color:var(--text-muted); }
+.rq-sub strong { color:var(--text-primary); font-weight:600; }
+.rq-head-side { display:flex; align-items:center; gap:var(--sp-4); }
+.rq-chevron { display:inline-flex; color:var(--text-muted); transition:transform .25s; }
+.rq-order.expanded .rq-chevron { transform:rotate(180deg); }
 
-/* Card head — clicável */
-.rq-order-head { display:flex; align-items:center; justify-content:space-between;
-    padding:var(--sp-4) var(--sp-5); gap:var(--sp-3); cursor:pointer; user-select:none; }
-@media (hover: hover) {
-    .rq-order-head:hover { background:var(--bg-primary); } }
+/* Resumo de pagamento */
+.rq-pay { display:flex; align-items:center; justify-content:space-between; gap:var(--sp-4); flex-wrap:wrap;
+    margin:0 var(--sp-5) var(--sp-5); padding:var(--sp-4) var(--sp-5); border-radius:var(--border-radius-size-lg);
+    background:var(--bg-primary); }
+.rq-pay-info { display:flex; align-items:center; gap:var(--sp-4); flex-wrap:wrap; min-width:0; }
+.rq-pay-detail { font-size:var(--font-size-mdm); color:var(--text-primary); font-variant-numeric:tabular-nums; }
 
-.rq-order-id-wrap { display:flex; flex-direction:column; gap:var(--sp-2); width: 99%; }
-.rq-order-id   { font-size:var(--font-size-md); color:var(--text-primary); font-family:monospace; }
-.rq-order-date { font-size:var(--font-size-mds); color:var(--text-secondary); }
+/* Corpo expandido */
+.rq-body { display:none; padding:var(--sp-2) var(--sp-5) var(--sp-5); }
+.rq-order.expanded .rq-body { display:block; }
+.rq-steps { padding:var(--sp-5) var(--sp-2) var(--sp-6); }
+.rq-detail-btn { width:100%; }
 
-.rq-order-meta { display:flex; align-items:flex-end; gap:var(--sp-1); flex-wrap:wrap; text-wrap: nowrap; flex-direction: column-reverse; }
-.rq-items-count { font-size:var(--font-size-sm); color:var(--text-secondary); }
-.rq-links-badge { font-size:var(--font-size-mds); font-weight:700; color:var(--text-success); }
-
-.rq-chevron { font-size:var(--font-size-md); color:var(--text-secondary);
-    transition:transform .25s; flex-shrink:0; }
-.rq-order-card.expanded .rq-chevron { transform:rotate(180deg); }
-
-/* Card body */
-.rq-order-body { display:none; border-top:1px solid var(--border-color); }
-.rq-order-card.expanded .rq-order-body { display:block; }
-
-/* Progress bar */
-
-/* Sections inside body */
-.rq-section { padding:var(--sp-5); }
-.rq-section + .rq-section { border-top:1px solid var(--border-color); }
-
-/* Item rows */
-
-/* Download cards */
-.rq-dl-card { display:flex; align-items:center; gap:var(--sp-4);
-    padding:var(--sp-4); border-radius:var(--border-radius-size-mlg);
-    border:1px solid var(--border-color); background:var(--bg-primary);
-    transition:border-color .15s; }
-.rq-dl-card.available { border-color:var(--success-color); background:var(--bg-success); }
-@media (hover: hover) {
-    .rq-dl-card.available:hover { filter:brightness(.97); } }
-.rq-dl-card.blocked { opacity:.55; }
-
-.rq-dl-icon { font-size:1.4rem; flex-shrink:0; }
-.rq-dl-info { flex:1; min-width:0; }
-.rq-dl-label { font-size:var(--font-size-mdm); font-weight:600; color:var(--text-primary); }
-.rq-dl-meta  { font-size:var(--font-size-mds); margin-top:var(--sp-1); }
-.rq-dl-meta.valid     { color:var(--text-success); }
-.rq-dl-meta.expired   { color:var(--error-color); }
-.rq-dl-meta.indefinite { color:var(--text-secondary); }
-.rq-dl-meta.disabled  { color:var(--text-tertiary); }
-
-.rq-no-links { padding:var(--sp-5); background:var(--bg-primary);
-    border-radius:var(--border-radius-size-mlg); border:1px dashed var(--border-color);
-    text-align:center; color:var(--text-secondary); font-size:var(--font-size-mdm); }
-
-/* Contact chip */
-
-/* Notes */
-
-/* View all link */
-.rq-view-link { display:inline-flex; align-items:center; gap:var(--sp-2);
-    font-size:var(--font-size-sm); color:var(--accent-color);
-    text-decoration:none; transition:opacity .15s; }
-@media (hover: hover) {
-    .rq-view-link:hover { opacity:.75; text-decoration:underline; } }
+@media (max-width:560px) {
+    .rq-head { padding:var(--sp-4); gap:var(--sp-4); }
+        .rq-pay { margin:0 var(--sp-4) var(--sp-4); }
+    .rq-body { padding:var(--sp-2) var(--sp-4) var(--sp-4); }
+}
+@media (max-width:496px) { .rq-title { display:none; } .rq-orders-list { padding-top:var(--sp-3); } }

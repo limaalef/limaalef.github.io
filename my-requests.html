@@ -24,12 +24,13 @@
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/order-ui.css">
     <link rel="stylesheet" href="css/my-requests.css">
 </head>
 <body>
     <header>
         <div class="header-frame" id="header"
-            data-title=""
+            data-title-key="requestMyRequests"
             data-back="true"
             data-reqbtn="false"></div>
     </header>
@@ -55,6 +56,7 @@
         <div class="adm-layout narrow-width">
             <!-- Conteúdo -->
             <div class="adm-main px-5">
+                <h1 class="rq-title" data-i18n="requestMyRequests">Meus Pedidos</h1>
                 <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
                 <div class="is-hidden" id="rq-content"></div>
             </div>
@@ -66,8 +68,9 @@
 <script src="js/config.js"></script>
 <script src="js/translation.js"></script>
 <script src="js/utils.js"></script>
-    <script src="js/auth.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/api_service.js"></script>
+<script src="js/order-ui.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script>
 
@@ -87,10 +90,6 @@ function showDashboard() {
     document.getElementById('rq-auth').classList.add('is-hidden');
     document.getElementById('rq-dashboard').classList.remove('is-hidden');
     document.dispatchEvent(new Event('authchange'));   // header mostra o menu do usuário
-
-    // Header title
-    const hdr = document.getElementById('header');
-    if (hdr) hdr.dataset.title = t('requestMyRequests');
 
     loadOrders();
 }
@@ -115,8 +114,6 @@ async function loadOrders() {
 
 document.addEventListener('languagechange', () => {
     if (!_orders) return;
-    const hdr = document.getElementById('header');
-    if (hdr) hdr.dataset.title = t('requestMyRequests');
     renderOrders(_orders);
 });
 
@@ -132,7 +129,7 @@ function renderOrders(orders) {
                 <h2>📦</h2>
                 <h2 data-i18n="requestNoOrders">${t('requestNoOrders')}</h2>
                 <p data-i18n="requestNoOrdersHint">${t('requestNoOrdersHint')}</p>
-                <a href="collection.html" class="action-btn btn-primary d-inline-block mt-5 no-underline">
+                <a href="collection.html" class="rd-btn rd-btn--solid mt-5">
                     <span data-i18n="backToCollection">${t('backToCollection')}</span>
                 </a>
             </div>`;
@@ -142,192 +139,125 @@ function renderOrders(orders) {
     const sorted = [...orders].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     content.innerHTML = `<div class="rq-orders-list">${sorted.map(buildOrderCard).join('')}</div>`;
 
-    // Accordion
-    content.querySelectorAll('.rq-order-head').forEach(head => {
-        head.addEventListener('click', () => {
-            head.closest('.rq-order-card').classList.toggle('expanded');
+    // Accordion (teclado: Enter/Espaço)
+    content.querySelectorAll('.rq-head').forEach(head => {
+        const toggle = () => {
+            const card = head.closest('.rq-order');
+            const open = card.classList.toggle('expanded');
+            head.setAttribute('aria-expanded', String(open));
+        };
+        head.addEventListener('click', toggle);
+        head.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
         });
     });
 }
 
-const SPORT_ICON = { football:'⚽', multisport:'🏀', motor:'🏎️' };
-const CONTACT_ICON = { email:'📧', whatsapp:'💬', telegram:'✈️', bluesky:'🦋', x:'𝕏' };
+function fmtMoney(v, cur) {
+    try { return new Intl.NumberFormat(loc(), { style:'currency', currency:cur }).format(v); }
+    catch(e) { return `${esc(cur)} ${Number(v).toFixed(2)}`; }
+}
+function fmtWhen(d) {
+    return new Date(d).toLocaleString(loc(), { dateStyle:'short', timeStyle:'short' });
+}
+
+// Resumo de pagamento — mesmo formato para Pix, PayPal e liberação manual:
+//   [situação]  valor · data                                   [logo do método]
+function paymentSummaryHtml(o) {
+    const A   = o.access || {};
+    if (o.status === 'cancelled') return '';
+    const pay = o.payment;
+    const ext = o.externalPayment || null;
+    const detail = parts => parts.filter(Boolean).join(' · ');
+
+    // Pago via PayPal / pagamento externo registrado
+    if (ext) {
+        return `<div class="rq-pay">
+            <div class="rq-pay-info">
+                ${pill('ok', t('requestPaidViaPayPal'))}
+                <span class="rq-pay-detail">${detail([fmtMoney(ext.amount, ext.currency), ext.paidAt && fmtWhen(ext.paidAt)])}</span>
+            </div>
+        </div>`;
+    }
+
+    // Pago via Pix (Mercado Pago) ou liberado manualmente
+    if (A.paid) {
+        const viaPix  = !!pay?.mpPaymentId || pay?.provider === 'mercadopago';
+        const amount  = pay?.amount ?? o.valueEffective?.amount;
+        const cur     = pay?.currency ?? o.valueEffective?.currency ?? 'BRL';
+        return `<div class="rq-pay">
+            <div class="rq-pay-info">
+                ${pill('ok', viaPix ? t('requestPaidViaPix') : t('requestPaymentApproved'))}
+                <span class="rq-pay-detail">${detail([amount != null && fmtMoney(amount, cur), pay?.paidAt && fmtWhen(pay.paidAt)])}</span>
+            </div>
+        </div>`;
+    }
+
+    // Aguardando pagamento: valor + botão para pagar
+    if (A.showPayment) {
+        const external = !!o.paymentExternal;
+        const due = external ? o.externalDueEffective : o.valueEffective;
+        return `<div class="rq-pay">
+            <div class="rq-pay-info">
+                ${pill('wait', t('requestPaymentWaiting'))}
+                ${due ? `<span class="rq-pay-detail">${fmtMoney(due.amount, due.currency)}</span>` : ''}
+            </div>
+            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rd-btn rd-btn--solid">${t('requestPayNow')}</a>
+        </div>`;
+    }
+
+    // Em análise / pendente: apenas o valor combinado
+    if (A.showValues && !A.unlocked && o.valueEffective) {
+        return `<div class="rq-pay">
+            <div class="rq-pay-info">
+                <span class="rq-pay-detail">${t('requestPaymentAmountLabel')} ${fmtMoney(o.valueEffective.amount, o.valueEffective.currency)}</span>
+            </div>
+        </div>`;
+    }
+    return '';
+}
 
 function buildOrderCard(o) {
     const now   = new Date();
     const dt    = new Date(o.createdAt).toLocaleString(loc(), { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
-
-    // Regras de exibição vêm do servidor (o.access): links, caixa de pagamento e valores
-    const A = o.access || {};
+    const A     = o.access || {};
 
     // Links disponíveis = itens com link ativo e não expirado — só contam quando os links podem ser exibidos
     const activeLinks = !A.showLinks ? 0 : items.filter(it =>
         it.link && !it.link.disabled && (!it.link.expiresAt || new Date(it.link.expiresAt) > now)
     ).length;
-    const hasAnyLink = items.some(it => it.link);
 
-    // Pagamento: considera aprovado também quando admin liberou manualmente
-    const pay        = o.payment;
-    const ext        = o.externalPayment || null;
-    const payPending = !!A.showPayment;   // só em "Pronto", com valor e ainda sem pagamento/liberação
+    const sub = [
+        dt,
+        `${items.length} ${items.length === 1 ? t('requestItemUnit') : t('requestItemsUnit')}`,
+        activeLinks > 0 ? `<strong>${activeLinks} ${activeLinks === 1 ? t('requestLinkAvailable') : t('requestLinksAvailable')}</strong>` : ''
+    ].filter(Boolean).join(' · ');
 
-    // Progress bar
-    const steps = [
-        { key:'pending',    label: t('requestProgressReceived') },
-        { key:'processing', label: t('requestProgressAnalysis') },
-        { key:'ready',      label: t('requestProgressReady')    },
-    ];
-    const stepIdx = { pending:0, processing:1, ready:2, completed:3, expired:2, cancelled:2 };
-    const curIdx  = stepIdx[o.status] ?? 0;
-
-    const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
-        <div class="prog prog-pad">
-            ${steps.map((s, i) => {
-                let cls = '';
-                if (i < curIdx)  cls = 'done';
-                if (i === curIdx) cls = 'active';
-                return `<div class="prog-conn ${cls} prog-conn-min"></div><div class="prog-step">
-                            <div class="prog-dot ${cls}">${i < curIdx ? `<svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path class="prog-dot-svg ${cls}" d="M1.5 4l2 2 3-3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>` : `<div class="prog-dot-svg2 ${cls} dot-6"></div>`}</div>
-                            <span class="prog-lbl ${cls}">${s.label}</span>
-                        </div>`;
-            }).join('')}
-        </div>` : ``;
-
-    // Items com link
-    const itemsHtml = items.map(item => {
-        const link    = item.link;
-        const expired = link && link.expiresAt && new Date(link.expiresAt) < now;
-        const blocked = !link || link.disabled || expired;
-        const url     = link ? (link.proxyUrl || link.url || '#') : null;
-
-        let dlMeta = '', dlMetaCls = '';
-        if (!link) {
-            dlMeta = t('requestLinkPending'); dlMetaCls = 'disabled';
-        } else if (link.disabled) {
-            dlMeta = t('requestLinkDisabled'); dlMetaCls = 'disabled';
-        } else if (expired) {
-            dlMeta = t('requestLinkExpired'); dlMetaCls = 'expired';
-        } else if (!link.expiresAt) {
-            dlMeta = t('requestLinkNoExpiry'); dlMetaCls = 'indefinite';
-        } else {
-            const days = Math.ceil((new Date(link.expiresAt) - now) / 86_400_000);
-            dlMeta = `${t('requestLinkValidDays').replace('{n}', days)}`; dlMetaCls = 'valid';
-        }
-
-        return `
-        <div class="rq-dl-card ${!blocked ? 'available' : 'blocked'}">
-            <div class="rq-dl-icon">${blocked ? '🔒' : '📥'}</div>
-            <div class="rq-dl-info">
-                <div class="rq-dl-label">${esc(item.label)}${item.station ? ' · ' + esc(item.station) : ''}</div>
-                <div class="rq-dl-meta ${dlMetaCls}">${dlMeta}</div>
-            </div>
-            ${!blocked && url ? `<a href="${url}" class="action-btn btn-primary no-underline shrink-0" target="_blank" rel="noopener" download
-               >⬇ ${t('requestDownload')}</a>` : ''}
-        </div>`;
-    }).join('');
-
-    // Aviso de pagamento pendente (sobrepõe seção de downloads)
-    const fmtMoney = (v, cur) => {
-        try { return new Intl.NumberFormat(loc(), { style:'currency', currency:cur }).format(v); }
-        catch(e) { return `${esc(cur)} ${Number(v).toFixed(2)}`; }
-    };
-
-    // Pagamento externo (PayPal) pendente: não há botão de Pix
-    const extNoticeHtml = (payPending && o.paymentExternal) ? `
-            <div class="rq-section">
-        <div class="rq-notice">
-                <div class="flex-1 min-w-0">
-                    <div class="text-mdm fw-600 text-primary">${t('requestPaymentExternalTitle')}</div>
-                    <div class="text-sm text-secondary mt-1px">
-                        ${o.externalDueEffective ? `${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</strong> &nbsp;· ` : ''}${t('requestPaymentExternalShort')}
-                    </div>
-                </div>
-                <a href="request-detail.html?id=${encodeURIComponent(o.id)}"
-                    class="action-btn btn-primary no-underline shrink-0 nowrap">
-                    ${t('requestDetailsBtn')}
-                </a>
-            </div>
-        </div>` : '';
-
-    // Pagamento externo confirmado
-    const extPaidHtml = (ext && o.status !== 'cancelled') ? `
-            <div class="rq-section">
-                <div class="text-sm text-secondary">
-                    <span class="pill st-paid">${t('requestPaidViaPayPal')}</span>
-                    &nbsp;${fmtMoney(ext.amount, ext.currency)} · ${new Date(ext.paidAt).toLocaleString(loc(), { dateStyle:'short', timeStyle:'short' })}
-                </div>
-            </div>` : '';
-
-    // Aviso de pagamento pendente (sobrepõe seção de downloads)
-    const payNoticeHtml = (payPending && !o.paymentExternal) ? `
-            <div class="rq-section">    
-        <div class="rq-notice">
-                <div class="flex-1 min-w-0">
-                    <div class="text-mdm fw-600 text-primary">
-                        ${t('requestPaymentRequired')}
-                    </div>
-                    <div class="text-sm text-secondary mt-1px">
-                        ${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.valueEffective.amount, o.valueEffective.currency)}</strong>
-                        &nbsp;· ${t('requestPaymentLinksAfter')}
-                    </div>
-                </div>
-                <a href="request-detail.html?id=${encodeURIComponent(o.id)}"
-                    class="action-btn btn-primary no-underline shrink-0 nowrap">
-                    ${t('requestPayNow')}
-                </a>
-            </div>
-        </div>` : '';
-
-    // Pendente / em análise (ou Pronto sem cobrança ativa): apenas o valor, sem pagamento e sem links
-    const valueOnlyHtml = (A.showValues && !A.unlocked && !A.showPayment && o.valueEffective) ? `
-            <div class="rq-section">
-                <div class="text-sm text-secondary">
-                    ${t('requestPaymentAmountLabel')} <strong>${fmtMoney(o.valueEffective.amount, o.valueEffective.currency)}</strong>
-                </div>
-            </div>` : '';
-
-    // Nenhum link ainda
-    const noLinks = !hasAnyLink ? `
-        <div class="rq-no-links">
-            ${{ pending: t('requestNoLinkPending'), processing: t('requestNoLinkProcessing'),
-                ready: t('requestNoLinkReady'), completed:t('requestStatusCompleted'), expired: t('requestNoLinkExpired'),
-                cancelled: t('requestNoLinkCancelled') }[o.status] || t('requestNoLinkPending')}
-        </div>` : '';
+    const steps = stepsHtml(o);
 
     return `
-    <div class="rq-order-card" id="order-${esc(o.id)}">
-        <div class="rq-order-head">
-            <div class="rq-order-id-wrap">
-                <span class="rq-order-id">${esc(o.id)}</span>
-                <span class="rq-order-date">${dt}</span>
+    <article class="rq-order" id="order-${esc(o.id)}">
+        <div class="rq-head" role="button" tabindex="0" aria-expanded="false">
+            <div class="rq-head-main">
+                <span class="rq-id">${esc(o.id)}</span>
+                <span class="rq-sub">${sub}</span>
             </div>
-            <div class="rq-order-meta">
-                <div>
-                    <span class="rq-items-count">${items.length} ${items.length === 1 ? t('requestItemUnit') : t('requestItemsUnit')}</span>
-                    ${activeLinks > 0
-                        ? `<span class="rq-items-count">/ </span><span class="rq-links-badge">${activeLinks} ${activeLinks === 1 ? t('requestLinkAvailable') : t('requestLinksAvailable')}</span>`
-                        : ''}
-                </div>
-                <span class="pill st-${o.status}">${statusPtBR(o.status)}</span>
-            </div>
-            <span class="rq-chevron">▼</span>
-        </div>
-
-        <div class="rq-order-body">
-            ${progressHtml}
-
-            ${payPending ? (o.paymentExternal ? extNoticeHtml : payNoticeHtml) : valueOnlyHtml}
-
-            ${extPaidHtml}
-
-            <div class="rq-section text-right">
-                <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rq-view-link">
-                    ${t('requestViewDetail')} →
-                </a>
+            <div class="rq-head-side">
+                ${pill(STATUS_KIND[o.status] || 'off', statusPtBR(o.status))}
+                <span class="rq-chevron">${ico('chevron', 18)}</span>
             </div>
         </div>
-    </div>`;
+
+        ${paymentSummaryHtml(o)}
+
+        <div class="rq-body">
+            ${steps ? `<div class="rq-steps">${steps}</div>` : ''}
+            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rd-btn rq-detail-btn">
+                ${t('requestViewDetail')} ${ico('arrow', 15)}
+            </a>
+        </div>
+    </article>`;
 }
 
 function statusPtBR(s) {

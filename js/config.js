@@ -104,6 +104,22 @@ window._headerPromise = new Promise(resolve => {
     });
 });
 
+// Título do header. Aceita { key } (chave de translation.js, traduzida e atualizada ao trocar de idioma)
+// ou { text } (texto fixo, ex.: o ID do pedido). Pode ser chamado antes do header carregar.
+//   HTML:  <div class="header-frame" id="header" data-title-key="requestMyRequests" ...>
+//   JS:    CONFIG.setHeaderTitle({ key: 'requestMyRequests' })  /  CONFIG.setHeaderTitle({ text: order.id })
+CONFIG.setHeaderTitle = function ({ key, text } = {}) {
+    const el = document.getElementById('page-title');
+    if (!el) { CONFIG._pendingTitle = { key, text }; return; }
+    if (key) {
+        el.setAttribute('data-i18n', key);          // updateAllTexts() retraduz a cada troca de idioma
+        el.textContent = LanguageManager.t(key);
+    } else {
+        el.removeAttribute('data-i18n');
+        el.textContent = text || '';
+    }
+};
+
 CONFIG._setupHeader = function (container, isMobile) {
     const logo = document.getElementById('logo-header-svg');
     const requestBtn = document.getElementById('headerRequestBtn');
@@ -111,7 +127,9 @@ CONFIG._setupHeader = function (container, isMobile) {
     if (container.dataset.reqbtn === 'false') requestBtn.hidden = true;
 
     if ((isMobile || container.dataset.forced === 'true') && container.dataset.back === 'true') {
-        document.getElementById('page-title').textContent = container.dataset.title || '';
+        CONFIG.setHeaderTitle(CONFIG._pendingTitle || (container.dataset.titleKey
+            ? { key: container.dataset.titleKey }
+            : { text: container.dataset.title }));
 
         document.getElementById('headerTitle').hidden = false;
         if (container.dataset.admin === 'true') {
@@ -163,12 +181,17 @@ CONFIG._setupHeaderUser = async function (container) {
     const esc = v => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const tr = k => LanguageManager.t(k);
 
-    function close() {
-        const menu = slot.querySelector('.hu-menu');
-        if (!menu) return;
-        menu.hidden = true;
-        slot.querySelector('.hu-trigger').setAttribute('aria-expanded', 'false');
+    let closeTimer = null;
+    function setOpen(open) {
+        clearTimeout(closeTimer);
+        const pop = slot.querySelector('.hu-pop');
+        const trigger = slot.querySelector('.hu-trigger');
+        if (!pop || !trigger) return;
+        pop.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
     }
+    const close = () => setOpen(false);
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
 
     function render() {
         const session = Auth.site;
@@ -182,25 +205,36 @@ CONFIG._setupHeaderUser = async function (container) {
         const pic = session.user?.picture;
         slot.innerHTML = `
             <button type="button" class="hu-trigger" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(name)}">
-                <span class="hu-avatar">${esc(initials)}</span>
-                ${pic ? `<img class="hu-avatar hu-avatar-img" src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
+                <span class="hu-avatar-wrap">
+                    <span class="hu-avatar">${esc(initials)}</span>
+                    ${pic ? `<img class="hu-avatar hu-avatar-img" src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
+                </span>
+                <span class="hu-label">${esc(name)}</span>
             </button>
-            <div class="hu-menu" role="menu" hidden>
-                <div class="hu-name">${esc(name)}</div>
-                <a role="menuitem" class="hu-item" href="my-requests.html">${tr('myrequests')}</a>
-                <button type="button" role="menuitem" class="hu-item hu-logout">${tr('requestLogout')}</button>
+            <div class="hu-pop" hidden>
+                <div class="hu-menu" role="menu">
+                    <div class="hu-name">${esc(name)}</div>
+                    <a role="menuitem" class="hu-item" href="my-requests.html">${tr('myrequests')}</a>
+                    <button type="button" role="menuitem" class="hu-item hu-logout">${tr('requestLogout')}</button>
+                </div>
             </div>`;
 
         const trigger = slot.querySelector('.hu-trigger');
-        const menu = slot.querySelector('.hu-menu');
         trigger.addEventListener('click', e => {
             e.stopPropagation();
-            const open = menu.hidden;
-            menu.hidden = !open;
-            trigger.setAttribute('aria-expanded', String(open));
+            setOpen(slot.querySelector('.hu-pop').hidden);
         });
         slot.querySelector('.hu-logout').addEventListener('click', () => session.logout(() => location.reload()));
     }
+
+    // Mouse: abre ao passar o cursor (pequeno atraso ao sair para não fechar sem querer). Toque: só por clique.
+    slot.addEventListener('mouseenter', () => { if (canHover.matches) setOpen(true); });
+    slot.addEventListener('mouseleave', () => {
+        if (!canHover.matches) return;
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(close, 180);
+    });
+    slot.addEventListener('focusout', e => { if (!slot.contains(e.relatedTarget)) close(); });
 
     document.addEventListener('click', e => { if (!slot.contains(e.target)) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });

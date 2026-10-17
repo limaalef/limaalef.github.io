@@ -1,0 +1,63 @@
+/* ═══════════════════════════════════════════════════════════════
+   ORDER UI — estilos compartilhados (my-requests e request-detail)
+   Todas as cores vêm das variáveis de theme.css.
+═══════════════════════════════════════════════════════════════ */
+/* Pílulas de status: fundo neutro; só a bolinha leva a cor do tema */
+.rd-pill { display:inline-flex; align-items:center; gap:var(--sp-2); padding:var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-3);
+    border-radius:var(--border-radius-size-circle); background:var(--soft-bg);
+    font-size:var(--font-size-mds); font-weight:500; color:var(--text-primary); white-space:nowrap; }
+.rd-pill i, .rd-dot { width:7px; height:7px; border-radius:50%; background:var(--text-muted); flex-shrink:0; display:inline-block; }
+.rd-pill--ok     i, .rd-dot--ok     { background:var(--success-color); }
+.rd-pill--wait   i, .rd-dot--wait   { background:var(--warning-color); }
+.rd-pill--err    i, .rd-dot--err    { background:var(--error-color); }
+.rd-pill--info   i, .rd-dot--info   { background:var(--info-color); }
+.rd-pill--accent i, .rd-dot--accent { background:var(--accent-color); }
+.rd-dot--live { background:var(--text-primary); animation:rd-blink 1.4s ease-in-out infinite; }
+@keyframes rd-blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* Botões */
+.rd-btn { display:inline-flex; align-items:center; justify-content:center; gap:var(--sp-2);
+    padding:var(--sp-3) var(--sp-5); border:0; border-radius:var(--border-radius-size-md); cursor:pointer;
+    background:var(--soft-bg); color:var(--text-primary); text-decoration:none; white-space:nowrap;
+    font-family:inherit; font-size:var(--font-size-mdm); font-weight:600; transition:background .2s, transform .2s; }
+@media (hover:hover) { .rd-btn:hover { background:var(--soft-bg-hover); } }
+.rd-btn:active { transform:scale(.97); }
+.rd-btn--block { width:100%; }
+.rd-btn--solid { background:var(--text-primary); color:var(--bg-primary); }
+@media (hover:hover) { .rd-btn--solid:hover { background:var(--text-primary); opacity:.88; } }
+.rd-btn:focus-visible { outline:2px solid var(--text-primary); outline-offset:2px; }
+
+/* Progresso: etapas concluídas em accent */
+.rd-steps { list-style:none; display:flex; align-items:flex-start; }
+.rd-step { position:relative; flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:var(--sp-3); }
+.rd-step::before { content:''; position:absolute; top:10px; left:22px; right:-4px; height:2px;
+    border-radius:2px; background:var(--soft-line); }
+.rd-step:last-child { flex:0 0 auto; }
+.rd-step:last-child::before { display:none; }
+.rd-step.done::before { background:var(--accent-color); }
+.rd-step-dot { position:relative; z-index:1; width:22px; height:22px; border-radius:50%;
+    display:grid; place-items:center; background:var(--bg-primary);
+    box-shadow:inset 0 0 0 2px var(--soft-line); }
+.rd-step.done .rd-step-dot   { background:var(--accent-color); color:var(--text-accent-color); box-shadow:none; }
+.rd-step.active .rd-step-dot { box-shadow:inset 0 0 0 2px var(--text-primary); }
+.rd-step.active .rd-step-dot::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--text-primary); }
+.rd-step-lbl { font-size:var(--font-size-sm); color:var(--text-muted); }
+.rd-step.done .rd-step-lbl, .rd-step.active .rd-step-lbl { color:var(--text-primary); }
+.rd-step.active .rd-step-lbl { font-weight:600; }
+
+/* Miniatura gerada pelo ID do item: cor escolhida na paleta --chart-* do tema */
+.rd-thumb { flex-shrink:0; width:46px; height:46px; border-radius:var(--border-radius-size-lg); display:grid; place-items:center;
+    background:linear-gradient(135deg, color-mix(in srgb, var(--c) 65%, var(--bg-tertiary)), color-mix(in srgb, var(--c) 35%, var(--bg-tertiary)));
+    color:var(--text-primary); font-size:var(--font-size-xs); font-weight:600; letter-spacing:.02em; font-variant-numeric:tabular-nums; }
+
+/* Logotipo do método: versão clara/escura conforme o tema */
+.rd-mlogo { display:inline-flex; align-items:center; }
+.rd-mlogo img { height:22px; max-width:72px; object-fit:contain; }
+.rd-mlogo-d { display:none; }
+@media (prefers-color-scheme: dark) {
+    .rd-mlogo-l { display:none; }
+    .rd-mlogo-d { display:inline; }
+}
+.rd-mlogo.single img { display:inline !important; }
+
+@media (prefers-reduced-motion: reduce) { .rd-dot--live { animation:none; } }

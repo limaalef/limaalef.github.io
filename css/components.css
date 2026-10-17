@@ -2641,19 +2641,34 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 /* Menu do usuário no header */
 .header-user { position: relative; margin-left: auto; }
-.hu-trigger { position: relative; display: block; width: 36px; height: 36px; padding: 0; border: 0; cursor: pointer;
-    border-radius: var(--border-radius-size-circle); background: transparent; }
-.hu-avatar { width: 36px; height: 36px; border-radius: var(--border-radius-size-circle); display: grid; place-items: center;
-    background: var(--bg-tertiary); color: var(--text-primary); font-size: var(--font-size-mdm); font-weight: 600; }
-.hu-avatar-img { position: absolute; inset: 0; object-fit: cover; }
+.hu-trigger { display: flex; align-items: center; gap: var(--sp-3); max-width: 100%; padding: var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-1);
+    border: 0; border-radius: var(--border-radius-size-circle); background: transparent; color: var(--text-primary);
+    font-family: inherit; cursor: pointer; transition: background .2s; }
+@media (hover: hover) { .hu-trigger:hover, .header-user:hover .hu-trigger { background: var(--bg-secondary); } }
+.hu-trigger[aria-expanded="true"] { background: var(--bg-secondary); }
 .hu-trigger:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
-.hu-menu { position: absolute; right: 0; top: calc(100% + var(--sp-3)); min-width: 200px; z-index: var(--z-modal);
-    padding: var(--sp-2); border-radius: var(--border-radius-size-lg); background: var(--bg-secondary);
-    box-shadow: 0 8px 28px var(--black-a30); }
-.hu-name { padding: var(--sp-3) var(--sp-4); font-size: var(--font-size-mdm); font-weight: 600; color: var(--text-primary);
+.hu-avatar-wrap { position: relative; width: 32px; height: 32px; flex-shrink: 0; }
+.hu-avatar { width: 32px; height: 32px; border-radius: var(--border-radius-size-circle); display: grid; place-items: center;
+    background: var(--bg-tertiary); color: var(--text-primary); font-size: var(--font-size-sm); font-weight: 600; }
+.hu-avatar-img { position: absolute; inset: 0; object-fit: cover; }
+.hu-label { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: var(--font-size-mdm); font-weight: 500; }
+/* O espaçamento fica no .hu-pop (área de hover contínua entre o botão e o menu) */
+.hu-pop { position: absolute; right: 0; top: 100%; padding-top: var(--sp-3); z-index: var(--z-modal); }
+.hu-menu { min-width: 200px; padding: var(--sp-2); border-radius: var(--border-radius-size-lg);
+    background: var(--bg-secondary); box-shadow: 0 8px 28px var(--black-a30); }
+.hu-name { display: none; padding: var(--sp-3) var(--sp-4); font-size: var(--font-size-mdm); font-weight: 600; color: var(--text-primary);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
 .hu-item { display: block; width: 100%; padding: var(--sp-3) var(--sp-4); border: 0; border-radius: var(--border-radius-size-md);
     background: transparent; color: var(--text-secondary); font: inherit; font-size: var(--font-size-mdm);
     text-align: left; text-decoration: none; cursor: pointer; }
 @media (hover: hover) { .hu-item:hover { background: var(--bg-tertiary); color: var(--text-primary); } }
 .hu-logout { color: var(--error-color); }
+
+/* Celular: só o avatar no header; o nome aparece dentro do menu */
+@media (max-width: 560px) {
+    .hu-label { display: none; }
+    .hu-trigger { padding: 0; }
+    .hu-name { display: block; }
+    .hu-menu { min-width: 190px; max-width: calc(100vw - 2 * var(--sp-5)); }
+}

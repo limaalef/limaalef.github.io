@@ -24,11 +24,16 @@
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/order-ui.css">
     <link rel="stylesheet" href="css/request-detail.css">
 </head>
 <body>
     <header>
-        <div class="header-frame" id="header" data-title="" data-back="true" data-reqbtn="false"></div>
+        <div class="header-frame" id="header"
+        data-title-key="requestMyRequest"
+        data-back="true"
+        data-reqbtn="false">
+    </div>
     </header>
 
     <!-- Auth -->
@@ -70,6 +75,7 @@
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api_service.js"></script>
+    <script src="js/order-ui.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
 const RD_CFG = {
@@ -132,8 +138,6 @@ async function loadOrder() {
         _lastOrder = order;
         document.getElementById('rd-loading').classList.add('is-hidden');
 
-        const hdr = document.getElementById('header');
-        if (hdr) hdr.dataset.title = order.id;
         document.title = `${order.id} | Sports Archive`;
 
         // Restaura QR do servidor se o pagamento estiver pendente e houver dados salvos.
@@ -162,55 +166,16 @@ async function loadOrder() {
     }
 }
 
-// ── Ícones (traço único, herdam a cor do texto) ────────────────────────────
-const RD_ICON = {
-    copy:     '<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/>',
-    check:    '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
-    download: '<path d="M12 4v11"/><path d="M7.5 11 12 15.5 16.5 11"/><path d="M5 19.5h14"/>',
-    lock:     '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
-    media:    '<rect x="3.5" y="5" width="17" height="14" rx="3.5"/><path d="M10.5 9.5v5l4.2-2.5z"/>',
-    back:     '<path d="M15 6l-6 6 6 6"/>',
-};
-function ico(name, size = 16) {
-    return `<svg class="rd-ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${RD_ICON[name]}</svg>`;
-}
-
-// Pílula de status: texto neutro + ponto discreto (a cor só sinaliza, não pinta o fundo)
-function pill(kind, label) {
-    return `<span class="rd-pill rd-pill--${kind}"><i></i>${label}</span>`;
-}
-// Miniatura gerada a partir do ID do item: matiz estável por ID, saturação baixa (combina com claro/escuro)
-function itemThumb(item) {
-    const id  = String(item.id ?? item.label ?? '');
-    let h = 0;
-    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
-    const txt = id.length > 6 ? id.slice(-6) : id;
-    return `<span class="rd-item-ico rd-thumb" style="--h:${h}" aria-hidden="true"><span>${esc(txt)}</span></span>`;
-}
-const STATUS_KIND = { pending:'wait', processing:'wait', ready:'ok', completed:'ok', expired:'off', cancelled:'err' };
-
 function kv(label, valueHtml, extraCls = '') {
     return `<div class="rd-kv ${extraCls}"><span class="rd-k">${label}</span><span class="rd-v">${valueHtml}</span></div>`;
 }
 
-// Métodos de pagamento. Os logotipos oficiais ficam em /icons/payments/ (ver README da pasta);
-// se o arquivo não existir, a linha continua legível apenas com o nome.
-const PAY_METHODS = {
-    pix:    { name: 'Pix',    logo: '/icons/payments/pix.svg'    },
-    paypal: { name: 'PayPal', logo: '/icons/payments/paypal.svg' },
-};
-function payMethodKey(o) {
-    return (o.externalPayment || o.paymentExternal === true || o.payment?.provider === 'paypal') ? 'paypal' : 'pix';
-}
 function methodRow(o) {
-    const m = PAY_METHODS[payMethodKey(o)];
+    const key = payMethodKey(o);
     return `
     <div class="rd-method">
         <span class="rd-k">${t('requestPaymentMethod')}</span>
-        <span class="rd-method-val">
-            <span>${m.name}</span>
-            <img class="rd-method-logo" src="${m.logo}" alt="" onerror="this.remove()">
-        </span>
+        <span class="rd-method-val"><span>${PAY_METHODS[key].name}</span>${methodLogo(key)}</span>
     </div>`;
 }
 
@@ -228,29 +193,6 @@ function buildOrderDetail(o) {
     const dt    = new Date(o.createdAt).toLocaleString(loc(), { dateStyle:'long', timeStyle:'short' });
     const items = o.items || [];
     const A     = o.access || {};   // regras de exibição vindas do servidor (links / pagamento / valores)
-
-    // Progresso do pedido
-    const steps = [
-        { label: t('requestProgressReceived') },
-        { label: t('requestProgressAnalysis')  },
-        { label: t('requestProgressReady')     },
-    ];
-    const stepIdx = { pending:0, processing:1, ready:2, completed:3, expired:2, cancelled:2 };
-    const curIdx  = stepIdx[o.status] ?? 0;
-
-    const progressHtml = (o.status !== 'expired' && o.status !== 'cancelled') ? `
-        <section class="rd-block">
-            <h2 class="rd-block-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</h2>
-            <ol class="rd-steps">
-                ${steps.map((s, i) => {
-                    const cls = i < curIdx ? 'done' : (i === curIdx ? 'active' : 'todo');
-                    return `<li class="rd-step ${cls}">
-                        <span class="rd-step-dot">${i < curIdx ? ico('check', 12) : ''}</span>
-                        <span class="rd-step-lbl">${s.label}</span>
-                    </li>`;
-                }).join('')}
-            </ol>
-        </section>` : '';
 
     // Pagamento: pílula de situação (só quando há cobrança relevante)
     let payPill = '';
@@ -360,7 +302,7 @@ function buildOrderDetail(o) {
             <nav class="rd-crumb" aria-label="breadcrumb">
                 <a href="my-requests.html">${ico('back', 14)}<span data-i18n="requestMyRequests">${t('requestMyRequests')}</span></a>
             </nav>
-            <h1 class="rd-title"><span data-i18n="order">${t('order')}</span></h1>
+            <h1 class="rd-title"><span data-i18n="requestMyRequest">${t('requestMyRequest')}</span></h1>
         `,
         body: `
             <section class="rd-block rd-details">
@@ -370,7 +312,10 @@ function buildOrderDetail(o) {
                 ${payPill ? kv(t('requestPaymentLabel'), payPill) : ''}
             </section>
 
-            ${progressHtml}
+            ${(o.status !== 'expired' && o.status !== 'cancelled') ? `<section class="rd-block">
+                <h2 class="rd-block-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</h2>
+                ${stepsHtml(o)}
+            </section>` : ''}
 
             <section class="rd-block">
                 <h2 class="rd-block-title"><span data-i18n="requestDownloads">${t('requestDownloads')}</span> <span class="rd-count">${items.length}</span></h2>

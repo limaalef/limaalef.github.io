@@ -4,10 +4,10 @@
    - CSS/JS/componentes/ícones do mesmo domínio: stale-while-revalidate.
    - Requisições de outros domínios (APIs, imagens externas, Google): nunca interceptadas.
    Incremente CACHE_VERSION ao publicar mudanças no shell. */
-const CACHE_VERSION = 'sa-shell-v3';
+const CACHE_VERSION = 'sa-shell-v4';
 const SHELL = [
   '/', '/index.html', '/collection.html', '/my-requests.html',
-  '/css/theme.css', '/css/components.css',
+  '/css/theme.css', '/css/components.css', '/css/order-ui.css', '/js/order-ui.js',
   '/js/config.js', '/js/translation.js', '/js/utils.js',
   '/components/header.html', '/components/footer.html'
 ];
