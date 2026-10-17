@@ -52,7 +52,7 @@
 
 /* Logotipo do método: versão clara/escura conforme o tema */
 .rd-mlogo { display:inline-flex; align-items:center; }
-.rd-mlogo img { height:22px; max-width:72px; object-fit:contain; }
+.rd-mlogo img { height:18px; max-width:72px; object-fit:contain; }
 .rd-mlogo-d { display:none; }
 @media (prefers-color-scheme: dark) {
     .rd-mlogo-l { display:none; }

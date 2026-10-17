@@ -211,7 +211,8 @@ function buildOrderDetail(o) {
         return `
         <section class="rd-sec">
             <h3 class="rd-sec-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
-            ${kv(t('requestValue'), fmt(fig.total - taxaVal))}
+            ${kv(t('requestValue'), fmt(fig.total - taxaVal + fig.discount))}
+            ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(fig.discount)) : ''}
             ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'is-muted')}
             <div class="rd-total">
                 <span>${t('requestTotalValue')}</span>
@@ -295,7 +296,7 @@ function buildOrderDetail(o) {
         `,
         body: `
             <section class="rd-block rd-details">
-                ${kv(t('order'), `<span class="rd-id">${esc(o.id)}</span><button type="button" class="rd-icon-btn" id="rd-copy-id" onclick="copyOrderId()" aria-label="${t('requestCopied')}">${ico('copy', 15)}</button>`)}
+                ${kv(t('requestID'), `<span class="rd-id">${esc(o.id)}</span><button type="button" class="rd-icon-btn" id="rd-copy-id" onclick="copyOrderId()" aria-label="${t('requestCopied')}">${ico('copy', 15)}</button>`)}
                 ${kv(t('date'), dt)}
                 ${kv(t('requestStatusLabel'), pill(STATUS_KIND[o.status] || 'off', statusPtBR(o.status)))}
                 ${payPill ? kv(t('requestPaymentLabel'), payPill) : ''}
@@ -325,14 +326,16 @@ function buildOrderDetail(o) {
 function paymentFigures(o) {
     const A   = o.access || {};
     const ext = o.externalPayment;
-    if (ext) return { total: parseFloat(ext.amount), currency: ext.currency, feePct: o.externalFeePercent || 0 };
+    const disc = x => Math.max(0, parseFloat(x) || 0);   // desconto aplicado pelo admin (0 = sem desconto)
+    if (ext) return { total: parseFloat(ext.amount), currency: ext.currency, feePct: o.externalFeePercent || 0,
+                      discount: disc(ext.discount ?? o.externalDueEffective?.discount ?? o.externalDue?.discount) };
     if (o.paymentExternal) {
         const due = o.externalDueEffective;
-        return (A.showValues && due) ? { total: parseFloat(due.amount), currency: due.currency, feePct: o.externalFeePercent || 0 } : null;
+        return (A.showValues && due) ? { total: parseFloat(due.amount), currency: due.currency, feePct: o.externalFeePercent || 0, discount: disc(due.discount) } : null;
     }
     const v = o.valueEffective;
     return ((A.showValues || A.paid) && v && v.method === 'mercadopago' && o.platformFeePercent != null)
-        ? { total: parseFloat(v.amount), currency: v.currency || 'BRL', feePct: o.platformFeePercent } : null;
+        ? { total: parseFloat(v.amount), currency: v.currency || 'BRL', feePct: o.platformFeePercent, discount: disc(v.discount ?? o.paymentDiscount) } : null;
 }
 
 function copyOrderId() {
@@ -372,7 +375,7 @@ function buildExternalPaymentSection(o) {
             <div class="rd-pay-head">
                 <i class="rd-dot rd-dot--wait"></i>
                 <div>
-                    <div class="rd-pay-title">${t('requestPaymentExternalTitle')}</div>
+                    <div class="rd-pay-title">${t('requestPaymentWaiting')}</div>
                     <div class="rd-pay-sub">${o.paypalEnabled ? t('requestPaymentViaPayPal') : t('requestPaymentExternalDesc')}</div>
                 </div>
             </div>

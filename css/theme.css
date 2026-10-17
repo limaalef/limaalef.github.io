@@ -5,9 +5,9 @@
     color-scheme: light dark;
 
     /* Backgrounds */
-    --bg-primary: #f5f4f0;
-    --bg-secondary: #eeece7;
-    --bg-tertiary: #dadbdd;
+    --bg-primary: #f9f8f3;
+    --bg-secondary: #eae8e4;
+    --bg-tertiary: #d6d7da;
     
     /* Textos */
     --text-primary: #1a1a18;
@@ -19,8 +19,8 @@
     --border-color: #d8d6d0;
 
     /* Superfícies, linhas e texto suaves derivados do texto atual (valem para claro e escuro) */
-    --soft-bg: color-mix(in srgb, var(--text-primary) 6%, transparent);
-    --soft-bg-hover: color-mix(in srgb, var(--text-primary) 11%, transparent);
+    --soft-bg: color-mix(in srgb, var(--text-primary) 8%, transparent);
+    --soft-bg-hover: color-mix(in srgb, var(--text-primary) 12%, transparent);
     --soft-line: color-mix(in srgb, var(--text-primary) 9%, transparent);
     --text-muted: color-mix(in srgb, var(--text-primary) 58%, var(--bg-primary));
 
@@ -241,9 +241,9 @@ body.theme-admin {
 @media (prefers-color-scheme: dark) {
     :root {
         /* Backgrounds */
-        --bg-primary: #131313;
-        --bg-secondary: #1a1a1a;
-        --bg-tertiary: #363636;
+        --bg-primary: rgb(19, 19, 19);
+        --bg-secondary: rgb(31, 31, 31);
+        --bg-tertiary: rgb(58, 58, 58);
         
         /* Textos */
         --text-primary: #e8e8e8;
