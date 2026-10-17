@@ -175,7 +175,7 @@ function methodRow(o) {
     return `
     <div class="rd-method">
         <span class="rd-k">${t('requestPaymentMethod')}</span>
-        <span class="rd-method-val"><span>${PAY_METHODS[key].name}</span>${methodLogo(key)}</span>
+        <span class="rd-method-val">${methodLogo(key)}</span>
     </div>`;
 }
 
@@ -202,34 +202,23 @@ function buildOrderDetail(o) {
         else if (A.showPayment)                      payPill = pill('wait', t('requestPaymentWaiting'));
     }
 
-    // ── Resumo de valores ──────────────────────────────────────────────────
-    function summaryHtml(netVal, feePct, taxaVal, total, fmt) {
+    // ── Resumo de valores (mesmo formato para Pix e PayPal, pago ou não) ───
+    const fig = paymentFigures(o);
+    const paymentValueHtml = fig ? (() => {
+        const taxaVal = fig.total * (fig.feePct / 100);
+        const fmt = v => fmtMoney(v, fig.currency);
+        const pct = Number(fig.feePct).toLocaleString(loc(), { maximumFractionDigits: 2 });
         return `
         <section class="rd-sec">
             <h3 class="rd-sec-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
-            ${feePct > 0 ? kv(t('requestValue'), fmt(netVal)) + kv(`${t('requestFee')} (${feePct}%)`, fmt(taxaVal), 'is-muted') : ''}
+            ${kv(t('requestValue'), fmt(fig.total - taxaVal))}
+            ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'is-muted')}
             <div class="rd-total">
                 <span>${t('requestTotalValue')}</span>
-                <strong>${fmt(total)}</strong>
+                <strong>${fmt(fig.total)}</strong>
             </div>
         </section>`;
-    }
-
-    const mpValueHtml = (A.showValues && !o.paymentExternal && o.valueEffective?.method === 'mercadopago' && o.platformFeePercent != null) ? (() => {
-        const feePct  = o.platformFeePercent;
-        const total   = parseFloat(o.valueEffective.amount);
-        const taxaVal = total * (feePct / 100);
-        return summaryHtml(total - taxaVal, feePct, taxaVal, total, v => fmtMoney(v, 'BRL'));
     })() : '';
-
-    // Pagamento externo: mesmo resumo (valor, taxa e total), enquanto não pago
-    const paymentValueHtml = (A.showValues && o.paymentExternal && o.externalDueEffective && !o.externalPayment) ? (() => {
-        const due     = o.externalDueEffective;
-        const feePct  = o.externalFeePercent || 0;
-        const total   = parseFloat(due.amount);
-        const taxaVal = total * (feePct / 100);
-        return summaryHtml(total - taxaVal, feePct, taxaVal, total, v => fmtMoney(v, due.currency));
-    })() : (o.paymentExternal ? '' : mpValueHtml);
 
     const paymentHtml = buildPaymentSection(o);
 
@@ -332,6 +321,20 @@ function buildOrderDetail(o) {
     };
 }
 
+// Valores do pedido normalizados (Pix/Mercado Pago ou PayPal/externo). null = não há o que exibir.
+function paymentFigures(o) {
+    const A   = o.access || {};
+    const ext = o.externalPayment;
+    if (ext) return { total: parseFloat(ext.amount), currency: ext.currency, feePct: o.externalFeePercent || 0 };
+    if (o.paymentExternal) {
+        const due = o.externalDueEffective;
+        return (A.showValues && due) ? { total: parseFloat(due.amount), currency: due.currency, feePct: o.externalFeePercent || 0 } : null;
+    }
+    const v = o.valueEffective;
+    return ((A.showValues || A.paid) && v && v.method === 'mercadopago' && o.platformFeePercent != null)
+        ? { total: parseFloat(v.amount), currency: v.currency || 'BRL', feePct: o.platformFeePercent } : null;
+}
+
 function copyOrderId() {
     if (!_lastOrder) return;
     navigator.clipboard.writeText(_lastOrder.id).then(() => {
@@ -358,9 +361,8 @@ function buildExternalPaymentSection(o) {
     if (ep) {
         return paySection(`
             ${kv(t('requestStatusLabel'), pill('ok', t('requestPaymentApproved')))}
-            ${kv(t('requestValue'), fmtMoney(ep.amount, ep.currency))}
-            ${kv(t('requestPaidAt'), new Date(ep.paidAt).toLocaleString(loc()))}
             ${ep.reference ? kv('ID', esc(ep.reference), 'is-mono') : ''}
+            ${kv(t('requestPaidAt'), new Date(ep.paidAt).toLocaleString(loc()))}
             ${methodRow(o)}`);
     }
     if (o.paymentAccessGranted === true) return '';
@@ -374,7 +376,7 @@ function buildExternalPaymentSection(o) {
                     <div class="rd-pay-sub">${o.paypalEnabled ? t('requestPaymentViaPayPal') : t('requestPaymentExternalDesc')}</div>
                 </div>
             </div>
-            ${(o.externalDueEffective && !o.access?.showValues) ? `
+            ${(o.externalDueEffective && !paymentFigures(o)) ? `
             <div class="rd-pay-due">
                 <span class="rd-k">${t('requestAmountDue')}</span>
                 <strong>${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</strong>
