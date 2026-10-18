@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
-    <link rel="stylesheet" href="css/order-ui.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/my-requests.css">
 </head>
 <body>
@@ -57,7 +57,7 @@
             <!-- Conteúdo -->
             <div class="adm-main px-5">
                 <h1 class="rq-title" data-i18n="requestMyRequests">Meus Pedidos</h1>
-                <div class="rq-loading" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
+                <div class="status-message" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
                 <div class="is-hidden" id="rq-content"></div>
             </div>
         </div>
@@ -68,9 +68,9 @@
 <script src="js/config.js"></script>
 <script src="js/translation.js"></script>
 <script src="js/utils.js"></script>
-<script src="js/auth.js"></script>
+    <script src="js/auth.js"></script>
 <script src="js/api_service.js"></script>
-<script src="js/order-ui.js"></script>
+<script src="js/ui-components.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script>
 
@@ -129,7 +129,7 @@ function renderOrders(orders) {
                 <h2>📦</h2>
                 <h2 data-i18n="requestNoOrders">${t('requestNoOrders')}</h2>
                 <p data-i18n="requestNoOrdersHint">${t('requestNoOrdersHint')}</p>
-                <a href="collection.html" class="rd-btn rd-btn--solid mt-5">
+                <a href="collection.html" class="button button--solid mt-5">
                     <span data-i18n="backToCollection">${t('backToCollection')}</span>
                 </a>
             </div>`;
@@ -166,15 +166,29 @@ function fmtWhen(d) {
 function paymentSummaryHtml(o) {
     const A   = o.access || {};
     if (o.status === 'cancelled') return '';
-    const pay = o.payment || null;
+    const pay = o.payment;
+    const ext = o.externalPayment || null;
     const detail = parts => parts.filter(Boolean).join(' · ');
 
     // Pago via PayPal / pagamento externo registrado
-    if (pay) {
+    if (ext) {
         return `<div class="rq-pay">
             <div class="rq-pay-info">
-                ${pill('ok', (pay.provider === "mercadopago" ? t('requestPaidViaPix') : t('requestPaidViaPayPal')))}
-                <span class="rq-pay-detail">${detail([fmtMoney(o.payment.amount, o.payment.currency), o.payment.paidAt && fmtWhen(o.payment.paidAt)])}</span>
+                ${pill('success', t('requestPaidViaPayPal'))}
+                <span class="rq-pay-detail">${detail([fmtMoney(ext.amount, ext.currency), ext.paidAt && fmtWhen(ext.paidAt)])}</span>
+            </div>
+        </div>`;
+    }
+
+    // Pago via Pix (Mercado Pago) ou liberado manualmente
+    if (A.paid) {
+        const viaPix  = !!pay?.mpPaymentId || pay?.provider === 'mercadopago';
+        const amount  = pay?.amount ?? o.valueEffective?.amount;
+        const cur     = pay?.currency ?? o.valueEffective?.currency ?? 'BRL';
+        return `<div class="rq-pay">
+            <div class="rq-pay-info">
+                ${pill('success', viaPix ? t('requestPaidViaPix') : t('requestPaymentApproved'))}
+                <span class="rq-pay-detail">${detail([amount != null && fmtMoney(amount, cur), pay?.paidAt && fmtWhen(pay.paidAt)])}</span>
             </div>
         </div>`;
     }
@@ -185,10 +199,10 @@ function paymentSummaryHtml(o) {
         const due = external ? o.externalDueEffective : o.valueEffective;
         return `<div class="rq-pay">
             <div class="rq-pay-info">
-                ${pill('wait', t('requestPaymentWaiting'))}
+                ${pill('waiting', t('requestPaymentWaiting'))}
                 ${due ? `<span class="rq-pay-detail">${fmtMoney(due.amount, due.currency)}</span>` : ''}
             </div>
-            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rd-btn rd-btn--solid">${t('requestPayNow')}</a>
+            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="button button--solid">${t('requestPayNow')}</a>
         </div>`;
     }
 
@@ -225,7 +239,7 @@ function buildOrderCard(o) {
             </div>
             <div class="rq-head-side">
                 ${pill(STATUS_KIND[o.status] || 'off', statusPtBR(o.status))}
-                <span class="rq-chevron">${ico('chevron', 18)}</span>
+                <span class="rq-chevron">${icon('chevron', 18)}</span>
             </div>
         </div>
 
@@ -233,8 +247,8 @@ function buildOrderCard(o) {
 
         <div class="rq-body">
             ${steps ? `<div class="rq-steps">${steps}</div>` : ''}
-            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="rd-btn rq-detail-btn">
-                ${t('requestViewDetail')} ${ico('arrow', 15)}
+            <a href="request-detail.html?id=${encodeURIComponent(o.id)}" class="button rq-detail-btn">
+                ${t('requestViewDetail')} ${icon('arrow', 15)}
             </a>
         </div>
     </article>`;

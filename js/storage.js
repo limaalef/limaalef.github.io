@@ -13,10 +13,10 @@ const PSEUDO_DISKS = {
 
 // Situação do disco (a cor só aparece na bolinha, como nas demais telas)
 const DISK_STATES = {
-    over:    { label: 'Acima da capacidade', kind: 'err'  },
+    over:    { label: 'Acima da capacidade', kind: 'error'  },
     full:    { label: 'Cheio',               kind: 'off'  },
-    near:    { label: 'Quase cheio',         kind: 'wait' },
-    ok:      { label: 'Com espaço',          kind: 'ok'   },
+    near:    { label: 'Quase cheio',         kind: 'waiting' },
+    ok:      { label: 'Com espaço',          kind: 'success' },
     unknown: { label: 'Sem capacidade',      kind: 'off'  },
 };
 
@@ -87,20 +87,20 @@ function renderSummary() {
     const pctOf = v => cap > 0 ? (v / cap) * 100 : 0;
 
     document.getElementById('sdSummary').innerHTML = `
-        <div class="sd-tiles">
-            <div class="sd-tile"><div class="sd-tile-val">${disks.length}</div><div class="sd-tile-lbl">Discos físicos</div></div>
-            <div class="sd-tile"><div class="sd-tile-val">${formatGB(cap)}</div><div class="sd-tile-lbl">Capacidade total</div></div>
-            <div class="sd-tile"><div class="sd-tile-val">${formatGB(used)}</div><div class="sd-tile-lbl">Em uso · ${nf(pctOf(used), 0)}%</div></div>
-            <div class="sd-tile sd-tile--hl"><div class="sd-tile-val">${formatGB(free)}</div><div class="sd-tile-lbl">Livre · ${nf(pctOf(free), 0)}%</div></div>
+        <div class="stat-tile-grid">
+            ${statTile(disks.length, 'Discos físicos')}
+            ${statTile(formatGB(cap), 'Capacidade total')}
+            ${statTile(formatGB(used), `Em uso · ${nf(pctOf(used), 0)}%`)}
+            ${statTile(formatGB(free), `Livre · ${nf(pctOf(free), 0)}%`, true)}
         </div>
-        <div class="sd-bar sd-bar--lg" role="img" aria-label="Distribuição do espaço total">
-            <span class="sd-seg sd-seg--archive" style="width:${pctOf(archive)}%"></span>
-            <span class="sd-seg sd-seg--other"   style="width:${pctOf(other)}%"></span>
+        <div class="usage-bar usage-bar--large" role="img" aria-label="Distribuição do espaço total">
+            <span class="usage-bar-segment usage-bar-segment--archive" style="width:${pctOf(archive)}%"></span>
+            <span class="usage-bar-segment usage-bar-segment--other"   style="width:${pctOf(other)}%"></span>
         </div>
-        <div class="sd-legend">
-            <span><i class="sd-key sd-key--archive"></i>Arquivo (jogos) <b>${formatGB(archive)}</b></span>
-            <span><i class="sd-key sd-key--other"></i>Outros arquivos <b>${formatGB(other)}</b></span>
-            <span><i class="sd-key sd-key--free"></i>Livre <b>${formatGB(free)}</b></span>
+        <div class="usage-legend">
+            <span><i class="usage-legend-key usage-legend-key--archive"></i>Arquivo (jogos) <b>${formatGB(archive)}</b></span>
+            <span><i class="usage-legend-key usage-legend-key--other"></i>Outros arquivos <b>${formatGB(other)}</b></span>
+            <span><i class="usage-legend-key usage-legend-key--free"></i>Livre <b>${formatGB(free)}</b></span>
         </div>
         ${over ? `<p class="sd-note">${over} ${over === 1 ? 'disco informa' : 'discos informam'} uso acima da capacidade; nas barras e nos totais o uso é limitado a 100%.</p>` : ''}`;
 
@@ -123,7 +123,7 @@ function renderChips() {
     ].filter(([k, , n]) => k === 'all' || n > 0);
     if (!chips.some(([k]) => k === StorageState.filter)) StorageState.filter = 'all';
     document.getElementById('sdChips').innerHTML = chips.map(([k, label, n]) =>
-        `<button type="button" class="sd-chip ${StorageState.filter === k ? 'active' : ''}" data-filter="${k}">${label} <span>${n}</span></button>`).join('');
+        `<button type="button" class="chip ${StorageState.filter === k ? 'active' : ''}" data-filter="${k}">${label} <span>${n}</span></button>`).join('');
 }
 
 function visibleDisks() {
@@ -152,19 +152,19 @@ function diskRow(d, idx) {
         </div>
         <div class="sd-usage">
             ${d.knownTotal ? `
-            <div class="sd-bar" role="img" aria-label="${pctTxt} usado">
-                <span class="sd-seg sd-seg--archive" style="width:${aW}%"></span>
-                <span class="sd-seg sd-seg--other"   style="width:${oW}%"></span>
-            </div>` : '<div class="sd-bar sd-bar--empty"></div>'}
-            <div class="sd-legend sd-legend--sm">
-                ${d.archiveGB > 0 || d.otherGB === 0 ? `<span><i class="sd-key sd-key--archive"></i>Arquivo ${formatGB(d.archiveGB)}</span>` : ''}
-                ${d.otherGB > 0 ? `<span><i class="sd-key sd-key--other"></i>Outros ${formatGB(d.otherGB)}</span>` : ''}
+            <div class="usage-bar" role="img" aria-label="${pctTxt} usado">
+                <span class="usage-bar-segment usage-bar-segment--archive" style="width:${aW}%"></span>
+                <span class="usage-bar-segment usage-bar-segment--other"   style="width:${oW}%"></span>
+            </div>` : '<div class="usage-bar usage-bar--empty"></div>'}
+            <div class="usage-legend usage-legend--small">
+                ${d.archiveGB > 0 || d.otherGB === 0 ? `<span><i class="usage-legend-key usage-legend-key--archive"></i>Arquivo ${formatGB(d.archiveGB)}</span>` : ''}
+                ${d.otherGB > 0 ? `<span><i class="usage-legend-key usage-legend-key--other"></i>Outros ${formatGB(d.otherGB)}</span>` : ''}
             </div>
         </div>
         <div class="sd-num"><strong>${formatGB(d.usedGB)}</strong><span>${d.knownTotal ? 'de ' + formatGB(d.totalGB) : 'usados'}</span></div>
         <div class="sd-num"><strong>${d.knownTotal ? formatGB(d.freeGB) : '—'}</strong><span>livres</span></div>
-        <div class="sd-state"><span class="rd-pill rd-pill--${st.kind}"><i></i>${st.label}</span><span class="sd-pct">${pctTxt}</span></div>
-        <span class="sd-go" aria-hidden="true">${ico('chevron-right', 16)}</span>
+        <div class="sd-state">${pill(st.kind, st.label)}<span class="sd-pct">${pctTxt}</span></div>
+        <span class="sd-go" aria-hidden="true">${icon('chevron-right', 16)}</span>
     </button>`;
 }
 
@@ -174,7 +174,7 @@ function renderList() {
     document.getElementById('sdDiskCount').textContent = rows.length === StorageState.disks.length ? '' : `${rows.length} de ${StorageState.disks.length}`;
     list.innerHTML = rows.length
         ? `<div class="sd-head" aria-hidden="true"><span>Disco</span><span>Uso</span><span>Usado</span><span>Livre</span><span>Situação</span><span></span></div>` + rows.map(d => diskRow(d, StorageState.all.indexOf(d))).join('')
-        : `<div class="sd-empty">Nenhum disco encontrado.</div>`;
+        : `<div class="status-message">Nenhum disco encontrado.</div>`;
 }
 
 function renderOthers() {
@@ -188,17 +188,17 @@ function openDiskModal(d, opener) {
     const st = DISK_STATES[d.state];
     const denom = Math.max(d.totalGB, d.usedGB) || 1;
     const kv = (k, v) => v === null || v === undefined || v === '' || v === '-' ? '' :
-        `<div class="sd-kv"><span>${k}</span><b>${sdEsc(v)}</b></div>`;
+        keyValueRow(k, sdEsc(v));
     const pctTxt = d.knownTotal ? `${nf(d.pct, d.pct > 100 ? 0 : 1)}%` : '—';
     document.getElementById('sdModalBody').innerHTML = `
         <div class="sd-modal-head">
             <h3 id="sdModalTitle">${sdEsc(d.name)}</h3>
-            <span class="rd-pill rd-pill--${st.kind}"><i></i>${st.label}</span>
+            ${pill(st.kind, st.label)}
         </div>
         ${d.knownTotal ? `
-        <div class="sd-bar sd-bar--lg">
-            <span class="sd-seg sd-seg--archive" style="width:${(d.archiveGB / denom) * 100}%"></span>
-            <span class="sd-seg sd-seg--other"   style="width:${(d.otherGB / denom) * 100}%"></span>
+        <div class="usage-bar usage-bar--large">
+            <span class="usage-bar-segment usage-bar-segment--archive" style="width:${(d.archiveGB / denom) * 100}%"></span>
+            <span class="usage-bar-segment usage-bar-segment--other"   style="width:${(d.otherGB / denom) * 100}%"></span>
         </div>` : ''}
         <div class="sd-modal-sec">
             <h4>Espaço</h4>
@@ -215,7 +215,7 @@ function openDiskModal(d, opener) {
             ${kv('Situação cadastral', d.status)}${kv('Descrição', d.kindLabel)}
         </div>
         ${d.notes ? `<div class="sd-modal-sec"><h4>Observações</h4><p class="sd-modal-notes">${sdEsc(d.notes)}</p></div>` : ''}
-        <a class="rd-btn rd-btn--solid rd-btn--block" href="${diskHref(d)}">Ver conteúdo do disco ${ico('chevron-right', 16)}</a>`;
+        <a class="button button--solid button--block" href="${diskHref(d)}">Ver conteúdo do disco ${icon('chevron-right', 16)}</a>`;
     const m = document.getElementById('sdModal');
     m.hidden = false;
     document.body.classList.add('sd-lock');
@@ -228,12 +228,6 @@ function closeDiskModal() {
     m.hidden = true;
     document.body.classList.remove('sd-lock');
     m._opener?.focus();
-}
-
-// ─── Ícone (traço único, herda a cor) ────────────
-function ico(name, size = 16) {
-    const paths = { 'chevron-right': '<path d="M9 6l6 6-6 6"/>' };
-    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name]}</svg>`;
 }
 
 // ─── Init ────────────────────────────────────────
@@ -252,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.warn('Storage:', err);
         summaryEl.innerHTML = `<div class="sd-error">
             <p>Não foi possível carregar os discos (${sdEsc(err.message)}).</p>
-            <button type="button" class="rd-btn" onclick="location.reload()">Tentar de novo</button></div>`;
+            <button type="button" class="button" onclick="location.reload()">Tentar de novo</button></div>`;
         document.getElementById('sdList').innerHTML = '';
         return;
     }
@@ -268,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDiskModal(); });
 
     document.getElementById('sdChips').addEventListener('click', e => {
-        const b = e.target.closest('.sd-chip'); if (!b) return;
+        const b = e.target.closest('.chip'); if (!b) return;
         StorageState.filter = b.dataset.filter; renderChips(); renderList();
     });
     document.getElementById('sdSort').addEventListener('change', e => { StorageState.sort = e.target.value; renderList(); });

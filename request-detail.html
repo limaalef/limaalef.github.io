@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
-    <link rel="stylesheet" href="css/order-ui.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/request-detail.css">
 </head>
 <body>
@@ -57,7 +57,7 @@
             <!-- Conteúdo -->
             <div class="rd-head" id="rd-order-head"></div>
             <main class="rd-main">
-                <div class="rd-loading" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
+                <div class="status-message" id="rd-loading" data-i18n="requestLoadingOrder">Carregando pedido...</div>
                 <div id="rd-order-body"></div>
             </main>
 
@@ -75,7 +75,7 @@
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api_service.js"></script>
-    <script src="js/order-ui.js"></script>
+    <script src="js/ui-components.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
 const RD_CFG = {
@@ -166,9 +166,7 @@ async function loadOrder() {
     }
 }
 
-function kv(label, valueHtml, extraCls = '') {
-    return `<div class="rd-kv ${extraCls}"><span class="rd-k">${label}</span><span class="rd-v">${valueHtml}</span></div>`;
-}
+const kv = keyValueRow;
 
 function methodRow(o) {
     const key = payMethodKey(o);
@@ -182,7 +180,7 @@ function methodRow(o) {
 function paySection(inner) {
     return `
     <section class="rd-sec">
-        <h3 class="rd-sec-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</h3>
+        <h3 class="block-title" data-i18n="requestPaymentInfo">${t('requestPaymentInfo')}</h3>
         ${inner}
     </section>`;
 }
@@ -197,9 +195,9 @@ function buildOrderDetail(o) {
     // Pagamento: pílula de situação (só quando há cobrança relevante)
     let payPill = '';
     if (o.status !== 'cancelled') {
-        if (A.paid)                                  payPill = pill('ok',   t('requestPaymentApproved'));
-        else if (o.payment?.status === 'cancelled')  payPill = pill('err',  t('requestPaymentCancelled'));
-        else if (A.showPayment)                      payPill = pill('wait', t('requestPaymentWaiting'));
+        if (A.paid)                                  payPill = pill('success',   t('requestPaymentApproved'));
+        else if (o.payment?.status === 'cancelled')  payPill = pill('error',  t('requestPaymentCancelled'));
+        else if (A.showPayment)                      payPill = pill('waiting', t('requestPaymentWaiting'));
     }
 
     // ── Resumo de valores (mesmo formato para Pix e PayPal, pago ou não) ───
@@ -210,10 +208,10 @@ function buildOrderDetail(o) {
         const pct = Number(fig.feePct).toLocaleString(loc(), { maximumFractionDigits: 2 });
         return `
         <section class="rd-sec">
-            <h3 class="rd-sec-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
+            <h3 class="block-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
             ${kv(t('requestValue'), fmt(fig.total - taxaVal + fig.discount))}
+            ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'muted')}
             ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(fig.discount)) : ''}
-            ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'is-muted')}
             <div class="rd-total">
                 <span>${t('requestTotalValue')}</span>
                 <strong>${fmt(fig.total)}</strong>
@@ -255,10 +253,10 @@ function buildOrderDetail(o) {
             sideHtml = `
                 <span class="rd-exp ${expCls}">${expText}</span>
                 ${(!blocked && url)
-                    ? `<a href="${url}" class="rd-btn" target="_blank" rel="noopener" download>${ico('download', 15)}${t('requestDownload')}</a>`
+                    ? `<a href="${url}" class="button" target="_blank" rel="noopener" download>${icon('download', 15)}${t('requestDownload')}</a>`
                     : ''}`;
         } else if (A.showPayment) {
-            sideHtml = `<span class="rd-exp locked">${ico('lock', 14)}${t('requestLockedNotice')}</span>`;   // Pronto, aguardando pagamento
+            sideHtml = `<span class="rd-exp locked">${icon('lock', 14)}${t('requestLockedNotice')}</span>`;   // Pronto, aguardando pagamento
         } else if (o.status === 'expired') {
             sideHtml = `<span class="rd-exp expired">${t('requestLinkExpired')}</span>`;
         } else {
@@ -282,33 +280,33 @@ function buildOrderDetail(o) {
     const channelLabel = { email:'E-mail', whatsapp:'WhatsApp', telegram:'Telegram', bluesky:'Bluesky', x:'𝕏' }[channel] || channel || '—';
     const contactHtml = `
         <section class="rd-sec">
-            <h3 class="rd-sec-title" data-i18n="requestContactInfo">${t('requestContactInfo')}</h3>
+            <h3 class="block-title" data-i18n="requestContactInfo">${t('requestContactInfo')}</h3>
             ${kv(channelLabel, esc(o.contact?.value || '—'))}
-            ${o.notes ? `<div class="rd-note"><span class="rd-k">${t('requestNotesLabel')}</span><p>${esc(o.notes)}</p></div>` : ''}
+            ${o.notes ? `<div class="rd-note"><span class="key-value-label">${t('requestNotesLabel')}</span><p>${esc(o.notes)}</p></div>` : ''}
         </section>`;
 
     return {
         head: `
             <nav class="rd-crumb" aria-label="breadcrumb">
-                <a href="my-requests.html">${ico('back', 14)}<span data-i18n="requestMyRequests">${t('requestMyRequests')}</span></a>
+                <a href="my-requests.html">${icon('back', 14)}<span data-i18n="requestMyRequests">${t('requestMyRequests')}</span></a>
             </nav>
             <h1 class="rd-title"><span data-i18n="requestMyRequest">${t('requestMyRequest')}</span></h1>
         `,
         body: `
             <section class="rd-block rd-details">
-                ${kv(t('requestID'), `<span class="rd-id">${esc(o.id)}</span><button type="button" class="rd-icon-btn" id="rd-copy-id" onclick="copyOrderId()" aria-label="${t('requestCopied')}">${ico('copy', 15)}</button>`)}
+                ${kv(t('requestID'), `<span>${esc(o.id)}</span><button type="button" class="icon-button" id="rd-copy-id" onclick="copyOrderId()" aria-label="${t('requestCopied')}">${icon('copy', 15)}</button>`)}
                 ${kv(t('date'), dt)}
                 ${kv(t('requestStatusLabel'), pill(STATUS_KIND[o.status] || 'off', statusPtBR(o.status)))}
                 ${payPill ? kv(t('requestPaymentLabel'), payPill) : ''}
             </section>
 
             ${(o.status !== 'expired' && o.status !== 'cancelled') ? `<section class="rd-block">
-                <h2 class="rd-block-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</h2>
+                <h2 class="block-title" data-i18n="requestOrderStatus">${t('requestOrderStatus')}</h2>
                 ${stepsHtml(o)}
             </section>` : ''}
 
             <section class="rd-block">
-                <h2 class="rd-block-title"><span data-i18n="requestDownloads">${t('requestDownloads')}</span> <span class="rd-count">${items.length}</span></h2>
+                <h2 class="block-title"><span data-i18n="requestDownloads">${t('requestDownloads')}</span> <span class="counter">${items.length}</span></h2>
                 <ul class="rd-items">${itemsHtml}</ul>
             </section>
         `,
@@ -343,9 +341,9 @@ function copyOrderId() {
     navigator.clipboard.writeText(_lastOrder.id).then(() => {
         const btn = document.getElementById('rd-copy-id');
         if (!btn) return;
-        btn.innerHTML = ico('check', 15);
+        btn.innerHTML = icon('check', 15);
         btn.classList.add('done');
-        setTimeout(() => { btn.innerHTML = ico('copy', 15); btn.classList.remove('done'); }, 1600);
+        setTimeout(() => { btn.innerHTML = icon('copy', 15); btn.classList.remove('done'); }, 1600);
     });
 }
 
@@ -363,8 +361,8 @@ function buildExternalPaymentSection(o) {
     const ep = o.externalPayment;
     if (ep) {
         return paySection(`
-            ${kv(t('requestStatusLabel'), pill('ok', t('requestPaymentApproved')))}
-            ${ep.reference ? kv('ID', esc(ep.reference), 'is-mono') : ''}
+            ${kv(t('requestStatusLabel'), pill('success', t('requestPaymentApproved')))}
+            ${ep.reference ? kv('ID', esc(ep.reference), 'mono') : ''}
             ${kv(t('requestPaidAt'), new Date(ep.paidAt).toLocaleString(loc()))}
             ${methodRow(o)}`);
     }
@@ -373,7 +371,7 @@ function buildExternalPaymentSection(o) {
         ${methodRow(o)}
         <div class="rd-pay">
             <div class="rd-pay-head">
-                <i class="rd-dot rd-dot--wait"></i>
+                <i class="status-dot status-dot--waiting"></i>
                 <div>
                     <div class="rd-pay-title">${t('requestPaymentWaiting')}</div>
                     <div class="rd-pay-sub">${o.paypalEnabled ? t('requestPaymentViaPayPal') : t('requestPaymentExternalDesc')}</div>
@@ -381,7 +379,7 @@ function buildExternalPaymentSection(o) {
             </div>
             ${(o.externalDueEffective && !paymentFigures(o)) ? `
             <div class="rd-pay-due">
-                <span class="rd-k">${t('requestAmountDue')}</span>
+                <span class="key-value-label">${t('requestAmountDue')}</span>
                 <strong>${fmtMoney(o.externalDueEffective.amount, o.externalDueEffective.currency)}</strong>
             </div>` : ''}
             ${buildPaypalAction(o)}
@@ -397,7 +395,7 @@ function buildPaypalAction(o) {
     return `
     <div class="rd-pp-wrap">
         <div class="rd-err is-hidden" id="rd-pp-err"></div>
-        <button class="rd-cta" id="rd-pp-btn" onclick="startPaypal()">${t('requestPayWithPayPal')}</button>
+        <button class="button button--solid button--block button--large" id="rd-pp-btn" onclick="startPaypal()">${t('requestPayWithPayPal')}</button>
         <div class="rd-hint">${t('requestPaypalRedirectHint')}</div>
     </div>`;
 }
@@ -414,8 +412,8 @@ function buildPaymentSection(o) {
     // Pago
     if (A.paid) {
         return paySection(`
-            ${kv(t('requestStatusLabel'), pill('ok', t('requestPaymentApproved')))}
-            ${pay?.mpPaymentId ? kv('ID', esc(String(pay.mpPaymentId)), 'is-mono') : ''}
+            ${kv(t('requestStatusLabel'), pill('success', t('requestPaymentApproved')))}
+            ${pay?.mpPaymentId ? kv('ID', esc(String(pay.mpPaymentId)), 'mono') : ''}
             ${pay?.paidAt ? kv(t('requestPaidAt'), new Date(pay.paidAt).toLocaleString(loc())) : ''}
             ${methodRow(o)}`);
     }
@@ -425,7 +423,7 @@ function buildPaymentSection(o) {
         return paySection(`
             <div class="rd-pay">
                 <div class="rd-pay-head">
-                    <i class="rd-dot rd-dot--err"></i>
+                    <i class="status-dot status-dot--error"></i>
                     <div>
                         <div class="rd-pay-title">${t('requestPaymentCancelled')}</div>
                         <div class="rd-pay-sub">${t('requestPaymentCancelledDesc')}</div>
@@ -441,7 +439,7 @@ function buildPaymentSection(o) {
         ${methodRow(o)}
         <div class="rd-pay" id="rd-pay-card">
             <div class="rd-pay-head">
-                <i class="rd-dot ${hasPendingQr ? 'rd-dot--live' : 'rd-dot--wait'}"></i>
+                <i class="status-dot ${hasPendingQr ? 'status-dot--live' : 'status-dot--waiting'}"></i>
                 <div>
                     <div class="rd-pay-title">${hasPendingQr ? t('requestPaymentWaiting') : t('requestPaymentRequired')}</div>
                     <div class="rd-pay-sub">${hasPendingQr ? t('requestPaymentScanQr') : t('requestPaymentViaPix')}</div>
@@ -457,14 +455,14 @@ function renderCpfStep() {
     return `
     <div class="rd-cpf">
         <label class="rd-label" for="rd-cpf-input">${t('requestCPFPayer')}</label>
-        <input id="rd-cpf-input" class="rd-input" maxlength="14"
+        <input id="rd-cpf-input" class="field field--comfortable field--on-surface" maxlength="14"
             inputmode="numeric" placeholder="000.000.000-00"
             oninput="maskCpf(this)"
             onkeydown="if(event.key==='Enter') submitCpf()">
         <div class="rd-hint">${t('requestFiscalRequirement')}</div>
         <div class="rd-err is-hidden" id="rd-cpf-err"></div>
     </div>
-    <button class="rd-cta" onclick="submitCpf()">${t('requestGenerateQr')}</button>`;
+    <button class="button button--solid button--block button--large" onclick="submitCpf()">${t('requestGenerateQr')}</button>`;
 }
 
 function renderQrStep() {
@@ -478,7 +476,7 @@ function renderQrStep() {
         ${ps.pixCopyPaste ? `
         <div class="rd-qr-copy-wrap">
             <div class="rd-qr-code-text" id="rd-qr-code-text">${esc(ps.pixCopyPaste)}</div>
-            <button class="rd-btn rd-btn--block" onclick="copyCodigo()">${t('requestPixCopyPaste')}</button>
+            <button class="button button--block" onclick="copyCodigo()">${t('requestPixCopyPaste')}</button>
         </div>` : ''}
         <div class="rd-qr-timer" id="rd-qr-timer">${t('requestValidFor')} <span id="rd-countdown">—</span></div>
         <div class="rd-poll-status">
@@ -524,7 +522,7 @@ async function submitCpf() {
     errEl.classList.add('is-hidden');
 
     const body = document.getElementById('rd-pay-body');
-    body.innerHTML = `<div class="text-center p-5"><div class="rd-spinner"></div><div class="mt-3 text-secondary text-sm">${t('requestGeneratingPix')}</div></div>`;
+    body.innerHTML = `<div class="text-center p-5"><div class="spinner"></div><div class="mt-3 text-secondary text-sm">${t('requestGeneratingPix')}</div></div>`;
 
     try {
         const res  = await session.fetch(`${RD_CFG.paymentsBase}/payments/create`, {

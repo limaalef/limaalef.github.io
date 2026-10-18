@@ -7,7 +7,7 @@
 const CACHE_VERSION = 'sa-shell-v5';
 const SHELL = [
   '/', '/index.html', '/collection.html', '/my-requests.html',
-  '/css/theme.css', '/css/components.css', '/css/order-ui.css', '/js/order-ui.js',
+  '/css/theme.css', '/css/components.css', '/css/ui-components.css', '/js/ui-components.js',
   '/js/config.js', '/js/translation.js', '/js/utils.js',
   '/components/header.html', '/components/footer.html'
 ];

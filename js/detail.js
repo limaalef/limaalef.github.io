@@ -161,54 +161,10 @@ Renderer.populateYearFilter = function () {
 };
 
 /* ─────────────────────────────────────────
-   Patch no CardManager: injetar placar central
-   e mover data para inline com a fase
+   Layout do card na coleção: placar central e data
+   na linha da fase (opção do card único, só p/ partidas)
 ───────────────────────────────────────── */
-const _origCardCreate = CardManager.create.bind(CardManager);
-CardManager.create = function (match) {
-    const card = _origCardCreate(match);
-
-    // ── Fase + data na mesma linha ──
-    const compInfo = card.querySelector('.competition-info');
-    if (compInfo) {
-        const phaseEl = compInfo.querySelector('.match-phase');
-        const dateDisplay = Utils.formatMatchDate(match.utcDate);
-
-        // Substitui o conteúdo do competition-info para incluir a linha fase/data
-        const competitionEl = compInfo.querySelector('.match-competition');
-        compInfo.innerHTML = `
-            ${competitionEl ? competitionEl.outerHTML : ''}
-            <div class="match-phase-date-row">
-                <span class="match-phase">${phaseEl ? phaseEl.textContent : ''}</span>
-                <span class="match-date-inline">${dateDisplay}</span>
-            </div>
-        `;
-    }
-
-    // ── Placar central ──
-    const teamsEl = card.querySelector('.match-teams');
-    if (teamsEl) {
-        const { homeGoals, homeWinner,
-                awayGoals, awayWinner,
-                hasWinner } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
-
-        const scoreCenter = document.createElement('div');
-        scoreCenter.className = 'match-score-center';
-        scoreCenter.innerHTML = `
-            <span class="score-val ${homeWinner ? 'winner' : awayWinner ? 'loser' : ''}">${homeGoals !== '' ? homeGoals : '-'}</span>
-            <span class="score-sep">x</span>
-            <span class="score-val ${awayWinner ? 'winner' : homeWinner ? 'loser' : ''}">${awayGoals !== '' ? awayGoals : '-'}</span>
-        `;
-
-        // Insere entre os dois .team
-        const teams = teamsEl.querySelectorAll('.team');
-        if (teams.length === 2) {
-            teamsEl.insertBefore(scoreCenter, teams[1]);
-        }
-    }
-
-    return card;
-};
+CardManager.options.layout = 'detail';
 
 /* ─────────────────────────────────────────
    CollectionApp — controlador principal

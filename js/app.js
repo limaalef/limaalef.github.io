@@ -26,14 +26,14 @@ const App = {
         }
     },
 
-    switchSport(sport) {
+    async switchSport(sport) {
         CONFIG.currentSport = sport;
         AppState.currentPage = 1;
         document.querySelectorAll('.sport-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sport === sport);
         });
+        await this.loadData();
         Utils.applySportTheme(sport);
-        this.loadData();
     },
 
     readUrlParams() {

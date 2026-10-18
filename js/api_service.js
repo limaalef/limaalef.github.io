@@ -7,7 +7,7 @@ const APIService = {
         return data;
     },
 
-    async fetchMatches(page, itemsPerPage) {
+    async fetchMatches(page, itemsPerPage = 50) {
         const loadingMessage = LanguageManager.t('loadingData');
         Utils.showNotification(loadingMessage, 'info');
 
@@ -32,7 +32,7 @@ const APIService = {
         };
     },
 
-    async fetchChangelog(page, itemsPerPage, { mode = '' } = {}) {
+    async fetchChangelog(page, itemsPerPage = 50, { mode = '' } = {}) {
         const url = new URL(CONFIG.CHANGELOG_URL);
         url.searchParams.set('page', page);
         url.searchParams.set('limit', itemsPerPage);
@@ -50,7 +50,7 @@ const APIService = {
         return this._fetchJson(url.toString());
     },
 
-    async fetchByTeam(page, itemsPerPage) {
+    async fetchByTeam(page, itemsPerPage = 50) {
         const loadingMessage = LanguageManager.t('loadingData');
         Utils.showNotification(loadingMessage, 'info');
         let url = null
@@ -61,7 +61,7 @@ const APIService = {
             url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
         }
         
-        url.searchParams.append('max_items', 100);
+        url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
         url.searchParams.append(CollectionState.type, CollectionState.query);
 
@@ -70,7 +70,7 @@ const APIService = {
 
     // Busca os jogos que estão fisicamente armazenados em um disco/volume
     // específico (ex.: openVolumeDetail na página de storage).
-    async fetchByStorage(volumeName, page = 1, itemsPerPage = 1500) {
+    async fetchByStorage(volumeName, page = 1, itemsPerPage = 50) {
         const url = new URL(CONFIG.API_URLS['football']);
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);

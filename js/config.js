@@ -21,7 +21,7 @@ const CONFIG = {
     CHANGELOG_URL:     'https://api-archive.limaalef.com/changelog',
     CONTEXT_API_URL:   'https://api.limaalef.com/archive/matches?', 
     IMAGE_CONTENT_URL: 'https://img.limaalef.com/',
-    DEFAULT_ITEMS_PER_PAGE: 200,
+    DEFAULT_ITEMS_PER_PAGE: 52,
     currentSport: 'football',
 };
 

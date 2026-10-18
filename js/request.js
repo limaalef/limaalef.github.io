@@ -627,54 +627,6 @@ const RequestModule = (() => {
         });
     }
 
-    // ══════════════════════════════════════════════════════════
-    //  PATCH DE MANAGERS — injeta data-match-id nos cards
-    //
-    //  Feito via Object.defineProperty em vez de capturar
-    //  window.Renderer?.render no init, pois os objetos
-    //  Renderer/CardManager podem ainda não existir nesse momento.
-    //  O patch é aplicado depois do DOMContentLoaded através
-    //  do evento 'matchesRendered', que Renderer.render() já
-    //  dispara internamente — sem modificar managers.js.
-    // ══════════════════════════════════════════════════════════
-    function _patchManagers() {
-        // Patch CardManager.create — marca cards com várias fontes (sem botão de pedido)
-        if (typeof CardManager !== 'undefined' && !CardManager._rmPatched) {
-            const orig = CardManager.create.bind(CardManager);
-            CardManager.create = function (match) {
-                const card = orig(match);
-                if (_hasMultipleSources(match)) {
-                    card.dataset.groupId     = match.id;
-                    card.dataset.sourceCount = String(match.sources.length);
-                }
-                return card;
-            };
-            CardManager._rmPatched = true;
-        }
-
-        // Patch MotorCardManager.create
-        if (typeof MotorCardManager !== 'undefined' && !MotorCardManager._rmPatched) {
-            const orig = MotorCardManager.create.bind(MotorCardManager);
-            MotorCardManager.create = function (match) {
-                const card = orig(match);
-                card.dataset.matchId = match.id;
-                return card;
-            };
-            MotorCardManager._rmPatched = true;
-        }
-
-        // Patch CarnavalCardManager.create
-        if (typeof CarnavalCardManager !== 'undefined' && !CarnavalCardManager._rmPatched) {
-            const orig = CarnavalCardManager.create.bind(CarnavalCardManager);
-            CarnavalCardManager.create = function (match) {
-                const card = orig(match);
-                card.dataset.matchId = match.id;
-                return card;
-            };
-            CarnavalCardManager._rmPatched = true;
-        }
-    }
-
     function _patchModal() {
         if (typeof MatchModal !== 'undefined' && !MatchModal._rmPatched) {
             const origShow = MatchModal.show.bind(MatchModal);
@@ -717,14 +669,12 @@ const RequestModule = (() => {
         // ao invés de monkey-patchar Renderer.render, que pode
         // estar undefined no momento em que _init() executa.
         document.addEventListener('matchesRendered', () => {
-            _patchManagers();        // garante data-match-id nos creates futuros
             _patchModal();
             _injectRequestButtons(); // injeta nos cards já no DOM
         });
 
         // Garante patch assim que os managers existirem
         // (útil se DOMContentLoaded já disparou antes do evento)
-        _patchManagers();
         _patchModal();
 
         // ESC fecha o painel

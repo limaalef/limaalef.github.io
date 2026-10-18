@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/detail.css">
-    <link rel="stylesheet" href="css/order-ui.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/utilities.css">
@@ -40,7 +40,7 @@
 </style>
 <body class="page-admin">
     <header>
-        <div class="header-frame" id="header" data-title="Administração" data-back="false" data-admin="true" data-forced="true" data-reqbtn="false"></div>
+        <div class="header-frame" id="header" data-title="Administração" data-back="true" data-admin="true" data-forced="true" data-reqbtn="false"></div>
     </header>
 
     <!-- Auth -->
@@ -107,12 +107,12 @@
                   <div id="adm-list-view">
                     <!-- Stats -->
                     <div class="stats d-flex mb-5">
-                        <div class="stat"><div class="stat-value" id="st-total">—</div><div class="stat-label">Total</div></div>
-                        <div class="stat"><div class="stat-value highlighted" id="st-pending">—</div><div class="stat-label">Pendentes</div></div>
-                        <div class="stat"><div class="stat-value" id="st-processing">—</div><div class="stat-label">Em análise</div></div>
-                        <div class="stat"><div class="stat-value" id="st-ready">—</div><div class="stat-label">Prontos</div></div>
-                        <div class="stat"><div class="stat-value" id="st-completed">—</div><div class="stat-label">Concluídos</div></div>
-                        <div class="stat"><div class="stat-value" id="st-expired">—</div><div class="stat-label">Expirados</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="st-total">—</div><div class="stat-tile-label">Total</div></div>
+                        <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="st-pending">—</div><div class="stat-tile-label">Pendentes</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="st-processing">—</div><div class="stat-tile-label">Em análise</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="st-ready">—</div><div class="stat-tile-label">Prontos</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="st-completed">—</div><div class="stat-tile-label">Concluídos</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="st-expired">—</div><div class="stat-tile-label">Expirados</div></div>
                     </div>
 
                     <div class="section-divider"></div>
@@ -150,8 +150,8 @@
                             </tr></thead>
                             <tbody id="adm-tbody"></tbody>
                         </table>
-                        <div class="adm-loading" id="adm-loading">Carregando pedidos...</div>
-                        <div class="adm-empty is-hidden" id="adm-empty">Nenhum pedido encontrado.</div>
+                        <div class="status-message" id="adm-loading">Carregando pedidos...</div>
+                        <div class="status-message is-hidden" id="adm-empty">Nenhum pedido encontrado.</div>
                     </div>
                     </div>
                   </div>
@@ -159,8 +159,8 @@
                   <!-- Edição do pedido (na própria página, sem modal e sem recarregar) -->
                   <section class="adm-editor is-hidden" id="adm-editor" aria-labelledby="adm-editor-title">
                     <div class="adm-editor-head">
-                        <button type="button" class="rd-btn" onclick="closeOrder()">
-                            <svg class="rd-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                        <button type="button" class="button" onclick="closeOrder()">
+                            <svg class="inline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
                             Pedidos
                         </button>
                         <h2 class="adm-editor-title" id="adm-editor-title"></h2>
@@ -185,21 +185,21 @@
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Client ID</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-sandbox-client-id" placeholder="Client ID"
+                                        <input class="field field--end-aligned" id="pp-sandbox-client-id" placeholder="Client ID"
                                             autocomplete="off" spellcheck="false">
                                     </span>
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Client Secret</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-sandbox-secret" type="password" placeholder="Client Secret"
+                                        <input class="field field--end-aligned" id="pp-sandbox-secret" type="password" placeholder="Client Secret"
                                             autocomplete="new-password" spellcheck="false">
                                     </span>
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Webhook ID</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-sandbox-webhook" placeholder="Webhook ID (sandbox)"
+                                        <input class="field field--end-aligned" id="pp-sandbox-webhook" placeholder="Webhook ID (sandbox)"
                                             autocomplete="off" spellcheck="false">
                                     </span>
                                 </div>
@@ -226,7 +226,7 @@
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Moeda</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-amount-input" id="ext-currency-setting" list="ext-currencies" maxlength="3"
+                                        <input class="field field--amount" id="ext-currency-setting" list="ext-currencies" maxlength="3"
                                             placeholder="USD" autocomplete="off" style="text-transform:uppercase"
                                             oninput="recalcSettingsTotal('ext')">
                                         <datalist id="ext-currencies">
@@ -240,7 +240,7 @@
                                     <span class="detail-list-value">
                                         <div class="adm-amount-wrap">
                                             <span class="adm-amount-prefix" id="ext-base-prefix">USD</span>
-                                            <input class="adm-amount-input" id="ext-base-amount"
+                                            <input class="field field--amount" id="ext-base-amount"
                                                 type="number" min="0" step="0.01" placeholder="0,00"
                                                 oninput="recalcSettingsTotal('ext')">
                                         </div>
@@ -250,7 +250,7 @@
                                     <span class="detail-list-label">Taxa de processamento (%)</span>
                                     <span class="detail-list-value">
                                         <div class="adm-amount-wrap">
-                                            <input class="adm-amount-input" id="ext-fee-percent"
+                                            <input class="field field--amount" id="ext-fee-percent"
                                                 type="number" min="0" max="99" step="0.01" placeholder="0,00"
                                                 oninput="recalcSettingsTotal('ext')">
                                             <span class="adm-amount-prefix">%</span>
@@ -281,21 +281,21 @@
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Client ID</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-live-client-id" placeholder="Client ID"
+                                        <input class="field field--end-aligned" id="pp-live-client-id" placeholder="Client ID"
                                             autocomplete="off" spellcheck="false">
                                     </span>
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Client Secret</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-live-secret" type="password" placeholder="Client Secret"
+                                        <input class="field field--end-aligned" id="pp-live-secret" type="password" placeholder="Client Secret"
                                             autocomplete="new-password" spellcheck="false">
                                     </span>
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Webhook ID</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-live-webhook" placeholder="Webhook ID (live)"
+                                        <input class="field field--end-aligned" id="pp-live-webhook" placeholder="Webhook ID (live)"
                                             autocomplete="off" spellcheck="false">
                                     </span>
                                 </div>
@@ -331,7 +331,7 @@
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">URL do site</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="pp-site-url" placeholder="https://seusite.com"
+                                        <input class="field field--end-aligned" id="pp-site-url" placeholder="https://seusite.com"
                                             autocomplete="off" spellcheck="false"
                                             title="Para onde o PayPal devolve o usuário após o pagamento (apenas a origem, ex.: https://seusite.com)">
                                     </span>
@@ -384,14 +384,14 @@
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Access token</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="mp-access-token"
+                                        <input class="field field--end-aligned" id="mp-access-token"
                                             type="password" placeholder="APP_USR-..." autocomplete="off">
                                     </span>
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Public key</span>
                                     <span class="detail-list-value">
-                                        <input class="adm-input adm-input-text" id="mp-public-key"
+                                        <input class="field field--end-aligned" id="mp-public-key"
                                             placeholder="APP_USR-..." autocomplete="off">
                                     </span>
                                 </div>
@@ -411,7 +411,7 @@
                                     <span class="detail-list-value">
                                         <div class="adm-amount-wrap">
                                             <span class="adm-amount-prefix">R$</span>
-                                            <input class="adm-amount-input" id="mp-base-amount"
+                                            <input class="field field--amount" id="mp-base-amount"
                                                 type="number" min="0" step="0.01" placeholder="0,00"
                                                 oninput="recalcSettingsTotal('mp')">
                                         </div>
@@ -421,7 +421,7 @@
                                     <span class="detail-list-label">Taxa de processamento (%)</span>
                                     <span class="detail-list-value">
                                         <div class="adm-amount-wrap">
-                                            <input class="adm-amount-input" id="mp-fee-percent"
+                                            <input class="field field--amount" id="mp-fee-percent"
                                                 type="number" min="0" max="99" step="0.01" placeholder="0,00"
                                                 oninput="recalcSettingsTotal('mp')">
                                             <span class="adm-amount-prefix">%</span>
@@ -488,6 +488,7 @@
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/ui-components.js"></script>
     <script src="js/api_service.js"></script>
     <script src="js/managers.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
@@ -621,16 +622,16 @@ function renderTable() {
         const pay = o.payment;
         let payCell = `<span class="text-tertiary">—</span>`;
         if (o.externalPayment) {
-            payCell = `<span class="rd-pill rd-pill--ok" title="PayPal"><i></i>Pago · Ext.</span>`;
+            payCell = `<span class="status-pill status-pill--success" title="PayPal"><i></i>Pago · Ext.</span>`;
         } else if (o.paymentExternal) {
             payCell = o.paymentAccessGranted
-                ? `<span class="rd-pill rd-pill--ok"><i></i>Liberado</span>`
-                : `<span class="rd-pill rd-pill--wait" title="PayPal"><i></i>Ext. pendente</span>`;
+                ? `<span class="status-pill status-pill--success"><i></i>Liberado</span>`
+                : `<span class="status-pill status-pill--waiting" title="PayPal"><i></i>Ext. pendente</span>`;
         } else if (pay) {
             const lbl = { approved: 'Pago', pending: 'Aguardando', cancelled: 'Cancelado' }[pay.status] || pay.status;
             payCell = payPill(pay.status, lbl);
         } else if (o.paymentAccessGranted || o.status === 'completed') {
-            payCell = `<span class="rd-pill rd-pill--ok"><i></i>Liberado</span>`;
+            payCell = `<span class="status-pill status-pill--success"><i></i>Liberado</span>`;
         }
 
         return `<tr>
@@ -649,11 +650,11 @@ function renderTable() {
     }).join('');
 }
 
-// Pílulas: fundo neutro, bolinha na cor do tema (estilo compartilhado em order-ui.css)
-const ADM_STATUS_KIND = { pending:'wait', processing:'info', ready:'ok', completed:'accent', expired:'off', cancelled:'err' };
-const ADM_PAY_KIND    = { approved:'ok', pending:'wait', cancelled:'err' };
-const statusPill = s => `<span class="rd-pill rd-pill--${ADM_STATUS_KIND[s] || 'off'}"><i></i>${statusLabel(s)}</span>`;
-const payPill    = (s, label) => `<span class="rd-pill rd-pill--${ADM_PAY_KIND[s] || 'off'}"><i></i>${label}</span>`;
+// Pílulas: fundo neutro, bolinha na cor do tema (estilo compartilhado em ui-components.css)
+const ADM_STATUS_KIND = STATUS_KIND;
+const ADM_PAY_KIND    = { approved:'success', pending:'waiting', cancelled:'error' };
+const statusPill = s => pill(ADM_STATUS_KIND[s] || 'off', statusLabel(s));
+const payPill    = (s, label) => pill(ADM_PAY_KIND[s] || 'off', label);
 
 function statusLabel(s) {
     return {pending:'Pendente',processing:'Em análise',ready:'Pronto',completed:'Concluído',expired:'Expirado',cancelled:'Cancelado'}[s]||s;
@@ -684,7 +685,7 @@ async function openOrder(id) {
     if (!refresh) {
         document.getElementById('adm-editor-title').textContent = id;
         document.getElementById('adm-editor-pill').innerHTML = '';
-        body.innerHTML = '<div class="adm-loading">Buscando pedido...</div>';
+        body.innerHTML = '<div class="status-message">Buscando pedido...</div>';
         showOrderView(true);
         window.scrollTo(0, 0);
         history.pushState({ admOrder: id }, '', '#order=' + encodeURIComponent(id));
@@ -704,7 +705,7 @@ async function openOrder(id) {
         amtInit(order, 'pix');
         amtInit(order, 'ext');
     } catch (e) {
-        body.innerHTML = `<div class="adm-empty">⚠ Não foi possível carregar o pedido: ${esc(e.message)}</div>`;
+        body.innerHTML = `<div class="status-message">⚠ Não foi possível carregar o pedido: ${esc(e.message)}</div>`;
     }
 }
 
@@ -877,7 +878,7 @@ function amountBlockHtml(o, kind) {
     const cur0 = c.editCur ? (st.savedCur || st.defCur) : 'BRL';
     const oninput = `oninput="amtRender('${kind}')"`;
     const curField = c.editCur
-        ? `<input class="adm-amount-input adm-amount-cur" id="${amtId(kind, 'cur')}" list="ext-currencies" maxlength="3" placeholder="USD"
+        ? `<input class="field field--amount field--currency" id="${amtId(kind, 'cur')}" list="ext-currencies" maxlength="3" placeholder="USD"
                value="${esc(cur0)}" autocomplete="off" ${oninput}
                title="Moeda (código ISO: USD, EUR, BRL...). O valor não é convertido automaticamente.">`
         : `<span class="adm-amount-prefix">R$</span>`;
@@ -887,11 +888,11 @@ function amountBlockHtml(o, kind) {
         ${kvRow('Valor aplicado', `<span class="adm-amount-status" id="${amtId(kind, 'applied')}"></span>`)}
         ${kvRow(`Valor padrão (base × ${n} ${n === 1 ? 'item' : 'itens'})`, `<span id="${amtId(kind, 'default')}">calculando...</span>`)}
         ${kvRow('Valor personalizado', `<div class="adm-amount-wrap">${curField}
-            <input class="adm-amount-input" id="${amtId(kind, 'amount')}" type="number" min="0" step="0.01" inputmode="decimal"
+            <input class="field field--amount" id="${amtId(kind, 'amount')}" type="number" min="0" step="0.01" inputmode="decimal"
                 placeholder="padrão" value="${st.saved != null ? esc(String(st.saved)) : ''}" ${oninput}
                 title="Valor antes do desconto. Deixe o valor padrão para usar base × itens"></div>`)}
         ${kvRow('Desconto', `<div class="adm-amount-wrap">${discPrefix}
-            <input class="adm-amount-input" id="${amtId(kind, 'discount')}" type="number" min="0" step="0.01" inputmode="decimal"
+            <input class="field field--amount" id="${amtId(kind, 'discount')}" type="number" min="0" step="0.01" inputmode="decimal"
                 placeholder="0,00" value="${st.discount > 0 ? st.discount.toFixed(2) : ''}" ${oninput}
                 title="Valor abatido do total a pagar"></div>`)}
         ${kvRow('Total a pagar', `<strong id="${amtId(kind, 'total')}">—</strong>`, 'adm-total-row')}
@@ -924,7 +925,7 @@ function buildOrderDetail(o) {
         const linkRow = link
             ? `<div class="adm-item-link-row">
                 <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
-                ${disabled ? '<span class="rd-pill rd-pill--off text-xs"><i></i>OFF</span>' : ''}
+                ${disabled ? '<span class="status-pill status-pill--off text-xs"><i></i>OFF</span>' : ''}
                 <button type="button" class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
                     onclick="toggleItemLink('${o.id}',${idx},${disabled ? 'true' : 'false'})">
                     ${disabled ? 'Ligar' : 'Pausar'}
@@ -947,8 +948,8 @@ function buildOrderDetail(o) {
                 </div>
             </div>
             <div class="adm-item-fields">
-                <input class="adm-input" id="lnk-url-${idx}" placeholder="https://..." aria-label="URL do link" value="${esc(link?.url||'')}">
-                <select class="adm-input adm-input-select" id="lnk-expiry-${idx}" aria-label="Expiração">
+                <input class="field" id="lnk-url-${idx}" placeholder="https://..." aria-label="URL do link" value="${esc(link?.url||'')}">
+                <select class="field field--end-aligned field--select" id="lnk-expiry-${idx}" aria-label="Expiração">
                     ${link?.expiresAt ? '<option value="keep" selected>Manter atual</option>' : ''}
                     <option value="0" ${link?.expiresAt ? '' : 'selected'}>Sem expiração</option>
                     <option value="168">7 dias</option>
@@ -975,7 +976,7 @@ function buildOrderDetail(o) {
         </div>
         <div class="adm-expiry-inline" id="activate-panel">
             <label>Novo prazo:</label>
-            <select class="adm-expiry-sel" id="activate-expiry">
+            <select class="field" id="activate-expiry">
                 <option value="168">7 dias</option>
                 <option value="360">15 dias</option>
                 <option value="720" selected>30 dias</option>
@@ -1007,13 +1008,13 @@ function buildOrderDetail(o) {
                         <div class="detail-list-item">
                             <span class="detail-list-label">Status</span>
                             <span class="detail-list-value">
-                                ${ep ? `<span class="rd-pill rd-pill--ok"><i></i>Pago</span>` : `<span class="rd-pill rd-pill--wait"><i></i>Aguardando registro</span>`}
+                                ${ep ? `<span class="status-pill status-pill--success"><i></i>Pago</span>` : `<span class="status-pill status-pill--waiting"><i></i>Aguardando registro</span>`}
                             </span>
                         </div>
                         <div class="detail-list-item">
                             <span class="detail-list-label">Moeda</span>
                             <span class="detail-list-value">
-                                <input class="adm-amount-input" id="ext-currency" list="ext-currencies" maxlength="3"
+                                <input class="field field--amount" id="ext-currency" list="ext-currencies" maxlength="3"
                                     placeholder="USD" value="${esc(ep?.currency || due?.currency || '')}" autocomplete="off"
                                     style="text-transform:uppercase">
                             </span>
@@ -1021,21 +1022,21 @@ function buildOrderDetail(o) {
                         <div class="detail-list-item">
                             <span class="detail-list-label">Valor recebido</span>
                             <span class="detail-list-value">
-                                <input class="adm-amount-input" id="ext-amount" type="number" min="0" step="0.01"
+                                <input class="field field--amount" id="ext-amount" type="number" min="0" step="0.01"
                                     inputmode="decimal" placeholder="0,00" value="${ep ? esc(String(ep.amount)) : (due ? esc(String(due.amount)) : '')}">
                             </span>
                         </div>
                         <div class="detail-list-item">
                             <span class="detail-list-label">Data e hora do pagamento</span>
                             <span class="detail-list-value">
-                                <input class="adm-amount-input" id="ext-paid-at" type="datetime-local"
+                                <input class="field field--amount" id="ext-paid-at" type="datetime-local"
                                     style="width:auto" value="${toLocalInput(ep?.paidAt)}">
                             </span>
                         </div>
                         <div class="detail-list-item">
                             <span class="detail-list-label">ID da transação (opcional)</span>
                             <span class="detail-list-value">
-                                <input class="adm-amount-input" id="ext-ref" type="text" maxlength="100"
+                                <input class="field field--amount" id="ext-ref" type="text" maxlength="100"
                                     style="width:180px" value="${esc(ep?.reference || '')}">
                             </span>
                         </div>
@@ -1063,7 +1064,7 @@ function buildOrderDetail(o) {
     // Coluna 1: formas de pagamento e o que já foi pago
     const paymentHtml = `
     <div class="adm-sec">
-        <div class="adm-sec-title">Pagamento</div>
+        <div class="block-title">Pagamento</div>
         <div class="adm-payment-section">
             <div class="detail-list">
                 ${toggleRow({ key: 'access-grant', id: o.id, label: 'Acesso manual', on: granted, onText: 'Liberado', offText: 'Requer pagamento',
@@ -1079,7 +1080,7 @@ function buildOrderDetail(o) {
     // Coluna 2: valor cobrado. Mesmos campos (valor, desconto, total) para Pix e PayPal.
     const amountHtml = `
     <div class="adm-sec">
-        <div class="adm-sec-title">Valor do pedido</div>
+        <div class="block-title">Valor do pedido</div>
         <div id="order-access-note-${o.id}" class="adm-access-note ${granted ? '' : 'is-hidden'}">
             Acesso liberado sem cobrança: nenhum valor será exigido neste pedido.
         </div>
@@ -1091,7 +1092,7 @@ function buildOrderDetail(o) {
     <div class="adm-editor-body-grid">
     <div class="adm-col">
     <div class="adm-sec">
-        <div class="adm-sec-title">Usuário e status</div>
+        <div class="block-title">Usuário e status</div>
         <div>
             <div class="detail-list">
                 <div class="detail-list-item">
@@ -1109,7 +1110,7 @@ function buildOrderDetail(o) {
                 <div class="detail-list-item">
                     <span class="detail-list-label">Status</span>
                     <span class="detail-list-value">
-                        <select id="order-status-sel" class="adm-input adm-input-select">
+                        <select id="order-status-sel" class="field field--end-aligned field--select">
                             ${['pending','processing','ready','completed','expired','cancelled'].map(s =>
                                 `<option value="${s}" ${o.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}
                         </select>
@@ -1131,7 +1132,7 @@ function buildOrderDetail(o) {
     </div>
 
     <div class="adm-sec">
-        <div class="adm-sec-title">Itens e links <span class="rd-count">${total}</span></div>
+        <div class="block-title">Itens e links <span class="counter">${total}</span></div>
         ${bulkHtml}
         <div class="adm-items-list">${itemsHtml}</div>
     </div>
@@ -1209,21 +1210,21 @@ function amtRender(kind) {
                || amtFix(disc) !== amtFix(st.discount);
     let pill, hint = '';
     if (!curOk) {
-        pill = `<span class="rd-pill rd-pill--err"><i></i>Moeda inválida</span>`;
+        pill = `<span class="status-pill status-pill--error"><i></i>Moeda inválida</span>`;
         hint = 'Use o código ISO de 3 letras (ex.: USD, EUR, BRL)';
     } else if (base !== null && disc > base) {
-        pill = `<span class="rd-pill rd-pill--err"><i></i>Desconto maior que o valor</span>`;
+        pill = `<span class="status-pill status-pill--error"><i></i>Desconto maior que o valor</span>`;
     } else if (dirty && base !== null) {
-        pill = `<span class="rd-pill rd-pill--wait"><i></i>Alteração não salva · ${money(total)}</span>`;
+        pill = `<span class="status-pill status-pill--waiting"><i></i>Alteração não salva · ${money(total)}</span>`;
         if (c.editCur && cur !== effCur) hint = 'Moeda alterada — o valor não é convertido automaticamente';
     } else if (st.saved !== null) {
-        pill = `<span class="rd-pill rd-pill--ok"><i></i>Salvo · ${money(Math.max(0, st.saved - st.discount))}</span>`;
+        pill = `<span class="status-pill status-pill--success"><i></i>Salvo · ${money(Math.max(0, st.saved - st.discount))}</span>`;
         hint = 'Valor personalizado' + (st.discount > 0 ? ` · desconto de ${money(st.discount)}` : '');
     } else if (st.def !== null && st.def > 0) {
-        pill = `<span class="rd-pill"><i></i>Padrão · ${money(st.def)}</span>`;
+        pill = `<span class="status-pill"><i></i>Padrão · ${money(st.def)}</span>`;
         hint = 'Nenhum valor personalizado salvo';
     } else {
-        pill = `<span class="rd-pill rd-pill--err"><i></i>Nenhum valor definido</span>`;
+        pill = `<span class="status-pill status-pill--error"><i></i>Nenhum valor definido</span>`;
         hint = `Configure o valor base em ${c.hintBase}`;
     }
     appliedEl.innerHTML = pill + (hint ? `<span class="text-xs text-tertiary">${hint}</span>` : '');
@@ -1390,7 +1391,7 @@ function renderPaypalSettings(d) {
     admPp = d;
     const live = d.mode === 'live';
     document.getElementById('pp-mode-pill').innerHTML =
-        `<span class="rd-pill rd-pill--${live ? 'ok' : 'wait'}"><i></i>${live ? 'LIVE' : 'SANDBOX'}</span>`;
+        `<span class="status-pill status-pill--${live ? 'success' : 'waiting'}"><i></i>${live ? 'LIVE' : 'SANDBOX'}</span>`;
     for (const m of ['sandbox', 'live']) {
         const btn = document.getElementById(`pp-mode-${m}`);
         const on  = d.mode === m;
@@ -1555,16 +1556,16 @@ async function saveMpSettings() {
         const data = await res.json();
         if (res.ok && data.success) {
             msg.classList.remove('is-hidden');
-            msg.innerHTML = `<span class="rd-pill rd-pill--ok"><i></i>Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
+            msg.innerHTML = `<span class="status-pill status-pill--success"><i></i>Configurações salvas. Valor total: R$ ${(data.total_amount||0).toFixed(2).replace('.',',')}</span>`;
             document.getElementById('mp-access-token').value = '';
             loadMpSettings();
         } else {
             msg.classList.remove('is-hidden');
-            msg.innerHTML = `<span class="rd-pill rd-pill--err"><i></i>⚠ Erro: ${esc(data.error||'desconhecido')}</span>`;
+            msg.innerHTML = `<span class="status-pill status-pill--error"><i></i>⚠ Erro: ${esc(data.error||'desconhecido')}</span>`;
         }
     } catch(e) {
         msg.classList.remove('is-hidden');
-        msg.innerHTML = `<span class="rd-pill rd-pill--err"><i></i>⚠ ${esc(e.message)}</span>`;
+        msg.innerHTML = `<span class="status-pill status-pill--error"><i></i>⚠ ${esc(e.message)}</span>`;
     }
 }
 
@@ -1730,14 +1731,14 @@ async function saveExternalSettings() {
         const data = await res.json();
         msg.classList.remove('is-hidden');
         if (res.ok && data.success) {
-            msg.innerHTML = `<span class="rd-pill rd-pill--ok"><i></i>Salvo. Valor total: ${extMoney(data.total_amount || 0, data.currency)}</span>`;
+            msg.innerHTML = `<span class="status-pill status-pill--success"><i></i>Salvo. Valor total: ${extMoney(data.total_amount || 0, data.currency)}</span>`;
             loadExternalSettings();
         } else {
-            msg.innerHTML = `<span class="rd-pill rd-pill--err"><i></i>⚠ Erro: ${esc(data.error || 'desconhecido')}</span>`;
+            msg.innerHTML = `<span class="status-pill status-pill--error"><i></i>⚠ Erro: ${esc(data.error || 'desconhecido')}</span>`;
         }
     } catch (e) {
         msg.classList.remove('is-hidden');
-        msg.innerHTML = `<span class="rd-pill rd-pill--err"><i></i>⚠ ${esc(e.message)}</span>`;
+        msg.innerHTML = `<span class="status-pill status-pill--error"><i></i>⚠ ${esc(e.message)}</span>`;
     }
 }
 

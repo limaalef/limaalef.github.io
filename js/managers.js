@@ -38,212 +38,299 @@ const PaginationManager = {
     goToLast() { if (AppState.currentPage < AppState.totalPages) { AppState.currentPage = AppState.totalPages; App.loadData(); } }
 };
 
-// REVISADO
-const CardManager = {
-    create(match) {
-        const card = document.createElement('div');
-        const sources = Array.isArray(match.sources) ? match.sources : null;
-        const sourceCount = sources ? sources.length : 1;
+// ══════════════════════════════════════════════════════════════════
+//  CARD ÚNICO
+//  Um só template (CardManager.create) para todos os tipos de conteúdo.
+//  Cada esporte tem um ADAPTADOR que converte o item da API num
+//  view-model comum; o template só conhece o view-model.
+//
+//  View-model:
+//    { id, sport, status, hasVideo, statusBadge,
+//      header: { logo, logoAlt, title, subtitle },
+//      dateText,
+//      body:   { type: 'teams' | 'event' | 'show', ... },
+//      footer: { cls, sourcesCount, stationLogo, stationName, badges[] },
+//      sources, onClick }
+//
+//  Para criar um novo tipo de conteúdo: adicionar um adaptador em
+//  CardAdapters e (se o corpo for diferente) um renderer em CardBodies.
+// ══════════════════════════════════════════════════════════════════
+const CardAdapters = {
+    _slug(text) {
+        return String(text || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '') // Remove acentos
+            .replace(/\s+/g, '_');
+    },
 
-        card.dataset.matchId = match.id;
-        const status = Utils.getMatchStatus(match);
-        const hasVideo = match.has_embed_video;
-        card.className = `match-card ${status} ${hasVideo}`;
-        card.onclick = () => {
+    _competitionLogo(name, dateStr) {
+        if (!name || !dateStr) return '';
+        const d = Utils.parseDate(dateStr);
+        const year = d ? d.getFullYear() : new Date().getFullYear();
+        return `competition_logos/${this._slug(name)}_${year}.png`;
+    },
+
+    // Clique padrão: várias fontes → escolher emissora; senão abre o detalhe direto.
+    _defaultClick(item, sport, sources) {
+        return () => {
             if (sources && sources.length > 1) {
-                SourcePicker.open(match);
+                SourcePicker.open(item);
             } else {
-                const singleId = (sources && sources.length === 1) ? sources[0].id : match.id;
-                MatchModal.fetchAndShow(singleId, Utils.getItemSport(match));
+                const id = (sources && sources.length === 1 && sources[0].id != null) ? sources[0].id : item.id;
+                MatchModal.fetchAndShow(id, sport);
             }
         };
-        
-        const { homeGoals, homeWinner, homeLoser,
-                awayGoals, awayWinner, awayLoser,
-                hasWinner } = Utils.parseWinner(match.home_team?.goals, match.away_team?.goals);
-        
-        const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
-        const statusBadge = status === 'pending' ? `<span class="match-status">${statusText}</span>` : '';
+    },
 
-        const competition = LanguageManager.translateText(match.competition?.name);
-        const phase = LanguageManager.translateText(match.competition?.phase);
-        const audioFormat = LanguageManager.translateText(match.technical_details?.audio_format);
-        
-        // Gerar URL do logo da competição
-        let competitionLogo = '';
-        if (match.competition?.name && match.utcDate) {
-            const competitionSlug = match.competition?.name
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-                .replace(/\s+/g, '_');
-            
-            const matchDate = Utils.parseDate(match.utcDate);
-            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
-            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
+    // Football e Multisport compartilham o mesmo formato (times, placar, fontes).
+    match(item, sport) {
+        const sources = Array.isArray(item.sources) ? item.sources : null;
+        const tech = item.technical_details || {};
+        const station = item.station || sources?.[0]?.station || {};
+        return {
+            id: item.id,
+            sport,
+            status: Utils.getMatchStatus(item),
+            hasVideo: !!item.has_embed_video,
+            header: {
+                logo: this._competitionLogo(item.competition?.name, item.utcDate),
+                logoAlt: item.competition?.name,
+                title: LanguageManager.translateText(item.competition?.name) || 'N/A',
+                subtitle: LanguageManager.translateText(item.competition?.phase) || ''
+            },
+            dateText: Utils.formatMatchDate(item.utcDate),
+            body: {
+                type: 'teams',
+                home: item.home_team,
+                away: item.away_team,
+                // listagem traz home_team.goals; o detalhe (coleção) traz score.fullTime
+                goals: { home: item.home_team?.goals, away: item.away_team?.goals },
+                fullTime: { home: item.score?.fullTime?.home, away: item.score?.fullTime?.away },
+                dateInline: Utils.formatMatchDate(item.utcDate)
+            },
+            footer: {
+                cls: 'match-footer',
+                // Várias fontes: o logo da emissora sai e entra o contador (mesmo contador do motorsport)
+                count: (sources && sources.length > 1)
+                    ? { value: sources.length, label: LanguageManager.t('sourcesCount') } : null,
+                stationLogo: (sources && sources.length > 1) ? '' : station.logo,
+                stationName: station.name,
+                badges: [tech.video_quality, LanguageManager.translateText(tech.audio_format) ?? '']
+                    .filter((b, i) => i === 1 || b)
+            },
+            sourcesList: sources,
+            onClick: this._defaultClick(item, sport, sources)
+        };
+    },
+
+    // Motorsport: item = etapa que agrupa vários eventos.
+    motor(item, sport) {
+        const events = Array.isArray(item.events) ? item.events : [];
+        const n = events.length;
+        const label = LanguageManager.currentLang === 'en'
+            ? (n === 1 ? 'event' : 'events')
+            : (n === 1 ? 'evento' : 'eventos');
+        return {
+            id: item.id,
+            sport,
+            status: '',
+            hasVideo: !!item.media?.video_embed,
+            header: {
+                logo: this._competitionLogo(item.competition?.name, item.start_date),
+                logoAlt: item.competition?.phase,
+                title: LanguageManager.translateText(item.competition?.name) || 'N/A',
+                subtitle: ''
+            },
+            dateText: Utils.formatMotorDateRange(item.start_date, item.end_date),
+            body: {
+                type: 'event',
+                flag: item.competition?.country_name ? item.competition?.country_flag : '',
+                flagAlt: item.competition?.country_name,
+                title: LanguageManager.translateText(item.competition?.phase) || 'N/A'
+            },
+            footer: {
+                cls: 'motor-footer',
+                stationLogo: item.main_station_logo,
+                stationName: 'Emissora',
+                count: { value: n, label },
+            },
+            onClick: () => MatchModal.fetchAndShow(item.id, sport)
+        };
+    },
+
+    // Carnaval: sem agrupamento. Formato ATUAL: date, embed_video, championship{division,city},
+    // samba_school{name,logo,plot}, station{}. O backend vai migrar para um formato parecido
+    // com o dos outros esportes (utcDate, has_embed_video, competition{...}, sources[]);
+    // por isso cada campo lê o formato novo primeiro e cai no atual (fallbacks abaixo).
+    // ⚠ Nomes do formato novo são SUPOSIÇÃO — ajustar aqui quando o backend definir.
+    carnaval(item, sport) {
+        const school = item.samba_school || item.school || {};
+        const champ = item.championship || {};
+        const comp = item.competition || {};
+        const sources = Array.isArray(item.sources) ? item.sources : null;
+        const station = item.station || sources?.[0]?.station || {};
+        const tech = item.technical_details || {};
+        const dateStr = item.utcDate ?? item.date;
+        const city = comp.city ?? champ.city;
+        const citySlug = city ? this._slug(city) : '';
+        return {
+            id: item.id,
+            sport,
+            status: Utils.getEventStatus(dateStr),
+            hasVideo: !!(item.has_embed_video ?? item.embed_video),
+            header: {
+                logo: citySlug ? `city_flag/${citySlug}.svg` : '',
+                logoAlt: city,
+                title: LanguageManager.translateText(city) || 'N/A',
+                subtitle: LanguageManager.translateText(comp.phase ?? champ.division) || ''
+            },
+            dateText: Utils.formatMatchDate(dateStr),
+            body: {
+                type: 'show',
+                logo: school.logo ? school.logo.replace('.svg', '.png').replace(/[̀-ͯ]/g, '') : '',
+                name: school.name || 'N/A',
+                plot: school.plot || 'N/A'
+            },
+            footer: {
+                cls: 'match-footer',
+                stationLogo: station.logo,
+                stationName: station.name,
+                badges: [tech.video_quality, LanguageManager.translateText(tech.audio_format || '2.0')]
+                    .filter((b, i) => i === 1 || b)
+            },
+            onClick: () => MatchModal.fetchAndShow(item.id, sport)
+        };
+    }
+};
+
+// Corpo do card por tipo de conteúdo
+const CardBodies = {
+    teams(vm, opts) {
+        const b = vm.body;
+        const { homeGoals, homeWinner, homeLoser, awayGoals, awayWinner, awayLoser } =
+            Utils.parseWinner(b.goals.home, b.goals.away);
+        const team = (t, goals, win, lose, fallback) => {
+            const name = LanguageManager.t(t?.name);
+            return `
+                <div class="team">
+                    ${t?.logo ? `<img src="${t.logo}" alt="${Utils.escapeHtml(name || '')}" class="team-logo" onerror="this.style.display='none'">` : ''}
+                    <span class="team-name ${win ? 'winner' : ''} ${lose ? 'loser' : ''}">${name || fallback}</span>
+                    <span class="score ${win ? 'winner' : ''} ${lose ? 'loser' : ''}">${goals}</span>
+                </div>`;
+        };
+
+        let center = '';
+        if (opts.layout === 'detail') {
+            // Placar central entre os times (usa score.fullTime)
+            const ft = Utils.parseWinner(b.fullTime.home, b.fullTime.away);
+            center = `
+                <div class="match-score-center">
+                    <span class="score-val ${ft.homeWinner ? 'winner' : ft.awayWinner ? 'loser' : ''}">${ft.homeGoals !== '' ? ft.homeGoals : '-'}</span>
+                    <span class="score-sep">x</span>
+                    <span class="score-val ${ft.awayWinner ? 'winner' : ft.homeWinner ? 'loser' : ''}">${ft.awayGoals !== '' ? ft.awayGoals : '-'}</span>
+                </div>`;
         }
-
-        // Formatar a data
-        const dateDisplay = Utils.formatMatchDate(match.utcDate);
-        
-        card.innerHTML = `
-            ${statusBadge}
-            <div class="match-header">
-                ${competitionLogo ? `<img src="${competitionLogo}" alt="${match.competition?.name}" class="competition-logo" onerror="this.style.display='none'">` : ''}
-                <div class="competition-info">
-                    <div class="match-competition">${competition || 'N/A'}</div>
-                    <div class="match-phase">${phase || ''}</div>
-                </div>
-            </div>
-            <div class="match-date">${dateDisplay}</div>
+        return `
             <div class="match-teams">
-                <div class="team">
-                    ${match.home_team?.logo ? `<img src="${match.home_team?.logo}" alt="${LanguageManager.t(match.home_team?.name)}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${LanguageManager.t(match.home_team?.name) || 'Time 1'}</span>
-                    <span class="score ${homeWinner ? 'winner' : ''} ${homeLoser ? 'loser' : ''}">${homeGoals}</span>
-                </div>
-                <div class="team">
-                    ${match.away_team?.logo ? `<img src="${match.away_team?.logo}" alt="${LanguageManager.t(match.away_team?.name)}" class="team-logo" onerror="this.style.display='none'">` : ''}
-                    <span class="team-name ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${LanguageManager.t(match.away_team?.name) || 'Time 2'}</span>
-                    <span class="score ${awayWinner ? 'winner' : ''} ${awayLoser ? 'loser' : ''}">${awayGoals}</span>
-                </div>
-            </div>
-            <div class="match-footer">
-                ${sourceCount > 1 ? `
-                    <div class="sources-count-badge" title="${sourceCount} ${LanguageManager.t('sourcesCount') || 'fontes disponíveis'}">
-                        <span class="sources-count-value">${sourceCount}</span>
-                        <span class="sources-count-label">${LanguageManager.t('sourcesCount')}</span>
-                    </div>
-                ` : `
-                    ${match.station?.logo ? `<img src="${match.station?.logo}" alt="${match.station?.name}" class="broadcaster-logo${noFilterLogos.includes(match.station?.logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
-                    <div class="tech-badges">
-                        ${match.technical_details?.video_quality ? `<span class="tech-badge">${match.technical_details?.video_quality}</span>` : ''}
-                        <span class="tech-badge">${audioFormat}</span>
-                    </div>
-                `}
-            </div>
-        `;
-        return card;
-    }
-};
+                ${team(b.home, homeGoals, homeWinner, homeLoser, 'Time 1')}
+                ${center}
+                ${team(b.away, awayGoals, awayWinner, awayLoser, 'Time 2')}
+            </div>`;
+    },
 
-// REVISADO
-const MotorCardManager = {
-    create(event) {
-        const card = document.createElement('div');
-        const hasVideo = event.media?.video_embed ? 'has-video' : '';
-        card.className = `match-card motor-event ${hasVideo}`;
-        card.onclick = () => MatchModal.fetchAndShow(event.id, 'motor');
-        
-        const dateRange = Utils.formatMotorDateRange(event.start_date, event.end_date);
-        
-        const competition = LanguageManager.translateText(event.competition?.name);
-        const phase = LanguageManager.translateText(event.competition?.phase);
-        
-        const eventCount = event.events?.length || 0;
-        const eventLabel = LanguageManager.currentLang === 'en' 
-            ? (eventCount === 1 ? 'event' : 'events')
-            : (eventCount === 1 ? 'evento' : 'eventos');
-        
-        let competitionLogo = '';
-        if (event.competition?.name && event.start_date) {
-            const competitionSlug = event.competition?.name
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-                .replace(/\s+/g, '_');
-            
-            const matchDate = Utils.parseDate(event.start_date);
-            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
-            competitionLogo = `competition_logos/${competitionSlug}_${year}.png`;
-        }
-
-        card.innerHTML = `
-            <div class="match-header">
-                ${competitionLogo ? `<img src="${competitionLogo}" alt="${event.competition?.phase}" class="competition-logo" onerror="this.style.display='none'">` : ''}  
-                <div class="competition-info">
-                    <div class="match-competition">${competition || 'N/A'}</div>
-                </div>
-            </div>
-            <div class="match-date">${dateRange}</div>
+    event(vm) {
+        const b = vm.body;
+        return `
             <div class="motor-phase-section">
-                ${event.competition?.country_name ? `<img src="${event.competition?.country_flag}" alt="${event.competition?.country_name}" class="country-flag" onerror="this.style.display='none'">` : ''}
-                <div class="motor-phase-name">${phase || 'N/A'}</div>
-            </div>
-            <div class="motor-footer">
-                ${event.main_station_logo ? `<img src="${event.main_station_logo}" alt="Emissora" class="broadcaster-logo${noFilterLogos.includes(event.main_station_logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
-                <span class="tech-badge motor-event-badge">${eventCount} ${eventLabel}</span>
-            </div>
-        `;
-        return card;
-    }
-};
+                ${b.flag ? `<img src="${b.flag}" alt="${Utils.escapeHtml(b.flagAlt || '')}" class="country-flag" onerror="this.style.display='none'">` : ''}
+                <div class="motor-phase-name">${b.title}</div>
+            </div>`;
+    },
 
-const CarnavalCardManager = {
-    create(match) {
-        const card = document.createElement('div');
-        const school = match.samba_school || {};
-        const champ  = match.championship || {};
-        const station = match.station || {};
-        const tech   = match.technical_details || {};
-        const result = school.result || {};
-        card.dataset.matchId = match.id;
-        const status = Utils.getEventStatus(match.date);
-        const hasVideo = match.embed_video ? 'has-video' : '';
-        card.className = `match-card ${status} ${hasVideo}`;
-        card.onclick = () => MatchModal.fetchAndShow(match.id, 'carnaval');
-        
-        
-        const statusText = status === 'pending' ? LanguageManager.t('pendingMatch') : '';
-        const statusBadge = status === 'pending' ? `<span class="match-status">${statusText}</span>` : '';
-
-        const competition = LanguageManager.translateText(champ.city);
-        const phase = LanguageManager.translateText(champ.division);
-        const audioFormat = LanguageManager.translateText((tech.audio_format || '2.0'));
-        
-        // Gerar URL do logo da competição
-        let cityLogo = '';
-        if (champ.city) {
-            const citySlug = champ.city
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-                .replace(/\s+/g, '_');
-            
-            const matchDate = Utils.parseDate(match.date);
-            const year = matchDate ? matchDate.getFullYear() : new Date().getFullYear();
-            cityLogo = `city_flag/${citySlug}.svg`;
-        }
-
-        // Formatar a data
-        const dateDisplay = Utils.formatMatchDate(match.date);
-        
-        card.innerHTML = `
-            ${statusBadge}
-            <div class="match-header">
-                ${champ.city ? `<img src="${cityLogo}" alt="${champ.city}" class="competition-logo" onerror="this.style.display='none'">` : ''}
-                <div class="competition-info">
-                    <div class="match-competition">${competition || 'N/A'}</div>
-                    <div class="match-phase">${phase || ''}</div>
-                </div>
-            </div>
-            <div class="match-date">${dateDisplay}</div>
+    show(vm) {
+        const b = vm.body;
+        return `
             <div class="carnaval-data-section">
                 <div class="carnaval-school-section">
-                    ${school.logo ? `<img src="${school.logo.replace('.svg','.png').replace(/[\u0300-\u036f]/g, '')}" alt="${school.name}" class="country-flag" onerror="this.style.display='none'">` : ''}
-                    <div class="carnaval-school-name">${school.name || 'N/A'}</div>
-                </div> 
-                <div class="carnaval-plot-name">${school.plot || 'N/A'}</div>
-            </div>
-            <div class="match-footer">
-                ${station.logo ? `<img src="${station.logo}" alt="${station.name}" class="broadcaster-logo${noFilterLogos.includes(station.logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">` : '<div></div>'}
-                <div class="tech-badges">
-                    ${tech.video_quality ? `<span class="tech-badge">${tech.video_quality}</span>` : ''}
-                    <span class="tech-badge">${audioFormat}</span>
+                    ${b.logo ? `<img src="${b.logo}" alt="${Utils.escapeHtml(b.name)}" class="country-flag" onerror="this.style.display='none'">` : ''}
+                    <div class="carnaval-school-name">${b.name}</div>
+                </div>
+                <div class="carnaval-plot-name">${b.plot}</div>
+            </div>`;
+    }
+};
+
+const CardManager = {
+    // Opções globais. layout 'detail' (página de coleção) move a data para a linha da fase
+    // e mostra o placar central nos cards de partida; os demais tipos não mudam.
+    options: { layout: 'default' },
+
+    _adapterFor(sport) {
+        return (sport === 'motor' || sport === 'carnaval') ? CardAdapters[sport] : CardAdapters.match;
+    },
+
+    create(item, opts = {}) {
+        const o = { ...this.options, ...opts };
+        const sport = Utils.getItemSport(item);
+        const vm = this._adapterFor(sport).call(CardAdapters, item, sport);
+        const detail = o.layout === 'detail' && vm.body.type === 'teams';
+
+        const card = document.createElement('div');
+        card.dataset.matchId = vm.id;
+        if (vm.sourcesList && vm.sourcesList.length > 1) {
+            // Item agrupado: sem botão de pedido no card (o usuário escolhe a fonte antes)
+            card.dataset.groupId = vm.id;
+            card.dataset.sourceCount = String(vm.sourcesList.length);
+        }
+        card.className = ['match-card', vm.sport === 'motor' ? 'motor-event' : '', vm.status, vm.hasVideo ? 'has-video' : '']
+            .filter(Boolean).join(' ');
+        card.onclick = vm.onClick;
+
+        const statusBadge = vm.status === 'pending'
+            ? `<span class="match-status">${LanguageManager.t('pendingMatch')}</span>` : '';
+
+        const h = vm.header;
+        const logo = h.logo
+            ? `<img src="${h.logo}" alt="${Utils.escapeHtml(h.logoAlt || '')}" class="competition-logo" onerror="this.style.display='none'">` : '';
+        const info = detail
+            ? `<div class="match-competition">${h.title}</div>
+               <div class="match-phase-date-row">
+                   <span class="match-phase">${h.subtitle}</span>
+                   <span class="match-date-inline">${vm.body.dateInline}</span>
+               </div>`
+            : `<div class="match-competition">${h.title}</div>
+               ${vm.body.type === 'event' ? '' : `<div class="match-phase">${h.subtitle}</div>`}`;
+
+        card.innerHTML = `
+            ${statusBadge}
+            <div class="match-header">
+                ${logo}
+                <div class="competition-info">
+                    ${info}
                 </div>
             </div>
+            <div class="match-date">${vm.dateText}</div>
+            ${CardBodies[vm.body.type](vm, { layout: detail ? 'detail' : 'default' })}
+            ${this._footer(vm)}
         `;
         return card;
+    },
+
+    // Rodapé único: emissora à esquerda; à direita o contador (fontes / eventos)
+    // ou, sem contador, os selos técnicos.
+    _footer(vm) {
+        const f = vm.footer;
+        const logo = f.stationLogo
+            ? `<img src="${f.stationLogo}" alt="${Utils.escapeHtml(f.stationName || '')}" class="broadcaster-logo${noFilterLogos.includes(f.stationLogo) ? ' no-filter' : ''}" onerror="this.style.display='none'">`
+            : '<div></div>';
+        const right = f.count
+            ? `<div class="sources-count-badge" title="${f.count.value} ${Utils.escapeHtml(f.count.label || '')}">
+                   <span class="sources-count-value">${f.count.value}</span>
+                   <span class="sources-count-label">${f.count.label || ''}</span>
+               </div>`
+            : `<div class="tech-badges">${(f.badges || []).map(b => `<span class="tech-badge">${b}</span>`).join('')}</div>`;
+        return `<div class="${f.cls}">${logo}${right}</div>`;
     }
 };
 
@@ -863,14 +950,8 @@ const Renderer = {
         container.innerHTML = '<div class="matches-grid" id="grid"></div>';
         const grid = document.getElementById('grid');
         AppState.filteredMatches.forEach(match => {
-            // Cada item usa o card do PRÓPRIO esporte (a listagem "all" mistura esportes)
-            const itemSport = Utils.getItemSport(match);
-            const card = itemSport === 'motor'
-                ? MotorCardManager.create(match)
-                : itemSport === 'carnaval'
-                ? CarnavalCardManager.create(match)
-                : CardManager.create(match);
-            grid.appendChild(card);
+            // Card único: o adaptador do PRÓPRIO esporte do item (a listagem "all" mistura esportes)
+            grid.appendChild(CardManager.create(match));
         });
 
         document.dispatchEvent(new CustomEvent('matchesRendered'));

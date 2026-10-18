@@ -1,57 +1,27 @@
 /* ═══════════════════════════════════════════════════════════════
-   STORAGE — armazenamento por disco
-   Mesma linguagem das telas de pedido: sem caixas com borda,
-   superfícies suaves e linhas finas; cor de estado só na bolinha.
+   STORAGE — armazenamento por disco (só layout da página)
+   Pills, indicadores, barras, chips, campos e linhas rótulo → valor
+   vêm de css/ui-components.css.
 ═══════════════════════════════════════════════════════════════ */
 .sd-page { max-width: var(--page-width-size); margin: 0 auto; padding: var(--sp-5) var(--sp-6) var(--sp-9); }
 
 /* Resumo */
 .sd-summary { margin-bottom: var(--sp-8); }
-.sd-skeleton { padding: var(--sp-9) 0; text-align: center; color: var(--text-muted); font-size: var(--font-size-mdm); }
-.sd-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
-.sd-tile { background: var(--soft-bg); border-radius: var(--border-radius-size-lg); padding: var(--sp-5) var(--sp-6); }
-.sd-tile-val { font-size: var(--font-size-xxl); font-weight: 600; letter-spacing: -.03em; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-.sd-tile--hl .sd-tile-val { color: var(--accent-color); }
-.sd-tile-lbl { margin-top: var(--sp-1); font-size: var(--font-size-sm); color: var(--text-muted); }
+.sd-summary .stat-tile-grid { margin-bottom: var(--sp-6); }
 .sd-note { margin-top: var(--sp-4); font-size: var(--font-size-sm); color: var(--text-muted); }
 .sd-error { padding: var(--sp-8) 0; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); }
-
-/* Barras de uso: arquivo (accent) + outros (neutro); o resto é espaço livre */
-.sd-bar { display: flex; height: 8px; border-radius: var(--border-radius-size-circle); overflow: hidden; background: var(--soft-bg-hover); }
-.sd-bar--lg { height: 12px; }
-.sd-bar--empty { opacity: .5; }
-.sd-seg { height: 100%; transition: width .4s ease; }
-.sd-seg--archive, .sd-key--archive { background: var(--accent-color); }
-.sd-seg--other,   .sd-key--other   { background: color-mix(in srgb, var(--text-primary) 38%, transparent); }
-.sd-key--free { background: var(--soft-bg-hover); }
-.sd-legend { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-6); margin-top: var(--sp-4); font-size: var(--font-size-sm); color: var(--text-muted); }
-.sd-legend b { font-weight: 600; color: var(--text-primary); margin-left: var(--sp-1); font-variant-numeric: tabular-nums; }
-.sd-legend span { display: inline-flex; align-items: center; gap: var(--sp-2); }
-.sd-legend--sm { margin-top: var(--sp-2); gap: var(--sp-1) var(--sp-5); font-size: var(--font-size-xs); }
-.sd-key { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
 
 /* Seções */
 .sd-section { margin-bottom: var(--sp-8); }
 .sd-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); margin-bottom: var(--sp-4); }
 .sd-section-title { font-size: var(--font-size-lg); font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }
-.sd-count { font-size: var(--font-size-sm); font-weight: 500; color: var(--text-muted); margin-left: var(--sp-2); }
+.sd-section-title .counter { margin-left: var(--sp-2); background: transparent; padding: 0; font-size: var(--font-size-sm); font-weight: 500; }
 .sd-updated { font-size: var(--font-size-sm); color: var(--text-muted); }
 
 /* Barra de ferramentas */
 .sd-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-bottom: var(--sp-4); }
-.sd-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
-.sd-chip { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-4); border: 0; cursor: pointer;
-    border-radius: var(--border-radius-size-circle); background: var(--soft-bg); color: var(--text-muted);
-    font-family: inherit; font-size: var(--font-size-sm); font-weight: 500; transition: background .2s, color .2s; }
-.sd-chip span { font-variant-numeric: tabular-nums; opacity: .8; }
-@media (hover: hover) { .sd-chip:hover { background: var(--soft-bg-hover); color: var(--text-primary); } }
-.sd-chip.active { background: var(--accent-color); color: var(--text-accent-color); }
 .sd-tools { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
-.sd-search, .sd-select { border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); color: var(--text-primary);
-    padding: var(--sp-3) var(--sp-5); font-family: inherit; font-size: var(--font-size-mdm); width: auto; }
 .sd-search { min-width: 260px; }
-.sd-search::placeholder { color: var(--text-muted); }
-.sd-chip:focus-visible, .sd-search:focus-visible, .sd-select:focus-visible, .sd-row:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 
 /* Lista de discos (uma linha por disco; vira cartão no celular) */
 .sd-head, .sd-row {
@@ -63,6 +33,7 @@
     font: inherit; text-decoration: none; color: inherit; transition: background .2s; }
 .sd-row + .sd-row { border-top: 1px solid var(--soft-line); }
 @media (hover: hover) { .sd-row:hover { background: var(--soft-bg); } .sd-row:hover .sd-go { color: var(--accent-color); transform: translateX(2px); } }
+.sd-row:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 .sd-id { min-width: 0; }
 .sd-name { font-size: var(--font-size-md); font-weight: 600; color: var(--text-primary); letter-spacing: -.01em; overflow-wrap: anywhere; }
 .sd-sub  { margin-top: var(--sp-1); font-size: var(--font-size-sm); color: var(--text-muted); }
@@ -73,7 +44,6 @@
 .sd-state { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
 .sd-pct { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .sd-go { color: var(--text-muted); display: grid; place-items: center; transition: color .2s, transform .2s; }
-.sd-empty { padding: var(--sp-9) 0; text-align: center; color: var(--text-muted); font-size: var(--font-size-mdm); }
 
 /* Ficha técnica (modal) */
 body.sd-lock { overflow: hidden; }
@@ -91,14 +61,10 @@ body.sd-lock { overflow: hidden; }
 .sd-modal-sec { padding: var(--sp-5) 0 var(--sp-2); }
 .sd-modal-sec + .sd-modal-sec { border-top: 1px solid var(--soft-line); margin-top: var(--sp-3); }
 .sd-modal-sec h4 { font-size: var(--font-size-md); font-weight: 600; color: var(--text-primary); margin-bottom: var(--sp-2); }
-.sd-kv { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); padding: var(--sp-2) 0; font-size: var(--font-size-mdm); }
-.sd-kv span { color: var(--text-muted); flex-shrink: 0; }
-.sd-kv b { font-weight: 500; text-align: right; color: var(--text-primary); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .sd-modal-notes { font-size: var(--font-size-mdm); color: var(--text-primary); line-height: 1.5; overflow-wrap: anywhere; }
-.sd-modal-card .rd-btn { margin-top: var(--sp-6); }
+.sd-modal-card .button { margin-top: var(--sp-6); }
 
 @media (max-width: 1000px) {
-    .sd-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sd-head { display: none; }
     .sd-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id state" "usage usage" "used free"; row-gap: var(--sp-4); }
     .sd-id { grid-area: id; } .sd-state { grid-area: state; justify-content: flex-end; } .sd-usage { grid-area: usage; }
@@ -107,6 +73,6 @@ body.sd-lock { overflow: hidden; }
 }
 @media (max-width: 560px) {
     .sd-page { padding: var(--sp-4) var(--sp-5) var(--sp-9); }
-    .sd-search { min-width: 0; flex: 1 1 100%; } .sd-tools { width: 100%; } .sd-select { flex: 1 1 100%; }
+    .sd-search { min-width: 0; flex: 1 1 100%; } .sd-tools { width: 100%; } .sd-tools .field { flex: 1 1 100%; }
     .sd-state { flex-direction: column; align-items: flex-end; gap: var(--sp-1); }
 }

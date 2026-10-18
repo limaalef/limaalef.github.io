@@ -19,8 +19,8 @@
     --border-color: #d8d6d0;
 
     /* Superfícies, linhas e texto suaves derivados do texto atual (valem para claro e escuro) */
-    --soft-bg: color-mix(in srgb, var(--text-primary) 8%, transparent);
-    --soft-bg-hover: color-mix(in srgb, var(--text-primary) 12%, transparent);
+    --soft-bg: #E6E6E6;
+    --soft-bg-hover: #DCDCDC;
     --soft-line: color-mix(in srgb, var(--text-primary) 9%, transparent);
     --text-muted: color-mix(in srgb, var(--text-primary) 58%, var(--bg-primary));
 
@@ -156,6 +156,12 @@
 
         --logo-size: 45px;
 
+        --sp-1: 0.2rem;
+        --sp-2: 0.275rem;
+        --sp-3: 0.4rem;
+        --sp-4: 0.65rem;
+        --sp-5: 0.9rem;
+        --sp-6: 1.15rem;
         --sp-7: 1.25rem;
         --sp-8: 1.75rem;
         --sp-9: 2.25rem;
@@ -178,6 +184,7 @@
 
         --logo-size: 40px;
         
+        --sp-4: 0.5rem;
         --sp-5: 0.75rem;
         --sp-6: 1rem;
         --sp-7: 1.25rem;
@@ -249,6 +256,10 @@ body.theme-admin {
         --text-primary: #e8e8e8;
         --text-secondary: #aaaaaa;
         --text-tertiary: #757575;
+
+        /* Superfícies, linhas e texto suaves derivados do texto atual (valem para claro e escuro) */
+        --soft-bg: #232323;
+        --soft-bg-hover: #2C2C2C;
         
         /* Interface */
         --border-color: #333333;

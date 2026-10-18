@@ -40,7 +40,7 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/order-ui.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/storage.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
@@ -64,21 +64,21 @@
 
         <!-- Resumo geral dos discos físicos -->
         <section class="sd-summary" id="sdSummary" aria-label="Resumo do armazenamento">
-            <div class="sd-skeleton">Carregando discos...</div>
+            <div class="status-message">Carregando discos...</div>
         </section>
 
         <!-- Discos físicos -->
         <section class="sd-section">
             <div class="sd-section-head">
-                <h2 class="sd-section-title">Discos <span class="sd-count" id="sdDiskCount"></span></h2>
+                <h2 class="sd-section-title">Discos <span class="counter" id="sdDiskCount"></span></h2>
                 <span class="sd-updated" id="sdUpdated"></span>
             </div>
 
             <div class="sd-toolbar">
-                <div class="sd-chips" id="sdChips" role="group" aria-label="Filtrar por situação"></div>
+                <div class="chip-group" id="sdChips" role="group" aria-label="Filtrar por situação"></div>
                 <div class="sd-tools">
-                    <input type="search" class="sd-search" id="sdSearch" placeholder="Buscar disco, modelo ou serial..." aria-label="Buscar disco">
-                    <select class="sd-select" id="sdSort" aria-label="Ordenar">
+                    <input type="search" class="field field--comfortable sd-search" id="sdSearch" placeholder="Buscar disco, modelo ou serial..." aria-label="Buscar disco">
+                    <select class="field field--comfortable" id="sdSort" aria-label="Ordenar">
                         <option value="free">Mais espaço livre</option>
                         <option value="pct">Maior uso (%)</option>
                         <option value="total">Maior capacidade</option>
@@ -115,6 +115,7 @@
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/ui-components.js"></script>
     <script src="js/storage.js"></script>
 </body>
 </html>
