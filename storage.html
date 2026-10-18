@@ -40,9 +40,8 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/detail.css">
+    <link rel="stylesheet" href="css/order-ui.css">
     <link rel="stylesheet" href="css/storage.css">
-    <link rel="stylesheet" href="css/request.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
     <script>
@@ -61,184 +60,52 @@
 
     </header>
 
-    <div class="container">
-        <div class="section-divider"></div>
+    <main class="sd-page">
 
-        <!-- ── OVERVIEW ── -->
-        <div class="storage-overview" id="storageOverview">
+        <!-- Resumo geral dos discos físicos -->
+        <section class="sd-summary" id="sdSummary" aria-label="Resumo do armazenamento">
+            <div class="sd-skeleton">Carregando discos...</div>
+        </section>
 
-            <!-- Alert dinâmico (renderizado por JS se tiver volume crítico) -->
-            <div id="storageAlert"></div>
+        <!-- Discos físicos -->
+        <section class="sd-section">
+            <div class="sd-section-head">
+                <h2 class="sd-section-title">Discos <span class="sd-count" id="sdDiskCount"></span></h2>
+                <span class="sd-updated" id="sdUpdated"></span>
+            </div>
 
-            <!-- Stats topo -->
-            <div class="stats" id="storageStats">
-                <div class="stat">
-                    <div class="stat-value highlighted" id="statTotalSize">—</div>
-                    <div class="stat-label">Total em arquivo</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="statTotalDisks">—</div>
-                    <div class="stat-label">Quantidade de discos</div>
+            <div class="sd-toolbar">
+                <div class="sd-chips" id="sdChips" role="group" aria-label="Filtrar por situação"></div>
+                <div class="sd-tools">
+                    <input type="search" class="sd-search" id="sdSearch" placeholder="Buscar disco, modelo ou serial..." aria-label="Buscar disco">
+                    <select class="sd-select" id="sdSort" aria-label="Ordenar">
+                        <option value="free">Mais espaço livre</option>
+                        <option value="pct">Maior uso (%)</option>
+                        <option value="total">Maior capacidade</option>
+                        <option value="archive">Mais arquivo</option>
+                        <option value="name">Nome</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Barra de distribuição geral -->
-            <div class="home-section">
-                <div class="home-section-header">
-                    <div class="home-section-header-title">
-                        <p class="home-section-title">Distribuição dos volumes</p>
-                    </div>
-                    <span class="home-section-detail" id="totalCapacityLabel">—</span>
-                </div>
-                <div class="storage-dist-bar" id="distBar"></div>
-                <div class="storage-dist-legend" id="distLegend"></div>
+            <div class="sd-list" id="sdList" aria-live="polite"></div>
+        </section>
+
+        <!-- Nuvem e outros locais -->
+        <section class="sd-section" id="sdOthersSection" hidden>
+            <div class="sd-section-head">
+                <h2 class="sd-section-title">Nuvem e outros locais</h2>
             </div>
+            <div class="sd-list" id="sdOthers"></div>
+        </section>
 
-            <div class="section-divider"></div>
+    </main>
 
-            <!-- Volumes físicos -->
-            <div class="home-section">
-                <div class="home-section-header">
-                    <div class="home-section-header-title">
-                        <p class="home-section-title">Volumes físicos</p>
-                    </div>
-                </div>
-                <div class="volumes-grid" id="volumeList">
-                    <div class="section-state"><p>Carregando volumes...</p></div>
-                </div>
-            </div>
-
-            <div class="section-divider"></div>
-
-            <!-- Cloud -->
-            <div class="home-section">
-                <div class="home-section-header">
-                    <div class="home-section-header-title">
-                        <p class="home-section-title">Cloud backup</p>
-                    </div>
-                </div>
-                <div id="cloudCard">
-                    <div class="section-state"><p>Carregando...</p></div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ── DETALHE DO VOLUME (tela secundária) ── -->
-        <div class="storage-detail" id="storageDetail" style="display:none;">
-
-            <div class="collection-layout">
-
-                <!-- SIDEBAR: dados do volume -->
-                <aside class="collection-sidebar">
-                    <div class="volume-group">
-                        <button class="btn back-btn" id="backToOverview">‹</button>
-                        <div class="volume-hero" id="volumeHero"></div>
-                    </div>
-
-                    <!-- Barra de uso -->
-                    <div class="storage-bar-wrap" id="volumeBarWrap"></div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="stats sidebar-stats" id="volumeStats">
-                        <div class="stat">
-                            <div class="stat-value highlighted" id="volStatGames">—</div>
-                            <div class="stat-label">Jogos</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value highlighted" id="volStatSize">—</div>
-                            <div class="stat-label">Tamanho no volume</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="volStatDuration">—</div>
-                            <div class="stat-label">Duração total</div>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- CONTEÚDO PRINCIPAL: filtros + jogos -->
-                <div class="collection-main">
-
-                    <!-- Filtros rápidos -->
-                    <div class="controls">
-                        <!-- Filtros por ano e qualidade -->
-                        <div class="filter-options">
-                            <div class="filter-sub-group expand">
-                                <div class="control-group" style="max-width: 140px;">
-                                    <div class="dropdown-group">
-                                        <label data-i18n="years">Anos</label>
-                                        <select class="f-select" id="volumeYearFilter">
-                                            <option value="all" data-i18n="allYears">Todos os anos</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-group">
-                                <div class="search-box">
-                                    <input type="text" id="volumeSearch" placeholder="Buscar...">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-options">
-                            <div class="filter-sub-group">
-                                <div class="view-toggle" id="storageQuickFilters">
-                                    <div class="view-btn active" data-filter="all">
-                                        <span data-filter="all">Tudo</span>
-                                    </div>
-                                    
-                                    <div class="view-btn" data-filter="4k">
-                                        <span data-filter="4k">4K</span>
-                                    </div>
-
-                                    <div class="view-btn" data-filter="1080">
-                                        <span data-filter="1080">Full HD</span>
-                                    </div>
-
-                                    <div class="view-btn" data-filter="no-cloud">Sem cloud</div>
-                                </div>
-                            </div>
-
-                            <div class="filter-sub-group">
-                                <div class="pagination" id="volumePagination">
-                                    <div class="back-btn-group">
-                                        <button id="volFirstPage">«</button>
-                                        <button id="volPrevPage">‹</button>
-                                    </div>
-                                    <div class="pages-info-group">
-                                        <span class="value contrast" id="volPageNum">1</span>
-                                        <span class="label"> de </span>
-                                        <span class="value" id="volPageTotal">1</span>
-                                    </div>
-                                    <div class="back-btn-group">
-                                        <button id="volNextPage">›</button>
-                                        <button id="volLastPage">»</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Lista de jogos do volume -->
-                    <div class="match-container" id="volumeGames">
-                        <div class="section-state"><p>Selecione um volume para ver os jogos.</p></div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="btn close-btn" onclick="MatchModal.close()">×</button>
-                <h2 class="modal-title" id="modalTitle">Detalhes da Partida</h2>
-                <div id="modalScore" class="modal-score"></div>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
+    <!-- Ficha técnica do disco -->
+    <div class="sd-modal" id="sdModal" hidden>
+        <div class="sd-modal-card" role="dialog" aria-modal="true" aria-labelledby="sdModalTitle">
+            <button type="button" class="sd-modal-close" id="sdModalClose" aria-label="Fechar">×</button>
+            <div id="sdModalBody"></div>
         </div>
     </div>
 
@@ -247,10 +114,7 @@
     <script src="js/config.js"></script>
     <script src="js/translation.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/api_service.js"></script>
-    <script src="js/managers.js"></script>
-    <script src="js/storage.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/request.js"></script>
+    <script src="js/storage.js"></script>
 </body>
 </html>

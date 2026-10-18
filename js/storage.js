@@ -1,670 +1,279 @@
 /* =============================================
-   storage.js — Página de Storage Management
-   Combina dados reais dos discos (API /storage/disks)
-   com os jogos agregados por Local (CF_API_URLS)
+   storage.js — Armazenamento por disco
+   Fonte: API /storage/disks. A listagem do conteúdo de cada disco
+   fica em detail.html?type=storage&q=<nome do disco>.
    ============================================= */
 
-const VOLUME_COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)', 'var(--chart-6)'];
-
-// Nomes de "discos" que são apenas categorias da planilha, não hardware real
-const PSEUDO_DISKS = new Set(['local', 'nuvem', 'para baixar', 'desconhecido']);
-
-// ─── Estado ─────────────────────────────────────
-const StorageState = {
-    allMatches:       [],
-    volumes:          [],
-    diskSummary:      null,
-    cloud:            null,
-    currentVolume:    null,
-    filteredMatches:  [],
-    currentPage:      1,
-    itemsPerPage:     20,
-    totalPages:       1,
-    activeYearFilter: 'all',
-    activeQualFilter: 'all',
-    searchQuery:      '',
-    disksMeta:        [],
+// Entradas da planilha que não são hardware: vão para "Nuvem e outros locais"
+const PSEUDO_DISKS = {
+    'nuvem':       'Backup em nuvem',
+    'local':       'Armazenamento local',
+    'para baixar': 'Fila de download',
 };
+
+// Situação do disco (a cor só aparece na bolinha, como nas demais telas)
+const DISK_STATES = {
+    over:    { label: 'Acima da capacidade', kind: 'err'  },
+    full:    { label: 'Cheio',               kind: 'off'  },
+    near:    { label: 'Quase cheio',         kind: 'wait' },
+    ok:      { label: 'Com espaço',          kind: 'ok'   },
+    unknown: { label: 'Sem capacidade',      kind: 'off'  },
+};
+
+const SortFns = {
+    free:    (a, b) => b.freeGB - a.freeGB,
+    pct:     (a, b) => b.pct - a.pct,
+    total:   (a, b) => b.totalGB - a.totalGB,
+    archive: (a, b) => b.archiveGB - a.archiveGB,
+    name:    (a, b) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true }),
+};
+
+const StorageState = { all: [], disks: [], others: [], updatedAt: null, filter: 'all', sort: 'free', query: '' };
+
+// ─── Helpers ─────────────────────────────────────
+const sdEsc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const sdNorm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const nf = (v, d = 1) => v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+function formatGB(gb) {
+    if (gb === null || gb === undefined || isNaN(gb)) return '—';
+    return gb >= 1024 ? `${nf(gb / 1024)} TB` : `${nf(gb)} GB`;
+}
+
+// ─── Carregamento ────────────────────────────────
+async function loadDisks() {
+    const res = await fetch(`${CONFIG.REQUEST_API_BASE}/storage/disks`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    // A API devolve { data: [ [ { summary, disks } ], { registros, espaco } ] }
+    const payload = Array.isArray(json.data?.[0]) ? json.data[0][0] : json.data;
+    if (!payload || !Array.isArray(payload.disks)) throw new Error('Resposta inesperada da API');
+    return payload;
+}
+
+// A API devolve free_gb = 0 e used_pct acima de 100%: o que vale é capacidade, arquivo e total usado.
+function normalizeDisk(d) {
+    const totalGB   = d.total_gb || 0;
+    const usedGB    = d.used_gb  || 0;
+    const archiveGB = Math.min(d.archive_gb || 0, usedGB);
+    const otherGB   = Math.max(usedGB - archiveGB, 0);
+    const knownTotal = totalGB > 0;
+    const pct       = knownTotal ? (usedGB / totalGB) * 100 : 0;
+    const freeGB    = knownTotal ? Math.max(totalGB - usedGB, 0) : 0;
+    const key = !knownTotal ? 'unknown' : pct > 100 ? 'over' : pct >= 98 ? 'full' : pct >= 90 ? 'near' : 'ok';
+    const pseudo = PSEUDO_DISKS[sdNorm(d.name)];
+    return {
+        ...d, totalGB, usedGB, archiveGB, otherGB, freeGB, pct, knownTotal, state: key,
+        physical: !pseudo && d.brand !== null,
+        kindLabel: pseudo || null,
+        search: sdNorm([d.name, d.brand, d.model, d.serial, d.disk_type, d.format].filter(Boolean).join(' ')),
+    };
+}
+
+// ─── Resumo geral (só discos físicos) ────────────
+function renderSummary() {
+    const disks = StorageState.disks;
+    const cap = disks.reduce((a, d) => a + d.totalGB, 0);
+    // Disco acima da capacidade entra limitado a 100% para a soma fechar: arquivo + outros + livre = capacidade
+    let archive = 0, other = 0, free = 0;
+    disks.forEach(d => {
+        const scale = d.usedGB > d.totalGB && d.usedGB > 0 ? d.totalGB / d.usedGB : 1;
+        archive += d.archiveGB * scale;
+        other   += d.otherGB * scale;
+        free    += d.freeGB;
+    });
+    const used = archive + other;
+    const over = disks.filter(d => d.state === 'over').length;
+    const pctOf = v => cap > 0 ? (v / cap) * 100 : 0;
+
+    document.getElementById('sdSummary').innerHTML = `
+        <div class="sd-tiles">
+            <div class="sd-tile"><div class="sd-tile-val">${disks.length}</div><div class="sd-tile-lbl">Discos físicos</div></div>
+            <div class="sd-tile"><div class="sd-tile-val">${formatGB(cap)}</div><div class="sd-tile-lbl">Capacidade total</div></div>
+            <div class="sd-tile"><div class="sd-tile-val">${formatGB(used)}</div><div class="sd-tile-lbl">Em uso · ${nf(pctOf(used), 0)}%</div></div>
+            <div class="sd-tile sd-tile--hl"><div class="sd-tile-val">${formatGB(free)}</div><div class="sd-tile-lbl">Livre · ${nf(pctOf(free), 0)}%</div></div>
+        </div>
+        <div class="sd-bar sd-bar--lg" role="img" aria-label="Distribuição do espaço total">
+            <span class="sd-seg sd-seg--archive" style="width:${pctOf(archive)}%"></span>
+            <span class="sd-seg sd-seg--other"   style="width:${pctOf(other)}%"></span>
+        </div>
+        <div class="sd-legend">
+            <span><i class="sd-key sd-key--archive"></i>Arquivo (jogos) <b>${formatGB(archive)}</b></span>
+            <span><i class="sd-key sd-key--other"></i>Outros arquivos <b>${formatGB(other)}</b></span>
+            <span><i class="sd-key sd-key--free"></i>Livre <b>${formatGB(free)}</b></span>
+        </div>
+        ${over ? `<p class="sd-note">${over} ${over === 1 ? 'disco informa' : 'discos informam'} uso acima da capacidade; nas barras e nos totais o uso é limitado a 100%.</p>` : ''}`;
+
+    if (StorageState.updatedAt) {
+        const d = new Date(StorageState.updatedAt);
+        if (!isNaN(d)) document.getElementById('sdUpdated').textContent =
+            'Atualizado em ' + d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+}
+
+// ─── Filtros ─────────────────────────────────────
+function renderChips() {
+    const count = k => StorageState.disks.filter(d => d.state === k).length;
+    const chips = [
+        ['all',  'Todos',        StorageState.disks.length],
+        ['ok',   'Com espaço',   count('ok')],
+        ['near', 'Quase cheios', count('near')],
+        ['full', 'Cheios',       count('full')],
+        ['over', 'Acima da capacidade', count('over')],
+    ].filter(([k, , n]) => k === 'all' || n > 0);
+    if (!chips.some(([k]) => k === StorageState.filter)) StorageState.filter = 'all';
+    document.getElementById('sdChips').innerHTML = chips.map(([k, label, n]) =>
+        `<button type="button" class="sd-chip ${StorageState.filter === k ? 'active' : ''}" data-filter="${k}">${label} <span>${n}</span></button>`).join('');
+}
+
+function visibleDisks() {
+    const { disks, filter, query, sort } = StorageState;
+    const q = sdNorm(query.trim());
+    return disks
+        .filter(d => (filter === 'all' || d.state === filter) && (!q || d.search.includes(q)))
+        .sort(SortFns[sort] || SortFns.free);
+}
+
+// ─── Linha de disco ──────────────────────────────
+const diskHref = d => `detail.html?type=storage&q=${encodeURIComponent(d.name)}`;
+
+// Linha enxuta: só o que responde "quanto tem sobrando". Dados técnicos ficam na ficha (modal).
+function diskRow(d, idx) {
+    const denom = Math.max(d.totalGB, d.usedGB) || 1;
+    const aW = (d.archiveGB / denom) * 100, oW = (d.otherGB / denom) * 100;
+    const st = DISK_STATES[d.state];
+    const pctTxt = d.knownTotal ? `${nf(d.pct, d.pct > 100 ? 0 : 1)}%` : '—';
+
+    return `
+    <button type="button" class="sd-row" data-disk="${idx}" aria-haspopup="dialog">
+        <div class="sd-id">
+            <div class="sd-name">${sdEsc(d.name)}</div>
+            ${d.kindLabel ? `<div class="sd-sub">${sdEsc(d.kindLabel)}</div>` : ''}
+        </div>
+        <div class="sd-usage">
+            ${d.knownTotal ? `
+            <div class="sd-bar" role="img" aria-label="${pctTxt} usado">
+                <span class="sd-seg sd-seg--archive" style="width:${aW}%"></span>
+                <span class="sd-seg sd-seg--other"   style="width:${oW}%"></span>
+            </div>` : '<div class="sd-bar sd-bar--empty"></div>'}
+            <div class="sd-legend sd-legend--sm">
+                ${d.archiveGB > 0 || d.otherGB === 0 ? `<span><i class="sd-key sd-key--archive"></i>Arquivo ${formatGB(d.archiveGB)}</span>` : ''}
+                ${d.otherGB > 0 ? `<span><i class="sd-key sd-key--other"></i>Outros ${formatGB(d.otherGB)}</span>` : ''}
+            </div>
+        </div>
+        <div class="sd-num"><strong>${formatGB(d.usedGB)}</strong><span>${d.knownTotal ? 'de ' + formatGB(d.totalGB) : 'usados'}</span></div>
+        <div class="sd-num"><strong>${d.knownTotal ? formatGB(d.freeGB) : '—'}</strong><span>livres</span></div>
+        <div class="sd-state"><span class="rd-pill rd-pill--${st.kind}"><i></i>${st.label}</span><span class="sd-pct">${pctTxt}</span></div>
+        <span class="sd-go" aria-hidden="true">${ico('chevron-right', 16)}</span>
+    </button>`;
+}
+
+function renderList() {
+    const list = document.getElementById('sdList');
+    const rows = visibleDisks();
+    document.getElementById('sdDiskCount').textContent = rows.length === StorageState.disks.length ? '' : `${rows.length} de ${StorageState.disks.length}`;
+    list.innerHTML = rows.length
+        ? `<div class="sd-head" aria-hidden="true"><span>Disco</span><span>Uso</span><span>Usado</span><span>Livre</span><span>Situação</span><span></span></div>` + rows.map(d => diskRow(d, StorageState.all.indexOf(d))).join('')
+        : `<div class="sd-empty">Nenhum disco encontrado.</div>`;
+}
+
+function renderOthers() {
+    const sec = document.getElementById('sdOthersSection');
+    sec.hidden = !StorageState.others.length;
+    document.getElementById('sdOthers').innerHTML = StorageState.others.map(d => diskRow(d, StorageState.all.indexOf(d))).join('');
+}
+
+// ─── Ficha técnica (modal) ───────────────────────
+function openDiskModal(d, opener) {
+    const st = DISK_STATES[d.state];
+    const denom = Math.max(d.totalGB, d.usedGB) || 1;
+    const kv = (k, v) => v === null || v === undefined || v === '' || v === '-' ? '' :
+        `<div class="sd-kv"><span>${k}</span><b>${sdEsc(v)}</b></div>`;
+    const pctTxt = d.knownTotal ? `${nf(d.pct, d.pct > 100 ? 0 : 1)}%` : '—';
+    document.getElementById('sdModalBody').innerHTML = `
+        <div class="sd-modal-head">
+            <h3 id="sdModalTitle">${sdEsc(d.name)}</h3>
+            <span class="rd-pill rd-pill--${st.kind}"><i></i>${st.label}</span>
+        </div>
+        ${d.knownTotal ? `
+        <div class="sd-bar sd-bar--lg">
+            <span class="sd-seg sd-seg--archive" style="width:${(d.archiveGB / denom) * 100}%"></span>
+            <span class="sd-seg sd-seg--other"   style="width:${(d.otherGB / denom) * 100}%"></span>
+        </div>` : ''}
+        <div class="sd-modal-sec">
+            <h4>Espaço</h4>
+            ${kv('Capacidade', d.knownTotal ? formatGB(d.totalGB) : null)}
+            ${kv('Usado', `${formatGB(d.usedGB)}${d.knownTotal ? ' · ' + pctTxt : ''}`)}
+            ${kv('Arquivo (jogos)', formatGB(d.archiveGB))}
+            ${kv('Outros arquivos', formatGB(d.otherGB))}
+            ${kv('Livre', d.knownTotal ? formatGB(d.freeGB) : null)}
+        </div>
+        <div class="sd-modal-sec">
+            <h4>Características</h4>
+            ${kv('Marca', d.brand)}${kv('Modelo', d.model)}${kv('Tipo', d.disk_type)}${kv('Formato', d.format)}
+            ${kv('Interface', d.interface)}${kv('Serial', d.serial)}${kv('Ano de compra', d.purchase_year)}
+            ${kv('Situação cadastral', d.status)}${kv('Descrição', d.kindLabel)}
+        </div>
+        ${d.notes ? `<div class="sd-modal-sec"><h4>Observações</h4><p class="sd-modal-notes">${sdEsc(d.notes)}</p></div>` : ''}
+        <a class="rd-btn rd-btn--solid rd-btn--block" href="${diskHref(d)}">Ver conteúdo do disco ${ico('chevron-right', 16)}</a>`;
+    const m = document.getElementById('sdModal');
+    m.hidden = false;
+    document.body.classList.add('sd-lock');
+    m._opener = opener;
+    document.getElementById('sdModalClose').focus();
+}
+function closeDiskModal() {
+    const m = document.getElementById('sdModal');
+    if (m.hidden) return;
+    m.hidden = true;
+    document.body.classList.remove('sd-lock');
+    m._opener?.focus();
+}
+
+// ─── Ícone (traço único, herda a cor) ────────────
+function ico(name, size = 16) {
+    const paths = { 'chevron-right': '<path d="M9 6l6 6-6 6"/>' };
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name]}</svg>`;
+}
 
 // ─── Init ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
     await window._headerPromise;
-    await Promise.all([loadDisks()]);
-    buildVolumes();
-    buildOverview();
-    bindOverviewEvents();
-    bindDetailEvents();
-});
-
-// ─── Carregamento ────────────────────────────────
-
-async function loadDisks() {
+    const summaryEl = document.getElementById('sdSummary');
     try {
-        const res  = await fetch(`${CONFIG.REQUEST_API_BASE}/storage/disks`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-
-        const payload = Array.isArray(json.data?.[0]) ? json.data[0][0] : json.data;
-
-        StorageState.diskSummary = payload?.summary || null;
-
-        StorageState.disksMeta = (payload?.disks || []).filter(d =>
-            d.name &&
-            !PSEUDO_DISKS.has(d.name.toLowerCase()) &&
-            d.brand !== null   // sem marca = entrada de planilha, não hardware
-        );
+        const payload = await loadDisks();
+        const all = payload.disks.filter(d => d.name).map(normalizeDisk);
+        StorageState.all       = all;
+        StorageState.disks     = all.filter(d => d.physical);
+        StorageState.others    = all.filter(d => !d.physical).sort(SortFns.total);
+        StorageState.updatedAt = payload.updated_at || null;
+        renderSummary(); renderChips(); renderList(); renderOthers();
     } catch (err) {
-        console.warn('Dados de discos não disponíveis:', err);
-        StorageState.disksMeta = [];
-    }
-}
-
-// ─── Normaliza um disco da API ───────────────────
-function normalizeDisk(disk) {
-    const totalGB = disk.total_gb || 0;
-    const usedGB  = disk.used_gb  || 0;
-    const freeGB  = disk.free_gb  || 0;
-    const pct     = disk.used_pct || 0;
-
-    const knownTotal = totalGB > 0;
-    const rawPct  = pct;
-
-    return {
-        ...disk,
-        totalGB,
-        usedGB,
-        otherGB:    disk.other_gb    || 0,
-        archiveGB:  disk.archive_gb  || 0,
-        freeGB,
-        pct:        pct ?? 0,
-        rawPct,
-        knownTotal,
-        level: !knownTotal    ? 'ok'
-             : pct >= 100  ? 'critical'
-             : pct >= 95   ? 'critical'
-             : pct >= 90   ? 'warning'
-             : 'ok',
-    };
-}
-
-// ─── Monta volumes fundindo discos reais + jogos ─
-function buildVolumes() {
-    const { allMatches, disksMeta } = StorageState;
-
-    const matchesByLocal = {};
-    let cloudCount = 0, cloudGB = 0;
-
-    allMatches.forEach(m => {
-        const loc = m.Local || 'Desconhecido';
-        if (!matchesByLocal[loc]) matchesByLocal[loc] = [];
-        matchesByLocal[loc].push(m);
-        if (m.Nuvem) { cloudCount++; cloudGB += parseSizeGB(m.Tamanho); }
-    });
-
-    if (disksMeta.length) {
-        StorageState.volumes = disksMeta
-            .map((raw, idx) => {
-                const disk    = normalizeDisk(raw);
-                const matches = matchesByLocal[disk.name] || [];
-                const archiveGB = matches.reduce((a, m) => a + parseSizeGB(m.Tamanho), 0);
-                const archivePct = disk.knownTotal && disk.totalGB > 0
-                    ? Math.round((archiveGB / disk.totalGB) * 100) : 0;
-
-                return {
-                    ...disk,
-                    archiveGB,
-                    archivePct,
-                    // Os jogos deste volume só são buscados quando o
-                    // detalhamento é aberto (ver loadVolumeMatches).
-                    matches: null,
-                    color: VOLUME_COLORS[idx % VOLUME_COLORS.length],
-                };
-            })
-            .sort((a, b) => b.usedGB - a.usedGB);
-    } else {
-        // Fallback sem API de discos
-        StorageState.volumes = Object.entries(matchesByLocal)
-            .filter(([name]) => !PSEUDO_DISKS.has(name.toLowerCase()))
-            .map(([name, items], idx) => {
-                const usedGB  = items.reduce((a, m) => a + parseSizeGB(m.Tamanho), 0);
-                const totalGB = estimateTotalCapacity(usedGB);
-                const freeGB  = totalGB - usedGB;
-                const pct     = Math.round((usedGB / totalGB) * 100);
-                return {
-                    name, matches: null,
-                    color: VOLUME_COLORS[idx % VOLUME_COLORS.length],
-                    model: '—', brand: '—', disk_type: '—',
-                    usedGB, archiveGB: usedGB, otherGB: 0,
-                    totalGB, freeGB, pct, rawPct: pct, archivePct: pct,
-                    knownTotal: true,
-                    level: pct >= 85 ? 'critical' : pct >= 70 ? 'warning' : 'ok',
-                };
-            })
-            .sort((a, b) => b.usedGB - a.usedGB);
-    }
-
-    const totalGB = allMatches.reduce((a, m) => a + parseSizeGB(m.Tamanho), 0);
-    StorageState.cloud = {
-        syncedCount: cloudCount,
-        syncedGB:    cloudGB,
-        totalCount:  allMatches.length,
-        totalGB,
-    };
-}
-
-// ─── Overview ────────────────────────────────────
-function buildOverview() {
-    const { volumes, cloud, allMatches, disksMeta, diskSummary } = StorageState;
-    if (!volumes.length) return;
-
-    // Usa summary da API quando disponível — mais preciso
-    const totalUsedGB = diskSummary?.total_used
-        ?? volumes.reduce((a, v) => a + v.usedGB, 0);
-    const totalCapGB  = diskSummary?.total_capacity
-        ?? volumes.reduce((a, v) => a + v.totalGB, 0);
-    const totalFreeGB = diskSummary
-        ? Math.max(diskSummary.total_capacity - diskSummary.total_used, 0)
-        : volumes.reduce((a, v) => a + (v.freeGB ?? 0), 0);
-
-    const totalDuration = allMatches.reduce((a, m) => a + parseDuration(m.Duração), 0);
-    const cloudPct      = cloud?.totalCount
-        ? Math.round((cloud.syncedCount / cloud.totalCount) * 100) : 0;
-
-    document.getElementById('statTotalSize').textContent     = formatGB(totalUsedGB);
-    document.getElementById('statTotalDisks').textContent    = diskSummary?.total_disks;
-    document.getElementById('totalCapacityLabel').textContent =
-        `${formatGB(totalCapGB)} total · ${formatGB(totalFreeGB)} livres`;
-
-    // Alertas
-    const overDisks  = volumes.filter(v => v.rawPct !== null && v.rawPct >= 100);
-    const critVols   = volumes.filter(v => v.level === 'critical' && v.rawPct < 100);
-    const alertEl    = document.getElementById('storageAlert');
-    const alerts     = [];
-
-    if (overDisks.length) {
-        alerts.push(`<div class="storage-alert home-section">
-            <span class="alert-icon">🔴</span>
-            <span><strong>${overDisks.map(v => v.name).join(', ')}</strong>
-            ${overDisks.length > 1 ? 'estão' : 'está'} com uso acima de 100%</span>
-        </div>`);
-    }
-    if (critVols.length) {
-        alerts.push(`<div class="storage-alert home-section">
-            <span class="alert-icon">⚠️</span>
-            <span><strong>${critVols[0].name}</strong> está com ${critVols[0].pct}% de uso —
-            apenas ${formatGB(critVols[0].freeGB)} livres.</span>
-        </div>`);
-    }
-    alertEl.innerHTML = alerts.join('');
-
-    // Barra de distribuição
-    const bar    = document.getElementById('distBar');
-    const legend = document.getElementById('distLegend');
-    bar.innerHTML = legend.innerHTML = '';
-    volumes.forEach(v => {
-        const widthPct = totalCapGB > 0
-            ? (v.usedGB / totalCapGB * 100).toFixed(1) : 0;
-        const seg = document.createElement('div');
-        seg.className = 'storage-dist-seg';
-        seg.style.cssText = `width:${widthPct}%;background:${v.color}`;
-        bar.appendChild(seg);
-
-        const li = document.createElement('span');
-        li.className = 'storage-dist-leg-item';
-        li.innerHTML = `<span class="storage-dist-leg-dot" style="background:${v.color}"></span>${v.name}`;
-        li.addEventListener('click', () => openVolumeDetail(v));
-        legend.appendChild(li);
-    });
-
-    // Cards de volume
-    const volList = document.getElementById('volumeList');
-    volList.innerHTML = '';
-    volumes.forEach(v => volList.appendChild(buildVolumeCard(v)));
-
-    renderCloudCard();
-}
-
-function buildVolumeCard(vol) {
-    const modelLine = [vol.brand, vol.model, vol.disk_type, vol.format]
-        .filter(Boolean).join(' · ') || '—';
-    const interfaceLine  = vol.interface ? ` · ${vol.interface}` : '';
-    const yearLine       = vol.purchase_year ? `Comprado em ${vol.purchase_year}` : '';
-
-    // Exibe % com aviso se > 100
-    const pctDisplay = vol.rawPct !== null
-        ? (vol.rawPct > 100 ? `${vol.rawPct}% ⚠` : `${vol.pct}%`)
-        : '—';
-
-    // Barra e meta de uso
-    const barWidth   = vol.knownTotal ? `${Math.min(vol.pct, 100)}%` : '0%';
-    const usedLine   = vol.knownTotal
-        ? `${formatGB(vol.usedGB)} usados de ${formatGB(vol.totalGB)}`
-        : `${formatGB(vol.usedGB)} (capacidade não informada)`;
-    const freeLine   = vol.freeGB !== null
-        ? `${formatGB(vol.freeGB)} livres`
-        : '—';
-
-    const card = document.createElement('div');
-    card.className = `volume-card ${vol.level}`;
-    card.innerHTML = `
-        <div class="volume-card-header">
-            <div>
-                <div class="volume-card-name">
-                    <span class="vol-icon">💾</span> ${vol.name}
-                    ${vol.status && vol.status !== 'Ativo'
-                        ? `<span class="vol-status-badge">${vol.status}</span>` : ''}
-                </div>
-                <div class="volume-card-model">${modelLine}${interfaceLine}</div>
-                ${yearLine ? `<div class="volume-card-year">${yearLine}</div>` : ''}
-            </div>
-            <div class="volume-pct ${vol.level}">${pctDisplay}</div>
-        </div>
-        <div class="volume-bar-wrap">
-            <div class="volume-bar-bg">
-                <div class="volume-bar-fill ${vol.level}" style="width:${barWidth}"></div>
-            </div>
-            <div class="volume-bar-meta">
-                <span>${usedLine}</span>
-                <span class="free-label ${vol.level}">${freeLine}</span>
-            </div>
-            ${vol.otherGB > 0 ? `
-            <div class="volume-bar-breakdown">
-                <span>📁 Archive: ${formatGB(vol.archive_gb)}</span>
-                <span>📦 Outros: ${formatGB(vol.other_gb)}</span>
-            </div>` : ''}
-        </div>
-        ${vol.notes ? `<div class="volume-card-notes">📝 ${vol.notes}</div>` : ''}
-        <div class="volume-card-actions">
-            <button class="volume-action-btn" data-vol="${vol.name}" style="display:none;">Ver jogos</button>
-        </div>
-    `;
-    card.querySelector('[data-vol]').addEventListener('click', e => {
-        e.stopPropagation();
-        openVolumeDetail(vol);
-    });
-    return card;
-}
-
-function renderCloudCard() {
-    const cloud = StorageState.cloud;
-    if (!cloud) return;
-    const pct = cloud.totalGB > 0
-        ? Math.round((cloud.syncedGB / cloud.totalGB) * 100) : 0;
-
-    document.getElementById('cloudCard').innerHTML = `
-        <div class="cloud-volume-card">
-            <div class="cloud-volume-header">
-                <div class="cloud-volume-name">☁️ Cloud</div>
-                <span class="cloud-status-badge">Online</span>
-            </div>
-            <div class="volume-bar-wrap">
-                <div class="volume-bar-bg">
-                    <div class="volume-bar-fill ok" style="width:${pct}%"></div>
-                </div>
-                <div class="volume-bar-meta">
-                    <span>${formatGB(cloud.syncedGB)} espelhados</span>
-                    <span>${pct}% do acervo</span>
-                </div>
-            </div>
-            <div class="cloud-volume-detail">
-                <div class="vol-det-item">
-                    <div class="vol-det-label">Jogos espelhados</div>
-                    <div class="vol-det-val">${cloud.syncedCount.toLocaleString('pt-BR')}</div>
-                </div>
-                <div class="vol-det-item">
-                    <div class="vol-det-label">Total no acervo</div>
-                    <div class="vol-det-val">${cloud.totalCount.toLocaleString('pt-BR')}</div>
-                </div>
-                <div class="vol-det-item">
-                    <div class="vol-det-label">Cobertura</div>
-                    <div class="vol-det-val">${pct}%</div>
-                </div>
-                <div class="vol-det-item">
-                    <div class="vol-det-label">Status</div>
-                    <div class="vol-det-val" style="color:var(--success-color)">Online</div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ─── Detalhe do volume ───────────────────────────
-async function openVolumeDetail(vol) {
-    StorageState.currentVolume    = vol;
-    StorageState.currentPage      = 1;
-    StorageState.activeYearFilter = 'all';
-    StorageState.activeQualFilter = 'all';
-    StorageState.searchQuery      = '';
-
-    document.getElementById('storageOverview').style.display = 'none';
-    document.getElementById('storageDetail').style.display   = 'block';
-    document.getElementById('volumeSearch').value = '';
-
-    const modelLine = [vol.brand, vol.model].filter(Boolean).join(' ') || '—';
-    const metaItems = [
-        vol.disk_type     ? `<span class="vol-meta-badge">${vol.disk_type}</span>`         : '',
-        vol.format        ? `<span class="vol-meta-badge">${vol.format}</span>`            : '',
-        vol.interface     ? `<span class="vol-meta-badge">${vol.interface}</span>`         : '',
-        vol.purchase_year ? `<span class="vol-meta-badge">🗓 ${vol.purchase_year}</span>`  : '',
-        vol.serial        ? `<span class="vol-meta-badge serial">S/N: ${vol.serial}</span>`: '',
-    ].join('');
-
-    document.getElementById('volumeHero').innerHTML = `
-        <div class="volume-hero-info">
-            <div class="volume-hero-name">${vol.name}</div>
-            <div class="volume-hero-model">${modelLine}</div>
-            ${metaItems ? `<div class="volume-hero-meta">${metaItems}</div>` : ''}
-            ${vol.notes ? `<div class="volume-hero-notes">📝 ${vol.notes}</div>` : ''}
-        </div>
-    `;
-
-    const pctDisplay = vol.rawPct !== null
-        ? (vol.rawPct > 100 ? `${vol.rawPct}% ⚠` : `${vol.pct}%`) : '—';
-    const barWidth   = vol.knownTotal ? `${Math.min(vol.pct, 100)}%` : '0%';
-    const freeLine   = vol.freeGB !== null ? `· ${formatGB(vol.freeGB)} livres` : '';
-
-    document.getElementById('volumeBarWrap').innerHTML = `
-        <div class="storage-bar-bg">
-            <div class="storage-bar-fill ${vol.level}" style="width:${barWidth}"></div>
-        </div>
-        <div class="storage-bar-meta">
-            <span class="${vol.level !== 'ok' ? vol.level : ''}"
-                  style="font-weight:500">${pctDisplay} usado</span>
-            <span>${formatGB(vol.usedGB)} / ${vol.knownTotal ? formatGB(vol.totalGB) : '?'} ${freeLine}</span>
-        </div>
-        ${vol.otherGB > 0 ? `
-        <div class="volume-bar-breakdown">
-            <span>📁 Archive: ${formatGB(vol.archiveGB)} (${vol.archivePct}%)</span>
-            <span>📦 Outros: ${formatGB(vol.otherGB)}</span>
-        </div>` : ''}
-    `;
-
-    renderVolumeStats(null); // "—" enquanto carrega jogos/duração
-    const sizeEl = document.getElementById('volStatSize');
-    if (sizeEl) sizeEl.textContent = formatGB(vol.archive_gb);
-
-    document.getElementById('volumeYearFilter').innerHTML = '';
-    document.getElementById('volumeGames').innerHTML =
-        `<div class="section-state"><p>Carregando jogos do volume...</p></div>`;
-
-    await loadVolumeMatches(vol);
-
-    if (StorageState.currentVolume !== vol) return;
-
-    AppState.matches = vol.matches;
-
-    renderVolumeStats(vol.matches);
-    buildYearFilter(vol.matches);
-    applyFiltersAndRender();
-}
-
-// Busca os jogos de um volume específico só quando o detalhamento é aberto,
-// usando o filtro server-side search_type=storage&search=<nome do disco>.
-async function loadVolumeMatches(vol) {
-    try {
-        const itemsPerPage = 1500;
-        const MAX_PAGES    = 10;
-
-        let page       = 1;
-        let matches    = [];
-        let totalItems = Infinity;
-
-        while (matches.length < totalItems && page <= MAX_PAGES) {
-            const apiResponse = await APIService.fetchByStorage(vol.name, page, itemsPerPage);
-            matches = matches.concat(APIService.transformData(apiResponse, 'football'));
-
-            totalItems = apiResponse?.pagination?.total_items
-                ?? apiResponse?.total_registros
-                ?? apiResponse?.total_records
-                ?? matches.length;
-
-            page++;
-        }
-
-        vol.matches = matches;
-    } catch (err) {
-        console.error(`Erro ao carregar jogos do volume "${vol.name}":`, err);
-        vol.matches = [];
-        document.getElementById('volumeGames').innerHTML =
-            `<div class="section-state"><p>Erro ao carregar jogos deste volume.</p></div>`;
-    }
-}
-
-// ─── Acesso aos campos dos jogos do volume (modelo v2, com fallback ao legado) ───
-const vm = {
-    date:    m => m.utcDate || m.Data,
-    quality: m => m.technical_details?.video_quality || m.Qualidade || '',
-    cloud:   m => Elements.isCloud(m.technical_details) || !!m.Nuvem,
-    duration:m => m.technical_details?.duration || m.Duração,
-    comp:    m => m.competition?.name || m.Competição || '',
-};
-
-// Atualiza os stats da sidebar (Jogos / Duração) com base nos jogos carregados
-function renderVolumeStats(matches) {
-    const gamesEl = document.getElementById('volStatGames');
-    const durEl   = document.getElementById('volStatDuration');
-    if (!gamesEl || !durEl) return;
-
-    if (!matches) {
-        gamesEl.textContent = '—';
-        durEl.textContent   = '—';
+        console.warn('Storage:', err);
+        summaryEl.innerHTML = `<div class="sd-error">
+            <p>Não foi possível carregar os discos (${sdEsc(err.message)}).</p>
+            <button type="button" class="rd-btn" onclick="location.reload()">Tentar de novo</button></div>`;
+        document.getElementById('sdList').innerHTML = '';
         return;
     }
 
-    const totalDuration = matches.reduce((a, m) => a + parseDuration(vm.duration(m)), 0);
-    gamesEl.textContent = matches.length.toLocaleString('pt-BR');
-    durEl.textContent   = formatHours(totalDuration);
-}
-
-function buildYearFilter(matches) {
-    const years = [...new Set(matches.map(m => {
-        const d = Utils.parseDate(vm.date(m));
-        return d ? d.getFullYear() : null;
-    }).filter(Boolean))].sort((a, b) => b - a);
- 
-    const select = document.getElementById('volumeYearFilter');
-    select.innerHTML = `<option value="all" data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
- 
-    years.forEach(y => {
-        const opt = document.createElement('option');
-        opt.value = y;
-        opt.textContent = y;
-        select.appendChild(opt);
-    });
- 
-    select.value = StorageState.activeYearFilter;
- 
-    select.onchange = () => {
-        StorageState.activeYearFilter = select.value;
-        StorageState.currentPage = 1;
-        applyFiltersAndRender();
+    const openFromList = e => {
+        const row = e.target.closest('.sd-row'); if (!row) return;
+        openDiskModal(StorageState.all[+row.dataset.disk], row);
     };
-}
+    document.getElementById('sdList').addEventListener('click', openFromList);
+    document.getElementById('sdOthers').addEventListener('click', openFromList);
+    document.getElementById('sdModalClose').addEventListener('click', closeDiskModal);
+    document.getElementById('sdModal').addEventListener('click', e => { if (e.target.id === 'sdModal') closeDiskModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDiskModal(); });
 
-function applyFiltersAndRender() {
-    const { currentVolume, activeYearFilter, activeQualFilter, searchQuery, itemsPerPage } = StorageState;
-    if (!currentVolume) return;
-
-    let filtered = currentVolume.matches;
-
-    if (activeYearFilter !== 'all') {
-        filtered = filtered.filter(m => {
-            const d = Utils.parseDate(vm.date(m));
-            return d && d.getFullYear().toString() === activeYearFilter;
-        });
-    }
-
-    if (activeQualFilter === '4k') {
-        filtered = filtered.filter(m => /2160|4k/i.test(vm.quality(m)));
-    } else if (activeQualFilter === '1080') {
-        filtered = filtered.filter(m => /1080/i.test(vm.quality(m)));
-    } else if (activeQualFilter === 'no-cloud') {
-        filtered = filtered.filter(m => !vm.cloud(m));
-    }
-
-    if (searchQuery.trim()) {
-        // Mesmo índice das demais páginas: campos aninhados + texto traduzido + sem acentos
-        filtered = filtered.filter(m => Utils.matchesSearch(m, searchQuery));
-    }
-
-    filtered.sort((a, b) => {
-        const da = Utils.parseDate(vm.date(a)), db = Utils.parseDate(vm.date(b));
-        return (db || 0) - (da || 0);
+    document.getElementById('sdChips').addEventListener('click', e => {
+        const b = e.target.closest('.sd-chip'); if (!b) return;
+        StorageState.filter = b.dataset.filter; renderChips(); renderList();
     });
-
-    StorageState.filteredMatches = filtered;
-    StorageState.totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
-    StorageState.currentPage = Math.min(StorageState.currentPage, StorageState.totalPages);
-
-    const start = (StorageState.currentPage - 1) * itemsPerPage;
-    AppState.filteredMatches = filtered.slice(start, start + itemsPerPage);
-    Renderer.render();
-
-    updateVolumePagination();
-}
-
-if (!Renderer._storagePatched) {
-    Renderer.render = function () {
-        const container = document.getElementById('volumeGames');
-        if (!container) return;
-
-        if (AppState.filteredMatches.length === 0) {
-            container.innerHTML = `<div class="section-state"><p>Nenhum jogo encontrado.</p></div>`;
-            return;
-        }
-
-        container.innerHTML = '<div class="matches-grid" id="grid"></div>';
-        const grid = document.getElementById('grid');
-        AppState.filteredMatches.forEach(match => grid.appendChild(CardManager.create(match)));
-
-        document.dispatchEvent(new CustomEvent('matchesRendered'));
-    };
-    Renderer._storagePatched = true;
-}
-
-// ─── Card de jogo
-const _origCardCreate = CardManager.create.bind(CardManager);
-CardManager.create = function (match) {
-    const card = _origCardCreate(match);
-
-    const compInfo = card.querySelector('.competition-info');
-    if (compInfo) {
-        const phaseEl = compInfo.querySelector('.match-phase');
-        const dateDisplay = Utils.formatMatchDate(vm.date(match));
-        const competitionEl = compInfo.querySelector('.match-competition');
-        compInfo.innerHTML = `
-            ${competitionEl ? competitionEl.outerHTML : ''}
-            <div class="match-phase-date-row">
-                <span class="match-phase">${phaseEl ? phaseEl.textContent : ''}</span>
-                <span class="match-date-inline">${dateDisplay}</span>
-            </div>
-        `;
-    }
-
-    const teamsEl = card.querySelector('.match-teams');
-    if (teamsEl) {
-        const { homeGoals, homeWinner, awayGoals, awayWinner } =
-            Utils.parseWinner(match.home_team?.goals ?? match['Gols mandante'], match.away_team?.goals ?? match['Gols visitante']);
-
-        const scoreCenter = document.createElement('div');
-        scoreCenter.className = 'match-score-center';
-        scoreCenter.innerHTML = `
-            <span class="score-val ${homeWinner ? 'winner' : awayWinner ? 'loser' : ''}">${homeGoals !== '' ? homeGoals : '-'}</span>
-            <span class="score-sep">x</span>
-            <span class="score-val ${awayWinner ? 'winner' : homeWinner ? 'loser' : ''}">${awayGoals !== '' ? awayGoals : '-'}</span>
-        `;
-
-        const teams = teamsEl.querySelectorAll('.team');
-        if (teams.length === 2) teamsEl.insertBefore(scoreCenter, teams[1]);
-    }
-
-    return card;
-};
-
-function updateVolumePagination() {
-    const { currentPage, totalPages } = StorageState;
-    document.getElementById('volPageNum').textContent   = currentPage;
-    document.getElementById('volPageTotal').textContent = totalPages;
-    document.getElementById('volFirstPage').disabled = currentPage === 1;
-    document.getElementById('volPrevPage').disabled  = currentPage === 1;
-    document.getElementById('volNextPage').disabled  = currentPage === totalPages;
-    document.getElementById('volLastPage').disabled  = currentPage === totalPages;
-}
-
-// ─── Eventos ─────────────────────────────────────
-function bindOverviewEvents() {}
-
-function bindDetailEvents() {
-    document.getElementById('backToOverview').addEventListener('click', () => {
-        document.getElementById('storageDetail').style.display   = 'none';
-        document.getElementById('storageOverview').style.display = 'block';
-        StorageState.currentVolume = null;
+    document.getElementById('sdSort').addEventListener('change', e => { StorageState.sort = e.target.value; renderList(); });
+    let t;
+    document.getElementById('sdSearch').addEventListener('input', e => {
+        clearTimeout(t); t = setTimeout(() => { StorageState.query = e.target.value; renderList(); }, 150);
     });
-
-    document.getElementById('volFirstPage').addEventListener('click', () => { StorageState.currentPage = 1; applyFiltersAndRender(); });
-    document.getElementById('volPrevPage').addEventListener('click',  () => { if (StorageState.currentPage > 1) { StorageState.currentPage--; applyFiltersAndRender(); } });
-    document.getElementById('volNextPage').addEventListener('click',  () => { if (StorageState.currentPage < StorageState.totalPages) { StorageState.currentPage++; applyFiltersAndRender(); } });
-    document.getElementById('volLastPage').addEventListener('click',  () => { StorageState.currentPage = StorageState.totalPages; applyFiltersAndRender(); });
-
-    let searchTimer;
-    document.getElementById('volumeSearch').addEventListener('input', e => {
-        clearTimeout(searchTimer);
-        searchTimer = setTimeout(() => {
-            StorageState.searchQuery = e.target.value;
-            StorageState.currentPage = 1;
-            applyFiltersAndRender();
-        }, 300);
-    });
-
-    document.getElementById('storageQuickFilters').addEventListener('click', e => {
-        const btn = e.target.closest('.view-btn');
-        if (!btn) return;
-        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        StorageState.activeQualFilter = btn.dataset.filter;
-        StorageState.currentPage = 1;
-        applyFiltersAndRender();
-    });
-}
-
-// ─── Helpers ─────────────────────────────────────
-function parseSizeGB(str) {
-    if (!str) return 0;
-    const n = parseFloat(String(str).replace(',', '.'));
-    if (isNaN(n)) return 0;
-    if (/tb/i.test(str)) return n * 1024;
-    if (/mb/i.test(str)) return n / 1024;
-    return n;
-}
-
-function estimateTotalCapacity(usedGB) {
-    const tbs = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32];
-    const usedTB = usedGB / 1024;
-    for (const t of tbs) { if (usedTB <= t * 0.98) return t * 1024; }
-    return usedGB * 1.15;
-}
-
-function formatGB(gb) {
-    if (gb === null || gb === undefined || isNaN(gb)) return '—';
-    if (gb >= 1024) return `${(gb / 1024).toFixed(1)} TB`;
-    return `${gb.toFixed(1)} GB`;
-}
-
-function formatHours(minutes) {
-    const h = Math.round(minutes / 60);
-    return h >= 1000 ? `${(h / 1000).toFixed(1)}k h` : `${h}h`;
-}
-
-function parseDuration(str) {
-    if (!str) return 0;
-    const parts = str.split(':').map(Number);
-    if (parts.length === 3) return parts[0] * 60 + parts[1] + parts[2] / 60;
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    return 0;
-}
-
-function topQuality(matches) {
-    const count = {};
-    matches.forEach(m => { const k = vm.quality(m) || '—'; count[k] = (count[k] || 0) + 1; });
-    return Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
-}
+});
