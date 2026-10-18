@@ -89,6 +89,10 @@ const RequestModule = (() => {
             document.getElementById('om-overlay')?.classList.remove('om-visible');
         },
 
+        // Páginas de detalhe (match.html): botão "Adicionar ao pedido" no container informado.
+        // match precisa ter id e sport (ou ser reconhecível por Utils.getItemSport).
+        attachDetailButton(match, host) { _injectModalButton(match, host); },
+
         getCart()  { return [...cart]; },
         init()     { _init(); },
 
@@ -569,8 +573,9 @@ const RequestModule = (() => {
         });
     }
 
-    function _injectModalButton(match) {
-        const scoreEl = document.getElementById('modalScore');
+    // host: elemento que recebe a linha de botões (#modalScore no modal; o hero nas páginas de detalhe)
+    function _injectModalButton(match, host) {
+        const scoreEl = host || document.getElementById('modalScore');
         if (!scoreEl) return;
 
         const sport = _sportOf(match);
@@ -627,32 +632,15 @@ const RequestModule = (() => {
         });
     }
 
+    // Modal único: injeta o botão de pedido depois que o adaptador da categoria montou o conteúdo
     function _patchModal() {
         if (typeof MatchModal !== 'undefined' && !MatchModal._rmPatched) {
             const origShow = MatchModal.show.bind(MatchModal);
-            MatchModal.show = function (match) {
-                origShow(match);
-                _injectModalButton(match);
+            MatchModal.show = function (item, sportOverride) {
+                origShow(item, sportOverride);
+                _injectModalButton(item);
             };
             MatchModal._rmPatched = true;
-        }
-
-        if (typeof MotorModal !== 'undefined' && !MotorModal._rmPatched) {
-            const origShow = MotorModal.show.bind(MotorModal);
-            MotorModal.show = function (event) {
-                origShow(event);
-                _injectModalButton(event);
-            };
-            MotorModal._rmPatched = true;
-        }
-
-        if (typeof CarnavalModal !== 'undefined' && !CarnavalModal._rmPatched) {
-            const origShow = CarnavalModal.show.bind(CarnavalModal);
-            CarnavalModal.show = function (event) {
-                origShow(event);
-                _injectModalButton(event);
-            };
-            CarnavalModal._rmPatched = true;
         }
     }
 

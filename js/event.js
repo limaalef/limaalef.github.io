@@ -47,14 +47,8 @@ const MatchPage = {
             <div class="modal-body" id="modalBody"></div>
         `;
 
-        // Chama o show() existente — ele popula modalTitle, modalScore e modalBody
-        if (sport === 'motor') {
-            MotorModal.show(match);
-        } else if (sport === 'carnaval') {
-            CarnavalModal.show(match);
-        } else {
-            MatchModal.show(match);
-        }
+        // Chama o show() único — o adaptador da categoria monta modalTitle, modalScore e modalBody
+        MatchModal.show(match, sport);
 
         document.body.style.overflow = '';
         // O show() adiciona .active ao #modal (que não existe aqui), ignora silenciosamente

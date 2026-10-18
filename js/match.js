@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
         attachEditButton(id, sport);
+
+        // Botão "Adicionar ao pedido" (módulo de pedidos, request.js) — mesmo item e id usados no modal
+        attachRequestButton({ ...data, id: data.id ?? id, sport }, sport);
     } catch (err) {
         console.error('Erro ao carregar partida:', err);
         showError();
@@ -38,6 +41,22 @@ function attachEditButton(id, sport) {
     link.textContent = 'Editar dados';
     link.setAttribute('aria-label', 'Editar os dados desta partida');
     header.appendChild(link);
+}
+
+// ─── Botão de pedido (carrinho) ──────────────────
+function attachRequestButton(item) {
+    const overlay = document.querySelector('#meHero .score-overlay');
+    if (!overlay || !window.RequestModule) return;
+    let row = overlay.querySelector('.score-header-buttons');
+    if (!row) {
+        row = document.createElement('div');
+        row.className = 'score-header-buttons';
+        overlay.appendChild(row);
+    }
+    // a linha de botões fica logo abaixo do placar, antes da linha de data/local
+    const dateRow = overlay.querySelector('.score-date-row');
+    if (dateRow) overlay.insertBefore(row, dateRow);
+    RequestModule.attachDetailButton(item, overlay);
 }
 
 // ─── Render principal ────────────────────────────

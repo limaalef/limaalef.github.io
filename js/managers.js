@@ -402,6 +402,320 @@ const SourcePicker = {
     }
 };
 
+// ══════════════════════════════════════════════════════════════════
+//  MODAL ÚNICO
+//  Um só modal (MatchModal.show) para todos os tipos de conteúdo, na mesma
+//  linha dos cards: cada categoria tem um ADAPTADOR que converte o item da
+//  API num view-model comum; o modal só conhece o view-model.
+//
+//  View-model:
+//    { sport, variant, title: { competition, phase },
+//      header: { type: 'teams' | 'show' | 'period', ... },
+//      body:   { type: 'sections', imageItem, sections[], notes }
+//            | { type: 'accordion', events[] } }
+//    section = { title, html, boxClass? }
+//
+//  Novo tipo de conteúdo: adicionar um adaptador em ModalAdapters (e um
+//  cabeçalho/corpo em ModalHeaders/ModalBodies, se for diferente).
+//  O modal usa os mesmos IDs (#modalTitle, #modalScore, #modalBody) em
+//  index/collection (modal) e event.html (página).
+// ══════════════════════════════════════════════════════════════════
+const ModalAdapters = {
+    // Football e Multisport
+    match(item, sport) {
+        const status = Utils.getMatchStatus(item);
+        const tvInfo = Elements.renderTvInfo(item, false, false);
+        const rowsMatchInfo = [
+            { label: 'date', value: Utils.formatDateTime(item.utcDate), svg: '<svg viewBox="0 0 12 15" fill="currentcolor" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg"><path d="M11.882 3.187a.476.476 0 0 1 .475.475v11.063a.476.476 0 0 1-.475.475H1.118a.476.476 0 0 1-.475-.475V3.662a.476.476 0 0 1 .475-.475h1.328v.721a1.425 1.425 0 0 0 2.85 0v-.72H7.71v.72a1.425 1.425 0 0 0 2.85 0v-.72zm-.634 3.37H1.752v7.535h9.496zm-7.384.821H2.621V8.67h1.243zm0 2.292H2.621v1.292h1.243zm0 2.292H2.621v1.291h1.243zm.561-8.054V2.475a.554.554 0 1 0-1.108 0v1.433a.554.554 0 1 0 1.108 0zm1.613 3.47H4.794V8.67h1.244zm0 2.292H4.794v1.292h1.244zm0 2.292H4.794v1.291h1.244zm2.174-4.584H6.968V8.67h1.244zm0 2.292H6.968v1.292h1.244zm0 2.292H6.968v1.291h1.244zm1.477-8.054V2.475a.554.554 0 0 0-1.108 0v1.433a.554.554 0 0 0 1.108 0zm.696 3.47H9.142V8.67h1.243zm0 2.292H9.142v1.292h1.243zm0 2.292H9.142v1.291h1.243z"/></svg>' },
+            { label: 'city', value: item.venue?.city, svg: `<svg fill="currentColor"version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="00 0 315 315" xml:space="preserve"><g>
+<path d="M290.012,95.991c-3.629,7.01-7.824,14.115-12.246,21.031l-1.756,2.72c-3.723,5.708-7.569,11.257-11.343,16.485 c14.51,8.949,22.596,19.327,22.596,29.444c0,12.723-12.775,25.861-35.051,36.046c-7.314,3.344-15.367,6.236-23.97,8.676 c1.678-11.29,2.717-23.054,3.084-35.087c-0.849,0.231-1.727,0.365-2.625,0.365c-2.895,0-5.648-1.255-7.547-3.44 c-1.376-1.583-4.934-5.721-9.724-11.623c0.028,1.684,0.054,3.369,0.054,5.063c0,17.288-1.48,34.029-4.283,49.556 c-15.526,2.802-32.267,4.283-49.554,4.283c-17.29,0-34.032-1.48-49.561-4.283c-2.802-15.527-4.282-32.268-4.282-49.556 s1.48-34.029,4.282-49.556c15.528-2.802,32.271-4.283,49.561-4.283c6.46,0,12.843,0.207,19.115,0.612 c-4.195-6.804-8.103-13.727-11.412-20.507c-2.558-0.063-5.123-0.105-7.703-0.105c-15.396,0-30.438,1.12-44.727,3.243 c2.439-8.604,5.332-16.657,8.676-23.971c10.185-22.274,23.323-35.05,36.046-35.051c0.001,0,0.002,0,0.003,0 c0.245,0,0.491,0.014,0.737,0.023c2.158-7.064,5.347-13.683,9.401-19.672c-3.351-0.225-6.729-0.351-10.137-0.351 c-0.001,0-0.001,0-0.002,0h-0.001c-0.001,0-0.002,0-0.003,0C75.143,16.056,8.026,83.173,8.026,165.671 c0,82.498,67.116,149.615,149.615,149.618c0.001,0,0.002,0,0.003,0h0.001c0.001,0,0.001,0,0.002,0 c82.498,0,149.615-67.118,149.615-149.618C307.263,140.525,301.017,116.813,290.012,95.991z M114.175,43.561 c-3.869,5.612-7.476,12.028-10.768,19.227C98.425,73.686,94.34,85.98,91.2,99.229c-13.247,3.14-25.541,7.224-36.439,12.206 c-7.199,3.292-13.617,6.899-19.229,10.769C48.586,85.644,77.615,56.615,114.175,43.561z M63.078,129.624 c7.314-3.344,15.366-6.235,23.969-8.675c-2.123,14.287-3.242,29.327-3.242,44.722c0,15.395,1.119,30.434,3.242,44.721 c-8.603-2.439-16.655-5.331-23.968-8.675c-22.276-10.186-35.052-23.324-35.052-36.046 C28.026,152.948,40.802,139.809,63.078,129.624z M35.532,209.137c5.612,3.869,12.03,7.477,19.229,10.769 c10.897,4.982,23.191,9.067,36.439,12.207c3.14,13.248,7.225,25.543,12.207,36.441c3.292,7.199,6.899,13.615,10.768,19.227 C77.615,274.727,48.585,245.697,35.532,209.137z M157.645,295.289c-0.001,0-0.002,0-0.003,0 c-12.723-0.001-25.861-12.777-36.046-35.051c-3.344-7.314-6.236-15.367-8.676-23.971c14.289,2.123,29.33,3.243,44.727,3.243 c15.394,0,30.433-1.119,44.719-3.242c-2.439,8.604-5.332,16.656-8.676,23.97C183.506,282.513,170.367,295.289,157.645,295.289z M201.11,287.784c3.869-5.612,7.478-12.03,10.77-19.23c4.983-10.898,9.068-23.192,12.208-36.441 c13.248-3.139,25.543-7.225,36.441-12.207c7.199-3.292,13.616-6.899,19.228-10.769C266.703,245.7,237.672,274.731,201.11,287.784z"/>
+<path d="M229.034,154.702c0.898,0,1.749-0.402,2.319-1.097c9.218-11.23,55.2-68.64,55.2-96.088C286.553,25.802,260.75,0,229.035,0 c-31.715,0-57.517,25.802-57.517,57.517c0,27.459,45.98,84.861,55.197,96.088C227.285,154.3,228.136,154.702,229.034,154.702z M198.035,54.169c0-17.093,13.907-31,31-31c17.093,0,31,13.907,31,31s-13.907,31-31,31 C211.942,85.169,198.035,71.263,198.035,54.169z"/></g></svg>`
+            },
+            { label: 'type', value: LanguageManager.translateText(item.type) },
+        ];
+        return {
+            sport,
+            variant: '',
+            title: {
+                competition: LanguageManager.translateText(item.competition.name),
+                phase: LanguageManager.translateText(item.competition.phase)
+            },
+            header: {
+                type: 'teams',
+                home: item.home_team,
+                away: item.away_team,
+                homeGoals: Utils.parseGoals(item.score.fullTime?.home),
+                awayGoals: Utils.parseGoals(item.score.fullTime?.away),
+                pending: status === 'pending',
+                watchHref: item.media?.embed_video ? `watch.html?id=${item.id}` : '',
+                statsHref: item.media?.has_stats ? `match.html?id=${item.id}&sport=${sport}` : ''
+            },
+            body: {
+                type: 'sections',
+                imageItem: item,
+                sections: [
+                    { title: LanguageManager.t('matchInfo'),     html: Elements.setDetailList(rowsMatchInfo) },
+                    { title: LanguageManager.t('tvInfo'),        html: tvInfo },
+                    { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(item) },
+                    { title: LanguageManager.t('refereeInfo'),   html: Elements.renderRefereeInfo(item) },
+                    { title: LanguageManager.t('attRevInfo'),    html: Elements.renderAttRev(item) },
+                    { title: LanguageManager.t('storageInfo'),   html: Elements.setStorageBadges(item.technical_details), boxClass: 'storage-badges' }
+                ],
+                notes: item.additional_info
+            }
+        };
+    },
+
+    // Motorsport: item = etapa com vários eventos (acordeão)
+    motor(item, sport) {
+        const startDate = Utils.formatMatchDate(item.start_date);
+        const endDate = Utils.formatMatchDate(item.end_date);
+        const period = [startDate, endDate].filter(d => !Utils.isBlank(d)).filter((d, i, arr) => arr.indexOf(d) === i).join(' - ');
+        return {
+            sport,
+            variant: 'motor-division',
+            title: {
+                competition: LanguageManager.translateText(item.competition?.name),
+                phase: LanguageManager.translateText(item.competition?.phase)
+            },
+            header: { type: 'period', text: period },
+            body: {
+                type: 'accordion',
+                events: (item.events || []).map(evt => ({
+                    title: LanguageManager.translateText(evt.event_type) || 'Evento',
+                    date: Utils.formatMatchDate(evt.utcDate),
+                    images: evt.media?.image,
+                    sections: [
+                        { title: LanguageManager.t('eventInfo'),     html: Elements.renderTvInfo(evt, false, false) },
+                        { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(evt) },
+                        { title: LanguageManager.t('storageInfo'),   html: Elements.setStorageBadges(evt.technical_details), boxClass: 'storage-badges' }
+                    ],
+                    notes: evt.additional_info
+                }))
+            }
+        };
+    },
+
+    // Carnaval. Formato ATUAL: date, embed_video, championship{division,city,venue},
+    // samba_school{...}, station{}. O backend vai migrar para um formato parecido com o dos
+    // outros esportes; cada campo lê o novo primeiro e cai no atual (mesmas suposições do card).
+    carnaval(item, sport) {
+        const school = item.samba_school || item.school || {};
+        const champ = item.championship || {};
+        const comp = item.competition || {};
+        const sources = Array.isArray(item.sources) ? item.sources : null;
+        const station = item.station || sources?.[0]?.station || {};
+        const tech = item.technical_details || {};
+        const result = school.result || {};
+        const dateStr = item.utcDate ?? item.date;
+        const city = LanguageManager.translateText(comp.city ?? champ.city);
+        const division = LanguageManager.translateText(comp.phase ?? champ.division);
+        const placeText = LanguageManager.t('place');
+        const pointsText = LanguageManager.t('points');
+
+        const info = Elements.setDetailList([
+            { label: 'date',         value: Utils.formatMatchDate(dateStr) },
+            { label: 'city',         value: city },
+            { label: 'division',     value: division },
+            { label: 'plot',         value: school.plot },
+            { label: 'carnavalesco', value: school.carnavalesco },
+            { label: 'interpreter',  value: school.interpreter },
+            { label: 'venue',        value: comp.venue ?? champ.venue },
+            { label: 'type',         value: LanguageManager.translateText(item.type) },
+        ]);
+        const tvInfo = Elements.setDetailList([
+            { label: 'broadcaster', value: station.name },
+            { label: 'origin',      value: LanguageManager.translateText(station.origem ?? station.source_type) },
+            { label: 'narration',   value: station.narracao ?? station.commentary },
+        ]);
+        const competitionInfo = Elements.setDetailList([
+            { label: 'finalPos',   value: result.final_position ? LanguageManager.translateOrdinary(result.final_position, 'fem') + ' ' + placeText : '' },
+            { label: 'finalScore', value: result.total ? result.total + ' ' + pointsText : '' },
+        ]);
+        const judgments = Elements.renderJudgmentItems(result.category || []);
+        const techGrid = Elements.setDetailGrid([
+            { label: 'ID',          value: item.id },
+            { label: 'quality',     value: tech.video_quality },
+            { label: 'audioFormat', value: LanguageManager.translateText(tech.audio_format || '2.0') },
+            { label: 'bitrate',     value: (tech.video_bitrate ? tech.video_bitrate + ' Mbps' : '') },
+            { label: 'duration',    value: tech.duration },
+            { label: 'fileSize',    value: Utils.formatSize(tech.file_size) },
+        ]);
+        return {
+            sport,
+            variant: '',
+            title: { competition: city, phase: division },
+            header: {
+                type: 'show',
+                school,
+                pending: Utils.getEventStatus(dateStr) === 'pending',
+                watchHref: (item.has_embed_video ?? item.embed_video) ? `watch.html?id=${item.id}` : ''
+            },
+            body: {
+                type: 'sections',
+                imageItem: item,
+                sections: [
+                    { title: LanguageManager.t('carnavalInfo'),     html: info },
+                    { title: LanguageManager.t('competitionInfo'),  html: competitionInfo + (judgments || '') },
+                    { title: LanguageManager.t('tvInfo'),           html: tvInfo },
+                    { title: LanguageManager.t('technicalInfo'),    html: techGrid, boxClass: 'detail-grid technical' },
+                    { title: LanguageManager.t('storageInfo'),      html: Elements.setStorageBadges(tech), boxClass: 'storage-badges' }
+                ],
+                notes: item.additional_info
+            }
+        };
+    }
+};
+
+// Cabeçalho do modal (#modalScore) por tipo de conteúdo
+const ModalHeaders = {
+    _watchButton(href) {
+        return href ? `
+            <div class="score-button-container">
+                <a href="${href}" class="score-button watch-match-button">
+                    <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
+                </a>
+            </div>` : '';
+    },
+
+    teams(vm) {
+        const h = vm.header;
+        const pendingText = LanguageManager.t('pendingMatch');
+        const name = t => LanguageManager.t(t.name);
+        const logo = (t, cls) => t.logo ? `<img src="${t.logo}" alt="${name(t)}" class="${cls}" onerror="this.style.display='none'">` : '';
+        const statsButton = h.statsHref ? `
+            <div class="score-button-container">
+                <a href="${h.statsHref}" class="score-button see-stats-button">
+                    <span>${LanguageManager.t('seeStats') || 'Veja estatísticas'}</span>
+                </a>
+            </div>` : '';
+        const row = (t, goals) => `
+                <div class="score-mobile-row">
+                    <div class="score-mobile-team">
+                        ${logo(t, 'score-mobile-logo')}
+                        <span class="score-team-name">${name(t)}</span>
+                    </div>
+                    <span class="score-mobile-value">${goals}</span>
+                </div>`;
+        return `
+            <div class="score-desktop">
+                <span class="score-team-name">${name(h.home)}</span>
+                ${logo(h.home, 'score-team-logo')}
+                <span class="score-value-modal">${h.homeGoals} x ${h.awayGoals}</span>
+                ${logo(h.away, 'score-team-logo')}
+                <span class="score-team-name">${name(h.away)}</span>
+                ${h.pending ? `<span class="badge badge-warning score-status-badge">${pendingText}</span>` : ''}
+            </div>
+            <div class="score-mobile">
+                ${row(h.home, h.homeGoals)}
+                ${row(h.away, h.awayGoals)}
+                ${h.pending ? `<div class="score-mobile-status">
+                    <span class="badge badge-warning">${pendingText}</span>
+                </div>` : ''}
+            </div>
+            ${(h.statsHref || h.watchHref) ? `<div class="score-header-buttons">
+                ${statsButton}
+                ${this._watchButton(h.watchHref)}
+            </div>` : '<div class="score-header-buttons"></div>'}
+        `;
+    },
+
+    show(vm) {
+        const h = vm.header;
+        const school = h.school;
+        const schoolName = LanguageManager.t(school.name);
+        return `
+            <div>
+                <div class="score-mobile-row">
+                    <div class="score-mobile-team">
+                        ${school.logo ? `<img src="${school.logo}" alt="${schoolName}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="score-team-name">${schoolName}</span>
+                    </div>
+                </div>
+                <div class="score-mobile-row">
+                    <div class="score-mobile-team">
+                        <span class="carnaval-school-plot">${LanguageManager.t(school.plot)}</span>
+                    </div>
+                </div>
+                ${h.pending ? `<div class="score-mobile-status">
+                    <span class="badge badge-warning">${LanguageManager.t('pendingMatch')}</span>
+                </div>` : ''}
+            </div>
+            ${(!h.pending && h.watchHref) ? `<div class="score-header-buttons">
+                ${this._watchButton(h.watchHref)}
+            </div>` : ''}
+        `;
+    },
+
+    period(vm) {
+        const text = vm.header.text;
+        return `${text ? `<div style="text-align: center; font-weight: 600;">${text}</div>` : ''}<div class="score-header-buttons"></div>`;
+    }
+};
+
+// Corpo do modal (#modalBody) por tipo de conteúdo. Devolve { html, carousels }.
+const ModalBodies = {
+    _notes(text) {
+        return text ? `
+            <div class="detail-section">
+                <div class="section-title modal-style">${LanguageManager.t('observations')}</div>
+                <div class="detail-item" style="grid-column: 1/-1;">
+                    <div class="detail-value">${text}</div>
+                </div>
+            </div>` : '';
+    },
+
+    _sections(list) {
+        return list.map(s => Elements.section(s.title, s.html, s.boxClass)).join('\n');
+    },
+
+    sections(vm) {
+        const b = vm.body;
+        const { html, images, carouselId } = Elements.renderImages(b.imageItem, "matches_image/", null);
+        return {
+            html: `
+            ${html}
+
+            <div class="modal-division">
+            ${this._sections(b.sections)}
+            ${this._notes(b.notes)}
+            </div>
+        `,
+            carousels: (Array.isArray(images) && images.length > 1) ? [{ id: carouselId, images }] : []
+        };
+    },
+
+    // Motorsport: um item do acordeão por evento da etapa
+    accordion(vm) {
+        const carousels = [];
+        const html = vm.body.events.map((evt, index) => {
+            let imageHtml = '';
+            if (evt.images) {
+                const cid = `carousel-motor-${index}-${Date.now()}`;
+                if (Array.isArray(evt.images) && evt.images.length > 1) carousels.push({ id: cid, images: evt.images });
+                imageHtml = ImageCarousel.renderHTML(CONFIG.IMAGE_CONTENT_URL + evt.images, cid);
+            }
+            return `
+                <div class="motor-event-accordion">
+                    <div class="motor-event-header" onclick="MatchModal.toggleEvent(${index})">
+                        <div class="motor-event-header-content">
+                            <span class="motor-event-title">${evt.title}</span>
+                            <span class="motor-event-date">${evt.date}</span>
+                        </div>
+                        <span class="motor-event-icon" id="icon-${index}">▼</span>
+                    </div>
+                    <div class="motor-event-content" id="content-${index}" style="display: none;">
+                        ${imageHtml}
+                        ${this._sections(evt.sections)}
+                        ${this._notes(evt.notes)}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        return { html, carousels };
+    }
+};
+
 // REVISADO
 const MatchModal = {
     // O #modal é reutilizado por futebol, motorsport e carnaval: limpa o que um deles
@@ -410,9 +724,10 @@ const MatchModal = {
         document.getElementById('modalBody')?.classList.remove('motor-division');
     },
 
-    show(match) {
+    // Mostra qualquer tipo de conteúdo: o adaptador da categoria monta o view-model.
+    // sportOverride: para páginas que já sabem a categoria (event.html).
+    show(item, sportOverride) {
         document.body.style.overflow = 'hidden';
-
         MatchModal.resetVariant();
 
         const modal = document.getElementById('modal');
@@ -420,133 +735,34 @@ const MatchModal = {
         const score = document.getElementById('modalScore');
         const body = document.getElementById('modalBody');
         if (!title || !score || !body) return;
-        const status = Utils.getMatchStatus(match);
-        
-        const competition = LanguageManager.translateText(match.competition.name);
-        const phase = LanguageManager.translateText(match.competition.phase);
-        
+
+        const sport = sportOverride || Utils.getItemSport(item);
+        const adapter = (sport === 'motor' || sport === 'carnaval') ? ModalAdapters[sport] : ModalAdapters.match;
+        const vm = adapter.call(ModalAdapters, item, sport);
+
+        if (vm.variant) body.classList.add(vm.variant);
         title.innerHTML = `
-            <div class="section-title modal-title-competition">${competition}</div>
-            <div class="modal-title-phase">${phase}</div>
+            <div class="section-title modal-title-competition">${vm.title.competition}</div>
+            <div class="modal-title-phase">${vm.title.phase}</div>
         `;
-        
-        const homeGoals = Utils.parseGoals(match.score.fullTime?.home);
-        const awayGoals = Utils.parseGoals(match.score.fullTime?.away);
-        const pendingText = LanguageManager.t('pendingMatch');
-        const embed = match.media?.embed_video;
-        
-        // HTML do vídeo embed (se existir)
-        const videoId = match.id
-        const videoHtml = embed ? `
-            <div class="score-button-container">
-                <a href="watch.html?id=${videoId}" class="score-button watch-match-button">
-                    <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
-                </a>
-            </div>
-        ` : '';
+        score.innerHTML = ModalHeaders[vm.header.type](vm);
 
-        // HTML das estatistucas (se existir)
-        const statsHTML = match.media?.has_stats ? `
-            <div class="score-button-container">
-                <a href="match.html?id=${videoId}&sport=${Utils.getItemSport(match)}" class="score-button see-stats-button">
-                    <span>${LanguageManager.t('seeStats') || 'Veja estatísticas'}</span>
-                </a>
-            </div>
-        ` : '';
-        
-        let scoreHtml = '';
-        scoreHtml = `
-            <div class="score-desktop">
-                <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                <span class="score-value-modal">${homeGoals} x ${awayGoals}</span>
-                ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-team-logo" onerror="this.style.display='none'">` : ''}
-                <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                ${status === 'pending' ? `<span class="badge badge-warning score-status-badge">${pendingText}</span>` : ''}
-            </div>
-            <div class="score-mobile">
-                <div class="score-mobile-row">
-                    <div class="score-mobile-team">
-                        ${match.home_team.logo ? `<img src="${match.home_team.logo}" alt="${LanguageManager.t(match.home_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                        <span class="score-team-name">${LanguageManager.t(match.home_team.name)}</span>
-                    </div>
-                    <span class="score-mobile-value">${homeGoals}</span>
-                </div>
-                <div class="score-mobile-row">
-                    <div class="score-mobile-team">
-                        ${match.away_team.logo ? `<img src="${match.away_team.logo}" alt="${LanguageManager.t(match.away_team.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                        <span class="score-team-name">${LanguageManager.t(match.away_team.name)}</span>
-                    </div>
-                    <span class="score-mobile-value">${awayGoals}</span>
-                </div>
-                ${status === 'pending' ? `<div class="score-mobile-status">
-                    <span class="badge badge-warning">${pendingText}</span>
-                </div>` : ''}
-            </div>
-            <div class="score-header-buttons">
-            ${(match.media?.has_stats || embed) ? `
-                ${statsHTML}
-                ${videoHtml}
-            </div>` : ''}
-        `;
-        
-        score.innerHTML = scoreHtml;
-        
-        const rows_match_info = [
-            { label: 'date', value: Utils.formatDateTime(match.utcDate), svg: '<svg viewBox="0 0 12 15" fill="currentcolor" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg"><path d="M11.882 3.187a.476.476 0 0 1 .475.475v11.063a.476.476 0 0 1-.475.475H1.118a.476.476 0 0 1-.475-.475V3.662a.476.476 0 0 1 .475-.475h1.328v.721a1.425 1.425 0 0 0 2.85 0v-.72H7.71v.72a1.425 1.425 0 0 0 2.85 0v-.72zm-.634 3.37H1.752v7.535h9.496zm-7.384.821H2.621V8.67h1.243zm0 2.292H2.621v1.292h1.243zm0 2.292H2.621v1.291h1.243zm.561-8.054V2.475a.554.554 0 1 0-1.108 0v1.433a.554.554 0 1 0 1.108 0zm1.613 3.47H4.794V8.67h1.244zm0 2.292H4.794v1.292h1.244zm0 2.292H4.794v1.291h1.244zm2.174-4.584H6.968V8.67h1.244zm0 2.292H6.968v1.292h1.244zm0 2.292H6.968v1.291h1.244zm1.477-8.054V2.475a.554.554 0 0 0-1.108 0v1.433a.554.554 0 0 0 1.108 0zm.696 3.47H9.142V8.67h1.243zm0 2.292H9.142v1.292h1.243zm0 2.292H9.142v1.291h1.243z"/></svg>' },
-            { label: 'city', value: match.venue?.city, svg: `<svg fill="currentColor"version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="00 0 315 315" xml:space="preserve"><g>
-<path d="M290.012,95.991c-3.629,7.01-7.824,14.115-12.246,21.031l-1.756,2.72c-3.723,5.708-7.569,11.257-11.343,16.485 c14.51,8.949,22.596,19.327,22.596,29.444c0,12.723-12.775,25.861-35.051,36.046c-7.314,3.344-15.367,6.236-23.97,8.676 c1.678-11.29,2.717-23.054,3.084-35.087c-0.849,0.231-1.727,0.365-2.625,0.365c-2.895,0-5.648-1.255-7.547-3.44 c-1.376-1.583-4.934-5.721-9.724-11.623c0.028,1.684,0.054,3.369,0.054,5.063c0,17.288-1.48,34.029-4.283,49.556 c-15.526,2.802-32.267,4.283-49.554,4.283c-17.29,0-34.032-1.48-49.561-4.283c-2.802-15.527-4.282-32.268-4.282-49.556 s1.48-34.029,4.282-49.556c15.528-2.802,32.271-4.283,49.561-4.283c6.46,0,12.843,0.207,19.115,0.612 c-4.195-6.804-8.103-13.727-11.412-20.507c-2.558-0.063-5.123-0.105-7.703-0.105c-15.396,0-30.438,1.12-44.727,3.243 c2.439-8.604,5.332-16.657,8.676-23.971c10.185-22.274,23.323-35.05,36.046-35.051c0.001,0,0.002,0,0.003,0 c0.245,0,0.491,0.014,0.737,0.023c2.158-7.064,5.347-13.683,9.401-19.672c-3.351-0.225-6.729-0.351-10.137-0.351 c-0.001,0-0.001,0-0.002,0h-0.001c-0.001,0-0.002,0-0.003,0C75.143,16.056,8.026,83.173,8.026,165.671 c0,82.498,67.116,149.615,149.615,149.618c0.001,0,0.002,0,0.003,0h0.001c0.001,0,0.001,0,0.002,0 c82.498,0,149.615-67.118,149.615-149.618C307.263,140.525,301.017,116.813,290.012,95.991z M114.175,43.561 c-3.869,5.612-7.476,12.028-10.768,19.227C98.425,73.686,94.34,85.98,91.2,99.229c-13.247,3.14-25.541,7.224-36.439,12.206 c-7.199,3.292-13.617,6.899-19.229,10.769C48.586,85.644,77.615,56.615,114.175,43.561z M63.078,129.624 c7.314-3.344,15.366-6.235,23.969-8.675c-2.123,14.287-3.242,29.327-3.242,44.722c0,15.395,1.119,30.434,3.242,44.721 c-8.603-2.439-16.655-5.331-23.968-8.675c-22.276-10.186-35.052-23.324-35.052-36.046 C28.026,152.948,40.802,139.809,63.078,129.624z M35.532,209.137c5.612,3.869,12.03,7.477,19.229,10.769 c10.897,4.982,23.191,9.067,36.439,12.207c3.14,13.248,7.225,25.543,12.207,36.441c3.292,7.199,6.899,13.615,10.768,19.227 C77.615,274.727,48.585,245.697,35.532,209.137z M157.645,295.289c-0.001,0-0.002,0-0.003,0 c-12.723-0.001-25.861-12.777-36.046-35.051c-3.344-7.314-6.236-15.367-8.676-23.971c14.289,2.123,29.33,3.243,44.727,3.243 c15.394,0,30.433-1.119,44.719-3.242c-2.439,8.604-5.332,16.656-8.676,23.97C183.506,282.513,170.367,295.289,157.645,295.289z M201.11,287.784c3.869-5.612,7.478-12.03,10.77-19.23c4.983-10.898,9.068-23.192,12.208-36.441 c13.248-3.139,25.543-7.225,36.441-12.207c7.199-3.292,13.616-6.899,19.228-10.769C266.703,245.7,237.672,274.731,201.11,287.784z"/>
-<path d="M229.034,154.702c0.898,0,1.749-0.402,2.319-1.097c9.218-11.23,55.2-68.64,55.2-96.088C286.553,25.802,260.75,0,229.035,0 c-31.715,0-57.517,25.802-57.517,57.517c0,27.459,45.98,84.861,55.197,96.088C227.285,154.3,228.136,154.702,229.034,154.702z M198.035,54.169c0-17.093,13.907-31,31-31c17.093,0,31,13.907,31,31s-13.907,31-31,31 C211.942,85.169,198.035,71.263,198.035,54.169z"/></g></svg>`
-            },
-            { label: 'type', value: LanguageManager.translateText(match.type) },
-        ];
-        const matchInfoTitle = LanguageManager.t('matchInfo');
-        const match_info  = Elements.setDetailList(rows_match_info);
-
-        const tvInfoTitle = LanguageManager.t('tvInfo');
-        const tv_info     = Elements.renderTvInfo(match, false, false);
-
-        const technicalInfoTitle = LanguageManager.t('technicalInfo');
-        const tech_info   = Elements.renderTechInfo(match);
-
-        const refereeTitle = LanguageManager.t('refereeInfo');
-        const referee_info = Elements.renderRefereeInfo(match);
-
-        const attRevTitle = LanguageManager.t('attRevInfo');
-        const attrev_info = Elements.renderAttRev(match);
-
-        const storageTitle = LanguageManager.t('storageInfo');
-
-        const observationsTitle = LanguageManager.t('observations');
-
-        const { html, images, carouselId } = Elements.renderImages(match, "matches_image/", null);
-        body.innerHTML = `
-            ${html}
-            
-            <div class="modal-division">
-            ${Elements.section(matchInfoTitle, match_info)}
-            ${Elements.section(tvInfoTitle, tv_info)}
-            ${Elements.section(technicalInfoTitle, tech_info)}
-            ${Elements.section(refereeTitle, referee_info)}
-            ${Elements.section(attRevTitle, attrev_info)}
-            ${Elements.section(storageTitle, Elements.setStorageBadges(match.technical_details), 'storage-badges')}
-            
-            ${match.additional_info ? `
-                <div class="detail-section">
-                    <div class="section-title modal-style">${observationsTitle}</div>
-                    <div class="detail-item" style="grid-column: 1/-1;">
-                        <div class="detail-value">${match.additional_info}</div>
-                    </div>
-                </div>
-                </div>
-            ` : ''}
-        `;
-        
-        if (Array.isArray(images) && images.length > 1) {
-            ImageCarousel.init(carouselId, images);
-        }
+        const { html, carousels } = ModalBodies[vm.body.type](vm);
+        body.innerHTML = html;
+        carousels.forEach(c => ImageCarousel.init(c.id, c.images));
         modal?.classList.add('active');
     },
+
+    // Acordeão de eventos (motorsport)
+    toggleEvent(index) {
+        const content = document.getElementById(`content-${index}`);
+        const icon = document.getElementById(`icon-${index}`);
+        if (!content || !icon) return;
+        const open = content.style.display === 'none';
+        content.style.display = open ? 'block' : 'none';
+        icon.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    },
+
     // options.requestHtml: bloco HTML extra (ex.: dados coletados no pedido do usuário), exibido no topo do modal.
     async fetchAndShow(id, sport = 'football', options = {}) {
         const modal = document.getElementById('modal');
@@ -592,19 +808,10 @@ const MatchModal = {
         try {
             const apiResponse = await APIService.fetchById(id, sport);
 
-            if (sport === 'motor') {
-                const items = apiResponse.data;
-                if (!items.length) throw new Error('Item não encontrado');
-                MotorModal.show({ ...items[0], sport });
-            } else if (sport === 'carnaval') {
-                const items = APIService.transformData(apiResponse, sport);
-                if (!items.length) throw new Error('Item não encontrado');
-                CarnavalModal.show(items[0]);
-            } else {
-                const items = apiResponse.data;
-                if (!items.length) throw new Error('Item não encontrado');
-                MatchModal.show({ ...items[0], sport });
-            }
+            // Carnaval ainda passa pelo transformData (formato antigo da API)
+            const items = sport === 'carnaval' ? APIService.transformData(apiResponse, sport) : apiResponse.data;
+            if (!items.length) throw new Error('Item não encontrado');
+            MatchModal.show({ ...items[0], sport });
             if (options.requestHtml) body.insertAdjacentHTML('afterbegin', options.requestHtml);
         } catch (err) {
             title.innerHTML = '';
@@ -665,271 +872,6 @@ const MatchModal = {
     }
 };
 MatchModal._bindEscape();
-
-const CarnavalModal = {
-    show(match) {
-        document.body.style.overflow = 'hidden';
-        MatchModal.resetVariant();
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const score = document.getElementById('modalScore');
-        const body = document.getElementById('modalBody');
-        if (!title || !score || !body) return;
-        const school = match.samba_school || {};
-        const champ  = match.championship || {};
-        const station = match.station || {};
-        const tech   = match.technical_details || {};
-        const result = school.result || {};
-        const status = Utils.getEventStatus(match.date);
-        
-        const competition = LanguageManager.translateText(champ.city);
-        const phase = LanguageManager.translateText(champ.division);
-        
-        title.innerHTML = `
-            <div class="section-title modal-title-competition">${competition}</div>
-            <div class="modal-title-phase">${phase}</div>
-        `;
-
-        const embed = match.embed_video;
-        
-        // ADICIONAR: HTML do vídeo embed (se existir)
-        const videoHtml = match.embed_video ? `
-            <div class="score-button-container">
-                <a href="watch.html?id=${match.id}" class="score-button watch-match-button">
-                    <span>${LanguageManager.t('watchMatch') || 'Assistir jogo'}</span>
-                </a>
-            </div>
-        ` : '';
-        
-        let scoreHtml = '';
-        if (status === 'pending') {
-            const pendingText = LanguageManager.t('pendingMatch');
-            scoreHtml = `
-                <div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${school.logo ? `<img src="${school.logo}" alt="${LanguageManager.t(school.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(school.name)}</span>
-                        </div>
-                    </div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            <span class="carnaval-school-plot">${LanguageManager.t(school.plot)}</span>
-                        </div>
-                    </div>
-                    <div class="score-mobile-status">
-                        <span class="badge badge-warning">${pendingText}</span>
-                    </div>
-                </div>
-            `;
-        } else {
-            scoreHtml = `
-                <div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            ${school.logo ? `<img src="${school.logo}" alt="${LanguageManager.t(school.name)}" class="score-mobile-logo" onerror="this.style.display='none'">` : ''}
-                            <span class="score-team-name">${LanguageManager.t(school.name)}</span>
-                        </div>
-                    </div>
-                    <div class="score-mobile-row">
-                        <div class="score-mobile-team">
-                            <span class="carnaval-school-plot">${LanguageManager.t(school.plot)}</span>
-                        </div>
-                    </div>
-                </div>
-                ${match.embed_video ? `<div class="score-header-buttons">
-                    ${videoHtml}
-                </div>` : ''}
-            `;
-        }
-        
-        score.innerHTML = scoreHtml;
-        
-        const audioFormat = LanguageManager.translateText((tech.audio_format || '2.0'));
-
-        const carnavalInfoTitle = LanguageManager.t('carnavalInfo');
-        const competitionInfoTitle = LanguageManager.t('competitionInfo');
-        const tvInfoTitle = LanguageManager.t('tvInfo');
-        const technicalInfoTitle = LanguageManager.t('technicalInfo');
-        const storageTitle = LanguageManager.t('storageInfo');
-        const observationsTitle = LanguageManager.t('observations');
-        const videoTitle = LanguageManager.t('video') || 'Vídeo';
-        const imageTitle = LanguageManager.t('image') || 'Imagem';
-
-        const placeText = LanguageManager.t('place')
-        const pointsText = LanguageManager.t('points')
-
-        const rows_carnaval_info = [
-            { label: 'date',        value: Utils.formatMatchDate(match.date) },
-            { label: 'city',        value: competition },
-            { label: 'division',    value: phase },
-            { label: 'plot',        value: school.plot },
-            { label: 'carnavalesco',value: school.carnavalesco },
-            { label: 'interpreter', value: school.interpreter },
-            { label: 'venue',       value: champ.venue },
-            { label: 'type',        value: LanguageManager.translateText(match.type) },
-        ];
-        
-        const rows_tv_info = [
-            { label: 'broadcaster', value: station.name },
-            { label: 'origin',      value: LanguageManager.translateText(station.origem) },
-            { label: 'narration',   value: station.narracao },
-        ];
-        
-        const rows_competition_info = [
-            { label: 'finalPos',    value: result.final_position ? LanguageManager.translateOrdinary(result.final_position, 'fem') + ' ' + placeText : '' },
-            { label: 'finalScore',  value: result.total ? result.total + ' ' + pointsText : '' },
-        ];
-        
-        const rows_tech_info = [
-            { label: 'ID',          value: match.id },
-            { label: 'quality',     value: tech.video_quality },
-            { label: 'audioFormat', value: audioFormat },
-            { label: 'bitrate',     value: (tech.video_bitrate ? tech.video_bitrate + ' Mbps' : '') },
-            { label: 'duration',    value: tech.duration },
-            { label: 'fileSize',    value: Utils.formatSize(tech.file_size) },
-        ];
-
-        const carnaval_info = Elements.setDetailList(rows_carnaval_info);
-        const tv_info = Elements.setDetailList(rows_tv_info);
-        const competition_info = Elements.setDetailList(rows_competition_info);
-        const result_info = Elements.renderJudgmentItems((result.category || []))
-        const tech_info = Elements.setDetailGrid(rows_tech_info);
-
-        const { html, images, carouselId } = Elements.renderImages(match, "matches_image/", null);
-        body.innerHTML = `
-            ${html}
-            
-            <div class="modal-division">
-            ${Elements.section(carnavalInfoTitle, carnaval_info)}
-            ${Elements.section(competitionInfoTitle, competition_info + (result_info || ''))}
-            ${Elements.section(tvInfoTitle, tv_info)}
-            ${Elements.section(technicalInfoTitle, tech_info, 'detail-grid technical')}
-            ${Elements.section(storageTitle, Elements.setStorageBadges(tech), 'storage-badges')}
-            
-            ${match.additional_info ? `
-                <div class="detail-section">
-                    <div class="section-title modal-style">${observationsTitle}</div>
-                    <div class="detail-item" style="grid-column: 1/-1;">
-                        <div class="detail-value">${match.additional_info}</div>
-                    </div>
-                </div>
-                </div>
-            ` : ''}
-        `;
-        
-        if (Array.isArray(images) && images.length > 1) {
-            ImageCarousel.init(carouselId, images);
-        }
-        modal?.classList.add('active');
-    },
-    
-    async fetchAndShow(id) {
-        return MatchModal.fetchAndShow(id, 'carnaval');
-    },
-    
-    close() {
-        MatchModal.close();
-    }
-};
-
-// REVISADO
-const MotorModal = {
-    show(event) {
-        document.body.style.overflow = 'hidden';
-        MatchModal.resetVariant();
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const score = document.getElementById('modalScore');
-        const body = document.getElementById('modalBody');
-        if (!title || !score || !body) return;
-        body.classList.add('motor-division');
-        
-        const competition = LanguageManager.translateText(event.competition?.name);
-        const phase = LanguageManager.translateText(event.competition?.phase);
-        
-        title.innerHTML = `
-            <div class="section-title modal-title-competition">${competition}</div>
-            <div class="modal-title-phase">${phase}</div>
-        `;
-        
-        const startDate = Utils.formatMatchDate(event.start_date);
-        const endDate = Utils.formatMatchDate(event.end_date);
-        const dateRange = [startDate, endDate].filter(d => !Utils.isBlank(d)).filter((d, i, arr) => arr.indexOf(d) === i).join(' - ');
-        
-        score.innerHTML = `${dateRange ? `<div style="text-align: center; font-weight: 600;">${dateRange}</div>` : ''}<div class="score-header-buttons"></div>`;
-
-        const _motorCarousels = [];
-        const eventsHtml = (event.events || []).map((evt, index) => {
-            const tv_info     = Elements.renderTvInfo(evt, false, false);
-            const tech_info   = Elements.renderTechInfo(evt);
-            const videoTitle = LanguageManager.t('video') || 'Vídeo';
-              
-            return `
-                <div class="motor-event-accordion">
-                    <div class="motor-event-header" onclick="MotorModal.toggleEvent(${index})">
-                        <div class="motor-event-header-content">
-                            <span class="motor-event-title">${LanguageManager.translateText(evt.event_type) || 'Evento'}</span>
-                            <span class="motor-event-date">${Utils.formatMatchDate(evt.utcDate)}</span>
-                        </div>
-                        <span class="motor-event-icon" id="icon-${index}">▼</span>
-                    </div>
-                    <div class="motor-event-content" id="content-${index}" style="display: none;">
-                        
-                        ${(() => {
-                            if (!evt.media?.image) return '';
-                            const cid = `carousel-motor-${index}-${Date.now()}`;
-                            if (Array.isArray(evt.media?.image) && evt.media?.image.length > 1) {
-                                _motorCarousels.push({ id: cid, images: evt.media?.image });
-                            }
-                            return ImageCarousel.renderHTML(CONFIG.IMAGE_CONTENT_URL + evt.media?.image, cid);
-                        })()}
-                        
-                        ${Elements.section(LanguageManager.t('eventInfo'), tv_info)}
-                        ${Elements.section(LanguageManager.t('technicalInfo'), tech_info)}
-                        ${Elements.section(LanguageManager.t('storageInfo'), Elements.setStorageBadges(evt.technical_details), 'storage-badges')}
-                        
-                        ${evt.additional_info ? `
-                            <div class="detail-section">
-                                <div class="section-title modal-style">${LanguageManager.t('observations')}</div>
-                                    <div class="detail-item" style="grid-column: 1/-1;">
-                                        <div class="detail-value">${evt.additional_info}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        body.innerHTML = eventsHtml;
-        _motorCarousels.forEach(c => ImageCarousel.init(c.id, c.images));
-        modal?.classList.add('active');
-    },
-    
-    async fetchAndShow(id) {
-        return MatchModal.fetchAndShow(id, 'motor');
-    },
-    toggleEvent(index) {
-        const content = document.getElementById(`content-${index}`);
-        const icon = document.getElementById(`icon-${index}`);
-        
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
-            icon.textContent = '▼';
-            icon.style.transform = 'rotate(180deg)';
-        } else {
-            content.style.display = 'none';
-            icon.textContent = '▼';
-            icon.style.transform = 'rotate(0deg)';
-        }
-    },
-    
-    close() {
-        MatchModal.close();
-    }
-};
 
 // REVISADO
 const Renderer = {
