@@ -263,28 +263,7 @@
 .match-possession-row { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-mdm); }
 .match-possession-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .match-possession-row b { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.match-possession-row .usage-legend-key, .match-shots-name .usage-legend-key { flex: none; }
-
-/* Finalizações: gol (no gol e bloqueadas dentro, em vermelho) e "para fora" do lado de fora */
-.match-shots { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
-.match-shots-team { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
-.match-shots-name { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-sm); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; line-height: 1.2; }
-.match-shots-name span { min-width: 0; overflow-wrap: anywhere; }
-.match-goal {
-    display: flex; align-items: flex-end; justify-content: space-around; gap: var(--sp-3);
-    min-height: 5.5rem; padding: var(--sp-4) var(--sp-3) var(--sp-3);
-    border: var(--sp-1) solid var(--text-primary); border-bottom: 0;
-    border-radius: var(--border-radius-size-sm) var(--border-radius-size-sm) 0 0;
-    background-color: var(--bg-primary);
-    background-image: linear-gradient(var(--soft-line) 1px, transparent 1px), linear-gradient(90deg, var(--soft-line) 1px, transparent 1px);
-    background-size: var(--sp-5) var(--sp-5);
-}
-.match-goal b { display: block; font-size: var(--font-size-xl); font-weight: 700; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.match-goal small { display: block; margin-top: var(--sp-1); font-size: var(--font-size-xs); color: var(--text-muted); }
-.match-goal-on, .match-goal-blocked { text-align: center; min-width: 0; }
-.match-goal-blocked b { color: var(--error-color); }
-.match-shots-off { padding-top: var(--sp-2); border-top: 1px solid var(--soft-line); font-size: var(--font-size-sm); color: var(--text-muted); }
-.match-shots-off b { font-size: var(--font-size-md); font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.match-possession-row .usage-legend-key { flex: none; }
 
 /* Demais estatísticas */
 .match-stat-legend { margin: 0 0 var(--sp-3); }
@@ -295,7 +274,7 @@
 .match-stat-line span { flex: 1; text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); }
 .match-stat-line b { font-weight: 500; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .match-stat-line b.lead { font-weight: 700; color: var(--text-primary); }
-@media (max-width: 560px) { .match-highlight, .match-stats-card { padding: var(--sp-5); } .match-possession { gap: var(--sp-5); } .match-donut { width: 6rem; height: 6rem; } .match-shots { gap: var(--sp-4); } }
+@media (max-width: 560px) { .match-highlight, .match-stats-card { padding: var(--sp-5); } .match-possession { gap: var(--sp-5); } .match-donut { width: 6rem; height: 6rem; } }
 
 /* Observações e tags: neutras */
 .page-match .me-tag,
@@ -357,14 +336,23 @@
     .match-stage::after, .match-stage .score-overlay { transition: none; }
 }
 
-/* Bloco dedicado de finalizações: gol estilizado e trave dividida pelas cores dos times. */
+/* Finalizações: "para fora" acima do gol; o gol (traves nas cores dos times) traz "na trave" no travessão e "no gol";
+   "bloqueadas" fica abaixo. Mandante à esquerda, visitante à direita. */
 .match-shots-goal { display: grid; grid-template-columns: 1fr; gap: 0; }
-.match-shots-off, .match-shots-blocked { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); color: var(--text-muted); font-size: var(--font-size-sm); text-align: center; }
-.match-shots-off { background: var(--soft-bg-hover); border-bottom: 1px solid var(--soft-line); }
+.match-shots-off, .match-shots-blocked { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-8); color: var(--text-muted); font-size: var(--font-size-sm); text-align: center; }
+.match-shots-off { background: var(--soft-bg-hover); border-bottom: 1px solid var(--soft-line); border-radius: var(--border-radius-size-md) var(--border-radius-size-md) 0 0; }
 .match-shots-blocked { border-top: 1px solid var(--soft-line); }
 .match-shots-off b, .match-shots-blocked b { color: var(--text-primary); font-size: var(--font-size-md); font-variant-numeric: tabular-nums; }
-.match-goal-frame { position: relative; padding: var(--sp-1) var(--sp-1) 0; background: linear-gradient(90deg, var(--home-team-color) 0 50%, var(--away-team-color) 50% 100%); border-radius: var(--border-radius-size-md) var(--border-radius-size-md) 0 0; }
-.match-goal-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); min-height: 3.5rem; padding: var(--sp-3) var(--sp-4); background: var(--soft-bg); color: var(--text-primary); text-align: center; font-size: var(--font-size-sm); font-weight: 600; border-radius: var(--border-radius-size-sm) var(--border-radius-size-sm) 0 0; }
+.match-shots-off b:first-child, .match-shots-blocked b:first-child { text-align: left; }
+.match-shots-off b:last-child, .match-shots-blocked b:last-child { text-align: right; }
+/* "Na trave": o número fica sobre a trave de cada time; o rótulo, sobre o travessão */
+.match-goal-post-count { position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; min-width: 1.75rem; height: 1.75rem; padding: 0 var(--sp-2); box-sizing: border-box; border: 3px solid; border-radius: var(--border-radius-size-circle); background: var(--soft-bg); color: var(--text-primary); font-size: var(--font-size-mdm); font-weight: 700; font-variant-numeric: tabular-nums; transform: translate(-50%, -50%); }
+.match-goal-post-count--home { left: var(--sp-1); border-color: var(--home-team-color); }
+.match-goal-post-count--away { left: auto; right: var(--sp-1); transform: translate(50%, -50%); border-color: var(--away-team-color); }
+.match-goal-crossbar-label { position: absolute; top: var(--sp-1); left: 50%; z-index: 1; padding: 0 var(--sp-3); border-radius: var(--border-radius-size-circle); background: var(--bg-primary); color: var(--text-muted); font-size: var(--font-size-xs); font-weight: 600; line-height: 1.6; white-space: nowrap; transform: translate(-50%, -50%); }
+.match-goal-frame { position: relative; padding: var(--sp-2) var(--sp-2) 0; background: linear-gradient(90deg, var(--home-team-color) 0 50%, var(--away-team-color) 50% 100%); border-radius: var(--border-radius-size-md) var(--border-radius-size-md) 0 0; }
+.match-goal-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); min-height: 3.5rem; padding: var(--sp-4) var(--sp-8); background: var(--soft-bg); color: var(--text-primary); text-align: center; font-size: var(--font-size-sm); font-weight: 600; }
+.match-goal-bar { border-radius: var(--border-radius-size-sm) var(--border-radius-size-sm) 0 0; }
 .match-goal-bar b { font-size: var(--font-size-md); font-variant-numeric: tabular-nums; }
 .match-goal-bar b:first-child { text-align: left; }
 .match-goal-bar b:last-child { text-align: right; }

@@ -15,20 +15,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const data = await APIService.fetchEnrichment(id, sport);
 
-        renderMatch(data, sport);
+        pageState = { data, id, sport };
+        drawPage();
         hideLoading();
         showContent();
 
-        // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
-        attachEditButton(id, sport);
-
-        // Botão "Adicionar ao pedido" (módulo de pedidos, request.js) — mesmo item e id usados no modal
-        attachRequestButton({ ...data, id: data.id ?? id, sport }, sport);
+        // Troca de idioma: os textos são montados em JS, então a página é redesenhada
+        document.addEventListener('languagechange', () => { if (pageState) drawPage(); });
     } catch (err) {
         console.error('Erro ao carregar partida:', err);
         showError();
     }
 });
+
+// ─── Estado e desenho da página ──────────────────
+// Tudo que depende de idioma é gerado aqui; por isso o desenho pode ser repetido (troca de idioma).
+let pageState = null;
+
+function drawPage() {
+    const { data, id, sport } = pageState;
+    renderMatch(data, sport);
+
+    // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
+    attachEditButton(id, sport);
+
+    // Botão "Adicionar ao pedido" (módulo de pedidos, request.js) — mesmo item e id usados no modal
+    attachRequestButton({ ...data, id: data.id ?? id, sport }, sport);
+
+    updateDocumentTitle(data);
+}
+
+function updateDocumentTitle(match) {
+    const t = key => LanguageManager.t(key);
+    const home = t(match.home_team?.name) || '', away = t(match.away_team?.name) || '';
+    const { homeGoals, awayGoals } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
+    const score = homeGoals !== null && awayGoals !== null ? ` ${homeGoals} × ${awayGoals} ` : ' × ';
+    document.title = `${home}${score}${away} — Sports Archive`;
+}
 
 // ─── Botão de edição (admin) ─────────────────────
 // Fica na linha de ações da capa, junto de "Assistir" e "Adicionar ao pedido" (secundário).
@@ -39,8 +62,8 @@ function attachEditButton(id, sport) {
     const link = document.createElement('a');
     link.className = 'me-edit-link match-action--ghost';
     link.href = `match-edit.html?id=${encodeURIComponent(id)}&sport=${encodeURIComponent(sport)}`;
-    link.textContent = 'Editar dados';
-    link.setAttribute('aria-label', 'Editar os dados desta partida');
+    link.textContent = LanguageManager.t('editData');
+    link.setAttribute('aria-label', LanguageManager.t('editDataLabel'));
     row.appendChild(link);
 }
 
@@ -133,7 +156,7 @@ function renderAside(match) {
                 html += rows([{ label: t('inflationAdjusted'), value: money(adjusted.value, adjusted.currency) }]);
                 if (adjusted.realIncrease != null) {
                     const increase = (adjusted.realIncrease / 100).toLocaleString(lang, { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 2 });
-                    html += `<div class="match-aside-note">+${increase} nominal</div>`;
+                    html += `<div class="match-aside-note">+${increase} ${esc(t('nominalIncrease'))}</div>`;
                 }
             }
         }
@@ -209,10 +232,10 @@ function renderHero(match) {
     document.getElementById('meHero').innerHTML = `
       <div class="match-stage${hasImages ? '' : ' match-stage--no-image'}" id="matchStage">
         <div id="image-carousel"></div>
-        ${hasImages ? `<button type="button" class="match-stage-toggle" id="matchStageToggle" aria-pressed="false" aria-label="Ocultar textos e degradê da imagem">
+        ${hasImages ? `<button type="button" class="match-stage-toggle" id="matchStageToggle" aria-pressed="false" aria-label="${LanguageManager.t('hideStageTextLabel')}">
             <svg class="icon-visible" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="icon-hidden" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.5 10.5 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 4.4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-            <span id="matchStageToggleLabel">Ocultar textos</span>
+            <span id="matchStageToggleLabel">${LanguageManager.t('hideStageText')}</span>
         </button>` : ''}
         <div class="score-overlay">
             <div class="logo-title-header">
@@ -293,8 +316,8 @@ function bindStageToggle() {
     const apply = clean => {
         stage.classList.toggle('is-clean', clean);
         toggle.setAttribute('aria-pressed', String(clean));
-        toggle.setAttribute('aria-label', clean ? 'Mostrar textos e degradê da imagem' : 'Ocultar textos e degradê da imagem');
-        label.textContent = clean ? 'Mostrar textos' : 'Ocultar textos';
+        toggle.setAttribute('aria-label', LanguageManager.t(clean ? 'showStageTextLabel' : 'hideStageTextLabel'));
+        label.textContent = LanguageManager.t(clean ? 'showStageText' : 'hideStageText');
     };
 
     let saved = false;

@@ -306,16 +306,16 @@ const STATS_ORDER = [
 const Elements = {
     // Tags pré-definidas (detectadas no campo Obs)
     TAG_RULES: [
-        { pattern: /recorde|record/i,        label: 'Recorde histórico', cls: 'record'   },
-        { pattern: /hat.trick|hat trick/i,   label: 'Hat-trick',         cls: 'scorer'   },
-        { pattern: /prorrogação|aet/i,       label: 'Prorrogação',       cls: 'default'  },
-        { pattern: /pênaltis|penalties/i,    label: 'Pênaltis',          cls: 'default'  },
-        { pattern: /despedida/i,             label: 'Despedida',         cls: 'historic' },
-        { pattern: /estreia/i,               label: 'Estreia',           cls: 'historic' },
-        { pattern: /final/i,                 label: 'Final',             cls: 'record'   },
-        { pattern: /artilheiro/i,            label: 'Artilheiro',        cls: 'scorer'   },
-        { pattern: /virada/i,                label: 'Virada',            cls: 'historic' },
-        { pattern: /goleada/i,               label: 'Goleada',           cls: 'default'  },
+        { pattern: /recorde|record/i,        label: 'Recorde histórico', key: 'tagRecord', cls: 'record'   },
+        { pattern: /hat.trick|hat trick/i,   label: 'Hat-trick', key: 'tagHatTrick',         cls: 'scorer'   },
+        { pattern: /prorrogação|aet/i,       label: 'Prorrogação', key: 'tagExtraTime',       cls: 'default'  },
+        { pattern: /pênaltis|penalties/i,    label: 'Pênaltis', key: 'tagPenalties',          cls: 'default'  },
+        { pattern: /despedida/i,             label: 'Despedida', key: 'tagFarewell',         cls: 'historic' },
+        { pattern: /estreia/i,               label: 'Estreia', key: 'tagDebut',           cls: 'historic' },
+        { pattern: /final/i,                 label: 'Final', key: 'tagFinal',             cls: 'record'   },
+        { pattern: /artilheiro/i,            label: 'Artilheiro', key: 'tagTopScorer',        cls: 'scorer'   },
+        { pattern: /virada/i,                label: 'Virada', key: 'tagComeback',            cls: 'historic' },
+        { pattern: /goleada/i,               label: 'Goleada', key: 'tagRout',           cls: 'default'  },
     ],
 
     // Seção de modal: título + conteúdo. Sem conteúdo, a seção inteira não é exibida.
@@ -588,7 +588,7 @@ const Elements = {
         const tags = this.TAG_RULES.filter(r => r.pattern.test(obs));
         if (tags.length || obs) document.getElementById('meTagsSection').style.display = 'block';
         document.getElementById('meTagsList').innerHTML = tags
-            .map(t => `<span class="me-tag ${t.cls}">${t.label}</span>`).join('');
+            .map(t => `<span class="me-tag ${t.cls}">${LanguageManager.t(t.key)}</span>`).join('');
         if (obs) {
             document.getElementById('meObs').textContent = obs;
             document.getElementById('meObs').style.display = 'block';
@@ -694,7 +694,7 @@ const Elements = {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
                             }
-                        )}` + ` nominal`,
+                        )}` + ` ${LanguageManager.t('nominalIncrease')}`,
                         noNewLine: true,
                         smallColored: 'var(--success-color)',
                     }
@@ -977,6 +977,22 @@ const Elements = {
             }).join('');
     },
 
+    // Cor de time usada em gráficos sobre superfícies do tema: brancos e pretos quase puros somem em um dos temas,
+    // então são suavizados em direção ao cinza do tema (as demais cores seguem exatamente como vieram da API).
+    chartColor(color, fallback) {
+        const raw = String(color || '').trim();
+        if (!raw) return fallback;
+        let hex = raw.toLowerCase();
+        if (hex === 'white') hex = '#ffffff'; else if (hex === 'black') hex = '#000000';
+        const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(hex);
+        if (!m) return raw;
+        const h = m[1].length === 3 ? m[1].replace(/./g, c => c + c) : m[1];
+        const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
+            .map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        return luminance > 0.8 || luminance < 0.03 ? `color-mix(in srgb, ${raw} 45%, var(--text-muted))` : raw;
+    },
+
     // Estatísticas da página de partida. Mandante = accent, visitante = cinza neutro (como nas barras de uso),
     // porque as cores dos clubes (ex.: branco) nem sempre aparecem bem sobre o fundo.
     buildMatchStatistics(detail, home, away) {
@@ -984,8 +1000,8 @@ const Elements = {
         const num = (team, key) => { const v = parseFloat(team[key]?.total); return Number.isNaN(v) ? null : v; };
         const homeName = LanguageManager.t(detail.home_team?.name) || '';
         const awayName = LanguageManager.t(detail.away_team?.name) || '';
-        const homeColor = detail.home_team?.colors?.primary || 'var(--accent-color)';
-        const awayColor = detail.away_team?.colors?.primary || 'var(--text-muted)';
+        const homeColor = this.chartColor(detail.home_team?.colors?.primary, 'var(--accent-color)');
+        const awayColor = this.chartColor(detail.away_team?.colors?.primary, 'var(--text-muted)');
         const keyHome = `<i class="usage-legend-key usage-legend-key--archive" style="background-color:${homeColor}"></i>`;
         const keyAway = `<i class="usage-legend-key usage-legend-key--other" style="background-color:${awayColor}"></i>`;
         const used = new Set();
@@ -1018,28 +1034,34 @@ const Elements = {
             on: [num(home, 'goalFinish'), num(away, 'goalFinish')],
             off: [num(home, 'wrongFinish'), num(away, 'wrongFinish')],
             blocked: [num(home, 'blockedFinish'), num(away, 'blockedFinish')],
+            post: [num(home, 'ballOnThePost'), num(away, 'ballOnThePost')],
         };
-        const shotKeys = ['goalFinish', 'wrongFinish', 'blockedFinish'];
+        // "Na trave" faz parte do gol: fica na linha do travessão, acima de "No gol"
+        const hasPost = home.ballOnThePost !== undefined || away.ballOnThePost !== undefined;
+        const shotKeys = ['goalFinish', 'wrongFinish', 'blockedFinish', 'ballOnThePost'];
         const hasShots = shotKeys.some(key => home[key] !== undefined || away[key] !== undefined);
         if (hasShots) {
             shotKeys.forEach(key => used.add(key));
             const val = v => v === null ? '—' : v;
-            const shotsTitle = 'Finalizações';
+            const shotsTitle = esc(LanguageManager.t('shotsTitle'));
             highlights += `
                 <div class="match-highlight">
                     <h3 class="block-title">${shotsTitle}</h3>
                     <div class="usage-legend match-stat-legend"><span>${keyHome}${esc(homeName)}</span><span>${keyAway}${esc(awayName)}</span></div>
                     <div class="match-shots-goal">
                         <div class="match-shots-off">
-                            <b>${val(shots.off[0])}</b><span>Pra fora</span><b>${val(shots.off[1])}</b>
+                            <b>${val(shots.off[0])}</b><span>${esc(LanguageManager.t('shotOff'))}</span><b>${val(shots.off[1])}</b>
                         </div>
                         <div class="match-goal-frame" style="--home-team-color:${homeColor};--away-team-color:${awayColor}">
+                            ${hasPost ? `<span class="match-goal-crossbar-label">${esc(LanguageManager.t('ballOnThePost'))}</span>
+                            <b class="match-goal-post-count match-goal-post-count--home" aria-label="${esc(homeName)}: ${esc(LanguageManager.t('ballOnThePost'))}">${val(shots.post[0])}</b>
+                            <b class="match-goal-post-count match-goal-post-count--away" aria-label="${esc(awayName)}: ${esc(LanguageManager.t('ballOnThePost'))}">${val(shots.post[1])}</b>` : ''}
                             <div class="match-goal-bar">
-                                <b>${val(shots.on[0])}</b><span>No gol</span><b>${val(shots.on[1])}</b>
+                                <b>${val(shots.on[0])}</b><span>${esc(LanguageManager.t('shotOnGoal'))}</span><b>${val(shots.on[1])}</b>
                             </div>
                         </div>
                         <div class="match-shots-blocked">
-                            <b>${val(shots.blocked[0])}</b><span>Bloqueadas</span><b>${val(shots.blocked[1])}</b>
+                            <b>${val(shots.blocked[0])}</b><span>${esc(LanguageManager.t('shotBlocked'))}</span><b>${val(shots.blocked[1])}</b>
                         </div>
                     </div>
                 </div>`;
@@ -1092,9 +1114,9 @@ const Elements = {
 
         const resultIcon = r => {
             const v = (r || '').toUpperCase();
-            if (v === 'VICTORY' || v === 'WIN')  return '<span class="me-form-win">V</span>';
-            if (v === 'DEFEAT'  || v === 'LOSS') return '<span class="me-form-loss">D</span>';
-            return '<span class="me-form-draw">E</span>';
+            if (v === 'VICTORY' || v === 'WIN')  return `<span class="me-form-win">${LanguageManager.t('formWin')}</span>`;
+            if (v === 'DEFEAT'  || v === 'LOSS') return `<span class="me-form-loss">${LanguageManager.t('formLoss')}</span>`;
+            return `<span class="me-form-draw">${LanguageManager.t('formDraw')}</span>`;
         };
 
         const score = document.querySelector(".score-desktop");
