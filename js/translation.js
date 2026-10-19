@@ -56,6 +56,9 @@ const translations = {
         revenue: 'Renda',
         ticketAveragePrice: 'Valor médio do ingresso',
         stadiumCapacity: "da capacidade",
+        occupancy: 'Ocupação',
+        broadcastInfo: 'Transmissão',
+        fileInfo: 'Arquivo',
         stadiumCapacityFull: "Capacidade",
         inflationAdjusted: 'Renda ajustada pela inflação',
 
@@ -623,6 +626,9 @@ const translations = {
         revenue: 'Revenue',
         ticketAveragePrice: 'Average ticket price',
         stadiumCapacity: "stadium's capacity",
+        occupancy: 'Occupancy',
+        broadcastInfo: 'Broadcast',
+        fileInfo: 'File',
         stadiumCapacityFull: "Stadium's capacity",
         inflationAdjusted: 'Inflation-adjusted revenue',
 

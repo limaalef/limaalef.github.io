@@ -18,6 +18,8 @@ const ICON_PATHS = {
     chevron:  '<path d="M6 9.5l6 6 6-6"/>',
     arrow:    '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
     'chevron-right': '<path d="M9 6l6 6-6 6"/>',
+    disk:     '<rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 14.5h17"/><path d="M16.5 17h.01"/>',
+    cloud:    '<path d="M7 18.5a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 11a3.8 3.8 0 0 1-.5 7.5H7z"/>',
 };
 function icon(name, size = 16) {
     return `<svg class="inline-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</svg>`;

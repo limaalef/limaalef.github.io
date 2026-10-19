@@ -171,10 +171,9 @@
 }
 .match-column { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
 @media (min-width: 1000px) {
-    .page-match .me-body { grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); align-items: start; }
+    .page-match .me-body { grid-template-columns: minmax(0, 1fr) minmax(280px, 420px); align-items: start; }
     .page-match .match-column--side { position: sticky; top: var(--sp-6); }
 }
-.match-column-title { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }
 
 .page-match .detail-section,
 .page-match .me-section { margin: 0; padding: 0; }
@@ -195,8 +194,7 @@
 }
 
 /* Listas rótulo → valor: superfície suave, linhas finas, sem caixas com borda */
-.page-match .detail-list,
-.page-match .storage-badges { border: 0; background: var(--soft-bg); border-radius: var(--border-radius-size-lg); }
+.page-match .detail-list { border: 0; background: var(--soft-bg); border-radius: var(--border-radius-size-lg); }
 .page-match .detail-list-item { background: transparent; border-top: 1px solid var(--soft-line); }
 .page-match .detail-list-item:first-child { border-top: 0; }
 .page-match .detail-list-item.no-new-line { border-top: 0; }
@@ -204,13 +202,25 @@
 .page-match .detail-list-value { font-weight: 500; font-variant-numeric: tabular-nums; }
 .page-match .detail-list-progress-bar { background: var(--soft-bg-hover); }
 
-/* Armazenamento: pílulas neutras com bolinha de estado */
-.page-match .storage-badge,
-.page-match .storage-badge.storage-local,
-.page-match .storage-badge.storage-cloud { border: 0; background: var(--bg-primary); color: var(--text-primary); gap: var(--sp-2); }
-.page-match .storage-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
-.page-match .storage-badge.storage-local::before { background: var(--success-color); }
-.page-match .storage-badge.storage-cloud::before { background: var(--info-color); }
+/* ── Coluna da direita: painel único em superfície suave, blocos separados por linha fina ── */
+.match-aside { background: var(--bg-secondary); border-radius: var(--border-radius-size-xl); padding: var(--sp-7) var(--sp-6); }
+.match-aside-inner { display: flex; flex-direction: column; gap: var(--sp-7); }
+.match-aside-section:not([hidden]) ~ .match-aside-section:not([hidden]) { border-top: 1px solid var(--soft-line); padding-top: var(--sp-6); }
+.match-aside .usage-bar { margin: var(--sp-2) 0 var(--sp-3); }
+.match-aside-note { margin-top: calc(var(--sp-2) * -1); text-align: right; font-size: var(--font-size-xs); color: var(--text-success); font-variant-numeric: tabular-nums; }
+
+/* Armazenamento: rótulo à esquerda; locais com ícone e texto coloridos (verde = local, azul = nuvem), sem pílula nem bolinha */
+.match-aside-method { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-top: var(--sp-4); padding: var(--sp-4) var(--sp-5); border-radius: var(--border-radius-size-lg); background: var(--bg-primary); font-size: var(--font-size-mdm); }
+.match-aside-method[hidden] { display: none; }
+.match-aside-method-label { color: var(--text-muted); flex-shrink: 0; }
+.match-aside-method-value { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-2) var(--sp-5); }
+.match-storage-place { display: inline-flex; align-items: center; gap: var(--sp-2); font-weight: 600; }
+.match-storage-place--local { color: var(--text-success); }
+.match-storage-place--cloud { color: var(--text-info); }
+.match-storage-place .inline-icon { flex: none; }
+.match-storage-place--local .inline-icon { color: var(--success-color); }
+.match-storage-place--cloud .inline-icon { color: var(--info-color); }
+@media (max-width: 768px) { .match-aside { padding: var(--sp-6) var(--sp-5); } }
 
 /* Eventos, pênaltis, estatísticas, escalação */
 .page-match .plays-list,
@@ -265,9 +275,10 @@
     .match-stage .modal-image-carousel, .match-stage .modal-image { height: auto; border-radius: 0; }
     .match-stage .modal-image-carousel .carousel-img { height: auto; }
     .match-stage .score-overlay { background-color: var(--accent-color); color: var(--text-accent-color) !important; position: static; padding: var(--sp-5); color: var(--text-primary); pointer-events: auto; }
-    .match-stage .modal-title-phase { font-size: var(--font-size-md); }
+    .match-stage .modal-title-phase { color: var(--text-accent-color); font-size: var(--font-size-md); }
     .match-stage .score-team-name { font-size: var(--font-size-mxxl); }
     .match-stage .score-mobile-value { font-size: var(--font-size-mxxl); }
+    .match-stage .section-title.modal-title-competition, .page-match .score-date-row span { color: var(--text-accent-color) }
     .match-stage .carousel-counter { top: auto; bottom: var(--sp-4); right: var(--sp-4); }
     .match-actions { margin-top: var(--sp-5); gap: var(--sp-4); }
     .match-tags { display: none; }

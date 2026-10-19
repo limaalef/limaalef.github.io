@@ -57,11 +57,7 @@ function attachRequestButton(item) {
 function renderMatch(match, sport) {
     renderHero(match);
     Elements.renderImages(match, "matches_image/");
-    Elements.renderTvInfo(match, 'meTvInfo');
-    Elements.renderTechInfo(match, 'meTechInfo');
-    Elements.renderRefereeInfo(match, 'meRefereeInfo', 'meRefereeSection');
-    Elements.renderAttRev(match, 'meAttRevInfo');
-    Elements.renderStorage(match.technical_details, null, 'meStorageBadges');
+    renderAside(match);
     Elements.renderObsAndTags(match);
     Elements.renderLineups(match.home_team, match.away_team);
     Elements.renderStatistics(match);
@@ -71,6 +67,111 @@ function renderMatch(match, sport) {
     if (match.penalties?.length) {
         Elements.renderPenalties(match, match.home_team.tla);
     }
+}
+
+// ─── Coluna da direita ───────────────────────────
+// Painel único com quatro blocos (transmissão, arbitragem, público e renda, arquivo).
+// Usa as linhas rótulo → valor compartilhadas (ui-components); as funções Elements.render*
+// continuam como estão porque o modal e watch.html ainda as usam.
+function renderAside(match) {
+    const t   = key => LanguageManager.t(key);
+    const esc = value => Utils.escapeHtml(value);
+    const lang = LanguageManager.getLanguage();
+    const rows = list => list
+        .filter(r => !Utils.isBlank(r.value))
+        .map(r => keyValueRow(esc(r.label), esc(r.value)))
+        .join('');
+
+    const station = match.station || {};
+    const tech    = match.technical_details || {};
+    const money   = (value, currency) => value.toLocaleString(lang, { style: 'currency', currency });
+
+    // Transmissão
+    const tv = rows([
+        { label: t('broadcaster'), value: station.name },
+        { label: t('narration'),   value: station.commentary },
+        { label: t('origin'),      value: station.source_type ? t(station.source_type) : '' },
+        { label: t('type'),        value: match.type ? t(match.type) : '' },
+    ]);
+
+    // Arbitragem
+    const ref = match.referees || {};
+    const referee = rows([
+        { label: t('referee'),       value: ref.referee },
+        { label: t('refereeAssis'),  value: Array.isArray(ref.assistants) ? ref.assistants.join(' · ') : ref.assistants },
+        { label: t('refereeFourth'), value: ref.fourth_official },
+    ]);
+
+    // Público e renda: sem nenhum dos dois, o bloco não aparece (só estádio/capacidade repetiria o local da partida)
+    const attendance = (Array.isArray(match.attendance) ? match.attendance : [match.attendance])
+        .filter(item => item && item.value != null);
+    const revenue = match.revenue?.value != null ? match.revenue : null;
+    let attRev = '';
+    if (attendance.length || revenue) {
+        let html = rows([
+            { label: t('stadium'),             value: match.venue?.name || (typeof match.venue === 'string' ? match.venue : '') },
+            { label: t('stadiumCapacityFull'), value: match.venue?.capacity?.toLocaleString(lang) },
+        ]);
+        attendance.forEach(item => {
+            html += rows([{ label: t(item.label), value: item.value.toLocaleString(lang) }]);
+            const showOccupancy = item.occupancy && (attendance.length === 1 || String(item.label).toLowerCase() === 'público total');
+            if (showOccupancy) {
+                const percent = Math.max(0, Math.min(100, Number(item.occupancy) || 0));
+                html += `<div class="usage-bar" role="img" aria-label="${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}">
+                    <div class="usage-bar-segment usage-bar-segment--archive" style="width:${percent}%"></div></div>`
+                    + keyValueRow(esc(t('occupancy')), `${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}`);
+            }
+        });
+        if (revenue) {
+            // Renda segue o mesmo padrão das demais linhas (sem destaque)
+            html += rows([
+                { label: t('revenue'),            value: money(revenue.value, revenue.currency) },
+                { label: t('ticketAveragePrice'), value: revenue.averageTicket != null ? money(revenue.averageTicket, revenue.currency) : '' },
+            ]);
+            const adjusted = revenue.adjustedRevenue;
+            if (adjusted?.value != null) {
+                html += rows([{ label: t('inflationAdjusted'), value: money(adjusted.value, adjusted.currency) }]);
+                if (adjusted.realIncrease != null) {
+                    const increase = (adjusted.realIncrease / 100).toLocaleString(lang, { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                    html += `<div class="match-aside-note">+${increase} nominal</div>`;
+                }
+            }
+        }
+        attRev = html;
+    }
+
+    // Arquivo: especificações + onde está armazenado
+    const file = rows([
+        { label: 'ID',                 value: match.id },
+        { label: t('quality'),         value: tech.video_quality },
+        { label: t('audioFormat'),     value: tech.audio_format },
+        { label: t('bitrate'),         value: tech.video_bitrate ? `${tech.video_bitrate} Mbps` : '' },
+        { label: t('duration'),        value: tech.duration },
+        { label: t('fileSize'),        value: Utils.formatSize(tech.file_size) },
+    ]);
+
+    // Armazenamento: ícone + texto na cor do tema (verde = local, azul = nuvem), sem pílula nem bolinha
+    const places = [];
+    if (tech.local)               places.push(`<span class="match-storage-place match-storage-place--local">${icon('disk', 14)}${esc(tech.local)}</span>`);
+    if (Elements.isCloud(tech))      places.push(`<span class="match-storage-place match-storage-place--cloud">${icon('cloud', 14)}${esc(t('cloud'))}</span>`);
+    const storage = document.getElementById('meStorage');
+    storage.innerHTML = places.length
+        ? `<span class="match-aside-method-label">${esc(t('storageInfo'))}</span><span class="match-aside-method-value">${places.join('')}</span>`
+        : '';
+    storage.hidden = !places.length;
+
+    const fill = (id, html) => {
+        const el = document.getElementById(id);
+        el.innerHTML = html;
+        el.closest('.match-aside-section').hidden = !html && !(id === 'meTechInfo' && places.length);
+    };
+    fill('meTvInfo', tv);
+    fill('meRefereeInfo', referee);
+    fill('meAttRevInfo', attRev);
+    fill('meTechInfo', file);
+
+    const aside = document.getElementById('meAside');
+    aside.hidden = !aside.querySelector('.match-aside-section:not([hidden])');
 }
 
 function renderHero(match) {

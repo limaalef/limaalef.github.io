@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/match.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/match-page.css">
     <link rel="stylesheet" href="css/request.css">
     <!-- Google tag (gtag.js) -->
@@ -98,6 +99,11 @@
                         <div class="me-tags-wrap" id="meTagsList"></div>
                     </div>
 
+                    <div class="me-section" id="meLineupSection" style="display:none;">
+                        <div class="section-title modal-style" data-i18n="lineup"></div>
+                        <div class="me-lineup-grid" id="meLineupGrid"></div>
+                    </div>
+
                     <div class="me-section" id="mePlaysSection" style="display:none;">
                         <div class="section-title modal-style" data-i18n="plays"></div>
                         <div class="detail-list plays-list" id="mePlaysList"></div>
@@ -108,11 +114,6 @@
                         <div class="detail-list plays-list" id="mePenaltiesList"></div>
                     </div>
 
-                    <div class="me-section" id="meLineupSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="lineup"></div>
-                        <div class="me-lineup-grid" id="meLineupGrid"></div>
-                    </div>
-
                     <div class="detail-section" id="meStatisticsSection" style="display:none;">
                         <div class="section-title modal-style" data-i18n="statistics"></div>
                         <div class="detail-list me-stats-list" id="meStatisticsInfo"></div>
@@ -120,31 +121,29 @@
                 </div>
 
                 <aside class="match-column match-column--side">
-                    <h2 class="match-column-title">Detalhes</h2>
+                    <div class="match-aside" id="meAside">
+                        <div class="match-aside-inner">
+                            <section class="match-aside-section" hidden>
+                                <h3 class="block-title" data-i18n="broadcastInfo"></h3>
+                                <div id="meTvInfo"></div>
+                            </section>
 
-                    <div class="detail-section">
-                        <div class="section-title modal-style" data-i18n="tvInfo"></div>
-                        <div class="detail-list" id="meTvInfo"></div>
-                    </div>
+                            <section class="match-aside-section" hidden>
+                                <h3 class="block-title" data-i18n="refereeInfo"></h3>
+                                <div id="meRefereeInfo"></div>
+                            </section>
 
-                    <div class="detail-section">
-                        <div class="section-title modal-style" data-i18n="technicalInfo"></div>
-                        <div class="detail-list" id="meTechInfo"></div>
-                    </div>
+                            <section class="match-aside-section" hidden>
+                                <h3 class="block-title" data-i18n="attRevInfo"></h3>
+                                <div id="meAttRevInfo"></div>
+                            </section>
 
-                    <div class="detail-section" id="meRefereeSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="refereeInfo"></div>
-                        <div class="detail-list" id="meRefereeInfo"></div>
-                    </div>
-
-                    <div class="detail-section" id="meAttRevSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="attRevInfo"></div>
-                        <div class="detail-list" id="meAttRevInfo"></div>
-                    </div>
-
-                    <div class="detail-section">
-                        <div class="section-title modal-style" data-i18n="storageInfo"></div>
-                        <div class="storage-badges" id="meStorageBadges"></div>
+                            <section class="match-aside-section" hidden>
+                                <h3 class="block-title" data-i18n="fileInfo"></h3>
+                                <div id="meTechInfo"></div>
+                                <div class="match-aside-method" id="meStorage" hidden></div>
+                            </section>
+                        </div>
                     </div>
                 </aside>
             </div>
@@ -159,6 +158,7 @@
     <script src="js/auth.js"></script>
     <script src="js/api_service.js"></script>
     <script src="js/managers.js"></script>
+    <script src="js/ui-components.js"></script>
     <script src="js/match.js"></script>
     <script src="js/request.js"></script>
 </body>
