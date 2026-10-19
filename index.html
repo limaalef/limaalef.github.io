@@ -41,6 +41,7 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/banner.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
     <script>
@@ -61,6 +62,7 @@
 
     <div class="container">
         <div class="home-container">
+            <div id="homeBanners" class="home-banners" hidden></div>
             
             <div class="home-section">
                 <div class="home-section-header">
@@ -592,7 +594,10 @@
     <script src="js/utils.js"></script>
     <script src="js/api_service.js"></script>
     <script src="js/managers.js"></script>
+    <script src="js/banner.js"></script>
+    <script src="js/home-browse.js"></script>
     <script src="js/index.js"></script>
+    <script>BannerCarousel.mount('#homeBanners');</script>
 
 </body>
 </html>

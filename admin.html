@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/request.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/banner.css">
+    <link rel="stylesheet" href="css/admin-banners.css">
+    <link rel="stylesheet" href="css/admin-browse.css">
     <link rel="stylesheet" href="css/utilities.css">
 </head>
 <style>
@@ -90,6 +93,16 @@
                         </span> PayPal
                     </button>
 
+                    <button type="button" class="adm-nav-item" data-panel="browse" onclick="switchPanel('browse')">
+                        <span class="adm-nav-icon">
+                            <svg viewBox="0 0 12 12"><circle cx="3" cy="6" r="2"/><circle cx="9" cy="6" r="2"/></svg>
+                        </span> Carrosséis
+                    </button>
+                    <button type="button" class="adm-nav-item" data-panel="banners" onclick="switchPanel('banners')">
+                        <span class="adm-nav-icon">
+                            <svg viewBox="0 0 12 12"><path d="M1.5 2.5h9a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zm5 1.5v4h3.5V4z"/></svg>
+                        </span> Banners
+                    </button>
                     <div class="adm-nav-divider"></div>
                     <button type="button" class="adm-nav-item mt-auto" onclick="admLogout()">
                         <span class="adm-nav-icon">
@@ -101,6 +114,113 @@
 
             <!-- Conteúdo -->
             <div class="adm-main">
+                <!-- PAINEL: TIMES E NARRADORES (carrosséis da home) -->
+                <div class="adm-panel" id="panel-browse">
+                    <div class="bn-toolbar"><h2 class="block-title">Carrosséis da página inicial</h2></div>
+                    <div class="br-columns">
+                        <section>
+                            <h2 class="block-title">Times <span class="counter" id="br-team-count">0</span></h2>
+                            <div class="br-picker" id="br-team-picker">
+                                <input class="field field--on-surface" id="br-team-search" autocomplete="off" placeholder="Buscar para adicionar…" aria-label="Buscar times">
+                                <div class="br-results is-hidden" id="br-team-results"></div>
+                            </div>
+                            <div class="br-list" id="br-team-list"></div>
+                            <div class="status-message is-hidden" id="br-team-empty">Nenhum item. A home mostra a lista padrão da página.</div>
+                        </section>
+                        <section>
+                            <h2 class="block-title">Narradores <span class="counter" id="br-commentary-count">0</span></h2>
+                            <div class="br-picker" id="br-commentary-picker">
+                                <input class="field field--on-surface" id="br-commentary-search" autocomplete="off" placeholder="Buscar para adicionar…" aria-label="Buscar narradores">
+                                <div class="br-results is-hidden" id="br-commentary-results"></div>
+                            </div>
+                            <div class="br-list" id="br-commentary-list"></div>
+                            <div class="status-message is-hidden" id="br-commentary-empty">Nenhum item. A home mostra a lista padrão da página.</div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- PAINEL: BANNERS -->
+                <div class="adm-panel" id="panel-banners">
+                  <div id="bn-list-view">
+                    <div class="bn-toolbar">
+                        <h2 class="block-title">Banners da página inicial <span class="counter" id="bn-count">0</span></h2>
+                        <button type="button" class="action-btn btn-primary" id="bn-new">+ Novo banner</button>
+                    </div>
+                    <div class="bn-list" id="bn-list"></div>
+                    <div class="status-message" id="bn-loading">Carregando banners...</div>
+                    <div class="status-message is-hidden" id="bn-empty">Nenhum banner cadastrado.</div>
+                  </div>
+
+                  <section class="adm-editor is-hidden" id="bn-editor" aria-labelledby="bn-editor-title">
+                    <div class="adm-editor-head">
+                        <button type="button" class="button" id="bn-back">
+                            <svg class="inline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                            Banners
+                        </button>
+                        <h2 class="adm-editor-title" id="bn-editor-title">Novo banner</h2>
+                        <span id="bn-status"></span>
+                    </div>
+
+                    <div class="bn-editor-grid">
+                        <div class="bn-preview adm-col">
+                            <h3 class="adm-sub-title">Preview</h3>
+                            <div id="bn-preview"></div>
+                        </div>
+
+                        <form class="bn-form" id="bn-form" onsubmit="return false" autocomplete="off">
+                            <div class="bn-field">
+                                <span class="bn-label">Imagem <span class="bn-hint">PNG/WebP transparente, proporção 5×3, até 2 MB</span></span>
+                                <div class="bn-upload">
+                                    <div class="bn-thumb" id="bn-upload-thumb"></div>
+                                    <div>
+                                        <div class="bn-meta" id="bn-upload-name">Nenhuma imagem</div>
+                                        <div class="bn-actions bn-actions--start">
+                                            <button type="button" class="action-btn btn-ghost btn-xs" id="bn-pick">Escolher arquivo</button>
+                                            <button type="button" class="action-btn btn-ghost btn-xs" id="bn-remove-image">Remover</button>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="bn-file" accept="image/png,image/webp,image/jpeg,image/avif">
+                                </div>
+                            </div>
+
+                            <label class="bn-field"><span class="bn-label">Título (retângulo acima do destaque) <span class="bn-hint" id="bn-title-count"></span></span>
+                                <input class="field field--on-surface" id="bn-title" maxlength="40" placeholder="Ex.: NOVO"></label>
+                            <label class="bn-field"><span class="bn-label">Texto de destaque <span class="bn-hint" id="bn-headline-count"></span></span>
+                                <input class="field field--on-surface" id="bn-headline" maxlength="90" placeholder="Ex.: Final da Copa do Brasil 2025"></label>
+                            <label class="bn-field"><span class="bn-label">Texto auxiliar <span class="bn-hint" id="bn-subtitle-count"></span></span>
+                                <input class="field field--on-surface" id="bn-subtitle" maxlength="160" placeholder="Ex.: Já disponível no arquivo"></label>
+                            <label class="bn-field"><span class="bn-label">Link de destino <span class="bn-hint">https://… ou página do site</span></span>
+                                <input class="field field--on-surface" id="bn-link" maxlength="500" placeholder="collection.html?sport=football"></label>
+
+                            <div class="bn-colors">
+                                <label class="bn-color"><input type="color" id="bn-bg_color"><span>Fundo</span><code id="bn-bg_color-hex"></code></label>
+                                <label class="bn-color"><input type="color" id="bn-text_color"><span>Texto</span><code id="bn-text_color-hex"></code></label>
+                                <label class="bn-color"><input type="color" id="bn-title_bg_color"><span>Fundo do título</span><code id="bn-title_bg_color-hex"></code></label>
+                                <label class="bn-color"><input type="color" id="bn-title_text_color"><span>Texto do título</span><code id="bn-title_text_color-hex"></code></label>
+                            </div>
+
+                            <div class="bn-grid-2">
+                                <label class="bn-field"><span class="bn-label">Início da publicação <span class="bn-hint">vazio = imediato</span></span>
+                                    <input class="field field--on-surface" type="datetime-local" id="bn-starts"></label>
+                                <div class="bn-field"><span class="bn-label">Término <span class="bn-hint">vazio = indefinido</span></span>
+                                    <div class="bn-inline"><input class="field field--on-surface" type="datetime-local" id="bn-ends">
+                                    <button type="button" class="action-btn btn-ghost btn-xs" id="bn-clear-ends">Limpar</button></div></div>
+                            </div>
+                            <div class="bn-grid-2">
+                                <label class="bn-field"><span class="bn-label">Ordem <span class="bn-hint">menor aparece primeiro</span></span>
+                                    <input class="field field--on-surface" type="number" id="bn-order" step="1"></label>
+                                <label class="bn-toggle"><input type="checkbox" id="bn-enabled"> Habilitado</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="adm-editor-actions">
+                        <button type="button" class="action-btn btn-ghost" id="bn-cancel">Cancelar</button>
+                        <button type="button" class="action-btn btn-primary" id="bn-save">Salvar banner</button>
+                    </div>
+                  </section>
+                </div>
+
                 <!-- PAINEL: PEDIDOS -->
                 <div class="adm-panel active" id="panel-orders">
                   <!-- Lista de pedidos -->
@@ -489,6 +609,9 @@
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/ui-components.js"></script>
+    <script src="js/banner.js"></script>
+    <script src="js/admin-banners.js"></script>
+    <script src="js/admin-browse.js"></script>
     <script src="js/api_service.js"></script>
     <script src="js/managers.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
@@ -500,6 +623,8 @@ const ADM_CFG = {
 };
 
 const session   = Auth.admin;
+AdminBanners.init();
+AdminBrowse.init();
 let allOrders    = [];
 let filterStatus = '';
 let filterQuery  = '';
@@ -515,6 +640,8 @@ function switchPanel(name) {
         loadMpSettings();
         checkHealth();
     }
+    if (name === 'banners') AdminBanners.load();
+    if (name === 'browse') AdminBrowse.load();
     if (name === 'paypal-settings') {
         loadPaypalSettings();
         loadExternalSettings();

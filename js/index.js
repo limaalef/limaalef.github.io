@@ -377,4 +377,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     CompetitionsBrowser.render();
     WorldCuoBrowser.render();
     CommentorBrowser.render();
+    // Curadoria feita no admin; substitui as listas estáticas se houver itens cadastrados
+    HomeBrowse.load().then(() => { ClubsBrowser._updateNav(); CommentorBrowser._updateNav(); });
 });

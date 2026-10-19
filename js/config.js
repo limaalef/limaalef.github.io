@@ -15,6 +15,8 @@ const CONFIG = {
     // Edição administrativa do matchdata (match-edit.html). Exige "Authorization: Bearer <token da sessão admin>".
     ADMIN_API_BASE:    'https://api-archive.limaalef.com/v2/admin',
 
+    HOME_BROWSE_API_BASE: 'https://api-archive.limaalef.com/browse',
+    BANNERS_API_BASE:  'https://api-archive.limaalef.com/banners',
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
     GOOGLE_CLIENT_ID:  '879308026481-pl1bc6q5vrdng493omm4i40nddavgt6a.apps.googleusercontent.com',
