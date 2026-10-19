@@ -222,10 +222,16 @@
 .match-storage-place--cloud .inline-icon { color: var(--info-color); }
 @media (max-width: 768px) { .match-aside { padding: var(--sp-6) var(--sp-5); } }
 
+/* Time: barra vertical arredondada nas cores do clube ao lado do nome (as cores vêm da API; o nome segue o tema).
+   Cabeçalhos de lista: altura do nome; escalação: altura de nome + formação + técnico. */
+.page-match .me-lineup-team-name { display: flex; align-items: center; gap: var(--sp-3); color: var(--text-primary); }
+.team-swatch { flex: none; align-self: stretch; width: var(--sp-2); min-height: 1.5em; border-radius: var(--border-radius-size-circle); box-shadow: inset 0 0 0 1px var(--soft-line); }
+
 /* Eventos, pênaltis, estatísticas, escalação */
-.page-match .plays-list,
-.page-match .me-stats-list { background: var(--soft-bg); border-radius: var(--border-radius-size-lg); overflow: hidden; }
+.page-match .plays-list { background: var(--soft-bg); border-radius: var(--border-radius-size-lg); overflow: hidden; }
 .page-match .plays-names { border-right: 0 !important; }
+.page-match .plays-header-team--home { flex-direction: row-reverse; justify-content: flex-start; text-align: right; }
+.page-match .plays-header-team--home > span:last-child { text-align: right; }
 .page-match .plays-period-label::before,
 .page-match .plays-period-label::after,
 .page-match .pen-score-row::before,
@@ -238,6 +244,58 @@
 .page-match .me-lineup-col { background: var(--soft-bg); border-right: 0; }
 .page-match .me-lineup-formation { color: var(--text-primary); }
 .page-match .me-player-row.sub { opacity: .6; }
+
+/* ── Estatísticas: destaques (posse e finalizações) + cartão com as demais ──
+   Mandante e visitante usam as cores primárias recebidas da API. */
+.page-match #meStatisticsInfo { display: flex; flex-direction: column; gap: var(--sp-4); padding: 0; background: transparent; border-radius: 0; overflow: visible; }
+.match-highlights { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+@media (min-width: 760px) { .match-highlights { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.match-highlight, .match-stats-card { background: var(--soft-bg); border-radius: var(--border-radius-size-lg); padding: var(--sp-5) var(--sp-6); }
+.match-highlight .block-title { color: var(--text-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: .04em; }
+
+/* Posse de bola: rosca */
+.match-possession { display: flex; align-items: center; gap: var(--sp-6); }
+.match-donut { flex: none; width: 7rem; height: 7rem; }
+.match-donut circle { fill: none; stroke-width: 4.5; }
+.match-donut-track { stroke: var(--text-muted); }
+.match-donut-home { stroke: var(--accent-color); stroke-linecap: butt; }
+.match-possession-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+.match-possession-row { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-mdm); }
+.match-possession-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.match-possession-row b { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.match-possession-row .usage-legend-key, .match-shots-name .usage-legend-key { flex: none; }
+
+/* Finalizações: gol (no gol e bloqueadas dentro, em vermelho) e "para fora" do lado de fora */
+.match-shots { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+.match-shots-team { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
+.match-shots-name { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-sm); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; line-height: 1.2; }
+.match-shots-name span { min-width: 0; overflow-wrap: anywhere; }
+.match-goal {
+    display: flex; align-items: flex-end; justify-content: space-around; gap: var(--sp-3);
+    min-height: 5.5rem; padding: var(--sp-4) var(--sp-3) var(--sp-3);
+    border: var(--sp-1) solid var(--text-primary); border-bottom: 0;
+    border-radius: var(--border-radius-size-sm) var(--border-radius-size-sm) 0 0;
+    background-color: var(--bg-primary);
+    background-image: linear-gradient(var(--soft-line) 1px, transparent 1px), linear-gradient(90deg, var(--soft-line) 1px, transparent 1px);
+    background-size: var(--sp-5) var(--sp-5);
+}
+.match-goal b { display: block; font-size: var(--font-size-xl); font-weight: 700; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.match-goal small { display: block; margin-top: var(--sp-1); font-size: var(--font-size-xs); color: var(--text-muted); }
+.match-goal-on, .match-goal-blocked { text-align: center; min-width: 0; }
+.match-goal-blocked b { color: var(--error-color); }
+.match-shots-off { padding-top: var(--sp-2); border-top: 1px solid var(--soft-line); font-size: var(--font-size-sm); color: var(--text-muted); }
+.match-shots-off b { font-size: var(--font-size-md); font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* Demais estatísticas */
+.match-stat-legend { margin: 0 0 var(--sp-3); }
+.match-stats-grid { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--sp-8); }
+@media (min-width: 760px) { .match-stats-grid { grid-template-columns: 1fr 1fr; } }
+.match-stat { padding: var(--sp-3) 0; }
+.match-stat-line { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-2); font-size: var(--font-size-mdm); }
+.match-stat-line span { flex: 1; text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); }
+.match-stat-line b { font-weight: 500; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.match-stat-line b.lead { font-weight: 700; color: var(--text-primary); }
+@media (max-width: 560px) { .match-highlight, .match-stats-card { padding: var(--sp-5); } .match-possession { gap: var(--sp-5); } .match-donut { width: 6rem; height: 6rem; } .match-shots { gap: var(--sp-4); } }
 
 /* Observações e tags: neutras */
 .page-match .me-tag,
@@ -298,3 +356,15 @@
 @media (prefers-reduced-motion: reduce) {
     .match-stage::after, .match-stage .score-overlay { transition: none; }
 }
+
+/* Bloco dedicado de finalizações: gol estilizado e trave dividida pelas cores dos times. */
+.match-shots-goal { display: grid; grid-template-columns: 1fr; gap: 0; }
+.match-shots-off, .match-shots-blocked { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); color: var(--text-muted); font-size: var(--font-size-sm); text-align: center; }
+.match-shots-off { background: var(--soft-bg-hover); border-bottom: 1px solid var(--soft-line); }
+.match-shots-blocked { border-top: 1px solid var(--soft-line); }
+.match-shots-off b, .match-shots-blocked b { color: var(--text-primary); font-size: var(--font-size-md); font-variant-numeric: tabular-nums; }
+.match-goal-frame { position: relative; padding: var(--sp-1) var(--sp-1) 0; background: linear-gradient(90deg, var(--home-team-color) 0 50%, var(--away-team-color) 50% 100%); border-radius: var(--border-radius-size-md) var(--border-radius-size-md) 0 0; }
+.match-goal-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-3); min-height: 3.5rem; padding: var(--sp-3) var(--sp-4); background: var(--soft-bg); color: var(--text-primary); text-align: center; font-size: var(--font-size-sm); font-weight: 600; border-radius: var(--border-radius-size-sm) var(--border-radius-size-sm) 0 0; }
+.match-goal-bar b { font-size: var(--font-size-md); font-variant-numeric: tabular-nums; }
+.match-goal-bar b:first-child { text-align: left; }
+.match-goal-bar b:last-child { text-align: right; }

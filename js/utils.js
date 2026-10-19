@@ -392,6 +392,20 @@ const Elements = {
         return badges.join('');
     },
 
+    // Página de partida: o time é identificado por uma barra vertical arredondada com as cores do clube
+    // (1, 2 ou 3 faixas empilhadas) ao lado do nome, em vez de nome colorido + faixa no topo.
+    usesTeamSwatch() {
+        return document.body.classList.contains('page-match');
+    },
+
+    teamSwatch(colors) {
+        const valid = c => typeof c === 'string' && /^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(c.trim());
+        const list = [colors?.primary, colors?.secondary, colors?.tertiary].filter(valid).map(c => c.trim());
+        if (!list.length) return '';
+        const stops = list.map((c, i) => `${c} ${(i * 100 / list.length).toFixed(2)}% ${((i + 1) * 100 / list.length).toFixed(2)}%`).join(',');
+        return `<i class="team-swatch" aria-hidden="true" style="background:linear-gradient(to bottom,${stops})"></i>`;
+    },
+
     getTeamColorsStyle(colors) {
         const color1 = colors.primary;
         const color2 = colors.secondary;
@@ -422,6 +436,10 @@ const Elements = {
     },
 
     getTeamHeaderList(info) {
+        if (this.usesTeamSwatch()) {
+            const cell = (team, side) => `<span class="me-lineup-team-name plays-names plays-header-team plays-header-team--${side}">${this.teamSwatch(team?.colors)}<span>${LanguageManager.t(team?.name) || ''}</span></span>`;
+            return `<div class="plays-header-names"><div class="plays-header-grid">${cell(info.home_team, 'home')}${cell(info.away_team, 'away')}</div></div>`;
+        }
         const homeColor = info.home_team?.colors?.primary;
         const homeName  = info.home_team?.name;
         const awayColor = info.away_team?.colors?.primary;
@@ -429,10 +447,10 @@ const Elements = {
 
         return `<div class="plays-header-names">
             <div class="plays-header-grid">
-                <span class="me-lineup-team-name plays-names"${homeColor ? ` style="color:${homeColor};${this.getTeamColorsStyle(info.home_team.colors)};border-right:1px solid var(--border-color);"` : ''}>
+                <span class="me-lineup-team-name plays-names plays-header-team plays-header-team--home"${homeColor ? ` style="color:${homeColor};${this.getTeamColorsStyle(info.home_team.colors)};border-right:1px solid var(--border-color);"` : ''}>
                     ${LanguageManager.t(homeName) || ''}
                 </span>
-                <span class="me-lineup-team-name plays-names"${awayColor ? ` style="color:${awayColor};${this.getTeamColorsStyle(info.away_team.colors)};"` : ''}>
+                <span class="me-lineup-team-name plays-names plays-header-team plays-header-team--away"${awayColor ? ` style="color:${awayColor};${this.getTeamColorsStyle(info.away_team.colors)};"` : ''}>
                     ${LanguageManager.t(awayName) || ''}
                 </span>
             </div>
@@ -708,8 +726,35 @@ const Elements = {
         });
     },
 
+    // Lado (mandante/visitante) de um lance ou cobrança. A sigla do lance (teamAbbr) nem sempre é a mesma
+    // do time (tla): ex. tla "AFE" no time e "FER" nos lances. Ordem: sigla do mandante → sigla do visitante
+    // (o outro time é o mandante) → slug do time no lance. Sem nenhuma pista, mantém a comparação antiga.
+    makeSideResolver(detail, homeTla) {
+        const items  = [...(detail.plays || []), ...(detail.penalties || [])];
+        const abbrs  = [...new Set(items.map(i => i.teamAbbr).filter(Boolean))];
+        const awayTla = detail.away_team?.tla;
+        const norm = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const homeSlug = norm(detail.home_team?.name);
+        const awaySlug = norm(detail.away_team?.name);
+
+        let homeAbbr = homeTla;
+        if (!abbrs.includes(homeTla)) {
+            if (abbrs.includes(awayTla) && abbrs.length === 2) {
+                homeAbbr = abbrs.find(a => a !== awayTla);
+            } else {
+                // Pelo slug do lance (ex.: "ferroviaria-feminino" começa com "ferroviaria")
+                const bySlug = items.find(i => i.teamSlug && homeSlug && (norm(i.teamSlug) === homeSlug || norm(i.teamSlug).startsWith(homeSlug + '-')));
+                const byAway = items.find(i => i.teamSlug && awaySlug && (norm(i.teamSlug) === awaySlug || norm(i.teamSlug).startsWith(awaySlug + '-')));
+                if (bySlug) homeAbbr = bySlug.teamAbbr;
+                else if (byAway && abbrs.length === 2) homeAbbr = abbrs.find(a => a !== byAway.teamAbbr);
+            }
+        }
+        return item => item.teamAbbr === homeAbbr;
+    },
+
     renderPlays(detail, homeTeamAbbr) {
         const plays   = detail.plays;
+        const isHomePlay = this.makeSideResolver(detail, homeTeamAbbr);
         const section = document.getElementById('mePlaysSection');
         const list    = document.getElementById('mePlaysList');
 
@@ -733,7 +778,7 @@ const Elements = {
                 return `<div class="plays-period-label">${entry.label}</div>`;
             }
             const play   = entry.data;
-            const isHome = play.teamAbbr === homeTeamAbbr;
+            const isHome = isHomePlay(play);
             const badge  = this.goalTypeBadge(play.playType);
             const icon   = this.playTypeBadge(play.playType);
             const minute = `${play.minute}<span class="plays-minute-mark">'</span>`;
@@ -799,13 +844,13 @@ const Elements = {
         const penScore = detail.score?.penalties; // { home: N, away: N } ou null
  
         // Quem bateu primeiro
-        const firstTla    = penalties[0]?.teamAbbr;
-        const firstIsHome = firstTla === homeTla;
+        const isHomeKick  = this.makeSideResolver(detail, homeTla);
+        const firstIsHome = isHomeKick(penalties[0]);
  
         // Separa cobranças por time, mantendo índice de rodada
         const home = [], away = [];
         penalties.forEach(p => {
-            if (p.teamAbbr === homeTla) home.push(p);
+            if (isHomeKick(p)) home.push(p);
             else                        away.push(p);
         });
         const rounds = Math.max(home.length, away.length);
@@ -892,6 +937,12 @@ const Elements = {
         const statsList = document.getElementById('meStatisticsInfo');
 
         section.style.display = 'block';
+
+        // Página de partida: destaques (posse e finalizações) + cartão com as demais estatísticas
+        if (this.usesTeamSwatch()) {
+            statsList.innerHTML = this.buildMatchStatistics(detail, home, away);
+            return;
+        }
         
         statsList.innerHTML = this.getTeamHeaderList(detail);
         statsList.innerHTML += rows
@@ -924,6 +975,113 @@ const Elements = {
                     </div>
                 </div>`;
             }).join('');
+    },
+
+    // Estatísticas da página de partida. Mandante = accent, visitante = cinza neutro (como nas barras de uso),
+    // porque as cores dos clubes (ex.: branco) nem sempre aparecem bem sobre o fundo.
+    buildMatchStatistics(detail, home, away) {
+        const esc = v => Utils.escapeHtml(v);
+        const num = (team, key) => { const v = parseFloat(team[key]?.total); return Number.isNaN(v) ? null : v; };
+        const homeName = LanguageManager.t(detail.home_team?.name) || '';
+        const awayName = LanguageManager.t(detail.away_team?.name) || '';
+        const homeColor = detail.home_team?.colors?.primary || 'var(--accent-color)';
+        const awayColor = detail.away_team?.colors?.primary || 'var(--text-muted)';
+        const keyHome = `<i class="usage-legend-key usage-legend-key--archive" style="background-color:${homeColor}"></i>`;
+        const keyAway = `<i class="usage-legend-key usage-legend-key--other" style="background-color:${awayColor}"></i>`;
+        const used = new Set();
+        let highlights = '';
+
+        // Posse de bola: gráfico de rosca
+        const hp = num(home, 'ballPossession'), ap = num(away, 'ballPossession');
+        if (hp !== null && ap !== null && hp + ap > 0) {
+            used.add('ballPossession');
+            const homePct = hp / (hp + ap) * 100;
+            const title = LanguageManager.t('ballPossession').replace(' (%)', '');
+            highlights += `
+                <div class="match-highlight">
+                    <h3 class="block-title">${esc(title)}</h3>
+                    <div class="match-possession">
+                        <svg class="match-donut" viewBox="0 0 36 36" role="img" aria-label="${esc(homeName)} ${hp}% · ${esc(awayName)} ${ap}%">
+                            <circle class="match-donut-track" cx="18" cy="18" r="15.9155" style="stroke:${awayColor}"/>
+                            <circle class="match-donut-home" cx="18" cy="18" r="15.9155" style="stroke:${homeColor}" stroke-dasharray="${homePct.toFixed(2)} ${(100 - homePct).toFixed(2)}" transform="rotate(-90 18 18)"/>
+                        </svg>
+                        <div class="match-possession-legend">
+                            <div class="match-possession-row">${keyHome}<span>${esc(homeName)}</span><b>${hp}%</b></div>
+                            <div class="match-possession-row">${keyAway}<span>${esc(awayName)}</span><b>${ap}%</b></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // Finalizações: bloco dedicado com finalizações para fora, no gol e bloqueadas.
+        const shots = {
+            on: [num(home, 'goalFinish'), num(away, 'goalFinish')],
+            off: [num(home, 'wrongFinish'), num(away, 'wrongFinish')],
+            blocked: [num(home, 'blockedFinish'), num(away, 'blockedFinish')],
+        };
+        const shotKeys = ['goalFinish', 'wrongFinish', 'blockedFinish'];
+        const hasShots = shotKeys.some(key => home[key] !== undefined || away[key] !== undefined);
+        if (hasShots) {
+            shotKeys.forEach(key => used.add(key));
+            const val = v => v === null ? '—' : v;
+            const shotsTitle = 'Finalizações';
+            highlights += `
+                <div class="match-highlight">
+                    <h3 class="block-title">${shotsTitle}</h3>
+                    <div class="usage-legend match-stat-legend"><span>${keyHome}${esc(homeName)}</span><span>${keyAway}${esc(awayName)}</span></div>
+                    <div class="match-shots-goal">
+                        <div class="match-shots-off">
+                            <b>${val(shots.off[0])}</b><span>Pra fora</span><b>${val(shots.off[1])}</b>
+                        </div>
+                        <div class="match-goal-frame" style="--home-team-color:${homeColor};--away-team-color:${awayColor}">
+                            <div class="match-goal-bar">
+                                <b>${val(shots.on[0])}</b><span>No gol</span><b>${val(shots.on[1])}</b>
+                            </div>
+                        </div>
+                        <div class="match-shots-blocked">
+                            <b>${val(shots.blocked[0])}</b><span>Bloqueadas</span><b>${val(shots.blocked[1])}</b>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // Exibe as demais estatísticas, suprimindo apenas aquelas em que ambos os times têm valor 0.
+        const rows = STATS_ORDER
+            .filter(key => {
+                if (used.has(key) || (home[key] === undefined && away[key] === undefined)) return false;
+                const hv = num(home, key), av = num(away, key);
+                return !(hv === 0 && av === 0);
+            })
+            .map(key => {
+                let label = LanguageManager.t(key), suffix = '';
+                if (label.includes(' (%)')) { label = label.replace(' (%)', ''); suffix = '%'; }
+                const hv = num(home, key), av = num(away, key);
+                return { label, suffix, hv, av, hText: home[key]?.total ?? '—', aText: away[key]?.total ?? '—' };
+            })
+            .map(r => {
+                const both = r.hv !== null && r.av !== null;
+                const total = both ? r.hv + r.av : 0;
+                const bar = both && total > 0 ? `
+                    <div class="usage-bar" role="img" aria-label="${r.hv} × ${r.av}">
+                        <div class="usage-bar-segment usage-bar-segment--archive" style="background-color:${homeColor};width:${(r.hv / total * 100).toFixed(2)}%"></div>
+                        <div class="usage-bar-segment usage-bar-segment--other" style="background-color:${awayColor};width:${(r.av / total * 100).toFixed(2)}%"></div>
+                    </div>` : '';
+                return `
+                    <div class="match-stat">
+                        <div class="match-stat-line">
+                            <b class="${both && r.hv > r.av ? 'lead' : ''}">${r.hText}${r.suffix}</b>
+                            <span>${esc(r.label)}</span>
+                            <b class="${both && r.av > r.hv ? 'lead' : ''}">${r.aText}${r.suffix}</b>
+                        </div>${bar}
+                    </div>`;
+            }).join('');
+
+        return `
+            ${highlights ? `<div class="match-highlights">${highlights}</div>` : ''}
+            ${rows ? `<div class="match-stats-card">
+                <div class="usage-legend match-stat-legend"><span>${keyHome}${esc(homeName)}</span><span>${keyAway}${esc(awayName)}</span></div>
+                <div class="match-stats-grid">${rows}</div>
+            </div>` : ''}`;
     },
 
     renderLastResults(last_results, homeName, awayName) {
@@ -971,15 +1129,17 @@ const Elements = {
         const col = document.createElement('div');
         col.className = 'me-lineup-col';
 
-        // Faixa de cores no topo da coluna — reutiliza getTeamColorsStyle
-        if (team.colors) {
+        // Faixa de cores no topo da coluna — reutiliza getTeamColorsStyle (a página de partida usa o retângulo ao lado do nome)
+        const swatch = this.usesTeamSwatch();
+        if (team.colors && !swatch) {
             col.style.cssText += this.getTeamColorsStyle(team.colors);
         }
         col.innerHTML = `
             <div class="me-lineup-team-header">
+                ${swatch ? this.teamSwatch(team.colors) : ''}
                 <div class="me-lineup-team-info">
-                    <div class="me-lineup-team-name"${color ? ` style="color:${color}"` : ''}>
-                        ${LanguageManager.t(team.name) || ''}
+                    <div class="me-lineup-team-name"${color && !swatch ? ` style="color:${color}"` : ''}>
+                        <span>${LanguageManager.t(team.name) || ''}</span>
                     </div>
                     ${formation ? `<div class="me-lineup-formation">${formation}</div>` : ''}
                     ${coach     ? `<div class="me-lineup-coach">${LanguageManager.t('coach')}: ${coach}</div>` : ''}
