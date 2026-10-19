@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════
+   MATCH — visual da página de partida (match.html)
+   O carrossel de imagens é a "capa" da página e mantém aspect-ratio
+   16 / 9 (regra original de components.css). Título, placar e ações
+   ficam sobre a imagem no desktop e abaixo dela no celular.
+   Só layout e reescrita escopada em body.page-match; theme.css,
+   components.css e match.css (também usado por watch.html) não mudam.
+   Somente variáveis do tema.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Ícones do placar: os SVG vinham com width/height="var(...)" (inválido) ── */
+.page-match .score-date-row svg { width: var(--font-size-mdm); height: var(--font-size-mdm); flex: none; }
+.page-match .score-date-row span { display: inline-flex; align-items: center; gap: var(--sp-2); }
+
+/* ── Capa ── */
+.page-match #meHero { max-width: var(--page-width-size); margin: 0 auto; padding: var(--sp-5) var(--sp-5) 0; }
+
+.match-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-size-xl);
+    background: var(--soft-bg);
+    aspect-ratio: 16 / 9;
+}
+.match-stage #image-carousel { position: absolute; inset: 0; }
+.match-stage .modal-image-carousel,
+.match-stage .modal-image { width: 100%; height: 100%; aspect-ratio: 16 / 9; max-height: none; object-fit: cover; }
+.match-stage .modal-image-carousel .carousel-img { height: 100%; }
+
+/* Degradê de leitura sobre a imagem */
+.match-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to top, var(--black-a72) 0%, var(--black-a40) 38%, transparent 70%),
+        linear-gradient(to right, var(--black-a45) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity .3s ease;
+}
+
+.match-stage .score-overlay {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 2;
+    padding: var(--sp-8);
+    background: transparent;
+    color: var(--white);
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+}
+.match-stage .score-overlay a,
+.match-stage .score-overlay button { pointer-events: auto; }
+
+.match-stage .logo-title-header { margin: 0 0 var(--sp-4); gap: var(--sp-4); }
+.match-stage .comp-logo { width: var(--sp-9); height: var(--sp-9); }
+.match-stage .section-title.modal-title-competition { color: var(--white); font-size: var(--font-size-mdm); letter-spacing: .08em; margin: 0; }
+.match-stage .modal-title-phase { color: var(--on-media-muted); font-size: var(--font-size-sm); }
+
+.match-stage .score-desktop { justify-content: flex-start; gap: var(--sp-5); flex-wrap: nowrap; }
+.match-stage .score-team-name { font-size: var(--font-size-xxxxl); font-weight: 600; letter-spacing: -.035em; line-height: 1.05; }
+.match-stage .score-team-logo { width: var(--sp-9); height: var(--sp-9); filter: drop-shadow(0 2px 6px var(--black-a50)); }
+.match-stage .score-value-modal {
+    font-size: var(--font-size-xxxxl);
+    font-weight: 700;
+    padding: var(--sp-1) var(--sp-5);
+    border-radius: var(--border-radius-size-md);
+    background: var(--white-a20);
+    backdrop-filter: blur(8px);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.match-stage .score-date-row { justify-content: flex-start; margin-top: var(--sp-4); color: var(--on-media-muted); opacity: 1; gap: var(--sp-5); }
+.page-match .me-form-badges { display: inline-flex; gap: var(--sp-1); }
+
+/* ── Ações e etiquetas ── */
+.match-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-4); margin-top: var(--sp-6); }
+/* "Assistir": branco com texto preto sobre a imagem; os demais botões da linha (pedido) ficam em accent */
+.page-match .match-buttons .match-action--primary { background: var(--white); color: var(--black); }
+@media (hover: hover) { .page-match .match-buttons .match-action--primary:hover { background: var(--white); color: var(--black); } }
+
+/* Linha de botões: "Assistir", "Adicionar ao pedido" (request.js) e "Editar dados" (admin).
+   Todos os botões da linha têm o mesmo destaque; só "Editar dados" é secundário. */
+.page-match .match-buttons { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0; padding: 0; min-height: 0; }
+.page-match .match-buttons .score-button-container { display: contents; }
+.page-match .match-buttons :is(a, button) {
+    width: auto;
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-7);
+    border: 0;
+    border-radius: var(--border-radius-size-md);
+    background: var(--accent-color);
+    color: var(--text-accent-color);
+    font-family: inherit;
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: none;
+    transition: opacity .2s, transform .2s, background .2s;
+}
+@media (hover: hover) {
+    .page-match .match-buttons :is(a, button):hover { background: var(--accent-color); color: var(--text-accent-color); opacity: .88; box-shadow: none; border: 0; }
+}
+.page-match .match-buttons :is(a, button):active { transform: scale(.97); }
+.page-match .match-buttons :is(a, button):focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.page-match .match-buttons svg { width: 1.1em; height: 1.1em; fill: currentColor; flex: none; }
+/* Item já no pedido: estado discreto em vez de fundo colorido */
+.page-match .match-buttons .om-added { background: var(--white-a25); color: var(--white); }
+@media (hover: hover) { .page-match .match-buttons .om-added:hover { background: var(--white-a20); color: var(--white); } }
+
+.page-match .match-buttons .match-action--ghost { order: 2; background: var(--white-a20); color: var(--white); backdrop-filter: blur(8px); }
+@media (hover: hover) { .page-match .match-buttons .match-action--ghost:hover { background: var(--white-a25); color: var(--white); } }
+
+.match-tags { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.match-tag {
+    padding: var(--sp-1) var(--sp-4);
+    border-radius: var(--border-radius-size-circle);
+    background: var(--white-a20);
+    backdrop-filter: blur(8px);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+/* Logo da emissora (mesmas classes do card): sobre a imagem sempre em branco, exceto os que já funcionam sem filtro */
+.match-tags .broadcaster-logo { height: var(--sp-7); max-width: 4.5rem; filter: brightness(0) invert(1); }
+.match-tags .broadcaster-logo.no-filter { filter: none; }
+
+/* ── Botão para ver a imagem sem textos nem degradê ── */
+.match-stage-toggle {
+    position: absolute;
+    top: var(--sp-5); left: var(--sp-5);
+    z-index: 4;
+    display: inline-flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5);
+    border: 0;
+    border-radius: var(--border-radius-size-circle);
+    background: var(--black-a40);
+    backdrop-filter: blur(8px);
+    color: var(--white);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+.match-stage-toggle svg { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.match-stage-toggle .icon-hidden { display: none; }
+.match-stage-toggle[aria-pressed="true"] .icon-visible { display: none; }
+.match-stage-toggle[aria-pressed="true"] .icon-hidden { display: block; }
+@media (hover: hover) { .match-stage-toggle:hover { background: var(--black-a65); } }
+.match-stage-toggle:active { transform: scale(.97); }
+.match-stage-toggle:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
+.match-stage.is-clean::after { opacity: 0; }
+.match-stage.is-clean .score-overlay { opacity: 0; transform: translateY(var(--sp-4)); visibility: hidden; transition: opacity .3s ease, transform .3s ease, visibility 0s .3s; }
+
+/* Controles do carrossel: setas discretas, contador no canto */
+.match-stage .carousel-btn { z-index: 3; }
+.match-stage .carousel-counter { top: var(--sp-5); bottom: auto; left: auto; right: var(--sp-5); transform: none; background: var(--black-a40); backdrop-filter: blur(8px); z-index: 3; }
+
+/* ── Corpo ── */
+.page-match .me-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-8);
+    max-width: var(--page-width-size);
+    margin: 0 auto;
+    padding: var(--sp-7) var(--sp-5) var(--sp-9);
+}
+.match-column { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
+@media (min-width: 1000px) {
+    .page-match .me-body { grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); align-items: start; }
+    .page-match .match-column--side { position: sticky; top: var(--sp-6); }
+}
+.match-column-title { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }
+
+.page-match .detail-section,
+.page-match .me-section { margin: 0; padding: 0; }
+
+/* Títulos de bloco: "trilhos" no conteúdo principal, discretos na lateral */
+.page-match .section-title.modal-style {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    letter-spacing: .04em;
+    margin-bottom: var(--sp-4);
+}
+.page-match .match-column--main .section-title.modal-style {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    letter-spacing: -.02em;
+    text-transform: none;
+    color: var(--text-primary);
+}
+
+/* Listas rótulo → valor: superfície suave, linhas finas, sem caixas com borda */
+.page-match .detail-list,
+.page-match .storage-badges { border: 0; background: var(--soft-bg); border-radius: var(--border-radius-size-lg); }
+.page-match .detail-list-item { background: transparent; border-top: 1px solid var(--soft-line); }
+.page-match .detail-list-item:first-child { border-top: 0; }
+.page-match .detail-list-item.no-new-line { border-top: 0; }
+.page-match .detail-list-label { color: var(--text-muted); }
+.page-match .detail-list-value { font-weight: 500; font-variant-numeric: tabular-nums; }
+.page-match .detail-list-progress-bar { background: var(--soft-bg-hover); }
+
+/* Armazenamento: pílulas neutras com bolinha de estado */
+.page-match .storage-badge,
+.page-match .storage-badge.storage-local,
+.page-match .storage-badge.storage-cloud { border: 0; background: var(--bg-primary); color: var(--text-primary); gap: var(--sp-2); }
+.page-match .storage-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
+.page-match .storage-badge.storage-local::before { background: var(--success-color); }
+.page-match .storage-badge.storage-cloud::before { background: var(--info-color); }
+
+/* Eventos, pênaltis, estatísticas, escalação */
+.page-match .plays-list,
+.page-match .me-stats-list { background: var(--soft-bg); border-radius: var(--border-radius-size-lg); overflow: hidden; }
+.page-match .plays-names { border-right: 0 !important; }
+.page-match .plays-period-label::before,
+.page-match .plays-period-label::after,
+.page-match .pen-score-row::before,
+.page-match .pen-score-row::after { background: var(--soft-line); }
+.page-match .plays-minute,
+.page-match .me-stat-value,
+.page-match .pen-score { font-variant-numeric: tabular-nums; }
+.page-match .me-stat-bar { background: var(--soft-bg-hover); }
+.page-match .me-lineup-grid { border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); gap: 1px; }
+.page-match .me-lineup-col { background: var(--soft-bg); border-right: 0; }
+.page-match .me-lineup-formation { color: var(--text-primary); }
+.page-match .me-player-row.sub { opacity: .6; }
+
+/* Observações e tags: neutras */
+.page-match .me-tag,
+.page-match .me-tag.default,
+.page-match .me-tag.record,
+.page-match .me-tag.historic,
+.page-match .me-tag.scorer { background: var(--soft-bg); color: var(--text-primary); border: 0; font-size: var(--font-size-sm); font-weight: 500; }
+.page-match #meTagsSection .detail-item { background: transparent; border: 0; padding: 0 0 var(--sp-4); }
+.page-match #meObs { font-size: var(--font-size-md); line-height: 1.6; color: var(--text-primary); font-weight: 400; }
+
+/* ── Sem imagens: a capa tem só a altura do conteúdo de texto ── */
+.page-match .match-stage--no-image .match-buttons .match-action--primary { background: var(--text-primary); color: var(--bg-primary); }
+.match-stage--no-image { aspect-ratio: auto; overflow: visible; }
+.match-stage--no-image::after { display: none; }
+.match-stage--no-image #image-carousel { display: none; }
+.match-stage--no-image .score-overlay { position: static; padding: var(--sp-8); color: var(--text-primary); pointer-events: auto; background: var(--soft-bg); border-radius: var(--border-radius-size-xl); }
+.match-stage--no-image .comp-logo { background: var(--black); border-radius: var(--border-radius-size-circle); padding: var(--sp-2); }
+.match-stage--no-image .section-title.modal-title-competition { color: var(--text-primary); }
+.match-stage--no-image .modal-title-phase,
+.match-stage--no-image .score-date-row { color: var(--text-muted); }
+.match-stage--no-image .score-team-logo { filter: none; }
+.match-stage--no-image .score-value-modal { background: var(--bg-primary); backdrop-filter: none; }
+.match-stage--no-image .match-tag { background: var(--bg-primary); backdrop-filter: none; }
+.match-stage--no-image .match-tags .broadcaster-logo { filter: none; }
+@media (prefers-color-scheme: dark) { .match-stage--no-image .match-tags .broadcaster-logo:not(.no-filter) { filter: brightness(0) invert(1); } }
+.match-stage--no-image .match-buttons .om-added { background: var(--bg-primary); color: var(--text-primary); }
+.match-stage--no-image .match-buttons .match-action--ghost { background: var(--bg-primary); color: var(--text-primary); backdrop-filter: none; }
+
+/* ── Celular: imagem inteira em 16:9 e título abaixo dela, sem sobreposição ── */
+@media (max-width: 768px) {
+    .page-match #meHero { padding: 0; }
+    .match-stage { display: flex; flex-direction: column-reverse; border-radius: 0; overflow: visible; background: transparent; aspect-ratio: auto; }
+    .match-stage::after, .match-stage-toggle { display: none; }
+    .match-stage #image-carousel { position: relative; inset: auto; }
+    .match-stage .modal-image-carousel, .match-stage .modal-image { height: auto; border-radius: 0; }
+    .match-stage .modal-image-carousel .carousel-img { height: auto; }
+    .match-stage .score-overlay { background-color: var(--accent-color); color: var(--text-accent-color) !important; position: static; padding: var(--sp-5); color: var(--text-primary); pointer-events: auto; }
+    .match-stage .modal-title-phase { font-size: var(--font-size-md); }
+    .match-stage .score-team-name { font-size: var(--font-size-mxxl); }
+    .match-stage .score-mobile-value { font-size: var(--font-size-mxxl); }
+    .match-stage .carousel-counter { top: auto; bottom: var(--sp-4); right: var(--sp-4); }
+    .match-actions { margin-top: var(--sp-5); gap: var(--sp-4); }
+    .match-tags { display: none; }
+    .page-match .match-buttons { width: 100%; }
+    .page-match .match-buttons :is(a, button) { flex: 1 1 9rem; background-color: var(--white-a20); }
+    .page-match .match-buttons :is(a, button):hover { background: var(--text-primary); color: var(--bg-primary) }
+    .page-match .match-buttons .match-action--primary, .page-match .match-buttons .match-action--primary:hover { background: var(--text-primary); color: var(--bg-primary); }
+    .page-match .match-buttons .om-added { background: var(--soft-bg); color: var(--text-primary); }
+    .page-match .match-buttons .match-action--ghost { background: var(--soft-bg); color: var(--text-primary); backdrop-filter: none; flex: 0 1 auto; }
+    .match-tag { backdrop-filter: none; }
+    .match-tags .broadcaster-logo { filter: none; }
+    @media (prefers-color-scheme: dark) { .match-tags .broadcaster-logo:not(.no-filter) { filter: brightness(0) invert(1); } }
+    .match-stage--no-image .score-overlay { padding: var(--sp-5); border-radius: 0; }
+    .page-match .me-body { display: flex; padding: var(--sp-5) var(--sp-5) var(--sp-9); flex-direction: column-reverse; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .match-stage::after, .match-stage .score-overlay { transition: none; }
+}

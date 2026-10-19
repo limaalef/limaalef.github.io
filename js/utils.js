@@ -582,10 +582,22 @@ const Elements = {
     },
 
     renderAttRev(detail, divId) {
-        const attendance = Array.isArray(detail.attendance)
-            ? detail.attendance
-            : [detail.attendance];
-        
+        // Público e renda: sem nenhum dos dois, o bloco não é exibido (só estádio/capacidade repetiria o local da partida)
+        const attendance = (Array.isArray(detail.attendance) ? detail.attendance : [detail.attendance])
+            .filter(item => item && item.value != null);
+        const hasAttendance = attendance.length > 0;
+        const hasRevenue    = detail.revenue?.value != null;
+
+        if (!hasAttendance && !hasRevenue) {
+            if (divId) {
+                const sectionEl = document.getElementById('meAttRevSection');
+                if (sectionEl) sectionEl.style.display = 'none';
+                const target = document.getElementById(divId);
+                if (target) target.innerHTML = '';
+            }
+            return '';
+        }
+
         const rows = [
             ...detail.venue ? [{
                 label: 'stadium',
@@ -599,7 +611,7 @@ const Elements = {
                 svg: '<svg viewBox="0 0 256 256" fill="currentcolor" version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M41,53.1c9.1,0,16.6,7.4,16.6,16.6S50.2,86.2,41,86.2s-16.6-7.4-16.6-16.6S31.9,53.1,41,53.1z M84.7,53.1 c9.1,0,16.6,7.4,16.6,16.6s-7.4,16.6-16.6,16.6s-16.6-7.4-16.6-16.6S75.6,53.1,84.7,53.1z M62.2,11.9c9.1,0,16.6,7.4,16.6,16.6 S71.4,45,62.2,45s-16.6-7.4-16.6-16.6S53.1,11.9,62.2,11.9z M106.9,11.9c9.1,0,16.6,7.4,16.6,16.6S116.1,45,106.9,45 s-16.6-7.4-16.6-16.6S97.8,11.9,106.9,11.9z M149.3,11.9c9.1,0,16.6,7.4,16.6,16.6S158.5,45,149.3,45s-16.6-7.4-16.6-16.6 S140.2,11.9,149.3,11.9z M191.5,11.9c9.1,0,16.6,7.4,16.6,16.6S200.7,45,191.5,45S175,37.6,175,28.5S182.4,11.9,191.5,11.9z M171.1,53.1c9.1,0,16.6,7.4,16.6,16.6s-7.4,16.6-16.6,16.6c-9.1,0-16.6-7.4-16.6-16.6S161.9,53.1,171.1,53.1z M126.1,53.1 c9.1,0,16.6,7.4,16.6,16.6c0,9.1-7.4,16.6-16.6,16.6c-9.2,0-16.6-7.4-16.6-16.6C109.5,60.5,116.9,53.1,126.1,53.1z M214.6,53.1 c9.1,0,16.6,7.4,16.6,16.6c0,9.1-7.4,16.6-16.6,16.6c-9.2,0-16.6-7.4-16.6-16.6C198.1,60.5,205.5,53.1,214.6,53.1z M41.1,53.5 c9,0,16.3,7.3,16.3,16.3s-7.3,16.3-16.3,16.3s-16.3-7.3-16.3-16.3S32.1,53.5,41.1,53.5z M59.5,89.3H40.9H22.2 c-11.3,0-18.5,9.3-18.5,21.1V164c0,9.7,12.7,9.7,12.7,0v-50.2c0-1.2,1-2,2-2c1.2,0,2,0.8,2,2v121.8c0,5,4,9.1,9.1,9.1 c5,0,9.1-4,9.1-9.1v-60.6c0-1.2,1-2,2-2h0.4c1.2,0,2,1,2,2v60.6c0,5,4,9.1,9.1,9.1c5,0,9.1-4,9.1-9.1V113.7c0-1.2,1-2,2-2 c1.2,0,2,1,2,2v50.4c0,9.7,12.7,9.7,12.7,0v-53.6C78.2,98.6,71.1,89.3,59.5,89.3z M144.7,89.3h-18.7h-18.7 c-11.3,0-18.5,9.3-18.5,21.1V164c0,9.7,12.7,9.7,12.7,0v-50.2c0-1.2,1-2,2-2c1.2,0,2,0.8,2,2v121.8c0,5,4,9.1,9.1,9.1 c5,0,9.1-4,9.1-9.1v-60.6c0-1.2,1-2,2-2h0.4c1.2,0,2,1,2,2v60.6c0,5,4,9.1,9.1,9.1c5,0,9.1-4,9.1-9.1V113.7c0-1.2,1-2,2-2 c1.2,0,2,1,2,2v50.4c0,9.7,12.7,9.7,12.7,0v-53.6C163.4,98.6,156.3,89.3,144.7,89.3z M233.7,89.3h-18.7h-18.7 c-11.3,0-18.5,9.3-18.5,21.1V164c0,9.7,12.7,9.7,12.7,0v-50.2c0-1.2,1-2,2-2c1.2,0,2,0.8,2,2v121.8c0,5,4,9.1,9.1,9.1 c5,0,9.1-4,9.1-9.1v-60.6c0-1.2,1-2,2-2h0.4c1.2,0,2,1,2,2v60.6c0,5,4,9.1,9.1,9.1c5,0,9.1-4,9.1-9.1V113.7c0-1.2,1-2,2-2 c1.2,0,2,1,2,2v50.4c0,9.7,12.7,9.7,12.7,0v-53.6C252.4,98.6,245.3,89.3,233.7,89.3z"/></svg>'
             }] : [],
 
-            ...detail.attendance ? attendance.flatMap(item => [
+            ...hasAttendance ? attendance.flatMap(item => [
                 {
                     label: item.label,
                     value: item.value.toLocaleString(LanguageManager.getLanguage()),
@@ -616,7 +628,7 @@ const Elements = {
                     : [])
             ]) : [],
 
-            ...detail.revenue ? [{
+            ...hasRevenue ? [{
                 label: 'revenue',
                 value: detail.revenue.value.toLocaleString(
                     LanguageManager.getLanguage(),
@@ -628,7 +640,7 @@ const Elements = {
                 svg: '<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_443_3628)"><rect x="2" y="6" width="20" height="12" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 10C21.4747 10 20.9546 9.89654 20.4693 9.69552C19.984 9.4945 19.543 9.19986 19.1716 8.82843C18.8001 8.45699 18.5055 8.01604 18.3045 7.53073C18.1035 7.04543 18 6.52529 18 6L22 6L22 10Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 18C18 16.9391 18.4214 15.9217 19.1716 15.1716C19.9217 14.4214 20.9391 14 22 14L22 18L18 18Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14C3.06087 14 4.07828 14.4214 4.82843 15.1716C5.57857 15.9217 6 16.9391 6 18L2 18L2 14Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6C6 7.06087 5.57857 8.07828 4.82843 8.82843C4.07828 9.57857 3.06087 10 2 10L2 6H6Z" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.0741 9.5H11.3333C10.597 9.5 10 10.0596 10 10.75C10 11.4404 10.597 12 11.3333 12H13.1111C13.8475 12 14.4444 12.5596 14.4444 13.25C14.4444 13.9404 13.8475 14.5 13.1111 14.5H10" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9.51733V8.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 15.5173V14.5" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_443_3628"><rect width="24" height="24" fill="white"/></clipPath></defs></svg>'
             }] : [],
 
-            ...(detail.revenue && detail.revenue.averageTicket != null
+            ...(hasRevenue && detail.revenue.averageTicket != null
                 ? [{
                     label: 'ticketAveragePrice',
                     value: detail.revenue.averageTicket.toLocaleString(
@@ -642,7 +654,7 @@ const Elements = {
                 }]
                 : []),
 
-            ...(detail.revenue && detail.revenue.adjustedRevenue != null
+            ...(hasRevenue && detail.revenue.adjustedRevenue != null
                 ? [
                     {
                         label: `inflationAdjusted`,
