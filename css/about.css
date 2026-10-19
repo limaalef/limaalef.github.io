@@ -1,0 +1,28 @@
+/* ═══ Sobre nós (about.html, body.page-about) — só layout; peças vêm de ui-components.css ═══ */
+.page-about .about { max-width: 46rem; margin: 0 auto; padding: var(--sp-8) var(--sp-5) var(--sp-9); display: flex; flex-direction: column; gap: var(--sp-9); }
+.page-about .about-intro h1 { font-size: var(--font-size-xxxxl); font-weight: 700; letter-spacing: -.04em; line-height: 1.05; color: var(--text-primary); margin: 0 0 var(--sp-6); }
+.page-about .about-intro p { font-size: var(--font-size-xl); line-height: 1.6; color: var(--text-secondary); margin: 0; max-width: 40rem; }
+.page-about .about-block { display: flex; flex-direction: column; gap: var(--sp-5); }
+
+.page-about .about-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; counter-reset: step; }
+.page-about .about-steps li { counter-increment: step; display: grid; grid-template-columns: 2.75rem 1fr; column-gap: var(--sp-5); padding: var(--sp-5) 0; border-top: 1px solid var(--soft-line); }
+.page-about .about-steps li::before { content: counter(step); grid-row: 1 / span 2; font-size: var(--font-size-xxxl); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.page-about .about-steps h3 { margin: 0; font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }
+.page-about .about-steps p { margin: var(--sp-2) 0 0; color: var(--text-secondary); font-size: var(--font-size-md); line-height: 1.6; }
+
+.page-about .about-faq details { border-top: 1px solid var(--soft-line); }
+.page-about .about-faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: var(--sp-5); padding: var(--sp-5) 0; font-size: var(--font-size-lg); font-weight: 600; letter-spacing: -.01em; color: var(--text-primary); }
+.page-about .about-faq summary::-webkit-details-marker { display: none; }
+.page-about .about-faq summary::after { content: ""; flex: none; width: .6rem; height: .6rem; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); transition: transform .2s; margin-right: var(--sp-2); }
+.page-about .about-faq details[open] summary::after { transform: rotate(-135deg); }
+.page-about .about-faq summary:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; border-radius: var(--border-radius-size-sm); }
+.page-about .about-faq p { margin: 0 0 var(--sp-5); color: var(--text-secondary); font-size: var(--font-size-md); line-height: 1.6; max-width: 38rem; }
+
+.page-about .about-contact { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
+@media (max-width: 600px) {
+    .page-about .about { padding-top: var(--sp-7); gap: var(--sp-8); }
+    .page-about .about-intro h1 { font-size: var(--font-size-xxxl); }
+    .page-about .about-intro p { font-size: var(--font-size-lg); }
+}
+@media (prefers-reduced-motion: reduce) { .page-about .about-faq summary::after { transition: none; } }
+.page-about .about-block > .block-title { font-size: var(--font-size-sxxl); font-weight: 700; letter-spacing: -.035em; color: var(--text-primary); margin: 0; }

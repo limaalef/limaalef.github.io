@@ -143,6 +143,11 @@
 }
 .payment-logo.single img { display:inline !important; }
 
+/* ── Painel lateral: superfície suave, blocos separados por linha fina ── */
+.aside-panel { background:var(--bg-secondary); border-radius:var(--border-radius-size-xl); padding:var(--sp-7) var(--sp-6); }
+.aside-panel-section + .aside-panel-section { margin-top:var(--sp-7); padding-top:var(--sp-6); border-top:1px solid var(--soft-line); }
+@media (max-width: 900px) { .aside-panel { padding:var(--sp-6) var(--sp-5); } }
+
 /* ── Spinner e mensagens de estado ── */
 .spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--soft-line);
     border-top-color:var(--text-primary); border-radius:50%; animation:spinner-rotate .7s linear infinite; }
