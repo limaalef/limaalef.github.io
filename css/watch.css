@@ -1,131 +1,76 @@
-.modal-body {
-    margin: 0;
-}
+/* ═══════════════════════════════════════════════════════════════
+   WATCH — página de assistir (watch.html)
+   Mesma linguagem visual de match.html (match-page.css): superfícies
+   suaves, cantos grandes, texto no tema. Só informações básicas da
+   partida + player 16:9 + escalação. Somente variáveis do tema.
+═══════════════════════════════════════════════════════════════ */
 
-.watch-video-section {
-    display: grid;
-    grid-template-columns: 240px 1fr 240px;
-    grid-template-rows: auto;
-    max-width: 1400px;
-    margin: 0 auto var(--sp-3);
-    align-items: start;
-    padding: 0 var(--sp-5);
-}
-
-/* Escalações laterais: altura limitada com scroll */
-.watch-lineup-col {
-    height: 100%;
-    overflow-y: auto;
-    /* scrollbar discreta */
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
-}
-
-#watchHomeLineup {
-    border: solid 1px var(--border-color);
-    border-radius: var(--border-radius-size-xl) 0 0 var(--border-radius-size-xl);
-}
-#watchAwayLineup {
-    border: solid 1px var(--border-color);
-    border-radius: 0 var(--border-radius-size-xl) var(--border-radius-size-xl) 0;
-}
-
-.watch-lineup-col::-webkit-scrollbar       { width: 4px; }
-.watch-lineup-col::-webkit-scrollbar-track { background: transparent; }
-.watch-lineup-col::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
-
-/* Wrapper do player: aspect-ratio 16/9 */
-.watch-player-wrap {
-    align-self: start;
-}
-
-.video-container-watch {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: var(--bg-tertiary);
-}
-
-.video-container-watch iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-/* Placeholder quando não há vídeo */
-.watch-video-placeholder {
+.page-watch .watch-page {
+    max-width: var(--page-width-size);
+    margin: 0 auto;
+    padding: var(--sp-5) var(--sp-5) var(--sp-9);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--sp-3);
-    height: 100%;
-    color: var(--text-secondary);
+    gap: var(--sp-6);
+}
+
+/* ── Informações básicas: abaixo do player, cor accent, coladas nele (só cantos inferiores arredondados) ── */
+.page-watch .watch-page { gap: 0; }
+.page-watch .watch-page > .me-section { margin-top: var(--sp-6); }
+.page-watch .watch-info {
+    background: var(--accent-color);
+    color: var(--text-accent-color);
+    padding: var(--sp-6) var(--sp-7);
+    border-radius: 0 0 var(--border-radius-size-xl) var(--border-radius-size-xl);
+}
+.page-watch .score-overlay { background: transparent; color: inherit; padding: 0; }
+.page-watch .logo-title-header { margin: 0 0 var(--sp-4); gap: var(--sp-4); }
+.page-watch .comp-logo { width: var(--sp-9); height: var(--sp-9); }
+.page-watch .section-title.modal-title-competition { color: inherit; font-size: var(--font-size-mdm); letter-spacing: .08em; margin: 0; }
+.page-watch .modal-title-phase { color: inherit; opacity: .75; font-size: var(--font-size-sm); }
+
+.page-watch .score-desktop { justify-content: flex-start; gap: var(--sp-5); flex-wrap: nowrap; }
+.page-watch .score-team-name { font-size: var(--font-size-xxxxl); font-weight: 600; letter-spacing: -.035em; line-height: 1.05; }
+.page-watch .score-team-logo { width: var(--sp-9); height: var(--sp-9); }
+.page-watch .score-value-modal {
+    font-size: var(--font-size-xxxxl);
+    font-weight: 700;
+    padding: var(--sp-1) var(--sp-5);
+    border-radius: var(--border-radius-size-md);
+    background: var(--white-a20);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.page-watch .score-date-row { justify-content: flex-start; margin-top: var(--sp-4); color: inherit; opacity: .8; gap: var(--sp-5); flex-wrap: wrap; }
+
+/* ── Player: 16:9, mesmo raio da capa do match ── */
+.page-watch .watch-player {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--border-radius-size-xl) var(--border-radius-size-xl) 0 0;
+    background: var(--black);
+}
+.page-watch .watch-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.page-watch .watch-video-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-3);
+    background: var(--soft-bg);
+    color: var(--text-muted);
     font-size: var(--font-size-md);
-    font-weight: 600;
 }
-.watch-video-placeholder .icon {
-    font-size: 3rem;
-}
+.page-watch .watch-video-placeholder[hidden],
+.page-watch .watch-player iframe[hidden] { display: none; }
+.page-watch .watch-video-placeholder svg { width: var(--sp-9); height: var(--sp-9); fill: currentColor; opacity: .5; }
 
-/* ── Corpo de info abaixo do player ───────────
-   Força mesma largura das duas colunas
-   (override do 6fr 5fr do .me-body padrão)
-   ─────────────────────────────────────────── */
-.watch-info-body {
-    grid-template-columns: 1fr 1fr;
-}
+/* ── Escalação ── */
+.page-watch .me-section { padding: 0; }
+.page-watch .me-lineup-grid { overflow: hidden; }
 
-/* ── Responsivo: tablet ───────────────────────
-   Escalações descem abaixo do player em 2 colunas
-   ─────────────────────────────────────────── */
-@media (max-width: 900px) {
-    .watch-video-section {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        padding: 0;
-    }
-
-    /* Player ocupa a linha inteira acima */
-    .watch-player-wrap {
-        grid-column: 1 / -1;
-        grid-row: 1;
-    }
-
-    /* Escalações ficam lado a lado abaixo */
-    #watchHomeLineup {
-        grid-column: 1;
-        grid-row: 2;
-        margin-left: var(--sp-5);
-        margin-top: var(--sp-5);
-    }
-    #watchAwayLineup {
-        grid-column: 2;
-        grid-row: 2;
-        margin-right: var(--sp-5);
-        margin-top: var(--sp-5);
-        border-left: 0px;
-    }
-}
-
-/* ── Responsivo: mobile ───────────────────────
-   Escalações em 2 colunas menores (mesmo padrão
-   de .me-lineup-grid do match.css)
-   ─────────────────────────────────────────── */
-@media (max-width: 640px) {
-    .video-container-watch {
-        border-radius: 0;
-    }
-
-    .watch-video-section {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    .watch-info-body {
-        display: block;
-    }
+/* ── Celular: nomes e placar em duas linhas (components.css), sem barra de rolagem lateral ── */
+@media (max-width: 768px) {
+    .page-watch .watch-page { padding: var(--sp-4) var(--sp-4) var(--sp-8); }
+    .page-watch .watch-info { padding: var(--sp-5); }
+    .page-watch .watch-player { border-radius: var(--border-radius-size-lg) var(--border-radius-size-lg) 0 0; }
+    .page-watch .watch-info { border-radius: 0 0 var(--border-radius-size-lg) var(--border-radius-size-lg); }
 }
