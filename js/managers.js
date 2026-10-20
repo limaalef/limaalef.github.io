@@ -369,21 +369,34 @@ const SourcePicker = {
         const sport = Utils.getItemSport(match);
         const sources = Array.isArray(match.sources) ? match.sources : [];
 
-        title.innerHTML = `<div class="section-title modal-title-competition">${LanguageManager.t('chooseSource')}</div>`;
+        // Título + a partida a que as fontes se referem
+        const esc = v => Utils.escapeHtml(String(v ?? ''));
+        const matchup = (match.home_team && match.away_team)
+            ? `${LanguageManager.t(match.home_team.name)} x ${LanguageManager.t(match.away_team.name)}`
+            : LanguageManager.translateText(match.competition?.name || '');
+        title.innerHTML = `
+            <div class="section-title modal-title-competition">${esc(LanguageManager.t('chooseSource'))}</div>
+            <div class="modal-title-phase">${esc(matchup)}</div>`;
 
         body.innerHTML = `
-            <div class="detail-section source-picker-section">
-                <div class="source-picker-list" id="sourcePickerList">
-                    ${sources.map(src => `
-                        <button class="source-picker-item" data-source-id="${src.id}">
-                            ${src.station?.logo
-                                ? `<img src="${src.station.logo}" alt="${src.station?.name || ''}" class="broadcaster-logo${noFilterLogos.includes(src.station.logo) ? ' no-filter' : ''}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'source-picker-fallback-name',textContent:${JSON.stringify(src.station?.name || `#${src.id}`)}}))">`
-                                : `<span class="source-picker-fallback-name">${src.station?.name || `#${src.id}`}</span>`
-                            }
-                            <div class="source-picker-video-quality">${src.video_quality}</div>
-                        </button>
-                    `).join('')}
-                </div>
+            <div class="source-picker-section">
+                <p class="source-picker-hint">${esc(LanguageManager.t('chooseSourceHint'))}</p>
+                <ul class="source-picker-list" id="sourcePickerList">
+                    ${sources.map(src => {
+                        const name = src.station?.name || `#${src.id}`;
+                        const meta = [src.video_quality, src.audio_format, src.station?.commentary].filter(v => !Utils.isBlank(v)).map(esc).join(' · ');
+                        return `<li><button type="button" class="source-picker-item" data-source-id="${esc(src.id)}">
+                            <span class="source-picker-logo">${src.station?.logo
+                                ? `<img src="${esc(src.station.logo)}" alt="" class="broadcaster-logo${noFilterLogos.includes(src.station.logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">`
+                                : `<span class="source-picker-initials" aria-hidden="true">${esc(name.slice(0, 2).toUpperCase())}</span>`}</span>
+                            <span class="source-picker-text">
+                                <span class="source-picker-name">${esc(name)}</span>
+                                ${meta ? `<span class="source-picker-meta">${meta}</span>` : ''}
+                            </span>
+                            <svg class="source-picker-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                        </button></li>`;
+                    }).join('')}
+                </ul>
             </div>
         `;
 

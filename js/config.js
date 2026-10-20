@@ -32,11 +32,15 @@ const AppNav = {
     ICONS: {
         home:       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
         collection: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>',
-        requests:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>'
+        requests:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>',
+        about:      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6h.01"/></svg>',
+        cart:       '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/><path d="M2.5 3.5h3l2.4 11.2a1.8 1.8 0 0 0 1.8 1.4h8.1a1.8 1.8 0 0 0 1.8-1.4L21 7H6.2"/></svg>'
     },
     ITEMS: [
         { id: 'home',       href: 'index.html',       key: 'navHome',       pages: ['index'] },
+        //{ id: 'about',      href: 'about.html',       key: 'navAbout',      pages: ['about'] },
         { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'match-edit', 'watch', 'event', 'storage', 'changelog'] },
+        { id: 'cart',       href: 'collection.html#cart', key: 'navCart',   pages: [], action: 'cart' },
         { id: 'requests',   href: 'my-requests.html', key: 'myrequests',    pages: ['my-requests', 'request-detail'] }
     ],
 
@@ -54,11 +58,31 @@ const AppNav = {
         nav.setAttribute('aria-label', 'Principal');
         nav.innerHTML = this.ITEMS.map(item => {
             const active = item.pages.includes(page);
+            if (item.action === 'cart') {
+                return `<button type="button" class="bottom-nav-item bottom-nav-cart" id="nav-cart">
+                ${this.ICONS.cart}<span class="bottom-nav-badge" id="nav-cart-badge" hidden>0</span><span data-i18n="${item.key}"></span></button>`;
+            }
             return `<a href="${item.href}" class="bottom-nav-item${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>
                 ${this.ICONS[item.id]}<span data-i18n="${item.key}"></span></a>`;
         }).join('');
         document.body.appendChild(nav);
         document.body.classList.add('has-bottom-nav');
+        // Carrinho: abre o painel de pedidos; nas páginas sem o módulo, leva ao acervo já com o painel aberto
+        nav.querySelector('#nav-cart').addEventListener('click', () => {
+            if (window.RequestModule) RequestModule.openPanel();
+            else location.href = 'collection.html#cart';
+        });
+        this.updateBadge();
+    },
+
+    // Contador do carrinho (a lista vive em localStorage, então vale em qualquer página)
+    updateBadge() {
+        const badge = document.getElementById('nav-cart-badge');
+        if (!badge) return;
+        let count = 0;
+        try { count = JSON.parse(localStorage.getItem('sa_cart') || '[]').length; } catch { count = 0; }
+        badge.textContent = count;
+        badge.hidden = !count;
     }
 };
 

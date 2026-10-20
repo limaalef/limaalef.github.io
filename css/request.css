@@ -472,18 +472,86 @@
 @media (max-width: 496px) {
     .om-panel { width: 100%; border-left: 0px;}
 
-    .om-cart-fab {
-        width: var(--om-fab-size-sm);
-        height: var(--om-fab-size-sm);
-        background: rgba(var(--accent-color-rgb), .75);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--white-a20);
-    }
-    .om-cart-fab svg {
-        width: 18px;
-        height: 18px;
-    }
+    /* No celular o carrinho vive na barra inferior */
+    .om-cart-fab { display: none; }
 
     .om-contact-selector { grid-template-columns: 1fr; }
+}
+/* ══════════════════════════════════════════════════════════════
+   VISUAL ATUAL — painel da lista e formulário de pedido
+   Superfícies suaves sem bordas; botões em pílula; títulos sem caixa alta.
+   (Sobrescreve as regras acima; só tokens do tema.)
+   ══════════════════════════════════════════════════════════════ */
+.om-panel { background: var(--bg-secondary); border-left: 0; box-shadow: -12px 0 48px var(--black-a40); }
+.om-panel-header { padding: var(--sp-6) var(--sp-6) var(--sp-4); border-bottom: 0; background: transparent; }
+.om-panel-header h3 { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; }
+.om-panel-header .close-btn { position: static; width: 2.25rem; height: 2.25rem; padding: 0; border: 0; background: var(--soft-bg); color: var(--text-primary); font-size: var(--font-size-lg); }
+@media (hover: hover) { .om-panel-header .close-btn:hover { transform: none; border: 0; background: var(--soft-bg-hover); color: var(--text-primary); } }
+.om-panel-body { padding: var(--sp-2) var(--sp-6) var(--sp-6); }
+.om-panel-footer { padding: var(--sp-5) var(--sp-6); border-top: 0; background: transparent; }
+
+/* Lista */
+.om-list { gap: var(--sp-3); }
+.om-item { align-items: center; gap: var(--sp-4); padding: var(--sp-4) var(--sp-5); border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); }
+@media (hover: hover) { .om-item:hover { background: var(--soft-bg-hover); } }
+.om-item-info { gap: var(--sp-1); }
+.om-item-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+.om-item-label { font-size: var(--font-size-md); font-weight: 600; }
+.om-item-date { font-size: var(--font-size-sm); color: var(--text-muted); }
+.om-remove-btn { width: 2rem; height: 2rem; display: inline-grid; place-items: center; padding: 0; border-radius: var(--border-radius-size-circle); }
+.om-empty { padding: var(--sp-9) var(--sp-5); color: var(--text-muted); }
+.om-empty p { margin: var(--sp-2) 0; font-size: var(--font-size-md); }
+.om-hint { opacity: 1; }
+
+/* Rodapé e botões (as classes .action-btn vêm do components.css) */
+.om-footer-top { margin-bottom: var(--sp-4); }
+.om-footer-info { margin-bottom: var(--sp-4); font-size: var(--font-size-sm); color: var(--text-muted); }
+.om-my-requests-link { color: var(--text-primary); font-size: var(--font-size-md); font-weight: 500; }
+.om-footer-actions { gap: var(--sp-3); }
+.om-panel .action-btn, .om-step .action-btn { flex: 1; padding: var(--sp-3) var(--sp-5); border: 0; border-radius: var(--border-radius-size-circle); font-size: var(--font-size-md); font-weight: 600; transition: background .2s, opacity .2s, transform .2s; }
+.om-panel .action-btn:active { transform: scale(.97); }
+.om-panel .action-btn.btn-ghost { background: var(--soft-bg); color: var(--text-primary); }
+.om-panel .action-btn.btn-primary { background: var(--text-primary); color: var(--bg-primary); }
+.om-panel .action-btn:disabled { opacity: .55; cursor: default; }
+@media (hover: hover) {
+    .om-panel .action-btn.btn-ghost:hover { background: var(--soft-bg-hover); }
+    .om-panel .action-btn.btn-primary:hover { background: var(--text-primary); opacity: .88; }
+}
+
+/* Etapas do formulário */
+.om-step { gap: var(--sp-5); }
+.om-step-title { font-size: var(--font-size-lg); font-weight: 600; letter-spacing: -.01em; text-transform: none; color: var(--text-primary); }
+.om-step-desc { font-size: var(--font-size-md); color: var(--text-muted); line-height: 1.5; }
+.om-user-info { padding: var(--sp-4) var(--sp-5); border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); }
+.om-user-info small { color: var(--text-muted); }
+.om-oauth-btn { padding: var(--sp-4) var(--sp-5); border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); font-size: var(--font-size-md); font-weight: 600; }
+@media (hover: hover) { .om-oauth-btn:hover, .om-oauth-btn.om-google:hover, .om-oauth-btn.om-microsoft:hover { background: var(--soft-bg-hover); border: 0; } }
+
+/* Canal de contato: pílulas (ativa em accent) */
+.om-contact-selector { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.om-contact-opt { padding: var(--sp-2) var(--sp-5); border: 0; border-radius: var(--border-radius-size-circle); background: var(--soft-bg); color: var(--text-muted); font-size: var(--font-size-md); font-weight: 500; }
+@media (hover: hover) { .om-contact-opt:hover { border: 0; background: var(--soft-bg-hover); color: var(--text-primary); } }
+.om-contact-opt.selected { border: 0; background: var(--accent-color); color: var(--text-accent-color); font-weight: 600; }
+
+/* Campos */
+.om-contact-input-wrap { gap: var(--sp-2); }
+.om-contact-input-wrap label { font-size: var(--font-size-sm); color: var(--text-muted); font-weight: 500; }
+.om-input { padding: var(--sp-4) var(--sp-5); border: 0; border-radius: var(--border-radius-size-lg); background: var(--soft-bg); font-size: var(--font-size-md); }
+.om-input::placeholder { color: var(--text-muted); }
+.om-input:focus { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.om-textarea { min-height: 5.5rem; }
+
+/* Sucesso */
+.om-success { padding: var(--sp-9) var(--sp-5); gap: var(--sp-3); }
+.om-success h3 { font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em; }
+
+/* Botão "+" nos cards (o card em si não muda) */
+.om-add-btn { border: 0; background: var(--soft-bg-hover); color: var(--text-primary); border-radius: var(--border-radius-size-circle); font-weight: 600; letter-spacing: 0; }
+@media (hover: hover) { .om-add-btn:hover { background: var(--accent-color); color: var(--text-accent-color); } }
+.om-add-btn.om-added { background: var(--bg-success); color: var(--text-success); }
+
+@media (max-width: 496px) {
+    .om-panel-header { padding: var(--sp-5) var(--sp-5) var(--sp-3); }
+    .om-panel-body { padding: var(--sp-2) var(--sp-5) var(--sp-5); }
+    .om-panel-footer { padding: var(--sp-4) var(--sp-5) calc(var(--sp-4) + env(safe-area-inset-bottom, 0px)); }
 }

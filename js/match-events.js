@@ -195,46 +195,101 @@ function carnavalBody(item) {
 }
 
 // ─── Corpo: motorsport (um painel por evento da etapa) ───────────
+// Conteúdo escolhido no menu (-1 = nenhum). Guardado por etapa para sobreviver à troca de idioma.
+const motorState = { itemId: null, selected: -1, events: [] };
+
+// Detalhe de um conteúdo (evento da etapa): mesmos blocos do futebol/carnaval
+function motorEventDetail(evt, index) {
+    const t = key => LanguageManager.t(key);
+    const station = evt.station || {};
+    const carousels = [];
+
+    let imageHtml = '';
+    if (evt.media?.image) {
+        const carouselId = `carousel-motor-${index}`;
+        const images = Array.isArray(evt.media.image)
+            ? evt.media.image.map(img => CONFIG.IMAGE_CONTENT_URL + img)
+            : CONFIG.IMAGE_CONTENT_URL + evt.media.image;
+        if (Array.isArray(images) && images.length > 1) carousels.push({ id: carouselId, images });
+        imageHtml = `<div class="event-panel-image">${ImageCarousel.renderHTML(images, carouselId)}</div>`;
+    }
+
+    const title = LanguageManager.translateText(evt.event_type) || t('evento');
+    const date = Utils.formatMatchDate(evt.utcDate);
+
+    const broadcast = eventSection(t('tvInfo'), eventRows([
+        { label: t('broadcaster'), value: station.name },
+        { label: t('narration'),   value: station.commentary },
+        { label: t('origin'),      value: station.source_type ? LanguageManager.translateText(station.source_type) : '' },
+        { label: t('type'),        value: evt.type ? LanguageManager.translateText(evt.type) : '' }
+    ]));
+    const { rows, places } = fileInfo(evt);
+    const file = eventSection(t('fileInfo'), rows, places.length ? `<div class="match-aside-method">${storageHtml(places)}</div>` : '');
+
+    return {
+        html: `<article class="event-detail" aria-live="polite">
+            <header class="event-detail-head">
+                <h3 class="event-detail-title">${Utils.escapeHtml(title)}</h3>
+                ${date ? `<span class="event-detail-date">${Utils.escapeHtml(date)}</span>` : ''}
+            </header>
+            ${imageHtml}${broadcast}${file}${eventNotes(evt.additional_info)}
+        </article>`,
+        carousels
+    };
+}
+
+// Motorsport: menu lateral com os conteúdos da etapa; o detalhe só carrega ao escolher um
 function motorBody(item) {
     const t = key => LanguageManager.t(key);
     const events = item.events || [];
-    const carousels = [];
+    if (motorState.itemId !== item.id) { motorState.itemId = item.id; motorState.selected = -1; }
+    motorState.events = events;
 
-    const panels = events.map((evt, index) => {
+    const menu = events.map((evt, index) => {
         const title = LanguageManager.translateText(evt.event_type) || t('evento');
-        const date  = Utils.formatMatchDate(evt.utcDate);
-        const station = evt.station || {};
-
-        let imageHtml = '';
-        if (evt.media?.image) {
-            const carouselId = `carousel-motor-${index}`;
-            const images = Array.isArray(evt.media.image)
-                ? evt.media.image.map(img => CONFIG.IMAGE_CONTENT_URL + img)
-                : CONFIG.IMAGE_CONTENT_URL + evt.media.image;
-            if (Array.isArray(images) && images.length > 1) carousels.push({ id: carouselId, images });
-            imageHtml = `<div class="event-panel-image">${ImageCarousel.renderHTML(images, carouselId)}</div>`;
-        }
-
-        const broadcast = eventSection(t('tvInfo'), eventRows([
-            { label: t('broadcaster'), value: station.name },
-            { label: t('narration'),   value: station.commentary },
-            { label: t('origin'),      value: station.source_type ? LanguageManager.translateText(station.source_type) : '' },
-            { label: t('type'),        value: evt.type ? LanguageManager.translateText(evt.type) : '' }
-        ]));
-        const { rows, places } = fileInfo(evt);
-        const file = eventSection(t('fileInfo'), rows, places.length ? `<div class="match-aside-method">${storageHtml(places)}</div>` : '');
-
-        return `<details class="event-panel"${index === 0 ? ' open' : ''}>
-            <summary>
-                <span class="event-panel-title">${Utils.escapeHtml(title)}</span>
-                <span class="event-panel-date">${Utils.escapeHtml(date)}</span>
-                <svg class="event-panel-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
-            </summary>
-            <div class="event-panel-body">${imageHtml}${broadcast}${file}${eventNotes(evt.additional_info)}</div>
-        </details>`;
+        const date = Utils.formatMatchDate(evt.utcDate);
+        const on = index === motorState.selected;
+        return `<li><button type="button" class="event-menu-item${on ? ' active' : ''}" data-event="${index}" aria-pressed="${on}">
+            <span class="event-menu-title">${Utils.escapeHtml(title)}</span>
+            <span class="event-menu-date">${Utils.escapeHtml(date)}</span>
+        </button></li>`;
     }).join('');
 
-    return { main: `<div class="event-panels">${panels}</div>${eventNotes(item.additional_info)}`, side: '', carousels };
+    const side = `<nav class="event-menu" aria-label="${Utils.escapeHtml(t('eventContents'))}">
+        <h3 class="block-title">${Utils.escapeHtml(t('eventContents'))}<span class="counter">${events.length}</span></h3>
+        <ul class="event-menu-list">${menu}</ul>
+    </nav>`;
+
+    const chosen = events[motorState.selected];
+    const detail = chosen ? motorEventDetail(chosen, motorState.selected) : null;
+    const main = `<div id="eventDetailHost">${detail ? detail.html : `<div class="event-empty"><p>${Utils.escapeHtml(t('eventSelectPrompt'))}</p></div>`}</div>${eventNotes(item.additional_info)}`;
+
+    return { main, side, carousels: detail ? detail.carousels : [] };
+}
+
+// Escolha de um conteúdo no menu (delegação no #meEventBody)
+function bindMotorMenu() {
+    const host = document.getElementById('meEventBody');
+    if (host.dataset.motorBound) return;
+    host.dataset.motorBound = '1';
+    host.addEventListener('click', e => {
+        const btn = e.target.closest('.event-menu-item');
+        if (!btn) return;
+        const index = Number(btn.dataset.event);
+        const evt = motorState.events[index];
+        if (!evt) return;
+        motorState.selected = index;
+        host.querySelectorAll('.event-menu-item').forEach(b => {
+            const on = b === btn;
+            b.classList.toggle('active', on);
+            b.setAttribute('aria-pressed', String(on));
+        });
+        const detail = motorEventDetail(evt, index);
+        const target = document.getElementById('eventDetailHost');
+        target.innerHTML = detail.html;
+        detail.carousels.forEach(c => ImageCarousel.init(c.id, c.images));
+        if (window.matchMedia('(max-width: 900px)').matches) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 }
 
 // ─── Entrada ─────────────────────────────────────────────────────
@@ -243,8 +298,10 @@ function renderEventPage(item, sport) {
     const body = sport === 'carnaval' ? carnavalBody(item) : motorBody(item);
     const host = document.getElementById('meEventBody');
     host.classList.toggle('me-body--single', !body.side);
+    host.classList.toggle('me-body--menu', sport === 'motor');
     host.innerHTML = `
         <div class="match-column match-column--main">${body.main}</div>
         ${body.side ? `<aside class="match-column match-column--side"><div class="match-aside"><div class="match-aside-inner">${body.side}</div></div></aside>` : ''}`;
     (body.carousels || []).forEach(c => ImageCarousel.init(c.id, c.images));
+    if (sport === 'motor') bindMotorMenu();
 }

@@ -725,9 +725,9 @@ input[type="text"]:focus {
 }
 
 .source-picker-item .broadcaster-logo {
-    padding: var(--sp-3) var(--sp-4) 0 var(--sp-4);
-    height: 35px;
-    max-width: 105px;
+    padding: var(--sp-2);
+    height: 45px;
+    filter: none; 
 }
 
 .source-picker-fallback-name {
@@ -2263,8 +2263,7 @@ input[type="text"]:focus {
         width: 100%;
     }
 
-    /* Barra de busca flutuante: ocupa a largura toda; se houver botão de carrinho,
-       reserva o espaço dele (classe has-cart-fab, posta pelo módulo de pedidos). */
+    /* Barra de busca flutuante: ocupa a largura toda (o carrinho agora fica na barra inferior). */
     .search-box {
         position: fixed;
         bottom: var(--float-bottom);
@@ -2274,10 +2273,6 @@ input[type="text"]:focus {
         z-index: 900;
         height: var(--om-fab-size-sm, 40px);
     }
-    body.has-cart-fab .search-box {
-        width: calc(100% - (2 * var(--float-side)) - var(--om-fab-size-sm, 40px) - var(--float-gap));
-    }
-
     .search-box input {
         border-radius: var(--border-radius-size-circle);
         

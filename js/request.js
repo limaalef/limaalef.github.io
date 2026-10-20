@@ -171,12 +171,14 @@ const RequestModule = (() => {
     //  FAB + BADGE
     // ══════════════════════════════════════════════════════════
     function _renderBadge() {
+        if (typeof AppNav !== 'undefined') AppNav.updateBadge();
         const btn = document.getElementById('om-cart-btn');
         if (!btn) return;
         const count = cart.length;
         const badge = btn.querySelector('.om-badge');
         badge.textContent       = count;
         badge.style.display     = count ? 'flex' : 'none';
+        if (typeof AppNav !== 'undefined') AppNav.updateBadge();
     }
 
     function _injectCartButton() {
@@ -651,6 +653,8 @@ const RequestModule = (() => {
         _injectCartButton();
         _ensurePanel();
         _loadOAuthScripts();
+        // Vindo do botão de carrinho da barra inferior de outra página
+        if (location.hash === '#cart') API.openPanel();
 
         // ── HOOK PRINCIPAL ────────────────────────────────────
         // Escuta 'matchesRendered' (disparado por Renderer.render)

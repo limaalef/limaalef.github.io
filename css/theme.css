@@ -96,6 +96,7 @@
     --white-a15: rgba(255, 255, 255, 0.15);
     --white-a20: rgba(255, 255, 255, 0.2);
     --white-a25: rgba(255, 255, 255, 0.25);
+    --white-a50: rgba(255, 255, 255, 0.5);
 
     /* Destaque "premium" (partidas com vídeo) */
     --premium-gold: #FFD700;

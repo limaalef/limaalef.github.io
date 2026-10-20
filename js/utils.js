@@ -3,6 +3,11 @@ const Utils = {
 
     parseDate(dateStr) {
         if (!dateStr) return null;
+        // ISO com horário (2025-05-10T18:00:00Z): o Date nativo respeita o fuso e preserva a hora
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(dateStr)) {
+            const iso = new Date(dateStr);
+            if (!isNaN(iso)) return iso;
+        }
         const formats = [
             /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/,
             /(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/,
