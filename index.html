@@ -41,7 +41,9 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/banner.css">
+    <link rel="stylesheet" href="css/home.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
     <script>
@@ -51,7 +53,7 @@
         gtag('config', 'G-JJZTBEGJ91');
     </script>
 </head>
-<body>
+<body class="page-home">
     <header>
         <div class="header-frame" id="header"
             data-title="Homepage"
@@ -73,19 +75,19 @@
                 <!-- sport navigation -->
                 <div class="sport-nav">
                     <a href="collection.html?sport=football" class="sport-nav-card football">
-                        <div class="nav-icon">⚽</div>
+                        <div class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.6 2.6-1.4 4.2H9.8l-1.4-4.2z"/><path d="M12 7.6V3.2M15.6 10.2l4.2-1.4M14.2 14.4l2.6 3.6M9.8 14.4l-2.6 3.6M8.4 10.2L4.2 8.8"/></svg></div>
                         <p class="nav-text" data-i18n="football">Futebol</p>
                     </a>
                     <a href="collection.html?sport=multisport" class="sport-nav-card multisport">
-                        <div class="nav-icon">🏀</div>
+                        <div class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18"/><path d="M5.6 5.6c3 2.6 3 10.2 0 12.8M18.4 5.6c-3 2.6-3 10.2 0 12.8"/></svg></div>
                         <p class="nav-text" data-i18n="otherSports">Outros Esportes</p>
                     </a>
                     <a href="collection.html?sport=motor" class="sport-nav-card motor">
-                        <div class="nav-icon">🏎️</div>
+                        <div class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 10V3.2M10.3 13l-6 3.4M13.7 13l6 3.4"/></svg></div>
                         <p class="nav-text" data-i18n="motorSports">Automobilismo</p>
                     </a>
                     <a href="collection.html?sport=carnaval" class="sport-nav-card carnaval">
-                        <div class="nav-icon">🎭</div>
+                        <div class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7c3-1.5 6-2 9-2s6 .5 9 2c0 6-3 11-9 11S3 13 3 7z"/><path d="M7 10.5c1 .8 2.2.8 3 0M14 10.5c1 .8 2.2.8 3 0M9 14c1.8 1.4 4.2 1.4 6 0"/></svg></div>
                         <p class="nav-text" data-i18n="carnaval">Carnaval</p>
                     </a>
                 </div>
@@ -109,8 +111,8 @@
 
                 <div class="today-history-wrapper">
                     <div class="today-history-list" id="todayHistory">
-                        <div class="section-state">
-                            <p data-i18n="loading">Carregando jogos...</p>
+                        <div class="skeleton-cards" aria-busy="true">
+                            <span class="skeleton skeleton--card"></span><span class="skeleton skeleton--card"></span><span class="skeleton skeleton--card"></span>
                         </div>
                     </div>
                     
@@ -562,9 +564,10 @@
                             </div>
                         </div>
                         <div class="changelog-list" id="recentChanges">
-                            <div class="section-state">
-                                <div class="icon">⏳</div>
-                                <p data-i18n="loadingChanges">Carregando alterações recentes...</p>
+                            <div aria-busy="true">
+                                <div class="skeleton-row"><span class="skeleton skeleton--short"></span><span class="skeleton skeleton--line"></span></div>
+                                <div class="skeleton-row"><span class="skeleton skeleton--line"></span></div>
+                                <div class="skeleton-row"><span class="skeleton skeleton--line"></span></div>
                             </div>
                         </div>
                     </div>

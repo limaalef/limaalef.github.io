@@ -4,7 +4,7 @@ function renderRecentChanges(entries) {
     const container = document.getElementById('recentChanges');
 
     if (groups.length === 0) {
-        container.innerHTML = `<div class="section-state"><div class="icon">📭</div><p>${LanguageManager.t('noChanges')}</p></div>`;
+        container.innerHTML = `<div class="status-message">${LanguageManager.t('noChanges')}</div>`;
         return;
     }
 
@@ -27,7 +27,6 @@ function renderRecentChanges(entries) {
 
         const itemsHtml = shown.map(c => `
             <div class="cl-group-item">
-                <div class="cl-dot ${c.action}"></div>
                 <span class="cl-item-desc">${Utils.escapeHtml(c.description || 'ID ' + c.id)}</span>
                 <span class="cl-item-badge ${c.action}">${LanguageManager.t('action' + c.action.charAt(0).toUpperCase() + c.action.slice(1))}</span>
             </div>`).join('');
@@ -60,7 +59,7 @@ async function loadRecentChanges() {
 
         renderRecentChanges(data.data || []);
     } catch (err) {
-        container.innerHTML = `<div class="section-state"><div class="icon">❌</div><p>${LanguageManager.t('errorChanges')}</p></div>`;
+        container.innerHTML = `<div class="status-message">${LanguageManager.t('errorChanges')}</div>`;
         console.error('Changelog fetch error:', err);
     }
 }
@@ -90,7 +89,7 @@ const TodayInHistory = {
             this.render();
             
         } catch (err) {
-            container.innerHTML = `<div class="section-state"><div class="icon">❌</div><p>${LanguageManager.t('errorChanges')}</p></div>`;
+            container.innerHTML = `<div class="status-message">${LanguageManager.t('errorChanges')}</div>`;
             console.error('TodayInHistory error:', err);
         }
     },
@@ -141,7 +140,7 @@ const TodayInHistory = {
         const pagination = document.getElementById('tihPagination');
 
         if (this.items.length === 0) {
-            container.innerHTML = `<div class="section-state"><div class="icon">📭</div><p>${LanguageManager.t('noChanges')}</p></div>`;
+            container.innerHTML = `<div class="status-message">${LanguageManager.t('noChanges')}</div>`;
             pagination.style.display = 'none';
             return;
         }
@@ -329,6 +328,18 @@ const CommentorBrowser = {
     },
 };
 
+/* ── esmaecido nas bordas dos carrosséis: marca onde ainda há conteúdo para rolar ── */
+function watchScrollEdges() {
+    document.querySelectorAll('.browse-scroll-list').forEach(list => {
+        const mark = () => {
+            list.classList.toggle('has-more-start', list.scrollLeft > 4);
+            list.classList.toggle('has-more-end', list.scrollLeft + list.clientWidth < list.scrollWidth - 4);
+        };
+        if (!list.dataset.edges) { list.dataset.edges = '1'; list.addEventListener('scroll', mark, { passive: true }); window.addEventListener('resize', mark); }
+        mark();
+    });
+}
+
 /* ── apply i18n to static elements ── */
 function applyI18n() {
     const ids = [
@@ -378,5 +389,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     WorldCuoBrowser.render();
     CommentorBrowser.render();
     // Curadoria feita no admin; substitui as listas estáticas se houver itens cadastrados
-    HomeBrowse.load().then(() => { ClubsBrowser._updateNav(); CommentorBrowser._updateNav(); });
+    HomeBrowse.load().then(() => { ClubsBrowser._updateNav(); CommentorBrowser._updateNav(); watchScrollEdges(); });
+    watchScrollEdges();
 });
