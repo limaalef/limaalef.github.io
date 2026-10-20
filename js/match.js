@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!id) { showError(); return; }
 
     try {
-        const data = await APIService.fetchEnrichment(id, sport);
+        // Futebol e multiesporte usam o endpoint enriquecido; carnaval e motorsport usam o item simples.
+        const data = EVENT_SPORTS.includes(sport)
+            ? await loadEventItem(id, sport)
+            : await APIService.fetchEnrichment(id, sport);
 
         pageState = { data, id, sport };
         drawPage();
@@ -31,21 +34,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─── Estado e desenho da página ──────────────────
 // Tudo que depende de idioma é gerado aqui; por isso o desenho pode ser repetido (troca de idioma).
 let pageState = null;
+const EVENT_SPORTS = ['carnaval', 'motor'];
 
 function drawPage() {
     const { data, id, sport } = pageState;
-    renderMatch(data, sport);
+    const isEvent = EVENT_SPORTS.includes(sport);
 
-    // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
-    attachEditButton(id, sport);
+    // Cada categoria tem o seu corpo: partida (colunas + estatísticas) ou evento (carnaval/motorsport)
+    document.getElementById('meBody').hidden = isEvent;
+    document.getElementById('meEventBody').hidden = !isEvent;
+
+    if (isEvent) {
+        renderEventPage(data, sport);
+    } else {
+        renderMatch(data, sport);
+        // Botão "Editar dados": só aparece com sessão de administrador (a autorização real é do servidor)
+        attachEditButton(id, sport);
+    }
 
     // Botão "Adicionar ao pedido" (módulo de pedidos, request.js) — mesmo item e id usados no modal
     attachRequestButton({ ...data, id: data.id ?? id, sport }, sport);
 
-    updateDocumentTitle(data);
+    updateDocumentTitle(data, sport);
 }
 
-function updateDocumentTitle(match) {
+function updateDocumentTitle(match, sport) {
+    if (EVENT_SPORTS.includes(sport)) { document.title = `${eventTitle(match, sport)} — Sports Archive`; return; }
     const t = key => LanguageManager.t(key);
     const home = t(match.home_team?.name) || '', away = t(match.away_team?.name) || '';
     const { homeGoals, awayGoals } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
@@ -74,6 +88,35 @@ function attachRequestButton(item) {
     const overlay = document.querySelector('#meHero .score-overlay');
     if (!overlay || !window.RequestModule) return;
     RequestModule.attachDetailButton(item, overlay);
+}
+
+// ─── Arquivo: especificações + armazenamento (compartilhado com os eventos) ───
+// Armazenamento: ícone + texto na cor do tema (verde = local, azul = nuvem), sem pílula nem bolinha.
+function fileInfo(item) {
+    const t = key => LanguageManager.t(key);
+    const esc = value => Utils.escapeHtml(value);
+    const tech = item.technical_details || {};
+    const rows = [
+        { label: 'ID',             value: item.id },
+        { label: t('quality'),     value: tech.video_quality },
+        { label: t('audioFormat'), value: tech.audio_format },
+        { label: t('bitrate'),     value: tech.video_bitrate ? `${tech.video_bitrate} Mbps` : '' },
+        { label: t('duration'),    value: tech.duration },
+        { label: t('fileSize'),    value: Utils.formatSize(tech.file_size) },
+    ].filter(r => !Utils.isBlank(r.value))
+     .map(r => keyValueRow(esc(r.label), esc(r.value)))
+     .join('');
+
+    const places = [];
+    if (tech.local)             places.push(`<span class="match-storage-place match-storage-place--local">${icon('disk', 14)}${esc(tech.local)}</span>`);
+    if (Elements.isCloud(tech)) places.push(`<span class="match-storage-place match-storage-place--cloud">${icon('cloud', 14)}${esc(t('cloud'))}</span>`);
+    return { rows, places };
+}
+
+function storageHtml(places) {
+    if (!places.length) return '';
+    const label = Utils.escapeHtml(LanguageManager.t('storageInfo'));
+    return `<span class="match-aside-method-label">${label}</span><span class="match-aside-method-value">${places.join('')}</span>`;
 }
 
 // ─── Render principal ────────────────────────────
@@ -164,23 +207,9 @@ function renderAside(match) {
     }
 
     // Arquivo: especificações + onde está armazenado
-    const file = rows([
-        { label: 'ID',                 value: match.id },
-        { label: t('quality'),         value: tech.video_quality },
-        { label: t('audioFormat'),     value: tech.audio_format },
-        { label: t('bitrate'),         value: tech.video_bitrate ? `${tech.video_bitrate} Mbps` : '' },
-        { label: t('duration'),        value: tech.duration },
-        { label: t('fileSize'),        value: Utils.formatSize(tech.file_size) },
-    ]);
-
-    // Armazenamento: ícone + texto na cor do tema (verde = local, azul = nuvem), sem pílula nem bolinha
-    const places = [];
-    if (tech.local)               places.push(`<span class="match-storage-place match-storage-place--local">${icon('disk', 14)}${esc(tech.local)}</span>`);
-    if (Elements.isCloud(tech))      places.push(`<span class="match-storage-place match-storage-place--cloud">${icon('cloud', 14)}${esc(t('cloud'))}</span>`);
+    const { rows: file, places } = fileInfo(match);
     const storage = document.getElementById('meStorage');
-    storage.innerHTML = places.length
-        ? `<span class="match-aside-method-label">${esc(t('storageInfo'))}</span><span class="match-aside-method-value">${places.join('')}</span>`
-        : '';
+    storage.innerHTML = storageHtml(places);
     storage.hidden = !places.length;
 
     const fill = (id, html) => {

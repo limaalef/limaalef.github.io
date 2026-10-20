@@ -143,11 +143,6 @@
 }
 .payment-logo.single img { display:inline !important; }
 
-/* ── Painel lateral: superfície suave, blocos separados por linha fina ── */
-.aside-panel { background:var(--bg-secondary); border-radius:var(--border-radius-size-xl); padding:var(--sp-7) var(--sp-6); }
-.aside-panel-section + .aside-panel-section { margin-top:var(--sp-7); padding-top:var(--sp-6); border-top:1px solid var(--soft-line); }
-@media (max-width: 900px) { .aside-panel { padding:var(--sp-6) var(--sp-5); } }
-
 /* ── Spinner e mensagens de estado ── */
 .spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--soft-line);
     border-top-color:var(--text-primary); border-radius:50%; animation:spinner-rotate .7s linear infinite; }
@@ -155,3 +150,25 @@
 .status-message { text-align:center; padding:var(--sp-9) var(--sp-5); color:var(--text-muted); font-size:var(--font-size-mdm); }
 
 @media (prefers-reduced-motion: reduce) { .status-dot--live, .spinner { animation:none; } }
+
+/* ── Paginator: paginação compartilhada (changelog, collection, detail) ──
+   <nav class="paginator"> botões .paginator-button + .paginator-status */
+.paginator { display:flex; align-items:center; justify-content:center; gap:var(--sp-3); }
+.paginator-button { display:inline-grid; place-items:center; width:2.25rem; height:2.25rem; border:0; cursor:pointer;
+    border-radius:var(--border-radius-size-circle); background:var(--soft-bg); color:var(--text-primary);
+    font-family:inherit; font-size:var(--font-size-xl); line-height:1; transition:background .2s, opacity .2s; }
+@media (hover:hover) { .paginator-button:hover:not(:disabled) { background:var(--soft-bg-hover); } }
+.paginator-button:disabled { opacity:.3; cursor:default; }
+.paginator-button:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
+.paginator-status { min-width:8rem; text-align:center; font-size:var(--font-size-mdm); color:var(--text-muted); font-variant-numeric:tabular-nums; }
+.paginator-status strong { color:var(--text-primary); font-weight:600; }
+
+/* ── Skeleton: carregando (esqueleto com pulso) ── */
+.skeleton { display: block; border-radius: var(--border-radius-size-md); background: var(--soft-bg); animation: skeleton-pulse 1.4s ease-in-out infinite; }
+@keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+.skeleton-row { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-3) 0; }
+.skeleton--line { height: .9rem; flex: 1; }
+.skeleton--short { flex: 0 0 4rem; }
+.skeleton--card { flex: 0 0 15rem; height: 6rem; border-radius: var(--border-radius-size-lg); }
+.skeleton-cards { display: flex; gap: var(--sp-4); overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }

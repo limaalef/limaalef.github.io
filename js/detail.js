@@ -8,6 +8,111 @@ const CollectionState = {
 };
 
 /* ─────────────────────────────────────────
+   Tipos de busca suportados (?type=) e as suas imagens
+   Cada tipo define o formato da imagem e onde procurá-la. As fontes são tentadas
+   em ordem e a primeira que carrega vence:
+     1. image/logo do collections.json (ou da API de contexto)
+     2. imagem cadastrada no admin (times e narradores: HOME_BROWSE_API_BASE)
+     3. convenção de pastas do projeto, abaixo
+     4. iniciais do nome (sempre funciona)
+   Tipo novo: acrescente uma entrada aqui e uma chave detailType* em translation.js.
+───────────────────────────────────────── */
+const EntityTypes = (() => {
+    const slug = (name, sep) => String(name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, sep).replace(new RegExp(`^${sep}+|${sep}+$`, 'g'), '');
+    // Mesmo formato que a página inicial usa nos escudos: minúsculas, sem acento, espaço vira "-"
+    const legacySlug = name => String(name).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
+    const unique = list => [...new Set(list)];
+
+    const TYPES = {
+        team: {
+            shape: 'emblem', labelKey: 'detailTypeTeam', browseKind: 'teams',
+            images: name => unique([`teams_logos/${legacySlug(name)}.svg`, `teams_logos/${slug(name, '-')}.svg`, `teams_logos/${slug(name, '-')}.png`])
+        },
+        competition: {
+            shape: 'emblem', labelKey: 'detailTypeCompetition',
+            // Os logos de competição têm ano no nome (copa_do_brasil_2025.png): tenta sem ano e os anos recentes
+            images: name => {
+                const base = `competition_logos/${slug(name, '_')}`;
+                const year = new Date().getFullYear();
+                return [`${base}.png`, `${base}.svg`, ...[0, 1, 2, 3].map(back => `${base}_${year - back}.png`)];
+            }
+        },
+        commentary: {
+            shape: 'portrait', labelKey: 'detailTypeCommentary', browseKind: 'commentary',
+            images: name => ['png', 'webp', 'jpg'].map(ext => `people_icon/${slug(name, '_')}.${ext}`)
+        },
+        storage: { shape: 'icon', labelKey: 'detailTypeStorage', icon: 'disk', images: () => [] }
+    };
+
+    // collections.json usa "club"; a URL usa "team"
+    const ALIAS = { club: 'team' };
+
+    return {
+        resolve(urlType, infoType) {
+            const key = ALIAS[urlType] || urlType || ALIAS[infoType] || infoType;
+            return { key, ...(TYPES[key] || { shape: 'emblem', labelKey: '', images: () => [] }) };
+        }
+    };
+})();
+
+const EntityImage = {
+    _browse: null,
+
+    // Imagens cadastradas no admin (times e narradores), carregadas uma vez
+    async _browseImages() {
+        if (this._browse) return this._browse;
+        this._browse = (async () => {
+            if (typeof CONFIG === 'undefined' || !CONFIG.HOME_BROWSE_API_BASE) return {};
+            try {
+                const res = await fetch(CONFIG.HOME_BROWSE_API_BASE, { headers: { Accept: 'application/json' } });
+                return res.ok ? await res.json() : {};
+            } catch { return {}; }
+        })();
+        return this._browse;
+    },
+
+    _normalize: value => String(value || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(),
+
+    _canLoad(url) {
+        return new Promise(resolve => {
+            const probe = new Image();
+            probe.onload = () => resolve(true);
+            probe.onerror = () => resolve(false);
+            probe.src = url;
+        });
+    },
+
+    async _firstThatLoads(urls) {
+        for (const url of urls) { if (url && await this._canLoad(url)) return url; }
+        return '';
+    },
+
+    // Desenha o formato certo e já mostra o fallback; troca pela imagem quando encontrar uma que carrega.
+    async render(type, name, info) {
+        const holder = document.getElementById('entityImage');
+        holder.dataset.shape = type.shape;
+        const initials = String(name).trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        holder.innerHTML = type.icon
+            ? icon(type.icon, 40)
+            : `<span class="entity-image-fallback" aria-hidden="true">${Utils.escapeHtml(initials)}</span>`;
+
+        const fromData = info.logo || info.image || '';
+        let fromAdmin = '';
+        if (type.browseKind) {
+            const browse = await this._browseImages();
+            const wanted = this._normalize(name);
+            fromAdmin = (browse[type.browseKind] || []).find(i => this._normalize(i.name) === wanted)?.image || '';
+        }
+        const url = await this._firstThatLoads([fromData, fromAdmin, ...type.images(name)]);
+        // A página pode ter mudado de busca enquanto as imagens eram testadas
+        if (url && document.getElementById('entityImage') === holder) {
+            holder.innerHTML = `<img src="${Utils.escapeHtml(url)}" alt="${Utils.escapeHtml(name)}">`;
+        }
+    }
+};
+
+/* ─────────────────────────────────────────
    SidebarManager — carrega e exibe a sidebar
 ───────────────────────────────────────── */
 const SidebarManager = {
@@ -30,32 +135,32 @@ const SidebarManager = {
 
         // ── 2. Fallback: API remota ─────────────────────────────────────
         const apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.CONTEXT_API_URL : null;
-        if (!apiUrl) {
-            // Sem dado local e sem API configurada: limpa skeleton silenciosamente
-            console.warn(`SidebarManager: "${query}" não encontrado no CollectionsDB e CONTEXT_API_URL não configurada.`);
-            loading.innerHTML = '';
-            return;
-        }
+        if (apiUrl) {
+            try {
+                const url = new URL(apiUrl);
+                url.searchParams.set('q', query);
 
-        try {
-            const url = new URL(apiUrl);
-            url.searchParams.set('q', query);
+                const response = await fetch(url.toString());
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (!data.success) throw new Error('API retornou erro');
 
-            const response = await fetch(url.toString());
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if (!data.success) throw new Error('API retornou erro');
+                // Persiste no CollectionsDB para evitar novo fetch nesta sessão
+                if (typeof CollectionsDB !== 'undefined') {
+                    CollectionsDB.upsert({ key: query, ...data.data });
+                }
 
-            // Opcional: persiste no CollectionsDB para evitar re-fetch nesta sessão
-            if (typeof CollectionsDB !== 'undefined') {
-                CollectionsDB.upsert({ key: query, ...data.data });
+                this.render(data.data, query);
+                return;
+            } catch (err) {
+                console.warn('SidebarManager: erro ao carregar contexto via API:', err.message);
             }
-
-            this.render(data.data, query);
-        } catch (err) {
-            console.warn('SidebarManager: erro ao carregar contexto via API:', err.message);
-            loading.innerHTML = '';
+        } else {
+            console.warn(`SidebarManager: "${query}" não encontrado no CollectionsDB e CONTEXT_API_URL não configurada.`);
         }
+
+        // ── 3. Sem cadastro: o painel mostra o que se sabe pela própria busca (nome, tipo, imagem, números)
+        this.render({}, query);
     },
 
     render(info, query) {
@@ -64,38 +169,26 @@ const SidebarManager = {
             CollectionApp.applyTheme(info.sport);
         }
 
-        // Escudo / logo
-        const logoEl  = document.getElementById('sidebarLogo');
-        logoEl.src = info.logo || `teams_logos/${query.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-")}.svg`;
-        logoEl.alt = info.name || query;
-        logoEl.style.display = '';
+        const type = EntityTypes.resolve(CollectionState.type, info.type);
+        const name = info.name || query;
 
-        // Nome e meta
-        document.getElementById('sidebarName').textContent = info.name || query;
+        document.getElementById('sidebarName').textContent = name;
+        EntityImage.render(type, name, info);
 
-        const metaEl = document.getElementById('sidebarMeta');
-        if (info.type === 'club') {
-            metaEl.textContent = info.full_name || '';
-        } else if (info.type === 'competition') {
-            metaEl.textContent = info.scope || '';
-        } else {
-            metaEl.textContent = '';
-            
-        }
+        // Subtítulo: nome completo (clube), âmbito (competição) ou o próprio tipo da busca
+        const typeLabel = type.labelKey ? LanguageManager.t(type.labelKey) : '';
+        document.getElementById('sidebarMeta').textContent =
+            (info.type === 'club' ? info.full_name : info.type === 'competition' ? info.scope : '') || typeLabel;
 
         // Detalhes específicos
-        const detailsEl = document.getElementById('sidebarDetails');
         const pairs = [];
-
         if (info.type === 'club') {
-            if (info.country)       pairs.push(['País',          info.country]);
-            if (info.founded_year)  pairs.push(['Fundação',      info.founded_year]);
+            if (info.country)       pairs.push(['País',     info.country]);
+            if (info.founded_year)  pairs.push(['Fundação', info.founded_year]);
         } else if (info.type === 'competition') {
-            if (info.organizer) pairs.push(['Organização',   info.organizer]);
-            if (info.format)    pairs.push(['Sistema',       info.format]);
-            if (info.scope)     pairs.push(['Âmbito',        info.scope]);
-        } else {
-            detailsEl.style.display = 'none';
+            if (info.organizer) pairs.push(['Organização', info.organizer]);
+            if (info.format)    pairs.push(['Sistema',     info.format]);
+            if (info.scope)     pairs.push(['Âmbito',      info.scope]);
         }
 
         // Pares extras opcionais vindos do CollectionsDB (campo details[])
@@ -105,20 +198,12 @@ const SidebarManager = {
             });
         }
 
-        detailsEl.innerHTML = pairs.map(([label, value]) => `
-            <div class="sidebar-detail-item">
-                <span class="sidebar-detail-label">${LanguageManager.t(label)}</span>
-                <span class="sidebar-detail-value">${value}</span>
-            </div>
-        `).join('');
+        const detailsEl = document.getElementById('sidebarDetails');
+        detailsEl.innerHTML = pairs.map(([label, value]) => keyValueRow(Utils.escapeHtml(LanguageManager.t(label)), Utils.escapeHtml(value))).join('');
+        detailsEl.style.display = pairs.length ? '' : 'none';
 
-        // Descrição
-        const descEl = document.getElementById('sidebarDescription');
-        if (info.description ==! '') {
-            descEl.innerHTML = info.description ? `<p>${info.description}</p>` : '';
-        } else {
-            descEl.style.display = 'none';
-        }
+        // Descrição (texto cadastrado, sem HTML)
+        document.getElementById('sidebarDescription').textContent = info.description || '';
 
         // Mostra conteúdo
         document.getElementById('sidebarLoading').style.display = 'none';
@@ -127,8 +212,7 @@ const SidebarManager = {
 };
 
 /* ─────────────────────────────────────────
-   Patch no Renderer para filtro por ano via API
-   (não filtra localmente — dispara nova requisição)
+   Patch no Renderer: filtro por ano (aplicado aos jogos da página carregada)
 ───────────────────────────────────────── */
 Renderer.populateYearFilter = function () {
     const years = new Set();
@@ -140,23 +224,22 @@ Renderer.populateYearFilter = function () {
     const bar = document.getElementById('yearFilterBar');
     if (!bar) return;
 
-    bar.innerHTML = `<option value=null data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
- 
-    years.forEach(y => {
+    bar.innerHTML = `<option value="" data-i18n="allYears">${LanguageManager.t('allYears')}</option>`;
+    [...years].sort((a, b) => b - a).forEach(y => {
         const opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y;
         bar.appendChild(opt);
     });
- 
-    bar.value = CollectionState.yearFilter;
- 
+
+    // Mantém a seleção quando o ano ainda existe na página carregada
+    bar.value = years.has(CollectionState.yearFilter) ? CollectionState.yearFilter : '';
+    CollectionState.yearFilter = bar.value ? parseInt(bar.value, 10) : null;
+
+    // O filtro vale para os jogos da página carregada (a API ainda não recebe o ano)
     bar.onchange = () => {
-        const val = bar.value;
-        CollectionState.yearFilter = val ? parseInt(val) : null;
-        AppState.currentPage = 1;
-        CollectionApp.loadData();
-        console.log(CollectionState.yearFilter)
+        CollectionState.yearFilter = bar.value ? parseInt(bar.value, 10) : null;
+        FilterManager.apply();
     };
 };
 
@@ -198,12 +281,9 @@ const CollectionApp = {
             const message = `${AppState.matches.length} ${LanguageManager.t('games').toLowerCase()} ${LanguageManager.t('loadedText')} (${totalRecords} total) - ${LanguageManager.t('page')} ${AppState.currentPage}/${AppState.totalPages}`;
             Utils.showNotification(message, 'success');
         } catch (error) {
-            console.log(error)
+            console.error(error);
             document.getElementById('matchesContainer').innerHTML =
-                Utils.emptyStateHtml(
-                    'Erro ao carregar dados',
-                    `Verifique a URL da API<br><span style="font-size:0.9em;margin-top:10px;">Erro: ${error.message}</span>`
-                );
+                `<div class="detail-state"><h2>${LanguageManager.t('cl_error')}</h2><p>${Utils.escapeHtml(error.message)}</p></div>`;
         }
     },
 
@@ -260,17 +340,16 @@ const CollectionApp = {
         PaginationManager.update = function(apiResponse) {
             _origPaginationUpdate(apiResponse);
             const pagination = document.getElementById('pagination');
-            const wrapper = pagination.closest('.filter-sub-group').closest('.filter-options');
-            if (pagination) {
-                pagination.style.display = AppState.totalPages >= 2 ? '' : 'none';
-                wrapper.classList.toggle('expand2', AppState.totalPages < 2);
-            }
+            if (pagination) pagination.hidden = AppState.totalPages < 2;
         };
 
         const _origFilterApply = FilterManager.apply.bind(FilterManager);
         FilterManager.apply = function() {
             const query = document.getElementById('searchInput').value;
-            AppState.filteredMatches = AppState.matches.filter(match => Utils.matchesSearch(match, query));
+            const year = CollectionState.yearFilter;
+            AppState.filteredMatches = AppState.matches.filter(match =>
+                Utils.matchesSearch(match, query)
+                && (!year || Utils.parseDate(Utils.getItemDate(match))?.getFullYear() === year));
             Renderer.render();
         };
 

@@ -42,6 +42,8 @@
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/request.css">
+    <link rel="stylesheet" href="css/ui-components.css">
+    <link rel="stylesheet" href="css/changelog.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
     <script>
@@ -51,7 +53,7 @@
         gtag('config', 'G-JJZTBEGJ91');
     </script>
 </head>
-<body>
+<body class="page-changelog">
     <header>
         <div class="header-frame" id="header"
             data-title="Changelog"
@@ -61,74 +63,48 @@
     </header>
 
     <div class="container">
-        <div class="home-container">
-
-            <div class="controls">
-                <div class="filter-options">
-                    <div class="filter-sub-group">
-                        <div class="control-group">
-                            <div class="dropdown-group">
-                                <label data-i18n="items">Itens:</label>
-                                <select class="f-select highlighted" id="limitFilter">
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="dropdown-group">
-                                <label data-i18n="mode">Modo:</label>
-                                <select class="f-select" id="modeFilter">
-                                    <option value="" data-i18n="allContent">Todos</option>
-                                    <option value="football" data-i18n="modeFootball">Futebol</option>
-                                    <option value="multisport" data-i18n="modeMultisport">Multiesporte</option>
-                                    <option value="motorsport" data-i18n="modeMotorsport">Automobilismo</option>
-                                    <option value="carnaval" data-i18n="modeCarnaval">Carnaval</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="dropdown-group">
-                                <label data-i18n="action">Ação:</label>
-                                <select class="f-select" id="actionFilter">
-                                    <option value="" data-i18n="allContent">Todas as ações</option>
-                                    <option value="added" data-i18n="modeAdded">✅ Adicionados</option>
-                                    <option value="modified" data-i18n="modeModified">✏️ Modificados</option>
-                                    <option value="removed" data-i18n="modeRemoved">🗑️ Removidos</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+        <main class="changelog">
+            <div class="changelog-controls">
+                <div class="chip-group" id="modeFilter" role="group" aria-label="Modalidade" data-i18n-aria="mode">
+                    <button class="chip active" type="button" data-value="" data-i18n="allContent">Todos</button>
+                    <button class="chip" type="button" data-value="football" data-i18n="modeFootball">Futebol</button>
+                    <button class="chip" type="button" data-value="multisport" data-i18n="modeMultisport">Multiesporte</button>
+                    <button class="chip" type="button" data-value="motorsport" data-i18n="modeMotorsport">Automobilismo</button>
+                    <button class="chip" type="button" data-value="carnaval" data-i18n="modeCarnaval">Carnaval</button>
                 </div>
-                <div class="pagination" id="pagination">
-                    <div class="back-btn-group">
-                        <button id="firstPage">«</button>
-                        <button id="prevPage">‹</button>
+                <div class="changelog-controls-row">
+                    <div class="chip-group" id="actionFilter" role="group" aria-label="Ação" data-i18n-aria="action">
+                        <button class="chip active" type="button" data-value="" data-i18n="cl_actionAll">Todas as ações</button>
+                        <button class="chip" type="button" data-value="added" data-i18n="cl_sectionAdded">Adicionados</button>
+                        <button class="chip" type="button" data-value="modified" data-i18n="cl_sectionModified">Modificados</button>
+                        <button class="chip" type="button" data-value="removed" data-i18n="cl_sectionRemoved">Removidos</button>
                     </div>
-                    <div class="pages-info-group">
-                        <span class="label" data-i18n="page">Página</span>
-                        <span class="value contrast" id="pageNumber">1</span>
-                        <span class="label" data-i18n="pageSeparator">de</span>
-                        <span class="value" id="pageTotal">1</span>
-                    </div>
-                    <div class="back-btn-group">
-                        <button id="nextPage">›</button>
-                        <button id="lastPage">»</button>
-                    </div>
+                    <label class="changelog-limit">
+                        <span data-i18n="cl_perPage">Por página</span>
+                        <select class="field field--select" id="limitFilter">
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </label>
                 </div>
             </div>
 
-            <div class="changelog-group" id="changelogContent">
-                <div class="state-box">
-                    <div class="icon">⏳</div>
-                    <h2 id="loadingTitle">Carregando changelog...</h2>
-                    <p id="loadingMsg">Aguarde enquanto buscamos o histórico</p>
-                </div>
+            <div class="changelog-news is-hidden" id="changelogNews" role="status"></div>
+            <div class="changelog-timeline" id="changelogContent" aria-live="polite">
+                <div class="skeleton-row"><span class="skeleton skeleton--short"></span><span class="skeleton skeleton--line"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton--line"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton--line"></span></div>
             </div>
-        </div>
+
+            <nav class="paginator" id="pagination" aria-label="Paginação">
+                <button class="paginator-button" type="button" id="firstPage" data-i18n-aria="cl_first" aria-label="Primeira página">«</button>
+                <button class="paginator-button" type="button" id="prevPage" data-i18n-aria="cl_prev" aria-label="Página anterior">‹</button>
+                <span class="paginator-status"><span data-i18n="page">Página</span> <strong id="pageNumber">1</strong> <span data-i18n="pageSeparator">de</span> <span id="pageTotal">1</span></span>
+                <button class="paginator-button" type="button" id="nextPage" data-i18n-aria="cl_next" aria-label="Próxima página">›</button>
+                <button class="paginator-button" type="button" id="lastPage" data-i18n-aria="cl_last" aria-label="Última página">»</button>
+            </nav>
+        </main>
 
         <div class="modal" id="modal">
             <div class="modal-content">

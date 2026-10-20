@@ -41,6 +41,7 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/detail.css">
     <link rel="stylesheet" href="css/request.css">
     <!-- Google tag (gtag.js) -->
@@ -52,7 +53,7 @@
         gtag('config', 'G-JJZTBEGJ91');
     </script>
 </head>
-<body class="theme-football">
+<body class="theme-football page-detail">
     <header>
         <div class="header-frame" id="header"
             data-title-key="navCollection"
@@ -62,14 +63,12 @@
     </header>
 
     <div class="container">
-        <div class="section-divider"></div>
-
         <div class="collection-layout">
 
-            <!-- SIDEBAR -->
+            <!-- SIDEBAR: a entidade da busca (time, competição, narrador ou disco) -->
             <aside class="collection-sidebar" id="collectionSidebar">
 
-                <div class="sidebar-loading" id="sidebarLoading">
+                <div class="sidebar-loading" id="sidebarLoading" aria-busy="true">
                     <div class="sidebar-skeleton-emblem"></div>
                     <div class="sidebar-skeleton-line wide"></div>
                     <div class="sidebar-skeleton-line medium"></div>
@@ -77,98 +76,54 @@
 
                 <div class="sidebar-content" id="sidebarContent" style="display:none;">
                     <div class="sidebar-sport-header">
-                        <div class="sidebar-emblem-wrap">
-                            <img id="sidebarLogo" src="" alt="" class="sidebar-logo" onerror="this.style.display='none'">
-                        </div>
+                        <div class="entity-image" id="entityImage" data-shape="emblem"></div>
                         <div class="sidebar-header-text-group">
-                            <div class="sidebar-sport-name" id="sidebarName"></div>
+                            <h1 class="sidebar-sport-name" id="sidebarName"></h1>
                             <div class="sidebar-sport-meta" id="sidebarMeta"></div>
                         </div>
                     </div>
 
-                    <div class="section-divider" id="statsDivider" style="display:none;"></div>
+                    <div class="stat-tile-grid sidebar-stats" id="stats" style="display:none;">
+                        <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="totalGames">0</div><div class="stat-tile-label" data-i18n="games">Jogos</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="totalFiles">0</div><div class="stat-tile-label" data-i18n="totalfiles">Itens totais</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="totalSize">0 GB</div><div class="stat-tile-label" data-i18n="totalSize">Tamanho Total</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="totalDuration">0h</div><div class="stat-tile-label" data-i18n="totalDuration">Duração Total</div></div>
+                    </div>
 
                     <div class="sidebar-details" id="sidebarDetails"></div>
-
-                    <div class="section-divider"></div>
-
                     <div class="sidebar-description" id="sidebarDescription"></div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="stats sidebar-stats" id="stats" style="display:none;">
-                        <div class="stat">
-                            <div class="stat-value highlighted" id="totalGames">0</div>
-                            <div class="stat-label" data-i18n="games">Jogos</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value highlighted" id="totalFiles">0</div>
-                            <div class="stat-label" data-i18n="totalfiles">Itens totais</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value highlighted" id="totalSize">0 GB</div>
-                            <div class="stat-label" data-i18n="totalSize">Tamanho Total</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="totalDuration">0h</div>
-                            <div class="stat-label" data-i18n="totalDuration">Duração Total</div>
-                        </div>
-                    </div>
                 </div>
             </aside>
 
             <!-- CONTEÚDO PRINCIPAL -->
             <div class="collection-main">
 
-                <div class="empty-state" id="noQueryState" style="display:none;">
-                    <h2>Nenhuma busca definida</h2>
-                    <p>Acesse esta página com um parâmetro <code>?q=</code> na URL.</p>
+                <div class="detail-state" id="noQueryState" style="display:none;">
+                    <h2 data-i18n="detailNoQuery">Nenhuma busca definida</h2>
+                    <p data-i18n="detailNoQueryHint">Acesse esta página a partir do acervo ou da página inicial.</p>
                 </div>
 
-                <div class="controls" id="mainControls" style="display:none;">
-                    <div class="filter-options">
-                        <div class="filter-sub-group expand">
-                            <div class="control-group" style="max-width: 140px;">
-                                <div class="dropdown-group">
-                                    <label data-i18n="years">Anos</label>
-                                    <select class="f-select" id="yearFilterBar">
-                                        <option value=null data-i18n="allYears">Todos os anos</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-sub-group">
-                            <div class="search-box">
-                                <input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="🔍 Buscar...">
-                            </div>
-                        </div>
+                <div class="detail-controls" id="mainControls" style="display:none;">
+                    <label class="detail-filter">
+                        <span data-i18n="years">Anos</span>
+                        <select class="field field--select" id="yearFilterBar">
+                            <option value="" data-i18n="allYears">Todos os anos</option>
+                        </select>
+                    </label>
+                    <div class="detail-search">
+                        <input type="search" class="field" id="searchInput" data-i18n-placeholder="search" placeholder="Buscar..." autocomplete="off">
                     </div>
-                    
-                    <div class="filter-options">
-                        <div class="filter-sub-group">
-                            <div class="pagination" id="pagination">
-                                <div class="back-btn-group">
-                                    <button id="firstPage">«</button>
-                                    <button id="prevPage">‹</button>
-                                </div>
-                                <div class="pages-info-group">
-                                    <span class="label hidden" data-i18n="page">Página</span>
-                                    <span class="value contrast" id="pageNumber">1</span>
-                                    <span class="label" data-i18n="pageSeparator">de</span>
-                                    <span class="value" id="pageTotal">1</span>
-                                </div>
-                                <div class="back-btn-group">
-                                    <button id="nextPage">›</button>
-                                    <button id="lastPage">»</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <nav class="paginator" id="pagination" aria-label="Paginação">
+                        <button class="paginator-button" type="button" id="firstPage" data-i18n-aria="cl_first" aria-label="Primeira página">«</button>
+                        <button class="paginator-button" type="button" id="prevPage" data-i18n-aria="cl_prev" aria-label="Página anterior">‹</button>
+                        <span class="paginator-status"><strong id="pageNumber">1</strong> <span data-i18n="pageSeparator">de</span> <span id="pageTotal">1</span></span>
+                        <button class="paginator-button" type="button" id="nextPage" data-i18n-aria="cl_next" aria-label="Próxima página">›</button>
+                        <button class="paginator-button" type="button" id="lastPage" data-i18n-aria="cl_last" aria-label="Última página">»</button>
+                    </nav>
                 </div>
 
                 <div class="match-container" id="matchesContainer">
-                    <div class="empty-state">
+                    <div class="detail-state">
                         <h2 data-i18n="loading">Carregando jogos...</h2>
                         <p data-i18n="loadingMessage">Aguarde enquanto buscamos os dados</p>
                     </div>
@@ -195,6 +150,7 @@
     <script src="js/utils.js"></script>
     <script src="js/api_service.js"></script>
     <script src="js/managers.js"></script>
+    <script src="js/ui-components.js"></script>
     <script src="js/collections.js"></script>
     <script src="js/detail.js"></script>
     <script src="js/auth.js"></script>

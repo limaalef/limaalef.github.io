@@ -1,151 +1,60 @@
-/* ========================================
-   COLLECTION PAGE — sidebar + main (35/65)
-   Adicionar ao final de components.css
-   ======================================== */
+/* ═══ Detail (detail.html, body.page-detail) ═══
+   Sidebar da entidade (time, competição, narrador, disco) + lista de jogos.
+   Os cartões de jogo (.match-card) não mudam: ver bloco "CARDS" no fim. */
 
-/* ── Layout wrapper ── */
-.collection-layout {
-    display: flex;
-}
+.page-detail .collection-layout { display: flex; align-items: flex-start; gap: var(--sp-7); max-width: var(--page-width-size); margin: 0 auto; padding: var(--sp-7) var(--sp-5) var(--sp-9); }
 
-/* ── SIDEBAR ── */
-.collection-sidebar {
-    width: 35%;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100dvh;
-    overflow-y: auto;
-    border-right: 1px solid var(--border-color);
-    scrollbar-width: none;
-}
-.collection-sidebar::-webkit-scrollbar { display: none; }
+/* ── Sidebar: painel da entidade ── */
+.page-detail .collection-sidebar { width: 22rem; flex: none; position: sticky; top: var(--sp-6); max-height: calc(100dvh - var(--sp-8)); overflow-y: auto; scrollbar-width: none; background: var(--bg-secondary); border: 0; border-radius: calc(var(--border-radius-size-xl) * 1.5); padding: var(--sp-7) var(--sp-6); }
+.page-detail .collection-sidebar::-webkit-scrollbar { display: none; }
+.page-detail .collection-main { flex: 1; min-width: 0; width: auto; overflow: visible; display: flex; flex-direction: column; gap: var(--sp-5); }
+.page-detail .collection-main .match-container { padding: 0; }
 
-/* Skeleton loader */
-.sidebar-loading {
-    padding: 1.25rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.sidebar-skeleton-emblem {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--border-radius-size-md);
-    background: var(--border-color);
-    animation: skeleton-pulse 1.4s ease-in-out infinite;
-}
-.sidebar-skeleton-line {
-    height: 12px;
-    border-radius: 6px;
-    background: var(--border-color);
-    animation: skeleton-pulse 1.4s ease-in-out infinite;
-}
-.sidebar-skeleton-line.wide   { width: 70%; }
-.sidebar-skeleton-line.medium { width: 45%; }
-@keyframes skeleton-pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
-}
+.page-detail .sidebar-loading { padding: 0; display: flex; flex-direction: column; gap: var(--sp-4); }
+.page-detail .sidebar-skeleton-emblem { width: 5.5rem; height: 5.5rem; border-radius: var(--border-radius-size-xl); background: var(--soft-bg-hover); animation: skeleton-pulse 1.4s ease-in-out infinite; }
+.page-detail .sidebar-skeleton-line { height: .9rem; border-radius: var(--border-radius-size-sm); background: var(--soft-bg-hover); animation: skeleton-pulse 1.4s ease-in-out infinite; }
+.page-detail .sidebar-skeleton-line.wide   { width: 70%; }
+.page-detail .sidebar-skeleton-line.medium { width: 45%; }
+@keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 
-/* Header do sidebar */
-.sidebar-sport-header {
-    padding: 1.25rem 1rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+.page-detail .sidebar-content { display: flex; flex-direction: column; gap: var(--sp-6); }
+.page-detail .sidebar-sport-header { padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-5); }
+.page-detail .sidebar-header-text-group { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.page-detail .sidebar-sport-name { font-size: var(--font-size-xxxl); font-weight: 700; letter-spacing: -.04em; line-height: 1.05; color: var(--text-primary); overflow-wrap: anywhere; }
+.page-detail .sidebar-sport-meta { font-size: var(--font-size-md); color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+.page-detail .sidebar-sport-meta:empty { display: none; }
 
-.sidebar-emblem-wrap {
-    margin-bottom: 6px;
-}
+/* Imagem da entidade: o formato muda com o tipo da busca (data-shape) */
+.page-detail .entity-image { position: relative; display: grid; place-items: center; flex: none; overflow: hidden; background: var(--soft-bg-hover); color: var(--text-muted); }
+.page-detail .entity-image[data-shape="emblem"]   { width: 6rem; height: 6rem; border-radius: var(--border-radius-size-xl); padding: var(--sp-4); }
+.page-detail .entity-image[data-shape="portrait"] { width: 7.5rem; height: 7.5rem; border-radius: 50%; }
+.page-detail .entity-image[data-shape="icon"]     { width: 6rem; height: 6rem; border-radius: var(--border-radius-size-xl); }
+.page-detail .entity-image img { width: 100%; height: 100%; object-fit: contain; }
+.page-detail .entity-image[data-shape="portrait"] img { object-fit: cover; }
+.page-detail .entity-image-fallback { font-size: var(--font-size-xxxl); font-weight: 700; letter-spacing: -.04em; }
+.page-detail .entity-image svg { width: 2.5rem; height: 2.5rem; }
 
-.sidebar-logo {
-    min-height: 56px;
-    max-height: 56px;
-    max-width: 80px;
-    object-fit: contain;
-}
+/* Indicadores */
+.page-detail .sidebar-stats { display: flex; flex-wrap: wrap; gap: var(--sp-4); padding: 0; }
+.page-detail .sidebar-stats .stat-tile { flex: 1 1 8rem; min-width: 0; background: var(--bg-primary); }
 
-.sidebar-sport-name {
-    font-size: var(--font-size-mxxl);
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.03em;
-    line-height: 1.2;
-}
+/* Detalhes e descrição */
+.page-detail .sidebar-details { padding: 0; display: flex; flex-direction: column; }
+.page-detail .sidebar-details .key-value { padding: var(--sp-3) 0; }
+.page-detail .sidebar-description { padding: var(--sp-6) 0 0; border-top: 1px solid var(--soft-line); font-size: var(--font-size-md); color: var(--text-secondary); line-height: 1.6; }
+.page-detail .sidebar-description:empty { display: none; }
 
-.sidebar-sport-meta {
-    font-size: var(--font-size-sm);
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
+/* ── Controles ── */
+.page-detail .detail-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
+.page-detail .detail-filter { display: inline-flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-sm); color: var(--text-muted); }
+.page-detail .detail-filter .field { width: auto; min-width: 9rem; }
+.page-detail .detail-search { flex: 1 1 14rem; min-width: 0; }
+.page-detail .detail-search .field { width: 100%; padding: var(--sp-3) var(--sp-5); }
+.page-detail .detail-controls .paginator { margin-left: auto; }
+.page-detail .detail-state { padding: var(--sp-9) var(--sp-5); text-align: center; color: var(--text-muted); }
+.page-detail .detail-state h2 { margin: 0 0 var(--sp-2); font-size: var(--font-size-xl); color: var(--text-primary); }
 
-/* Stats em coluna dentro da sidebar */
-.stats.sidebar-stats {
-    flex-direction: column;
-    gap: 6px;
-    padding: 1rem;
-}
-.stats.sidebar-stats .stat {
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    align-items: baseline;
-}
-
-/* Detalhes (tabela label ↔ valor) */
-.sidebar-details {
-    padding: 0.75rem 1rem;
-    display: flex;
-    flex-direction: column;
-}
-.sidebar-detail-item {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-.sidebar-detail-item:last-child {
-    border-bottom: none;
-}
-.sidebar-detail-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-}
-.sidebar-detail-value {
-    font-size: var(--font-size-md);
-    color: var(--text-primary);
-    font-weight: 500;
-    text-align: right;
-}
-
-/* Descrição */
-.sidebar-description {
-    padding: 1rem;
-    font-size: var(--font-size-md);
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-/* ── MAIN CONTENT ── */
-.collection-main {
-    width: 65%;
-    overflow: hidden;
-}
-
-.collection-main .match-container {
-    padding: 0 1rem 1rem;
-}
-
-/* ── YEAR FILTER BAR ── */
+/* ═══ CARDS (sem alterações) ═══ */
 
 /* ── CARD NOVO: linha única "Casa 0 x 0 Visitante" ── */
 .match-card {
@@ -275,30 +184,17 @@
 }
 
 /* ── RESPONSIVO ── */
-@media (max-width: 640px) {
-    .collection-layout {
-        flex-direction: column;
-    }
-
-    .collection-main {
-        width: 100%;
-    }
-
-    .collection-sidebar {
-        width: 100%;
-        position: static;
-        height: auto;
-        max-height: none;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .stats.sidebar-stats {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    .stats.sidebar-stats .stat {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+@media (max-width: 900px) {
+    .page-detail .collection-layout { flex-direction: column; align-items: stretch; padding: var(--sp-5) var(--sp-5) var(--sp-9); gap: var(--sp-5); }
+    .page-detail .collection-sidebar { width: 100%; position: static; max-height: none; padding: var(--sp-6) var(--sp-5); }
+    .page-detail .sidebar-sport-header { flex-direction: row; align-items: center; }
+    .page-detail .entity-image[data-shape="emblem"], .page-detail .entity-image[data-shape="icon"] { width: 4.5rem; height: 4.5rem; padding: var(--sp-3); }
+    .page-detail .entity-image[data-shape="portrait"] { width: 5.5rem; height: 5.5rem; }
+    .page-detail .sidebar-sport-name { font-size: var(--font-size-xxl); }
+    .page-detail .detail-controls .paginator { margin-left: 0; width: 100%; justify-content: center; }
 }
+@media (prefers-reduced-motion: reduce) { .page-detail .sidebar-skeleton-emblem, .page-detail .sidebar-skeleton-line { animation: none; } }
+
+/* Estados vazios gerados pela listagem (managers.js) */
+.page-detail .collection-main .empty-state { padding: var(--sp-9) var(--sp-5); text-align: center; color: var(--text-muted); background: none; border: 0; }
+.page-detail .collection-main .empty-state h2 { margin: 0 0 var(--sp-2); font-size: var(--font-size-xl); color: var(--text-primary); }
