@@ -418,7 +418,7 @@ const SourcePicker = {
 //  Novo tipo de conteúdo: adicionar um adaptador em ModalAdapters (e um
 //  cabeçalho/corpo em ModalHeaders/ModalBodies, se for diferente).
 //  O modal usa os mesmos IDs (#modalTitle, #modalScore, #modalBody) em
-//  index/collection (modal) e event.html (página).
+//  index/collection (modal) e match.html (página).
 // ══════════════════════════════════════════════════════════════════
 const ModalAdapters = {
     // Football e Multisport
@@ -725,7 +725,7 @@ const MatchModal = {
     },
 
     // Mostra qualquer tipo de conteúdo: o adaptador da categoria monta o view-model.
-    // sportOverride: para páginas que já sabem a categoria (event.html).
+    // sportOverride: para páginas que já sabem a categoria (match.html).
     show(item, sportOverride) {
         document.body.style.overflow = 'hidden';
         MatchModal.resetVariant();
@@ -782,12 +782,13 @@ const MatchModal = {
         shareBtn.id = 'modalShareBtn';
         shareBtn.className = 'btn share-btn';
         shareBtn.title = 'Compartilhar';
-        shareBtn.innerHTML = '🔗';
+        shareBtn.setAttribute('aria-label', 'Compartilhar');
+        shareBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>';
         shareBtn.onclick = () => {
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('id', id);
             urlParams.set('sport', sport);
-            const shareUrl = `${window.location.origin}/${sport === 'football' || sport === 'multisport' ? 'match.html' : 'event.html'}?${urlParams.toString()}`;
+            const shareUrl = `${window.location.origin}/match.html?${urlParams.toString()}`;
             navigator.clipboard.writeText(shareUrl).then(() => {
                 Utils.showNotification('Link copiado!', 'success');
             }).catch(() => {

@@ -29,8 +29,9 @@ const App = {
     async switchSport(sport) {
         CONFIG.currentSport = sport;
         AppState.currentPage = 1;
-        document.querySelectorAll('.sport-btn').forEach(btn => {
+        document.querySelectorAll('.sport-chip').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sport === sport);
+            btn.setAttribute('aria-pressed', String(btn.dataset.sport === sport));
         });
         await this.loadData();
         Utils.applySportTheme(sport);
@@ -48,8 +49,9 @@ const App = {
         if (rawSport && Utils.VALID_SPORTS.includes(rawSport)) {
             CONFIG.currentSport = rawSport;
             Utils.applySportTheme(rawSport);
-            document.querySelectorAll('.sport-btn').forEach(btn => {
+            document.querySelectorAll('.sport-chip').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.sport === rawSport);
+                btn.setAttribute('aria-pressed', String(btn.dataset.sport === rawSport));
             });
         }
 

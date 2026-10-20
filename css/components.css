@@ -274,60 +274,6 @@ header {
     flex-wrap: wrap;
 }
 
-.sport-btn {
-    padding: var(--sp-2) var(--sp-4);
-    border: 1px solid var(--bg-secondary);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border-radius: var(--border-radius-size-md);
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    flex: 1;
-    font-weight: 600;
-    font-size: var(--font-size-md);
-    gap: var(--sp-3);
-    min-height: 26px;
-}
-
-.sport-btn-name {
-    font-weight: 600;
-    font-size: var(--font-size-md);
-}
-
-@media (hover: hover){
-    .sport-btn:hover {
-    border-color: var(--text-primary);
-}
-}
-
-.sport-btn.football.active {
-    background: var(--mode-football);
-    color: var(--white);
-    border: 1px solid var(--mode-football);
-}
-
-.sport-btn.multisport.active {
-    background: var(--mode-multisport);
-    color: var(--white);
-    border: 1px solid var(--mode-multisport);
-}
-
-.sport-btn.motor.active {
-    background: var(--mode-motor);
-    color: var(--white);
-    border: 1px solid var(--mode-motor);
-}
-
-.sport-btn.carnaval.active {
-    background: var(--mode-carnaval);
-    color: var(--white);
-    border: 1px solid var(--mode-carnaval);
-}
-
 /* ========================================
    TIPOGRAFIA
    ======================================== */
@@ -392,49 +338,6 @@ h1 {
     align-items: center;
     transition: all 0.3s ease;
     justify-content: center;
-}
-
-.control-group {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-secondary);
-    border-radius: var(--border-radius-size-md);
-    color: var(--text-tertiary);
-    min-width: 90px;
-    gap: var(--sp-3);
-    width: 100%;
-}
-
-.control-group label {
-    font-size: var(--font-size-sm);
-    margin: 0 0.75rem;
-}
-
-.dropdown-group {
-    flex:1;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-md);
-}
-
-.f-select {
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-size: var(--font-size-md);
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.f-select.highlighted {
-    color: var(--accent-color);
-}
-
-.f-select option {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 .filter-options {
@@ -2346,10 +2249,6 @@ input[type="text"]:focus {
     
     .motor-event-date {
         font-size: var(--font-size-sm);
-    }
-
-    .control-group {
-        max-width: 100% !important;
     }
 
     .expand {
