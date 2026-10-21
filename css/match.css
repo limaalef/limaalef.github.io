@@ -48,31 +48,13 @@
    MATCH ENRICHED PAGE
    ======================================== */
 
-
-
 /* ── Body ── */
 .me-section {
     padding: 1rem;
 }
 
 /* ── Forma recente ── */
-.me-form-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 4px 0;
-}
-.me-form-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.me-form-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    min-width: 80px;
-    font-weight: 500;
-}
+
 .me-form-badges {
     display: flex;
     gap: 5px;
@@ -180,12 +162,7 @@
     gap: var(--sp-4);
     margin-bottom: 10px;
 }
-.me-lineup-team-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
+
 .me-lineup-team-info {
     flex: 1;
     min-width: 0;
@@ -271,16 +248,6 @@
 .me-tag.historic { background: var(--bg-info);       color: var(--text-info);      }
 .me-tag.scorer   { background: var(--bg-success);    color: var(--text-success);   }
 .me-tag.default  { background: var(--bg-secondary);  color: var(--text-secondary); border: 1px solid var(--border-color); }
-
-.me-obs {
-    font-size: var(--font-size-md);
-    color: var(--text-secondary);
-    line-height: 1.6;
-    padding: 10px 14px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-size-lg);
-}
 
 /* ── Responsivo ── */
 @media (max-width: 640px) {

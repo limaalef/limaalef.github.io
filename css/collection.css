@@ -15,7 +15,6 @@
 /* Indicadores */
 /* Só o container do conteúdo: o header também tem um .container e não pode virar coluna/ganhar padding */
 body.page-collection > .container { display: flex; flex-direction: column; gap: var(--sp-6); padding: var(--sp-7) var(--sp-5) var(--sp-7); }
-@media (max-width: 900px) { body.page-collection > .container { padding-top: var(--sp-5); gap: var(--sp-5); } }
 @media (max-width: 496px) { body.page-collection > .container { padding-bottom: calc(var(--om-fab-size-sm, 40px) + var(--sp-7)); } }
 .page-collection .collection-stats { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
 .page-collection .collection-stats .stat-tile { flex: 1 1 10rem; min-width: 0; }
@@ -40,6 +39,4 @@ body.page-collection > .container { display: flex; flex-direction: column; gap: 
 }
 
 /* Mobile: a busca flutua no rodapé ao lado do carrinho (regra .search-box de components.css) */
-@media (max-width: 496px) {
-    .page-collection .collection-search .field { padding: 0 var(--sp-5); }
-}
+

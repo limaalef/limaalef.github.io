@@ -107,9 +107,7 @@ function fileInfo(item) {
      .map(r => keyValueRow(esc(r.label), esc(r.value)))
      .join('');
 
-    const places = [];
-    if (tech.local)             places.push(`<span class="match-storage-place match-storage-place--local">${icon('disk', 14)}${esc(tech.local)}</span>`);
-    if (Elements.isCloud(tech)) places.push(`<span class="match-storage-place match-storage-place--cloud">${icon('cloud', 14)}${esc(t('cloud'))}</span>`);
+    const places = Elements.storagePlaces(tech);
     return { rows, places };
 }
 

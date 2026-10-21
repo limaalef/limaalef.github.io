@@ -3,9 +3,7 @@
 .narrow-width      { max-width: var(--page-width-size); margin: auto;}
 .adm-sidebar       { min-width: 200px; width: 17%; flex-shrink: 0; background: var(--bg-secondary);
                      position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: none; }
-.adm-sidebar-right { min-width: 200px; width: 17%; flex-shrink: 0; background: var(--bg-secondary);
-                     position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: none; }
-.sidebar-wide      { min-width: 360px; width: 32%;  }
+
 .adm-sidebar::-webkit-scrollbar { display: none; }
 .adm-sidebar-nav   { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-4) var(--sp-3); }
 .adm-nav-item      { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
@@ -48,8 +46,7 @@
 .adm-item-label { font-size: var(--font-size-md); font-weight: 600; color: var(--text-primary); }
 .adm-item-meta  { font-size: var(--font-size-mds); color: var(--text-muted); margin-top: var(--sp-1); }
 .adm-item-link-row { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); flex-wrap: wrap; }
-.adm-item-link-url { font-size: var(--font-size-mds); color: var(--accent-color);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; flex: 1; }
+
 .adm-item-link-exp { font-size: var(--font-size-xs); color: var(--text-muted); white-space: nowrap; }
 .adm-item-link-exp.expired { color: var(--error-color); }
 .adm-item-no-link { font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--sp-3); }
@@ -112,9 +109,9 @@
     body.page-admin .modal { padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px)); }
     .adm-main { margin: 0; padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--sp-5)); }
     .adm-layout { flex-direction: column; gap: var(--sp-4); }
-    .layout-inverted { flex-direction: column-reverse; }
-    .adm-sidebar, .adm-sidebar-right { width: 100%; height: auto; position: static; min-height: 0px; overflow: visible; }
-    .sidebar-wide      { min-width: 0; width: 100%; }
+    
+    .adm-sidebar { width: 100%; height: auto; position: static; min-height: 0px; overflow: visible; }
+    
 
     /* Navegação do admin: barra inferior fixa (mesmo padrão do webapp) */
     .page-admin .adm-sidebar-nav {
@@ -131,87 +128,11 @@
     }
     .page-admin .adm-nav-item.active { border-top-color: var(--accent-color); background: transparent; }
     .adm-nav-divider { display: none; }
-    .adm-item-link-url { max-width: 160px; }
+    
     .adm-item-header { flex-direction: column; gap: var(--sp-2); }
     .filter-options { display: block; }
     .adm-amount-status, .adm-row-actions { justify-content: flex-start; }
 }
-
-.prog {
-    display: flex;
-    align-items: center;
-}
-
-.prog-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--sp-1);
-    min-width: 60px;
-}
-
-.prog-conn {
-    flex: 1;
-    height: 1px;
-    margin-bottom: var(--sp-4);
-    min-width: 20px;
-}
-
-.prog-conn.active {
-    background: var(--accent-color);
-}
-
-.prog-conn.done {
-    background: var(--text-success);
-}
-
-
-.prog-conn:first-child {
-    display: none;
-}
-
-.prog-dot {
-    width: 30px;
-    height: 30px;
-    border-radius: var(--border-radius-size-circle);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-}
-
-.prog-dot.active {
-    border: 1px solid var(--accent-color);
-    color: var(--accent-color);
-}
-
-.prog-dot.done {
-    border: 1px solid var(--text-success);
-    color: var(--text-success);
-}
-
-.prog-lbl {
-    font-size: var(--font-size-mds);
-    letter-spacing: -0.02em;
-    text-align: center;
-    color: var(--text-secondary);
-}
-.prog-lbl.active { color: var(--accent-color); }
-.prog-lbl.done   { color: var(--text-success); }
-
-.prog-dot-svg {
-    stroke: var(--text-secondary);
-}
-.prog-dot-svg.active { stroke: var(--accent-color); }
-.prog-dot-svg.done   { stroke: var(--text-success); }
-
-.prog-dot-svg2 {
-    background: var(--text-secondary);
-}
-.prog-dot-svg2.active { background: var(--accent-color); }
-.prog-dot-svg2.done   { background: var(--text-success); }
 
 /* Página de administração: sem margem lateral no container */
 body.page-admin .container { margin: 0; }
@@ -234,7 +155,6 @@ body.page-admin .container { margin: 0; }
 /* Itens de navegação agora são <button>: reseta o estilo nativo */
 button.adm-nav-item { width: 100%; background: none; border-top: 0; border-right: 0; border-bottom: 0;
     font-family: inherit; text-align: left; cursor: pointer; }
-
 
 /* ═══════════════════════════════════════════════════════════════
    Visual do admin: sem bordas, superfícies suaves, linhas finas.

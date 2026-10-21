@@ -27,11 +27,13 @@
 .page-detail .entity-image { position: relative; display: grid; place-items: center; flex: none; overflow: hidden; background: var(--soft-bg-hover); color: var(--text-muted); }
 .page-detail .entity-image { --entity-pad: 0px; box-sizing: border-box; }
 .page-detail .entity-image[data-shape="emblem"]   { width: 6rem; height: 6rem; border-radius: var(--border-radius-size-xl); --entity-pad: var(--sp-4); }
-.page-detail .entity-image[data-shape="portrait"] { width: 7.5rem; height: 7.5rem; border-radius: 50%; }
+/* Narrador: mesmo recorte da página inicial — círculo suave com a foto apoiada na base e saindo pelo topo */
+.page-detail .entity-image[data-shape="portrait"] { width: 7.5rem; height: 7.5rem; border-radius: 50%; overflow: visible; }
+.page-detail .entity-image[data-shape="portrait"].has-image { display: flex; align-items: flex-end; justify-content: center; margin-top: var(--sp-7); }
 .page-detail .entity-image[data-shape="icon"]     { width: 6rem; height: 6rem; border-radius: var(--border-radius-size-xl); }
 /* A imagem é posicionada dentro da caixa (e não dimensionada por porcentagem): logos grandes não estouram nem são cortados */
 .page-detail .entity-image img { position: absolute; inset: var(--entity-pad); width: calc(100% - 2 * var(--entity-pad)); height: calc(100% - 2 * var(--entity-pad)); object-fit: contain; }
-.page-detail .entity-image[data-shape="portrait"] img { object-fit: cover; }
+.page-detail .entity-image[data-shape="portrait"] img { position: static; width: 96%; height: auto; max-height: none; object-fit: contain; object-position: bottom; }
 .page-detail .entity-image-fallback { font-size: var(--font-size-xxxl); font-weight: 700; letter-spacing: -.04em; }
 .page-detail .entity-image svg { width: 2.5rem; height: 2.5rem; }
 
@@ -53,7 +55,6 @@
 .page-detail .detail-search .field { width: 100%; padding: var(--sp-3) var(--sp-5); }
 /* Mobile: a busca flutua no rodapé ao lado do carrinho (regra .search-box de components.css) */
 @media (max-width: 496px) {
-    .page-detail .detail-search .field { padding: 0 var(--sp-5); }
     .page-detail .collection-main { padding-bottom: calc(var(--float-bottom) + var(--om-fab-size-sm, 40px) + var(--sp-6)); }
 }
 .page-detail .detail-controls .paginator { margin-left: auto; }
@@ -191,10 +192,10 @@
 
 /* ── RESPONSIVO ── */
 @media (max-width: 900px) {
-    .page-detail .collection-layout { flex-direction: column; align-items: stretch; padding: var(--sp-5) var(--sp-5) var(--sp-9); gap: var(--sp-5); }
-    .page-detail .collection-sidebar { width: 100%; position: static; max-height: none; padding: var(--sp-6) var(--sp-5); }
+    .page-detail .collection-layout { flex-direction: column; align-items: stretch; }
+    .page-detail .collection-sidebar { width: 100%; position: static; max-height: none; }
     .page-detail .sidebar-sport-header { flex-direction: row; align-items: center; }
-    .page-detail .entity-image[data-shape="emblem"], .page-detail .entity-image[data-shape="icon"] { width: 4.5rem; height: 4.5rem; --entity-pad: var(--sp-3); }
+    .page-detail .entity-image[data-shape="emblem"], .page-detail .entity-image[data-shape="icon"] { width: 4.5rem; height: 4.5rem; }
     .page-detail .entity-image[data-shape="portrait"] { width: 5.5rem; height: 5.5rem; }
     .page-detail .sidebar-sport-name { font-size: var(--font-size-xxl); }
     .page-detail .detail-controls .paginator { margin-left: 0; width: 100%; justify-content: center; }

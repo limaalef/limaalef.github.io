@@ -324,12 +324,15 @@ const Elements = {
     ],
 
     // Seção de modal: título + conteúdo. Sem conteúdo, a seção inteira não é exibida.
-    section(title, innerHtml, boxClass = 'detail-list') {
-        if (!innerHtml || !String(innerHtml).trim()) return '';
+    // after: HTML solto depois da caixa (ex.: bloco de armazenamento)
+    section(title, innerHtml, boxClass = 'detail-list', after = '') {
+        const hasBody = !!innerHtml && !!String(innerHtml).trim();
+        if (!hasBody && !after) return '';
         return `
             <div class="detail-section">
-                <div class="section-title modal-style">${title}</div>
-                <div class="${boxClass}">${innerHtml}</div>
+                ${hasBody ? `<div class="section-title modal-style">${title}</div>
+                <div class="${boxClass}">${innerHtml}</div>` : ''}
+                ${after}
             </div>`;
     },
 
@@ -385,16 +388,23 @@ const Elements = {
         return !!raw;
     },
 
-    // Badges de armazenamento. Recebe o technical_details completo, ou (local, cloud) por compatibilidade.
-    setStorageBadges(localOrTech, cloud) {
+    // Armazenamento: mesmo bloco da página da partida (rótulo à esquerda, locais à direita).
+    // Recebe o technical_details completo, ou (local, cloud) por compatibilidade.
+    storagePlaces(localOrTech, cloud) {
         const isTech = localOrTech && typeof localOrTech === 'object';
         const local  = isTech ? localOrTech.local : localOrTech;
         const inCloud = this.isCloud(isTech ? localOrTech : cloud);
+        const esc = Utils.escapeHtml.bind(Utils);
+        const places = [];
+        if (local)   places.push(`<span class="match-storage-place match-storage-place--local">${icon('disk', 14)}${esc(local)}</span>`);
+        if (inCloud) places.push(`<span class="match-storage-place match-storage-place--cloud">${icon('cloud', 14)}${esc(LanguageManager.t('cloud'))}</span>`);
+        return places;
+    },
 
-        const badges = [];
-        if (local)   badges.push(`<span class="storage-badge storage-local">${Utils.escapeHtml ? Utils.escapeHtml(local) : local}</span>`);
-        if (inCloud) badges.push(`<span class="storage-badge storage-cloud">${LanguageManager.t('cloud')}</span>`);
-        return badges.join('');
+    storageMethod(localOrTech, cloud) {
+        const places = this.storagePlaces(localOrTech, cloud);
+        if (!places.length) return '';
+        return `<div class="match-aside-method"><span class="match-aside-method-label">${Utils.escapeHtml(LanguageManager.t('storageInfo'))}</span><span class="match-aside-method-value">${places.join('')}</span></div>`;
     },
 
     // Página de partida: o time é identificado por uma barra vertical arredondada com as cores do clube
@@ -601,7 +611,7 @@ const Elements = {
     },
 
     renderStorage(techOrLocal, cloud, divId) {
-        this.fillSection(divId, this.setStorageBadges(techOrLocal, cloud));
+        this.fillSection(divId, this.storageMethod(techOrLocal, cloud));
     },
 
     renderAttRev(detail, divId) {

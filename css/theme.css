@@ -202,7 +202,7 @@
 
 /* TEMA: OUTROS FUTEBOL */
 body.theme-football {
-    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 34%, var(--bg-primary));
     --accent-color: rgb(59, 130, 246);
     --accent-color-rgb: 59, 130, 246;
     --accent-hover: rgb(87, 149, 248);
@@ -211,7 +211,7 @@ body.theme-football {
 
 /* TEMA: OUTROS ESPORTES */
 body.theme-multisport {
-    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 34%, var(--bg-primary));
     --accent-color: rgb(245, 158, 11);
     --accent-color-rgb: 245, 158, 11;
     --accent-hover: rgb(247, 173, 46);
@@ -220,7 +220,7 @@ body.theme-multisport {
 
 /* TEMA: AUTOMOBILISMO */
 body.theme-motor {
-    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 34%, var(--bg-primary));
     --accent-color: rgb(239, 68, 68);
     --accent-color-rgb: 239, 68, 68;
     --accent-hover: rgb(247, 103, 103);
@@ -229,7 +229,7 @@ body.theme-motor {
 
 /* TEMA: CARNAVAL */
 body.theme-carnaval {
-    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 34%, var(--bg-primary));
     --accent-color: rgb(165, 38, 154);
     --accent-color-rgb: 165, 38, 154;
     --accent-hover: rgb(223, 90, 212);
@@ -238,7 +238,7 @@ body.theme-carnaval {
 
 /* TEMA: ADMIN */
 body.theme-admin {
-    --bg-accent-color: color-mix(in srgb, var(--accent-color) 14%, var(--bg-primary));
+    --bg-accent-color: color-mix(in srgb, var(--accent-color) 34%, var(--bg-primary));
     --accent-color: rgb(139, 92, 246);
     --accent-color-rgb: 139, 92, 246;
     --accent-hover: rgb(124, 58, 237);

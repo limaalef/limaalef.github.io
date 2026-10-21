@@ -66,13 +66,12 @@ body.sd-lock { overflow: hidden; }
 
 @media (max-width: 1000px) {
     .sd-head { display: none; }
-    .sd-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id state" "usage usage" "used free"; row-gap: var(--sp-4); }
+    .sd-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id state" "usage usage" "used free"; }
     .sd-id { grid-area: id; } .sd-state { grid-area: state; justify-content: flex-end; } .sd-usage { grid-area: usage; }
     .sd-row > .sd-num:nth-of-type(1) { grid-area: used; } .sd-row > .sd-num:nth-of-type(2) { grid-area: free; text-align: right; align-items: flex-end; }
     .sd-go { display: none; }
 }
 @media (max-width: 560px) {
-    .sd-page { padding: var(--sp-4) var(--sp-5) var(--sp-9); }
     .sd-search { min-width: 0; flex: 1 1 100%; } .sd-tools { width: 100%; } .sd-tools .field { flex: 1 1 100%; }
-    .sd-state { flex-direction: column; align-items: flex-end; gap: var(--sp-1); }
+    .sd-state { flex-direction: column; align-items: flex-end; }
 }

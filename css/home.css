@@ -1,3 +1,220 @@
+/* ── Base dos carrosséis e cartões da página inicial — migrado do antigo components.css ── */
+.sport-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 2fr);
+    gap: var(--sp-3);
+}
+
+.sport-nav-card {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-xl);
+    padding: var(--sp-4);
+    box-sizing: border-box;
+    min-height: 90px;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.sport-nav-card .nav-icon {
+    font-size: var(--font-size-xxl);
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.sport-nav-card .nav-text {
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    margin: 0 0 3px;
+}
+
+@media (hover: hover) {
+    .sport-nav-card.football:hover {
+    background-color: var(--mode-football);
+    color: var(--white)
+}
+}
+
+@media (hover: hover) {
+    .sport-nav-card.multisport:hover {
+    background-color: var(--mode-multisport);
+    color: var(--black)
+}
+}
+
+@media (hover: hover) {
+    .sport-nav-card.motor:hover {
+    background-color: var(--mode-motor);
+    color: var(--white)
+}
+}
+
+@media (hover: hover) {
+    .sport-nav-card.carnaval:hover {
+    background-color: var(--mode-carnaval);
+    color: var(--white)
+}
+}
+
+@media (hover: hover) {
+    .sport-nav-card.general:hover {
+    background-color: var(--accent-color);
+    color: var(--text-accent-color);
+}
+}
+
+@media (hover: hover) {
+    .sport-nav-card:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-primary)
+}
+}
+
+@media (max-width: 600px) {
+    .sport-nav { grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+}
+
+.browse-grid-section {
+    padding: var(--sp-5);
+}
+
+.browse-grid {
+    display: grid;
+    grid-template-columns: 60fr 40fr;
+    gap: var(--sp-5);
+    align-items: start;
+}
+
+.browse-col-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+}
+
+.browse-sub-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: var(--sp-4) 0;
+}
+
+.browse-col-aside {
+    min-width: 0;
+    border-left: 1px solid var(--border-color);
+    padding-left: var(--sp-5);
+}
+
+.browse-scroll-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.browse-scroll-list {
+    display: flex;
+    gap: var(--sp-4);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--sp-1);
+    flex: 1;
+    min-width: 0;
+}
+
+.list-overflow {
+    padding-top: var(--sp-8);
+}
+
+.browse-scroll-list::-webkit-scrollbar { display: none; }
+
+.browse-badge-card {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+@media (hover: hover) {
+    .browse-badge-card:hover {
+    transform: translateY(2px);
+    opacity: 0.85;
+}
+}
+
+.browse-badge-circle {
+    max-height: calc(60px + var(--sp-8));
+    border-radius: var(--border-radius-size-circle);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: var(--sp-8);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xxl);
+    line-height: 1;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+
+.circle-overflow {
+    align-items: flex-end;
+    overflow: visible;
+    position: relative;
+    padding: 0;
+    width: calc(60px + var(--sp-8));
+    height: calc(60px + var(--sp-8));
+}
+
+.browse-team-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.image-overflow {
+    width: calc(58px + var(--sp-8));
+    height: auto;
+    object-position: bottom;
+}
+
+@media (hover: hover) {
+    .browse-badge-card:hover .browse-badge-circle {
+    border-color: var(--accent-color);
+    background: var(--bg-accent-color, var(--bg-secondary));
+}
+}
+
+.browse-badge-name {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(60px + var(--sp-9));
+    line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+    .browse-grid {
+        grid-template-columns: 1fr;
+    }
+    .browse-col-aside {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border-color);
+        padding-top: var(--sp-6);
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    HOME — visual da página inicial (index.html, body.page-home)
    Só layout e reescrita escopada em .page-home; components.css e
@@ -115,3 +332,83 @@
 .skeleton--card { flex: 0 0 15rem; height: 6rem; border-radius: var(--border-radius-size-lg); }
 .skeleton-cards { display: flex; gap: var(--sp-4); overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+
+/* ── Mudanças recentes (lista da página inicial) — migrado do antigo components.css ── */
+.changelog-list {
+    padding: 0;
+}
+
+.cl-group {
+    padding: 1rem 0;
+    border-bottom: none;
+    transition: background 0.15s;
+}
+
+.cl-group:last-child { border-bottom: none; }
+
+.cl-group-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.cl-group-pills {
+    display: flex;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.cl-group-ts {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+
+.cl-group-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+}
+
+.cl-group-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    font-size: var(--font-size-mdm);
+    color: var(--text-secondary);
+    padding: 2px 0;
+}
+
+.cl-item-desc {
+    flex: 1;
+    font-size: var(--font-size-md);
+    margin: 0; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+
+.cl-item-badge {
+    flex-shrink: 0;
+    padding: 1px var(--sp-2);
+    border-radius: var(--border-radius-size-circle);
+    font-size: var(--font-size-mds);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.cl-group-overflow {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+.cl-item-badge.added    { background: var(--bg-success); color: var(--text-success); }
+
+.cl-item-badge.modified { background: var(--bg-warning); color: var(--text-warning); }
+
+.cl-item-badge.removed  { background: var(--bg-error); color: var(--text-error); }

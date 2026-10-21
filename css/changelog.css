@@ -1,4 +1,115 @@
-/* ═══ Changelog (changelog.html, body.page-changelog) ═══
+/* Base herdada do antigo components.css (as regras abaixo, escopadas em .page-changelog, vencem esta parte) */
+.sync-entry {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-size-lg);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+@media (hover: hover) {
+    .sync-entry:hover { border-color: var(--accent-color); transition: all 0.3s ease; }
+}
+
+.sync-entry-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-4) var(--sp-5);
+    cursor: pointer;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+}
+
+.sync-timestamp {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.sync-summary-pills {
+    display: flex;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+}
+
+.sync-entry.open .expand-icon { transform: rotate(180deg); }
+
+.sync-entry-body {
+    background-color: var(--bg-primary);
+    display: none;
+    border-top: 1px solid var(--border-color);
+    padding: 0;
+}
+
+.sync-entry.open .sync-entry-body { display: block; }
+
+.changes-section {
+    padding: var(--sp-4) var(--sp-6);
+}
+
+.changes-section + .changes-section {
+    border-top: 1px solid var(--border-color);
+}
+
+.change-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    padding: 6px 0;
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+}
+
+.change-item:last-child { border-bottom: none; }
+
+.change-id {
+    flex-shrink: 0;
+    width: 48px;
+    text-align: right;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-mdm);
+    padding-top: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.change-id-link {
+    cursor: pointer;
+}
+
+@media (hover: hover) {
+    .change-item:has(.change-id-link):hover { 
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-size-md);
+}
+}
+
+.change-desc { flex: 1; line-height: 1.4; }
+
+.changes-section-title.added    { color: var(--success-color); font-weight: 700; }
+
+.changes-section-title.modified { color: var(--warning-color); font-weight: 700; }
+
+.changes-section-title.removed  { color: var(--error-color); font-weight: 700; }
+
+.fc-field {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.fc-action {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+@media (max-width: 600px) {
+    .sync-entry-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ═══ Changelog (changelog.html, body
+
+.page-changelog) ═══
    Reescreve o visual das entradas por cima de components.css, só com .page-changelog.
    Controles, paginador e esqueletos vêm de ui-components.css. */
 
@@ -35,9 +146,7 @@
 .page-changelog .sync-summary-pills { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); min-width: 0; }
 .page-changelog .change-count { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--font-size-sm); color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .page-changelog .change-count i { width: .45rem; height: .45rem; border-radius: 50%; background: var(--text-muted); }
-.page-changelog .change-count--added i    { background: var(--success-color); }
-.page-changelog .change-count--modified i { background: var(--warning-color); }
-.page-changelog .change-count--removed i  { background: var(--error-color); }
+
 .page-changelog .sync-timestamp { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .page-changelog .expand-icon { color: var(--text-muted); transition: transform .2s; }
 .page-changelog .sync-entry.open .expand-icon { transform: rotate(180deg); }
@@ -67,17 +176,13 @@
 .page-changelog .field-changes-list li { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--border-radius-size-circle); background: var(--soft-bg); font-size: var(--font-size-xs); }
 .page-changelog .fc-field { color: var(--text-primary); font-weight: 500; }
 .page-changelog .fc-action { color: var(--text-muted); }
-.page-changelog .fc-added, .page-changelog .fc-modified, .page-changelog .fc-removed { background: none; }
 
 .page-changelog .paginator { margin-top: var(--sp-2); }
 
 @media (max-width: 640px) {
-    .page-changelog .changelog { padding-top: var(--sp-5); }
     .page-changelog .changelog-day-title { font-size: var(--font-size-sxxl); }
-    .page-changelog .sync-entry-header { grid-template-columns: minmax(0, 1fr) auto auto; row-gap: var(--sp-3); padding: var(--sp-4) var(--sp-5); }
+    .page-changelog .sync-entry-header { grid-template-columns: minmax(0, 1fr) auto auto; }
     .page-changelog .sync-summary-pills { grid-column: 1 / -1; grid-row: 2; }
-    .page-changelog .sync-entry-body { padding: 0 var(--sp-5) var(--sp-4); }
-    .page-changelog .change-item { gap: var(--sp-3); }
     .page-changelog .change-id { min-width: 3rem; }
 }
 @media (prefers-reduced-motion: reduce) { .page-changelog .expand-icon { transition: none; } }

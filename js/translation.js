@@ -373,6 +373,11 @@ const translations = {
  
         requestSend:               'Enviar pedido',
         requestSending:            'Enviando...',
+        requestProcessingTitle:    'Enviando seu pedido…',
+        requestProcessingHint:     'Estamos registrando a lista e verificando se os arquivos já estão disponíveis. Não feche esta janela.',
+        requestAutoTitle:          'Seu pedido já está disponível!',
+        requestAutoHint:           'Os arquivos já estavam no acervo, então o pedido foi liberado automaticamente. Abra a página do pedido para acessar os links.',
+        requestOpenOrder:          'Ir para o pedido',
         requestError:              'Erro ao enviar pedido',
  
         requestSuccessTitle:       'Pedido enviado!',
@@ -937,6 +942,11 @@ const translations = {
  
         requestSend:               'Send request',
         requestSending:            'Sending...',
+        requestProcessingTitle:    'Sending your request…',
+        requestProcessingHint:     'We are registering your list and checking whether the files are already available. Please keep this window open.',
+        requestAutoTitle:          'Your request is already available!',
+        requestAutoHint:           'The files were already in the archive, so the request was released automatically. Open the request page to get the links.',
+        requestOpenOrder:          'Go to request',
         requestError:              'Error sending request',
  
         requestSuccessTitle:       'Request sent!',

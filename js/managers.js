@@ -387,7 +387,7 @@ const SourcePicker = {
                         const meta = [src.video_quality, src.audio_format, src.station?.commentary].filter(v => !Utils.isBlank(v)).map(esc).join(' · ');
                         return `<li><button type="button" class="source-picker-item" data-source-id="${esc(src.id)}">
                             <span class="source-picker-logo">${src.station?.logo
-                                ? `<img src="${esc(src.station.logo)}" alt="" class="broadcaster-logo${noFilterLogos.includes(src.station.logo) ? ' no-filter' : ''}" onerror="this.style.display='none'">`
+                                ? `<img src="${esc(src.station.logo)}" alt="" class="broadcaster-logo no-filter" onerror="this.style.display='none'">`
                                 : `<span class="source-picker-initials" aria-hidden="true">${esc(name.slice(0, 2).toUpperCase())}</span>`}</span>
                             <span class="source-picker-text">
                                 <span class="source-picker-name">${esc(name)}</span>
@@ -469,10 +469,9 @@ const ModalAdapters = {
                 sections: [
                     { title: LanguageManager.t('matchInfo'),     html: Elements.setDetailList(rowsMatchInfo) },
                     { title: LanguageManager.t('tvInfo'),        html: tvInfo },
-                    { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(item) },
+                    { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(item), after: Elements.storageMethod(item.technical_details) },
                     { title: LanguageManager.t('refereeInfo'),   html: Elements.renderRefereeInfo(item) },
-                    { title: LanguageManager.t('attRevInfo'),    html: Elements.renderAttRev(item) },
-                    { title: LanguageManager.t('storageInfo'),   html: Elements.setStorageBadges(item.technical_details), boxClass: 'storage-badges' }
+                    { title: LanguageManager.t('attRevInfo'),    html: Elements.renderAttRev(item) }
                 ],
                 notes: item.additional_info
             }
@@ -500,8 +499,7 @@ const ModalAdapters = {
                     images: evt.media?.image,
                     sections: [
                         { title: LanguageManager.t('eventInfo'),     html: Elements.renderTvInfo(evt, false, false) },
-                        { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(evt) },
-                        { title: LanguageManager.t('storageInfo'),   html: Elements.setStorageBadges(evt.technical_details), boxClass: 'storage-badges' }
+                        { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(evt), after: Elements.storageMethod(evt.technical_details) }
                     ],
                     notes: evt.additional_info
                 }))
@@ -571,8 +569,7 @@ const ModalAdapters = {
                     { title: LanguageManager.t('carnavalInfo'),     html: info },
                     { title: LanguageManager.t('competitionInfo'),  html: competitionInfo + (judgments || '') },
                     { title: LanguageManager.t('tvInfo'),           html: tvInfo },
-                    { title: LanguageManager.t('technicalInfo'),    html: techGrid, boxClass: 'detail-grid technical' },
-                    { title: LanguageManager.t('storageInfo'),      html: Elements.setStorageBadges(tech), boxClass: 'storage-badges' }
+                    { title: LanguageManager.t('technicalInfo'),    html: techGrid, boxClass: 'detail-grid technical', after: Elements.storageMethod(tech) }
                 ],
                 notes: item.additional_info
             }
@@ -679,7 +676,7 @@ const ModalBodies = {
     },
 
     _sections(list) {
-        return list.map(s => Elements.section(s.title, s.html, s.boxClass)).join('\n');
+        return list.map(s => Elements.section(s.title, s.html, s.boxClass, s.after)).join('\n');
     },
 
     sections(vm) {

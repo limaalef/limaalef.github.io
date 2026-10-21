@@ -171,14 +171,14 @@ const RequestModule = (() => {
     //  FAB + BADGE
     // ══════════════════════════════════════════════════════════
     function _renderBadge() {
-        if (typeof AppNav !== 'undefined') AppNav.updateBadge();
+        const navBadge = document.getElementById('nav-cart-badge');
+        if (navBadge) { navBadge.textContent = cart.length; navBadge.hidden = !cart.length; }
         const btn = document.getElementById('om-cart-btn');
         if (!btn) return;
         const count = cart.length;
         const badge = btn.querySelector('.om-badge');
         badge.textContent       = count;
         badge.style.display     = count ? 'flex' : 'none';
-        if (typeof AppNav !== 'undefined') AppNav.updateBadge();
     }
 
     function _injectCartButton() {
@@ -199,8 +199,30 @@ const RequestModule = (() => {
         `;
         btn.addEventListener('click', () => API.openPanel());
         document.body.appendChild(btn);
+        _mountNavCart();
         _renderBadge();
     }
+
+    // Carrinho na barra inferior (mobile): inserido aqui, como o botão flutuante,
+    // então só existe nas páginas que carregam este módulo. A barra pode montar depois do módulo.
+    function _mountNavCart() {
+        const nav = document.querySelector('.bottom-nav');
+        if (!nav || document.getElementById('nav-cart')) return;
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.id = 'nav-cart';
+        item.className = 'bottom-nav-item bottom-nav-cart';
+        item.dataset.nav = 'cart';
+        item.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/><path d="M2.5 3.5h3l2.4 11.2a1.8 1.8 0 0 0 1.8 1.4h8.1a1.8 1.8 0 0 0 1.8-1.4L21 7H6.2"/></svg>
+            <span class="bottom-nav-badge" id="nav-cart-badge" hidden>0</span>
+            <span data-i18n="navCart">${LanguageManager.t('navCart')}</span>`;
+        item.addEventListener('click', () => API.openPanel());
+        // Antes do último item (Meus pedidos)
+        nav.insertBefore(item, nav.lastElementChild);
+        _renderBadge();
+    }
+    document.addEventListener('bottomnavmounted', _mountNavCart);
 
     // ══════════════════════════════════════════════════════════
     //  PAINEL LATERAL
@@ -427,7 +449,7 @@ const RequestModule = (() => {
             x:        { labelKey: 'requestContactX',         placeholder: '@usuario',                type: 'text'  },
         };
         const c = cfg[channel] || cfg.email;
-        label.textContent = t(c.labelKey);
+        label.textContent = LanguageManager.t(c.labelKey);
         input.placeholder = c.placeholder;
         input.type        = c.type;
         input.value       = (channel === 'email' && user?.email) ? user.email : '';
@@ -449,6 +471,7 @@ const RequestModule = (() => {
         const btn = document.getElementById('om-submit-btn');
         btn.disabled    = true;
         btn.textContent = LanguageManager.t('requestSending');
+        _setBusy(true);
 
         try {
             const res = await fetch(`${CFG.apiBase}/orders`, {
@@ -464,18 +487,56 @@ const RequestModule = (() => {
 
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            _renderSuccessStep(data.orderId);
+            _setBusy(false);
+            _renderSuccessStep(data.orderId, data.linksAvailable === true);
             API.clearCartEndOrder();
         } catch (err) {
+            _setBusy(false);
             Utils.showNotification(`${LanguageManager.t('requestError')}: ${err.message}`, 'error');
             btn.disabled    = false;
             btn.textContent = `${LanguageManager.t('requestSend')}`;
         }
     }
 
-    function _renderSuccessStep(requestId) {
+    // Enquanto o pedido é enviado: camada de progresso sobre o painel, botões travados
+    function _setBusy(busy) {
+        if (!_panel) return;
+        _panel.classList.toggle('om-busy', busy);
+        _panel.setAttribute('aria-busy', String(busy));
+        _panel.querySelector('.om-busy-layer')?.remove();
+        if (!busy) return;
+        _panel.querySelectorAll('.om-panel-footer button').forEach(b => { b.disabled = true; });
+        const layer = document.createElement('div');
+        layer.className = 'om-busy-layer';
+        layer.setAttribute('role', 'status');
+        layer.innerHTML = `
+            <span class="om-spinner" aria-hidden="true"></span>
+            <strong>${_esc(LanguageManager.t('requestProcessingTitle'))}</strong>
+            <span>${_esc(LanguageManager.t('requestProcessingHint'))}</span>`;
+        _panel.querySelector('.om-panel-body').appendChild(layer);
+    }
+
+    function _renderSuccessStep(requestId, linksAvailable = false) {
         const body   = document.getElementById('om-panel-body');
         const footer = document.getElementById('om-panel-footer');
+        if (linksAvailable) {
+            // Os arquivos já estavam disponíveis: o pedido foi liberado automaticamente
+            body.innerHTML = `
+                <div class="om-step om-success om-success--auto">
+                    <span class="om-success-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                    <h3 data-i18n="requestAutoTitle">${LanguageManager.t('requestAutoTitle')}</h3>
+                    <p>${LanguageManager.t('requestSuccessId')} <strong>#${_esc(String(requestId))}</strong></p>
+                    <p class="om-hint" data-i18n="requestAutoHint">${LanguageManager.t('requestAutoHint')}</p>
+                </div>`;
+            footer.innerHTML = `
+                <div class="om-footer-actions">
+                    <button class="action-btn btn-ghost" data-i18n="requestClose"
+                        onclick="RequestModule.closePanel()">${LanguageManager.t('requestClose')}</button>
+                    <a class="action-btn btn-primary" href="request-detail.html?id=${encodeURIComponent(requestId)}"
+                        data-i18n="requestOpenOrder">${LanguageManager.t('requestOpenOrder')}</a>
+                </div>`;
+            return;
+        }
         body.innerHTML = `
             <div class="om-step om-success">
                 <h3 data-i18n="requestSuccessTitle">${LanguageManager.t('requestSuccessTitle')}</h3>
@@ -653,8 +714,6 @@ const RequestModule = (() => {
         _injectCartButton();
         _ensurePanel();
         _loadOAuthScripts();
-        // Vindo do botão de carrinho da barra inferior de outra página
-        if (location.hash === '#cart') API.openPanel();
 
         // ── HOOK PRINCIPAL ────────────────────────────────────
         // Escuta 'matchesRendered' (disparado por Renderer.render)

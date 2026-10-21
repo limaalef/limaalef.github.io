@@ -92,6 +92,7 @@ const EntityImage = {
     async render(type, name, info) {
         const holder = document.getElementById('entityImage');
         holder.dataset.shape = type.shape;
+        holder.classList.remove('has-image');
         const initials = String(name).trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
         holder.innerHTML = type.icon
             ? icon(type.icon, 40)
@@ -108,6 +109,7 @@ const EntityImage = {
         // A página pode ter mudado de busca enquanto as imagens eram testadas
         if (url && document.getElementById('entityImage') === holder) {
             holder.innerHTML = `<img src="${Utils.escapeHtml(url)}" alt="${Utils.escapeHtml(name)}">`;
+            holder.classList.add('has-image');
         }
     }
 };
