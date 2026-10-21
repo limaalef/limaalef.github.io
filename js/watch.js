@@ -44,10 +44,7 @@ function renderWatchHero(match) {
     const { homeGoals, awayGoals } = Utils.parseWinner(match.score?.fullTime?.home, match.score?.fullTime?.away);
     const hasScore = homeGoals !== null && awayGoals !== null;
 
-    const compLogoSlug = (match.competition?.name || '')
-        .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_');
-    const year     = Utils.parseDate(match.utcDate)?.getFullYear() || '';
-    const compLogo = match.competition?.name ? `competition_logos/${compLogoSlug}_${year}.png` : '';
+    const compLogo = Utils.competitionLogoUrl(match.competition?.name, match.utcDate);
     const dateStr  = Utils.formatMatchDate(match.utcDate);
 
     // Fase vazia (null) não vira texto nem ocupa linha

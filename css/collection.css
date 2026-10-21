@@ -56,27 +56,7 @@ body.page-collection>.container {
     display: none;
 }
 
-/* Controles */
-.page-collection .collection-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-4);
-}
-
-.page-collection .collection-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-3);
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-}
-
-.page-collection .collection-filter .field {
-    width: auto;
-    min-width: 5.5rem;
-}
-
+/* Controles: .list-controls/.list-filter em ui-components.css */
 .page-collection .collection-search {
     flex: 1 1 14rem;
     min-width: 0;
@@ -87,35 +67,8 @@ body.page-collection>.container {
     padding: var(--sp-3) var(--sp-5);
 }
 
-.page-collection .collection-controls .paginator {
-    margin-left: auto;
-}
-
 .page-collection .match-container {
     padding: 0;
-}
-
-/* Estado vazio / carregando (gerado por Utils.emptyStateHtml) */
-.page-collection .empty-state {
-    padding: var(--sp-9) var(--sp-5);
-    text-align: center;
-    color: var(--text-muted);
-    background: none;
-    border: 0;
-}
-
-.page-collection .empty-state h2 {
-    margin: 0 0 var(--sp-2);
-    font-size: var(--font-size-xl);
-    color: var(--text-primary);
-}
-
-@media (max-width: 900px) {
-    .page-collection .collection-controls .paginator {
-        margin-left: 0;
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 /* Mobile: a busca flutua no rodapé ao lado do carrinho (regra .search-box de components.css) */

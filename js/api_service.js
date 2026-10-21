@@ -68,18 +68,6 @@ const APIService = {
         return this._fetchJson(url.toString());
     },
 
-    // Busca os jogos que estão fisicamente armazenados em um disco/volume
-    // específico (ex.: openVolumeDetail na página de storage).
-    async fetchByStorage(volumeName, page = 1, itemsPerPage = 50) {
-        const url = new URL(CONFIG.API_URLS['football']);
-        url.searchParams.append('max_items', itemsPerPage);
-        url.searchParams.append('page', page);
-        url.searchParams.append('search_type', 'storage');
-        url.searchParams.append('search', volumeName);
-
-        return this._fetchJson(url.toString());
-    },
-
     async fetchEnrichment(matchId, sport) {
         try {
             let url = `${CONFIG.REQUEST_API_BASE}/v2/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;

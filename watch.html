@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="css/match.css">
     <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/match-page.css">
     <link rel="stylesheet" href="css/watch.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
@@ -52,7 +53,7 @@
         gtag('config', 'G-JJZTBEGJ91');
     </script>
 </head>
-<body>
+<body class="page-watch">
     <header>
         <div class="header-frame" id="header"
             data-title-key="watch"
@@ -61,125 +62,42 @@
 
     </header>
 
-    <div class="container">
+    <main class="watch-page">
 
-        <!-- Loading -->
+        <!-- Carregando -->
         <div id="watchLoading">
-            <div class="state-box">
-                <div class="icon">⏳</div>
-                <h2>Carregando partida...</h2>
+            <div class="empty-state">
+                <h2 data-i18n="matchLoading">Carregando partida...</h2>
             </div>
         </div>
 
         <!-- Erro -->
         <div id="watchError" style="display:none;">
-            <div class="state-box">
-                <div class="icon">❌</div>
-                <h2>Partida não encontrada</h2>
-                <p>Verifique o ID na URL e tente novamente.</p>
+            <div class="empty-state">
+                <h2 data-i18n="matchNotFound">Partida não encontrada</h2>
+                <p data-i18n="matchNotFoundHint">Verifique o ID na URL e tente novamente.</p>
             </div>
         </div>
 
-        <!-- Conteúdo -->
+        <!-- Conteúdo: player, informações básicas (accent) e escalação -->
         <div id="watchContent" style="display:none;">
-
-            <!-- Hero: mesmo padrão do match -->
-            <div class="me-hero" id="watchHero"></div>
-
-            <!-- Vídeo + Escalações -->
-            <div class="watch-video-section">
-
-                <div class="me-lineup-col watch-lineup-col" id="watchHomeLineup">
-                    <div class="me-lineup-team-header">
-                        <div class="me-lineup-team-info">
-                            <div class="me-lineup-team-name" id="watchHomeTeamName">—</div>
-                            <div class="me-lineup-formation" id="watchHomeFormation"></div>
-                        </div>
-                    </div>
-                    <div id="watchHomeLineupList"></div>
-                </div>
-
-                <div class="watch-player-wrap">
-                    <div class="video-container-watch">
-                        <iframe
-                            id="videoPlayer"
-                            src=""
-                            frameborder="0"
-                            allowfullscreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            style="display:none;">
-                        </iframe>
-                        <div id="videoPlaceholder" class="watch-video-placeholder">
-                            <div class="icon">🎥</div>
-                            <div data-i18n="videoUnavailable">Vídeo não disponível</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="me-lineup-col watch-lineup-col" id="watchAwayLineup">
-                    <div class="me-lineup-team-header">
-                        <div class="me-lineup-team-info">
-                            <div class="me-lineup-team-name" id="watchAwayTeamName">—</div>
-                            <div class="me-lineup-formation" id="watchAwayFormation"></div>
-                        </div>
-                    </div>
-                    <div id="watchAwayLineupList"></div>
+            <div class="watch-player">
+                <iframe id="videoPlayer" src="" hidden allowfullscreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                <div id="videoPlaceholder" class="watch-video-placeholder">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    <div data-i18n="videoUnavailable">Vídeo indisponível</div>
                 </div>
             </div>
 
-            <!-- Informações abaixo do player: duas colunas iguais -->
-            <div class="me-body watch-info-body" id="watchBody">
+            <div class="watch-info" id="watchHero"></div>
 
-                <div class="modal-body">
-                    <div class="modal-division">
-                        <div class="detail-section">
-                            <div class="section-title modal-style" data-i18n="tvInfo"></div>
-                            <div class="detail-list" id="watchTvInfo"></div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="section-title modal-style" data-i18n="technicalInfo"></div>
-                            <div class="detail-list" id="watchTechInfo"></div>
-                        </div>
-
-                        <div class="detail-section" id="meRefereeSection" style="display:none;">
-                            <div class="section-title modal-style" data-i18n="refereeInfo"></div>
-                            <div class="detail-list" id="meRefereeInfo"></div>
-                        </div>
-
-                        <div class="detail-section" id="meAttRevSection" style="display:none;">
-                            <div class="section-title modal-style" data-i18n="attRevInfo"></div>
-                            <div class="detail-list" id="meAttRevInfo"></div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="section-title modal-style" data-i18n="storageInfo"></div>
-                            <div id="meStorageBadges"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="me-section" id="mePlaysSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="plays"></div>
-                        <div class="detail-list plays-list" id="mePlaysList"></div>
-                    </div>
-
-                    <div class="me-section" id="mePenaltiesSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="penalties"></div>
-                        <div class="detail-list plays-list" id="mePenaltiesList"></div>
-                    </div>
-
-                    <div class="me-section" id="meStatisticsSection" style="display:none;">
-                        <div class="section-title modal-style" data-i18n="statistics"></div>
-                        <div class="detail-list me-stats-list" id="meStatisticsInfo"></div>
-                    </div>
-                </div>
-
+            <div class="me-section" id="meLineupSection" style="display:none;">
+                <div class="section-title modal-style" data-i18n="lineup"></div>
+                <div class="me-lineup-grid" id="meLineupGrid"></div>
             </div>
-
         </div>
-    </div>
+    </main>
 
     <div id="footer"></div>
 

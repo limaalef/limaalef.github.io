@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/request-detail.css">
 </head>
-<body>
+<body class="page-request-detail">
     <header>
         <div class="header-frame" id="header"
         data-title-key="requestMyRequest"
@@ -37,7 +37,7 @@
     </header>
 
     <!-- Auth -->
-    <div id="rd-auth">
+    <div id="rd-auth" class="auth-gate">
         <div class="icon-lg">🔒</div>
         <h2 data-i18n="requestLoginRequired">Identificação necessária</h2>
         <p data-i18n="requestLoginRequiredDesc">Faça login para visualizar os detalhes do pedido.</p>
@@ -290,7 +290,7 @@ function buildOrderDetail(o) {
             <nav class="rd-crumb" aria-label="breadcrumb">
                 <a href="my-requests.html">${icon('back', 14)}<span data-i18n="requestMyRequests">${t('requestMyRequests')}</span></a>
             </nav>
-            <h1 class="rd-title"><span data-i18n="requestMyRequest">${t('requestMyRequest')}</span></h1>
+            <h1 class="page-heading"><span data-i18n="requestMyRequest">${t('requestMyRequest')}</span></h1>
         `,
         body: `
             <section class="rd-block rd-details">

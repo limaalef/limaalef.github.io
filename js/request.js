@@ -93,7 +93,6 @@ const RequestModule = (() => {
         // match precisa ter id e sport (ou ser reconhecível por Utils.getItemSport).
         attachDetailButton(match, host) { _injectModalButton(match, host); },
 
-        getCart()  { return [...cart]; },
         init()     { _init(); },
 
         // Exposto para onclick inline no HTML gerado
@@ -682,17 +681,6 @@ const RequestModule = (() => {
         btn.querySelector('span').textContent = label;
         btn.title = label;
         btn.classList.toggle('om-added', inCart);
-    }
-
-    // Atualiza estado visual dos botões sem reinjetar (ex: troca de esporte)
-    function _refreshButtonStates() {
-        document.querySelectorAll('.match-card[data-match-id] .om-add-btn').forEach(btn => {
-            const card   = btn.closest('.match-card');
-            const match  = card ? _findListItem(card.dataset.matchId) : null;
-            const inCart = match ? API.isInCart(_requestId(match), _sportOf(match)) : false;
-            btn.classList.toggle('om-added', inCart);
-            btn.textContent = _cardButtonLabel(inCart);
-        });
     }
 
     // Modal único: injeta o botão de pedido depois que o adaptador da categoria montou o conteúdo

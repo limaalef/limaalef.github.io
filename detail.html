@@ -78,7 +78,7 @@
                 <div class="sidebar-content" id="sidebarContent" style="display:none;">
                     <div class="sidebar-sport-header">
                         <div class="entity-image" id="entityImage" data-shape="emblem"></div>
-                        <div class="sidebar-header-text-group">
+                        <div class="sidebar-header-text-group stack">
                             <h1 class="sidebar-sport-name" id="sidebarName"></h1>
                             <div class="sidebar-sport-meta" id="sidebarMeta"></div>
                         </div>
@@ -99,13 +99,13 @@
             <!-- CONTEÚDO PRINCIPAL -->
             <div class="collection-main">
 
-                <div class="detail-state" id="noQueryState" style="display:none;">
+                <div class="empty-state" id="noQueryState" style="display:none;">
                     <h2 data-i18n="detailNoQuery">Nenhuma busca definida</h2>
                     <p data-i18n="detailNoQueryHint">Acesse esta página a partir do acervo ou da página inicial.</p>
                 </div>
 
-                <div class="detail-controls" id="mainControls" style="display:none;">
-                    <label class="detail-filter">
+                <div class="list-controls" id="mainControls" style="display:none;">
+                    <label class="list-filter">
                         <span data-i18n="years">Anos</span>
                         <select class="field field--select" id="yearFilterBar">
                             <option value="" data-i18n="allYears">Todos os anos</option>
@@ -124,7 +124,7 @@
                 </div>
 
                 <div class="match-container" id="matchesContainer">
-                    <div class="detail-state">
+                    <div class="empty-state">
                         <h2 data-i18n="loading">Carregando jogos...</h2>
                         <p data-i18n="loadingMessage">Aguarde enquanto buscamos os dados</p>
                     </div>

@@ -169,13 +169,13 @@
                         </div>
 
                         <form class="bn-form" id="bn-form" onsubmit="return false" autocomplete="off">
-                            <div class="bn-field">
+                            <div class="bn-field stack">
                                 <span class="bn-label">Imagem <span class="bn-hint">PNG/WebP transparente, proporção 5×3, até 2 MB</span></span>
                                 <div class="bn-upload">
                                     <div class="bn-thumb" id="bn-upload-thumb"></div>
                                     <div>
                                         <div class="bn-meta" id="bn-upload-name">Nenhuma imagem</div>
-                                        <div class="bn-actions bn-actions--start">
+                                        <div class="bn-actions row-wrap row-wrap--end bn-actions--start">
                                             <button type="button" class="action-btn btn-ghost btn-xs" id="bn-pick">Escolher arquivo</button>
                                             <button type="button" class="action-btn btn-ghost btn-xs" id="bn-remove-image">Remover</button>
                                         </div>
@@ -184,31 +184,31 @@
                                 </div>
                             </div>
 
-                            <label class="bn-field"><span class="bn-label">Título (retângulo acima do destaque) <span class="bn-hint" id="bn-title-count"></span></span>
+                            <label class="bn-field stack"><span class="bn-label">Título (retângulo acima do destaque) <span class="bn-hint" id="bn-title-count"></span></span>
                                 <input class="field field--on-surface" id="bn-title" maxlength="40" placeholder="Ex.: NOVO"></label>
-                            <label class="bn-field"><span class="bn-label">Texto de destaque <span class="bn-hint" id="bn-headline-count"></span></span>
+                            <label class="bn-field stack"><span class="bn-label">Texto de destaque <span class="bn-hint" id="bn-headline-count"></span></span>
                                 <input class="field field--on-surface" id="bn-headline" maxlength="90" placeholder="Ex.: Final da Copa do Brasil 2025"></label>
-                            <label class="bn-field"><span class="bn-label">Texto auxiliar <span class="bn-hint" id="bn-subtitle-count"></span></span>
+                            <label class="bn-field stack"><span class="bn-label">Texto auxiliar <span class="bn-hint" id="bn-subtitle-count"></span></span>
                                 <input class="field field--on-surface" id="bn-subtitle" maxlength="160" placeholder="Ex.: Já disponível no arquivo"></label>
-                            <label class="bn-field"><span class="bn-label">Link de destino <span class="bn-hint">https://… ou página do site</span></span>
+                            <label class="bn-field stack"><span class="bn-label">Link de destino <span class="bn-hint">https://… ou página do site</span></span>
                                 <input class="field field--on-surface" id="bn-link" maxlength="500" placeholder="collection.html?sport=football"></label>
 
-                            <div class="bn-colors">
+                            <div class="bn-colors grid-2">
                                 <label class="bn-color"><input type="color" id="bn-bg_color"><span>Fundo</span><code id="bn-bg_color-hex"></code></label>
                                 <label class="bn-color"><input type="color" id="bn-text_color"><span>Texto</span><code id="bn-text_color-hex"></code></label>
                                 <label class="bn-color"><input type="color" id="bn-title_bg_color"><span>Fundo do título</span><code id="bn-title_bg_color-hex"></code></label>
                                 <label class="bn-color"><input type="color" id="bn-title_text_color"><span>Texto do título</span><code id="bn-title_text_color-hex"></code></label>
                             </div>
 
-                            <div class="bn-grid-2">
-                                <label class="bn-field"><span class="bn-label">Início da publicação <span class="bn-hint">vazio = imediato</span></span>
+                            <div class="bn-grid-2 grid-2">
+                                <label class="bn-field stack"><span class="bn-label">Início da publicação <span class="bn-hint">vazio = imediato</span></span>
                                     <input class="field field--on-surface" type="datetime-local" id="bn-starts"></label>
-                                <div class="bn-field"><span class="bn-label">Término <span class="bn-hint">vazio = indefinido</span></span>
+                                <div class="bn-field stack"><span class="bn-label">Término <span class="bn-hint">vazio = indefinido</span></span>
                                     <div class="bn-inline"><input class="field field--on-surface" type="datetime-local" id="bn-ends">
                                     <button type="button" class="action-btn btn-ghost btn-xs" id="bn-clear-ends">Limpar</button></div></div>
                             </div>
-                            <div class="bn-grid-2">
-                                <label class="bn-field"><span class="bn-label">Ordem <span class="bn-hint">menor aparece primeiro</span></span>
+                            <div class="bn-grid-2 grid-2">
+                                <label class="bn-field stack"><span class="bn-label">Ordem <span class="bn-hint">menor aparece primeiro</span></span>
                                     <input class="field field--on-surface" type="number" id="bn-order" step="1"></label>
                                 <label class="bn-toggle"><input type="checkbox" id="bn-enabled"> Habilitado</label>
                             </div>
@@ -444,7 +444,7 @@
                                 </div>
                                 <div class="detail-list-item">
                                     <span class="detail-list-label">Alternar ambiente</span>
-                                    <span class="detail-list-value adm-row-actions">
+                                    <span class="detail-list-value adm-row-actions row-wrap row-wrap--end">
                                         <button type="button" class="action-btn btn-xs" id="pp-mode-sandbox" onclick="setPaypalMode('sandbox')">Sandbox</button>
                                         <button type="button" class="action-btn btn-xs" id="pp-mode-live" onclick="setPaypalMode('live')">Live</button>
                                     </span>
@@ -954,7 +954,7 @@ function buildPaymentData(o) {
         ${b.cancelLabel ? `
         <div class="detail-list-item">
             <span class="detail-list-label"></span>
-            <span class="detail-list-value adm-row-actions">
+            <span class="detail-list-value adm-row-actions row-wrap row-wrap--end">
                 <button type="button" class="action-btn btn-danger btn-xs" id="cancel-pay-btn-${o.id}"
                     onclick="cancelPayment('${o.id}', this)">${b.cancelLabel}</button>
             </span>
@@ -1026,7 +1026,7 @@ function amountBlockHtml(o, kind) {
         ${kvRow('Total a pagar', `<strong id="${amtId(kind, 'total')}">—</strong>`, 'adm-total-row')}
         <div class="detail-list-item adm-msg-row">
             <span class="detail-list-label"><span class="adm-amount-msg" id="${amtId(kind, 'msg')}" role="status" aria-live="polite"></span></span>
-            <span class="detail-list-value adm-row-actions">
+            <span class="detail-list-value adm-row-actions row-wrap row-wrap--end">
                 <button type="button" class="action-btn btn-primary btn-xs" onclick="amtSave('${o.id}', '${kind}', this)">Salvar valor</button>
             </span>
         </div>
@@ -1097,7 +1097,7 @@ function buildOrderDetail(o) {
                 <strong class="${active>0?'text-success':'text-error'}">${active}</strong>
                 de ${total} link(s) ativo(s)
             </div>
-            <div class="adm-bulk-actions">
+            <div class="adm-bulk-actions row-wrap row-wrap--loose">
                 <button type="button" class="action-btn btn-xs adm-btn-warning" onclick="disableAllLinks('${o.id}')">Desativar todos</button>
                 <button type="button" class="action-btn btn-xs adm-btn-success" onclick="toggleActivatePanel()">Ativar todos...</button>
             </div>
@@ -1179,7 +1179,7 @@ function buildOrderDetail(o) {
                             <span class="detail-list-label">
                                 <span class="adm-amount-msg" id="ext-msg-${o.id}" role="status" aria-live="polite"></span>
                             </span>
-                            <span class="detail-list-value adm-row-actions">
+                            <span class="detail-list-value adm-row-actions row-wrap row-wrap--end">
                                 ${ep ? `<button type="button" class="action-btn btn-danger btn-xs"
                                     onclick="clearExternalPayment('${o.id}', this)">Remover registro</button>` : ''}
                                 <button type="button" class="action-btn btn-primary btn-xs"
@@ -1939,10 +1939,7 @@ async function cancelPayment(orderId, btn) {
     }
 }
 
-// ── Utils ─────────────────────────────────────────────────────────────────
-function esc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s) { return Utils.escapeHtml(s); }
 </script>
 </body>
 </html>

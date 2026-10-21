@@ -325,7 +325,8 @@
 }
 
 /* Separador de período (1T / 2T / Prorr.) */
-.plays-period-label {
+.plays-period-label,
+.pen-score-row {
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--text-tertiary);
@@ -336,7 +337,9 @@
 }
 
 .plays-period-label::before,
-.plays-period-label::after {
+.plays-period-label::after,
+.pen-score-row::before,
+.pen-score-row::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -345,11 +348,13 @@
     background: var(--border-color);
 }
 
-.plays-period-label::before {
+.plays-period-label::before,
+.pen-score-row::before {
     left: 0;
 }
 
-.plays-period-label::after {
+.plays-period-label::after,
+.pen-score-row::after {
     right: 0;
 }
 
@@ -493,32 +498,8 @@
     letter-spacing: -0.02em;
 }
 
-.pen-score-row {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    text-align: center;
-    position: relative;
-}
-
-.pen-score-row::before,
-.pen-score-row::after {
-    content: '';
-    position: absolute;
-    top: 50%;
+.pen-score-row::before, .pen-score-row::after {
     width: 46%;
-    height: 1px;
-    background: var(--border-color);
-}
-
-.pen-score-row::before {
-    left: 0;
-}
-
-.pen-score-row::after {
-    right: 0;
 }
 
 /* Indicador de quem bateu primeiro */
@@ -552,13 +533,6 @@
 }
 
 /* Célula de uma cobrança */
-.pen-cell {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    min-width: 0;
-}
-
 .pen-cell.home {
     justify-content: flex-start;
     flex-direction: row-reverse;

@@ -62,11 +62,11 @@ const AdminBanners = (() => {
             return `<div class="bn-row" data-id="${esc(b.id)}">
                 <div class="bn-thumb" style="background:${esc(b.bg_color)}">${b.image_url ? `<img src="${esc(b.image_url)}" alt="" loading="lazy">` : ''}</div>
                 <div class="bn-info">
-                    <div class="bn-name">${esc(b.headline)}</div>
+                    <div class="bn-name item-name">${esc(b.headline)}</div>
                     <div class="bn-meta">${esc(b.title)} · ${esc(period(b))} · ordem ${b.sort_order}</div>
                 </div>
                 ${pill(kind, label)}
-                <div class="bn-actions">
+                <div class="bn-actions row-wrap row-wrap--end">
                     <button type="button" class="action-btn btn-ghost btn-xs" data-act="edit">Editar</button>
                     <button type="button" class="action-btn btn-ghost btn-xs" data-act="toggle">${b.enabled ? 'Desativar' : 'Ativar'}</button>
                     <button type="button" class="action-btn btn-danger btn-xs" data-act="delete">Excluir</button>

@@ -56,21 +56,6 @@ const PaginationManager = {
 //  CardAdapters e (se o corpo for diferente) um renderer em CardBodies.
 // ══════════════════════════════════════════════════════════════════
 const CardAdapters = {
-    _slug(text) {
-        return String(text || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[̀-ͯ]/g, '') // Remove acentos
-            .replace(/\s+/g, '_');
-    },
-
-    _competitionLogo(name, dateStr) {
-        if (!name || !dateStr) return '';
-        const d = Utils.parseDate(dateStr);
-        const year = d ? d.getFullYear() : new Date().getFullYear();
-        return `competition_logos/${this._slug(name)}_${year}.png`;
-    },
-
     // Clique padrão: várias fontes → escolher emissora; senão abre o detalhe direto.
     _defaultClick(item, sport, sources) {
         return () => {
@@ -94,7 +79,7 @@ const CardAdapters = {
             status: Utils.getMatchStatus(item),
             hasVideo: !!item.has_embed_video,
             header: {
-                logo: this._competitionLogo(item.competition?.name, item.utcDate),
+                logo: Utils.competitionLogoUrl(item.competition?.name, item.utcDate),
                 logoAlt: item.competition?.name,
                 title: LanguageManager.translateText(item.competition?.name) || 'N/A',
                 subtitle: LanguageManager.translateText(item.competition?.phase) || ''
@@ -137,7 +122,7 @@ const CardAdapters = {
             status: '',
             hasVideo: !!item.media?.video_embed,
             header: {
-                logo: this._competitionLogo(item.competition?.name, item.start_date),
+                logo: Utils.competitionLogoUrl(item.competition?.name, item.start_date),
                 logoAlt: item.competition?.phase,
                 title: LanguageManager.translateText(item.competition?.name) || 'N/A',
                 subtitle: ''
@@ -173,7 +158,7 @@ const CardAdapters = {
         const tech = item.technical_details || {};
         const dateStr = item.utcDate ?? item.date;
         const city = comp.city ?? champ.city;
-        const citySlug = city ? this._slug(city) : '';
+        const citySlug = city ? Utils.slug(city) : '';
         return {
             id: item.id,
             sport,
@@ -244,7 +229,7 @@ const CardBodies = {
         return `
             <div class="motor-phase-section">
                 ${b.flag ? `<img src="${b.flag}" alt="${Utils.escapeHtml(b.flagAlt || '')}" class="country-flag" onerror="this.style.display='none'">` : ''}
-                <div class="motor-phase-name">${b.title}</div>
+                <div class="motor-phase-name entity-title">${b.title}</div>
             </div>`;
     },
 
@@ -254,7 +239,7 @@ const CardBodies = {
             <div class="carnaval-data-section">
                 <div class="carnaval-school-section">
                     ${b.logo ? `<img src="${b.logo}" alt="${Utils.escapeHtml(b.name)}" class="country-flag" onerror="this.style.display='none'">` : ''}
-                    <div class="carnaval-school-name">${b.name}</div>
+                    <div class="carnaval-school-name entity-title">${b.name}</div>
                 </div>
                 <div class="carnaval-plot-name">${b.plot}</div>
             </div>`;
@@ -329,7 +314,7 @@ const CardManager = {
                    <span class="sources-count-value">${f.count.value}</span>
                    <span class="sources-count-label">${f.count.label || ''}</span>
                </div>`
-            : `<div class="tech-badges">${(f.badges || []).map(b => `<span class="tech-badge">${b}</span>`).join('')}</div>`;
+            : `<div class="tech-badges row-wrap">${(f.badges || []).map(b => `<span class="tech-badge">${b}</span>`).join('')}</div>`;
         return `<div class="${f.cls}">${logo}${right}</div>`;
     }
 };

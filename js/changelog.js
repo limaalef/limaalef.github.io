@@ -104,7 +104,7 @@ function entryHtml(entry, index, isNew) {
                 <span class="sync-mode-name">${info.modeName}</span>
                 ${isNew ? `<span class="new-marker">${LanguageManager.t('cl_new')}</span>` : ''}
             </span>
-            <span class="sync-summary-pills">${counts || `<span class="change-count"><i></i>${LanguageManager.t('cl_unchanged')}</span>`}</span>
+            <span class="sync-summary-pills row-wrap">${counts || `<span class="change-count"><i></i>${LanguageManager.t('cl_unchanged')}</span>`}</span>
             <span class="sync-timestamp">${timeOfDay(entry.timestamp)}</span>
             <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
         </button>

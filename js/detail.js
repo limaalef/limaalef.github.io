@@ -18,10 +18,9 @@ const CollectionState = {
    Tipo novo: acrescente uma entrada aqui e uma chave detailType* em translation.js.
 ───────────────────────────────────────── */
 const EntityTypes = (() => {
-    const slug = (name, sep) => String(name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-        .replace(/[^a-z0-9]+/g, sep).replace(new RegExp(`^${sep}+|${sep}+$`, 'g'), '');
+    const slug = (name, sep) => Utils.slugify(name, sep);
     // Mesmo formato que a página inicial usa nos escudos: minúsculas, sem acento, espaço vira "-"
-    const legacySlug = name => String(name).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
+    const legacySlug = name => Utils.slug(name, '-');
     const unique = list => [...new Set(list)];
 
     const TYPES = {
@@ -72,7 +71,7 @@ const EntityImage = {
         return this._browse;
     },
 
-    _normalize: value => String(value || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(),
+    _normalize: value => Utils.stripAccents(value).toLowerCase().trim(),
 
     _canLoad(url) {
         return new Promise(resolve => {
@@ -285,7 +284,7 @@ const CollectionApp = {
         } catch (error) {
             console.error(error);
             document.getElementById('matchesContainer').innerHTML =
-                `<div class="detail-state"><h2>${LanguageManager.t('cl_error')}</h2><p>${Utils.escapeHtml(error.message)}</p></div>`;
+                `<div class="empty-state"><h2>${LanguageManager.t('cl_error')}</h2><p>${Utils.escapeHtml(error.message)}</p></div>`;
         }
     },
 

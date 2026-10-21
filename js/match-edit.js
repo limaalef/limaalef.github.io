@@ -396,11 +396,7 @@ const MatchEdit = (() => {
 
     // ── Cabeçalho editável (dados gerais) ──────────────────────────────────
     // Visual do hero de match.html, mas com campos para alterar. É a seção "general" do matchdata.
-    function compLogoUrl(d) {
-        const slug = String(d.competition || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_');
-        const year = /^\d{4}/.test(d.utc_date || '') ? d.utc_date.slice(0, 4) : '';
-        return slug ? `competition_logos/${slug}_${year}.png` : '';
-    }
+    const compLogoUrl = d => Utils.competitionLogoUrl(d.competition, d.utc_date);
 
     function renderHero(box, sec) {
         box.replaceChildren();

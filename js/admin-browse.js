@@ -16,9 +16,7 @@ const AdminBrowse = (() => {
     let items = [], loaded = false;
 
     // "Atlético-MG" → atletico-mg ; "Cléber Machado" → cleber_machado
-    function slug(name, space) {
-        return String(name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9-]+/g, space).replace(new RegExp(`^${space}+|${space}+$`, 'g'), '');
-    }
+    const slug = (name, space) => Utils.stripAccents(name).toLowerCase().replace(/[^a-z0-9-]+/g, space).replace(new RegExp(`^${space}+|${space}+$`, 'g'), '');
     const json = (method, body) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const ofKind = k => items.filter(i => i.kind === k).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id);
 
@@ -41,8 +39,8 @@ const AdminBrowse = (() => {
             $(cfg.host + '-list').innerHTML = list.map((it, i) => `
                 <div class="br-row" data-id="${it.id}" data-kind="${kind}">
                     <div class="br-thumb"><img src="${esc(it.image)}" alt="" onerror="this.style.visibility='hidden'"></div>
-                    <div class="br-fields">
-                        <div class="br-name">${esc(it.name)}</div>
+                    <div class="br-fields stack">
+                        <div class="br-name item-name">${esc(it.name)}</div>
                         <input class="field field--on-surface" data-f="label" value="${esc(it.label)}" placeholder="Texto exibido (padrão: ${esc(it.name)})" maxlength="60" aria-label="Texto exibido">
                         <input class="field field--on-surface" data-f="image" value="${esc(it.image)}" placeholder="Caminho da imagem" maxlength="200" aria-label="Caminho da imagem">
                     </div>

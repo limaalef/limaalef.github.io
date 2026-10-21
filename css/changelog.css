@@ -29,12 +29,6 @@
     color: var(--text-secondary);
 }
 
-.sync-summary-pills {
-    display: flex;
-    gap: var(--sp-2);
-    flex-wrap: wrap;
-}
-
 .sync-entry.open .expand-icon {
     transform: rotate(180deg);
 }
@@ -159,18 +153,6 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-4);
-}
-
-.page-changelog .changelog-limit {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-3);
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-}
-
-.page-changelog .changelog-limit .field {
-    width: auto;
 }
 
 /* ── Novidades desde a última visita ── */

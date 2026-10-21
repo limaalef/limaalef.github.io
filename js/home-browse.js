@@ -4,7 +4,7 @@
    Se a API falhar ou a lista vier vazia, mantém o HTML estático da página.
 ═══════════════════════════════════════════════════════════════ */
 const HomeBrowse = (() => {
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const esc = v => Utils.escapeHtml(v);
 
     // Mesma marcação dos cartões estáticos de index.html
     function card(kind, item) {

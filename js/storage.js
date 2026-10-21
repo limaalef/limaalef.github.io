@@ -6,18 +6,18 @@
 
 // Entradas da planilha que não são hardware: vão para "Nuvem e outros locais"
 const PSEUDO_DISKS = {
-    'nuvem':       'Backup em nuvem',
-    'local':       'Armazenamento local',
-    'para baixar': 'Fila de download',
+    'nuvem':       'sdCloud',
+    'local':       'sdLocal',
+    'para baixar': 'sdQueue',
 };
 
 // Situação do disco (a cor só aparece na bolinha, como nas demais telas)
 const DISK_STATES = {
-    over:    { label: 'Acima da capacidade', kind: 'error'  },
-    full:    { label: 'Cheio',               kind: 'off'  },
-    near:    { label: 'Quase cheio',         kind: 'waiting' },
-    ok:      { label: 'Com espaço',          kind: 'success' },
-    unknown: { label: 'Sem capacidade',      kind: 'off'  },
+    over:    { label: 'sdStateOver',    kind: 'error'   },
+    full:    { label: 'sdStateFull',    kind: 'off'     },
+    near:    { label: 'sdStateNear',    kind: 'waiting' },
+    ok:      { label: 'sdStateOk',      kind: 'success' },
+    unknown: { label: 'sdStateUnknown', kind: 'off'     },
 };
 
 const SortFns = {
@@ -25,15 +25,16 @@ const SortFns = {
     pct:     (a, b) => b.pct - a.pct,
     total:   (a, b) => b.totalGB - a.totalGB,
     archive: (a, b) => b.archiveGB - a.archiveGB,
-    name:    (a, b) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true }),
+    name:    (a, b) => a.name.localeCompare(b.name, LanguageManager.getLanguage(), { numeric: true }),
 };
 
 const StorageState = { all: [], disks: [], others: [], updatedAt: null, filter: 'all', sort: 'free', query: '' };
 
 // ─── Helpers ─────────────────────────────────────
-const sdEsc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const sdNorm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-const nf = (v, d = 1) => v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const sdEsc = Utils.escapeHtml.bind(Utils);
+const sdNorm = Utils.normalizeSearch.bind(Utils);
+const t = (key, vars = {}) => Object.entries(vars).reduce((txt, [k, v]) => txt.replace(`{${k}}`, v), LanguageManager.t(key));
+const nf = (v, d = 1) => v.toLocaleString(LanguageManager.getLanguage(), { minimumFractionDigits: d, maximumFractionDigits: d });
 
 function formatGB(gb) {
     if (gb === null || gb === undefined || isNaN(gb)) return '—';
@@ -65,7 +66,7 @@ function normalizeDisk(d) {
     return {
         ...d, totalGB, usedGB, archiveGB, otherGB, freeGB, pct, knownTotal, state: key,
         physical: !pseudo && d.brand !== null,
-        kindLabel: pseudo || null,
+        kindLabel: pseudo ? t(pseudo) : null,
         search: sdNorm([d.name, d.brand, d.model, d.serial, d.disk_type, d.format].filter(Boolean).join(' ')),
     };
 }
@@ -88,26 +89,26 @@ function renderSummary() {
 
     document.getElementById('sdSummary').innerHTML = `
         <div class="stat-tile-grid">
-            ${statTile(disks.length, 'Discos físicos')}
-            ${statTile(formatGB(cap), 'Capacidade total')}
-            ${statTile(formatGB(used), `Em uso · ${nf(pctOf(used), 0)}%`)}
-            ${statTile(formatGB(free), `Livre · ${nf(pctOf(free), 0)}%`, true)}
+            ${statTile(disks.length, t('sdTilePhysical'))}
+            ${statTile(formatGB(cap), t('sdTileCapacity'))}
+            ${statTile(formatGB(used), `${t('sdTileUsed')} · ${nf(pctOf(used), 0)}%`)}
+            ${statTile(formatGB(free), `${t('sdTileFree')} · ${nf(pctOf(free), 0)}%`, true)}
         </div>
-        <div class="usage-bar usage-bar--large" role="img" aria-label="Distribuição do espaço total">
+        <div class="usage-bar usage-bar--large" role="img" aria-label="${t('sdSpaceAria')}">
             <span class="usage-bar-segment usage-bar-segment--archive" style="width:${pctOf(archive)}%"></span>
             <span class="usage-bar-segment usage-bar-segment--other"   style="width:${pctOf(other)}%"></span>
         </div>
         <div class="usage-legend">
-            <span><i class="usage-legend-key usage-legend-key--archive"></i>Arquivo (jogos) <b>${formatGB(archive)}</b></span>
-            <span><i class="usage-legend-key usage-legend-key--other"></i>Outros arquivos <b>${formatGB(other)}</b></span>
-            <span><i class="usage-legend-key usage-legend-key--free"></i>Livre <b>${formatGB(free)}</b></span>
+            <span><i class="usage-legend-key usage-legend-key--archive"></i>${t('sdLegendArchive')} <b>${formatGB(archive)}</b></span>
+            <span><i class="usage-legend-key usage-legend-key--other"></i>${t('sdLegendOther')} <b>${formatGB(other)}</b></span>
+            <span><i class="usage-legend-key usage-legend-key--free"></i>${t('sdTileFree')} <b>${formatGB(free)}</b></span>
         </div>
-        ${over ? `<p class="sd-note">${over} ${over === 1 ? 'disco informa' : 'discos informam'} uso acima da capacidade; nas barras e nos totais o uso é limitado a 100%.</p>` : ''}`;
+        ${over ? `<p class="sd-note">${t(over === 1 ? 'sdOverNoteOne' : 'sdOverNoteMany', { n: over })}</p>` : ''}`;
 
     if (StorageState.updatedAt) {
         const d = new Date(StorageState.updatedAt);
         if (!isNaN(d)) document.getElementById('sdUpdated').textContent =
-            'Atualizado em ' + d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+            t('sdUpdated') + ' ' + Utils.formatDateTime(d);
     }
 }
 
@@ -115,11 +116,11 @@ function renderSummary() {
 function renderChips() {
     const count = k => StorageState.disks.filter(d => d.state === k).length;
     const chips = [
-        ['all',  'Todos',        StorageState.disks.length],
-        ['ok',   'Com espaço',   count('ok')],
-        ['near', 'Quase cheios', count('near')],
-        ['full', 'Cheios',       count('full')],
-        ['over', 'Acima da capacidade', count('over')],
+        ['all',  t('sdChipAll'),  StorageState.disks.length],
+        ['ok',   t('sdChipOk'),   count('ok')],
+        ['near', t('sdChipNear'), count('near')],
+        ['full', t('sdChipFull'), count('full')],
+        ['over', t('sdChipOver'), count('over')],
     ].filter(([k, , n]) => k === 'all' || n > 0);
     if (!chips.some(([k]) => k === StorageState.filter)) StorageState.filter = 'all';
     document.getElementById('sdChips').innerHTML = chips.map(([k, label, n]) =>
@@ -152,18 +153,18 @@ function diskRow(d, idx) {
         </div>
         <div class="sd-usage">
             ${d.knownTotal ? `
-            <div class="usage-bar" role="img" aria-label="${pctTxt} usado">
+            <div class="usage-bar" role="img" aria-label="${t('sdUsedAria', { pct: pctTxt })}">
                 <span class="usage-bar-segment usage-bar-segment--archive" style="width:${aW}%"></span>
                 <span class="usage-bar-segment usage-bar-segment--other"   style="width:${oW}%"></span>
             </div>` : '<div class="usage-bar usage-bar--empty"></div>'}
             <div class="usage-legend usage-legend--small">
-                ${d.archiveGB > 0 || d.otherGB === 0 ? `<span><i class="usage-legend-key usage-legend-key--archive"></i>Arquivo ${formatGB(d.archiveGB)}</span>` : ''}
-                ${d.otherGB > 0 ? `<span><i class="usage-legend-key usage-legend-key--other"></i>Outros ${formatGB(d.otherGB)}</span>` : ''}
+                ${d.archiveGB > 0 || d.otherGB === 0 ? `<span><i class="usage-legend-key usage-legend-key--archive"></i>${t('sdArchiveShort')} ${formatGB(d.archiveGB)}</span>` : ''}
+                ${d.otherGB > 0 ? `<span><i class="usage-legend-key usage-legend-key--other"></i>${t('sdOtherShort')} ${formatGB(d.otherGB)}</span>` : ''}
             </div>
         </div>
-        <div class="sd-num"><strong>${formatGB(d.usedGB)}</strong><span>${d.knownTotal ? 'de ' + formatGB(d.totalGB) : 'usados'}</span></div>
-        <div class="sd-num"><strong>${d.knownTotal ? formatGB(d.freeGB) : '—'}</strong><span>livres</span></div>
-        <div class="sd-state">${pill(st.kind, st.label)}<span class="sd-pct">${pctTxt}</span></div>
+        <div class="sd-num"><strong>${formatGB(d.usedGB)}</strong><span>${d.knownTotal ? t('sdOf') + ' ' + formatGB(d.totalGB) : t('sdUsedPl')}</span></div>
+        <div class="sd-num"><strong>${d.knownTotal ? formatGB(d.freeGB) : '—'}</strong><span>${t('sdFreePl')}</span></div>
+        <div class="sd-state">${pill(st.kind, t(st.label))}<span class="sd-pct">${pctTxt}</span></div>
         <span class="sd-go" aria-hidden="true">${icon('chevron-right', 16)}</span>
     </button>`;
 }
@@ -171,10 +172,10 @@ function diskRow(d, idx) {
 function renderList() {
     const list = document.getElementById('sdList');
     const rows = visibleDisks();
-    document.getElementById('sdDiskCount').textContent = rows.length === StorageState.disks.length ? '' : `${rows.length} de ${StorageState.disks.length}`;
+    document.getElementById('sdDiskCount').textContent = rows.length === StorageState.disks.length ? '' : `${rows.length} ${t('sdOf')} ${StorageState.disks.length}`;
     list.innerHTML = rows.length
-        ? `<div class="sd-head" aria-hidden="true"><span>Disco</span><span>Uso</span><span>Usado</span><span>Livre</span><span>Situação</span><span></span></div>` + rows.map(d => diskRow(d, StorageState.all.indexOf(d))).join('')
-        : `<div class="status-message">Nenhum disco encontrado.</div>`;
+        ? `<div class="sd-head" aria-hidden="true"><span>${t('sdColDisk')}</span><span>${t('sdColUse')}</span><span>${t('sdColUsed')}</span><span>${t('sdColFree')}</span><span>${t('sdColState')}</span><span></span></div>` + rows.map(d => diskRow(d, StorageState.all.indexOf(d))).join('')
+        : `<div class="status-message">${t('sdNone')}</div>`;
 }
 
 function renderOthers() {
@@ -193,7 +194,7 @@ function openDiskModal(d, opener) {
     document.getElementById('sdModalBody').innerHTML = `
         <div class="sd-modal-head">
             <h3 id="sdModalTitle">${sdEsc(d.name)}</h3>
-            ${pill(st.kind, st.label)}
+            ${pill(st.kind, t(st.label))}
         </div>
         ${d.knownTotal ? `
         <div class="usage-bar usage-bar--large">
@@ -201,21 +202,21 @@ function openDiskModal(d, opener) {
             <span class="usage-bar-segment usage-bar-segment--other"   style="width:${(d.otherGB / denom) * 100}%"></span>
         </div>` : ''}
         <div class="sd-modal-sec">
-            <h4>Espaço</h4>
-            ${kv('Capacidade', d.knownTotal ? formatGB(d.totalGB) : null)}
-            ${kv('Usado', `${formatGB(d.usedGB)}${d.knownTotal ? ' · ' + pctTxt : ''}`)}
-            ${kv('Arquivo (jogos)', formatGB(d.archiveGB))}
-            ${kv('Outros arquivos', formatGB(d.otherGB))}
-            ${kv('Livre', d.knownTotal ? formatGB(d.freeGB) : null)}
+            <h4>${t('sdSpace')}</h4>
+            ${kv(t('sdCapacity'), d.knownTotal ? formatGB(d.totalGB) : null)}
+            ${kv(t('sdColUsed'), `${formatGB(d.usedGB)}${d.knownTotal ? ' · ' + pctTxt : ''}`)}
+            ${kv(t('sdLegendArchive'), formatGB(d.archiveGB))}
+            ${kv(t('sdLegendOther'), formatGB(d.otherGB))}
+            ${kv(t('sdTileFree'), d.knownTotal ? formatGB(d.freeGB) : null)}
         </div>
         <div class="sd-modal-sec">
-            <h4>Características</h4>
-            ${kv('Marca', d.brand)}${kv('Modelo', d.model)}${kv('Tipo', d.disk_type)}${kv('Formato', d.format)}
-            ${kv('Interface', d.interface)}${kv('Serial', d.serial)}${kv('Ano de compra', d.purchase_year)}
-            ${kv('Situação cadastral', d.status)}${kv('Descrição', d.kindLabel)}
+            <h4>${t('sdFeatures')}</h4>
+            ${kv(t('sdBrand'), d.brand)}${kv(t('sdModel'), d.model)}${kv(t('sdType'), d.disk_type)}${kv(t('sdFormat'), d.format)}
+            ${kv(t('sdInterface'), d.interface)}${kv(t('sdSerial'), d.serial)}${kv(t('sdPurchase'), d.purchase_year)}
+            ${kv(t('sdStatus'), d.status)}${kv(t('sdDescription'), d.kindLabel)}
         </div>
-        ${d.notes ? `<div class="sd-modal-sec"><h4>Observações</h4><p class="sd-modal-notes">${sdEsc(d.notes)}</p></div>` : ''}
-        <a class="button button--solid button--block" href="${diskHref(d)}">Ver conteúdo do disco ${icon('chevron-right', 16)}</a>`;
+        ${d.notes ? `<div class="sd-modal-sec"><h4>${t('sdNotes')}</h4><p class="sd-modal-notes">${sdEsc(d.notes)}</p></div>` : ''}
+        <a class="button button--solid button--block" href="${diskHref(d)}">${t('sdViewContent')} ${icon('chevron-right', 16)}</a>`;
     const m = document.getElementById('sdModal');
     m.hidden = false;
     document.body.classList.add('sd-lock');
@@ -242,11 +243,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         StorageState.others    = all.filter(d => !d.physical).sort(SortFns.total);
         StorageState.updatedAt = payload.updated_at || null;
         renderSummary(); renderChips(); renderList(); renderOthers();
+        document.addEventListener('languagechange', () => {
+            StorageState.others.concat(StorageState.disks).forEach(d => { const p = PSEUDO_DISKS[sdNorm(d.name)]; d.kindLabel = p ? t(p) : null; });
+            renderSummary(); renderChips(); renderList(); renderOthers();
+        });
     } catch (err) {
         console.warn('Storage:', err);
         summaryEl.innerHTML = `<div class="sd-error">
-            <p>Não foi possível carregar os discos (${sdEsc(err.message)}).</p>
-            <button type="button" class="button" onclick="location.reload()">Tentar de novo</button></div>`;
+            <p>${t('sdLoadError', { msg: sdEsc(err.message) })}</p>
+            <button type="button" class="button" onclick="location.reload()">${t('sdRetry')}</button></div>`;
         document.getElementById('sdList').innerHTML = '';
         return;
     }
@@ -266,8 +271,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         StorageState.filter = b.dataset.filter; renderChips(); renderList();
     });
     document.getElementById('sdSort').addEventListener('change', e => { StorageState.sort = e.target.value; renderList(); });
-    let t;
+    let searchTimer;
     document.getElementById('sdSearch').addEventListener('input', e => {
-        clearTimeout(t); t = setTimeout(() => { StorageState.query = e.target.value; renderList(); }, 150);
+        clearTimeout(searchTimer); searchTimer = setTimeout(() => { StorageState.query = e.target.value; renderList(); }, 150);
     });
 });

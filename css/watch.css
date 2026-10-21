@@ -15,23 +15,68 @@
 }
 
 /* ── Informações básicas: abaixo do player, cor accent, coladas nele (só cantos inferiores arredondados) ── */
-.page-watch .watch-page { gap: 0; }
-.page-watch .watch-page > .me-section { margin-top: var(--sp-6); }
+.page-watch .watch-page {
+    gap: 0;
+}
+
+.page-watch .watch-page>.me-section {
+    margin-top: var(--sp-6);
+}
+
 .page-watch .watch-info {
     background: var(--accent-color);
     color: var(--text-accent-color);
     padding: var(--sp-6) var(--sp-7);
     border-radius: 0 0 var(--border-radius-size-xl) var(--border-radius-size-xl);
 }
-.page-watch .score-overlay { background: transparent; color: inherit; padding: 0; }
-.page-watch .logo-title-header { margin: 0 0 var(--sp-4); gap: var(--sp-4); }
-.page-watch .comp-logo { width: var(--sp-9); height: var(--sp-9); }
-.page-watch .section-title.modal-title-competition { color: inherit; font-size: var(--font-size-mdm); letter-spacing: .08em; margin: 0; }
-.page-watch .modal-title-phase { color: inherit; opacity: .75; font-size: var(--font-size-sm); }
 
-.page-watch .score-desktop { justify-content: flex-start; gap: var(--sp-5); flex-wrap: nowrap; }
-.page-watch .score-team-name { font-size: var(--font-size-xxxxl); font-weight: 600; letter-spacing: -.035em; line-height: 1.05; }
-.page-watch .score-team-logo { width: var(--sp-9); height: var(--sp-9); }
+.page-watch .score-overlay {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+.page-watch .logo-title-header {
+    margin: 0 0 var(--sp-4);
+    gap: var(--sp-4);
+}
+
+.page-watch .comp-logo {
+    width: var(--sp-9);
+    height: var(--sp-9);
+}
+
+.page-watch .section-title.modal-title-competition {
+    color: inherit;
+    font-size: var(--font-size-mdm);
+    letter-spacing: .08em;
+    margin: 0;
+}
+
+.page-watch .modal-title-phase {
+    color: inherit;
+    opacity: .75;
+    font-size: var(--font-size-sm);
+}
+
+.page-watch .score-desktop {
+    justify-content: flex-start;
+    gap: var(--sp-5);
+    flex-wrap: nowrap;
+}
+
+.page-watch .score-team-name {
+    font-size: var(--font-size-xxxxl);
+    font-weight: 600;
+    letter-spacing: -.035em;
+    line-height: 1.05;
+}
+
+.page-watch .score-team-logo {
+    width: var(--sp-9);
+    height: var(--sp-9);
+}
+
 .page-watch .score-value-modal {
     font-size: var(--font-size-xxxxl);
     font-weight: 700;
@@ -41,7 +86,27 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
-.page-watch .score-date-row { justify-content: flex-start; margin-top: var(--sp-4); color: inherit; opacity: .8; gap: var(--sp-5); flex-wrap: wrap; }
+
+.page-watch .score-date-row {
+    justify-content: flex-start;
+    margin-top: var(--sp-4);
+    color: inherit;
+    opacity: .8;
+    gap: var(--sp-5);
+    flex-wrap: wrap;
+}
+
+.page-watch .score-date-row span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.page-watch .score-date-row svg {
+    width: var(--font-size-mdm);
+    height: var(--font-size-mdm);
+    flex: none;
+}
 
 /* ── Player: 16:9, mesmo raio da capa do match ── */
 .page-watch .watch-player {
@@ -51,26 +116,64 @@
     border-radius: var(--border-radius-size-xl) var(--border-radius-size-xl) 0 0;
     background: var(--black);
 }
-.page-watch .watch-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.page-watch .watch-player iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
 .page-watch .watch-video-placeholder {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-3);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
     background: var(--soft-bg);
     color: var(--text-muted);
     font-size: var(--font-size-md);
 }
+
 .page-watch .watch-video-placeholder[hidden],
-.page-watch .watch-player iframe[hidden] { display: none; }
-.page-watch .watch-video-placeholder svg { width: var(--sp-9); height: var(--sp-9); fill: currentColor; opacity: .5; }
+.page-watch .watch-player iframe[hidden] {
+    display: none;
+}
+
+.page-watch .watch-video-placeholder svg {
+    width: var(--sp-9);
+    height: var(--sp-9);
+    fill: currentColor;
+    opacity: .5;
+}
 
 /* ── Escalação ── */
-.page-watch .me-section { padding: 0; }
-.page-watch .me-lineup-grid { overflow: hidden; }
+.page-watch .me-section {
+    padding: 0;
+}
+
+.page-watch .me-lineup-grid {
+    overflow: hidden;
+}
 
 /* ── Celular: nomes e placar em duas linhas (components.css), sem barra de rolagem lateral ── */
 @media (max-width: 768px) {
-    .page-watch .watch-page { padding: var(--sp-4) var(--sp-4) var(--sp-8); }
-    .page-watch .watch-info { padding: var(--sp-5); }
-    .page-watch .watch-player { border-radius: var(--border-radius-size-lg) var(--border-radius-size-lg) 0 0; }
-    .page-watch .watch-info { border-radius: 0 0 var(--border-radius-size-lg) var(--border-radius-size-lg); }
+    .page-watch .watch-page {
+        padding: var(--sp-4) var(--sp-4) var(--sp-8);
+    }
+
+    .page-watch .watch-info {
+        padding: var(--sp-5);
+    }
+
+    .page-watch .watch-player {
+        border-radius: var(--border-radius-size-lg) var(--border-radius-size-lg) 0 0;
+    }
+
+    .page-watch .watch-info {
+        border-radius: 0 0 var(--border-radius-size-lg) var(--border-radius-size-lg);
+    }
 }

@@ -88,13 +88,6 @@
     gap: var(--sp-5);
 }
 
-.page-detail .sidebar-header-text-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
-    min-width: 0;
-}
-
 .page-detail .sidebar-sport-name {
     font-size: var(--font-size-xxxl);
     font-weight: 700;
@@ -226,24 +219,8 @@
 }
 
 /* ── Controles ── */
-.page-detail .detail-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-4);
-}
-
-.page-detail .detail-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-3);
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-}
-
-.page-detail .detail-filter .field {
-    width: auto;
-    min-width: 9rem;
+.page-detail .list-filter {
+    --filter-min: 9rem;
 }
 
 .page-detail .detail-search {
@@ -261,22 +238,6 @@
     .page-detail .collection-main {
         padding-bottom: calc(var(--float-bottom) + var(--om-fab-size-sm, 40px) + var(--sp-6));
     }
-}
-
-.page-detail .detail-controls .paginator {
-    margin-left: auto;
-}
-
-.page-detail .detail-state {
-    padding: var(--sp-9) var(--sp-5);
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.page-detail .detail-state h2 {
-    margin: 0 0 var(--sp-2);
-    font-size: var(--font-size-xl);
-    color: var(--text-primary);
 }
 
 /* ═══ CARDS (sem alterações) ═══ */
@@ -455,31 +416,10 @@
     .page-detail .sidebar-sport-name {
         font-size: var(--font-size-xxl);
     }
-
-    .page-detail .detail-controls .paginator {
-        margin-left: 0;
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .page-detail .sidebar-skeleton-emblem, .page-detail .sidebar-skeleton-line {
         animation: none;
     }
-}
-
-/* Estados vazios gerados pela listagem (managers.js) */
-.page-detail .collection-main .empty-state {
-    padding: var(--sp-9) var(--sp-5);
-    text-align: center;
-    color: var(--text-muted);
-    background: none;
-    border: 0;
-}
-
-.page-detail .collection-main .empty-state h2 {
-    margin: 0 0 var(--sp-2);
-    font-size: var(--font-size-xl);
-    color: var(--text-primary);
 }

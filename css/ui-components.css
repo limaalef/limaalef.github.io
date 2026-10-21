@@ -813,3 +813,125 @@
 .match-storage-place--cloud .inline-icon {
     color: var(--info-color);
 }
+
+/* ── Controles de listagem (collection, detail, changelog) ── */
+.list-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+}
+
+.list-controls>.paginator {
+    margin-left: auto;
+}
+
+.list-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.list-filter .field {
+    width: auto;
+    min-width: var(--filter-min, 5.5rem);
+}
+
+@media (max-width: 900px) {
+    .list-controls>.paginator {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ── Estado vazio / erro / carregando (Utils.emptyStateHtml) ── */
+.empty-state {
+    padding: var(--sp-9) var(--sp-5);
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.empty-state h2 {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+}
+
+/* ── Tela de login das páginas de pedidos ── */
+.auth-gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-9) var(--sp-5);
+    text-align: center;
+    min-height: calc(70vh - 13px);
+}
+
+.auth-gate h2 {
+    margin: 0;
+    font-size: var(--font-size-xxl);
+    color: var(--text-primary);
+}
+
+.auth-gate p {
+    margin: 0;
+    font-size: var(--font-size-mdm);
+    color: var(--text-secondary);
+}
+
+/* ── Título de página interna ── */
+.page-heading {
+    margin: 0 0 var(--sp-6);
+    font-size: var(--font-size-xxxl);
+    font-weight: 600;
+    letter-spacing: -.035em;
+    color: var(--text-primary);
+}
+
+/* ── Primitivas de layout (reutilizadas por várias telas) ── */
+.row-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+}
+
+.row-wrap--loose {
+    align-items: center;
+    gap: var(--sp-3);
+}
+
+.row-wrap--end {
+    justify-content: flex-end;
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    min-width: 0;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
+}
+
+.item-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entity-title {
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+}

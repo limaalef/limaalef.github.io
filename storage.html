@@ -51,10 +51,10 @@
         gtag('config', 'G-JJZTBEGJ91');
     </script>
 </head>
-<body>
+<body class="page-storage">
     <header>
         <div class="header-frame" id="header"
-            data-title="Storage"
+            data-title-key="sdTitle"
             data-back="true">
         </div>
 
@@ -63,27 +63,27 @@
     <main class="sd-page">
 
         <!-- Resumo geral dos discos físicos -->
-        <section class="sd-summary" id="sdSummary" aria-label="Resumo do armazenamento">
-            <div class="status-message">Carregando discos...</div>
+        <section class="sd-summary" id="sdSummary" aria-label="Resumo do armazenamento" data-i18n-aria="sdSummaryAria">
+            <div class="status-message" data-i18n="sdLoading">Carregando discos...</div>
         </section>
 
         <!-- Discos físicos -->
         <section class="sd-section">
             <div class="sd-section-head">
-                <h2 class="sd-section-title">Discos <span class="counter" id="sdDiskCount"></span></h2>
+                <h2 class="sd-section-title"><span data-i18n="sdDisks">Discos</span> <span class="counter" id="sdDiskCount"></span></h2>
                 <span class="sd-updated" id="sdUpdated"></span>
             </div>
 
             <div class="sd-toolbar">
-                <div class="chip-group" id="sdChips" role="group" aria-label="Filtrar por situação"></div>
-                <div class="sd-tools">
-                    <input type="search" class="field field--comfortable sd-search" id="sdSearch" placeholder="Buscar disco, modelo ou serial..." aria-label="Buscar disco">
-                    <select class="field field--comfortable" id="sdSort" aria-label="Ordenar">
-                        <option value="free">Mais espaço livre</option>
-                        <option value="pct">Maior uso (%)</option>
-                        <option value="total">Maior capacidade</option>
-                        <option value="archive">Mais arquivo</option>
-                        <option value="name">Nome</option>
+                <div class="chip-group" id="sdChips" role="group" aria-label="Filtrar por situação" data-i18n-aria="sdFilterAria"></div>
+                <div class="sd-tools row-wrap row-wrap--loose">
+                    <input type="search" class="field field--comfortable sd-search" id="sdSearch" placeholder="Buscar disco, modelo ou serial..." data-i18n-placeholder="sdSearchPh" aria-label="Buscar disco" data-i18n-aria="sdSearchAria">
+                    <select class="field field--comfortable" id="sdSort" aria-label="Ordenar" data-i18n-aria="sdSortAria">
+                        <option value="free" data-i18n="sdSortFree">Mais espaço livre</option>
+                        <option value="pct" data-i18n="sdSortPct">Maior uso (%)</option>
+                        <option value="total" data-i18n="sdSortTotal">Maior capacidade</option>
+                        <option value="archive" data-i18n="sdSortArchive">Mais arquivo</option>
+                        <option value="name" data-i18n="sdSortName">Nome</option>
                     </select>
                 </div>
             </div>
@@ -94,7 +94,7 @@
         <!-- Nuvem e outros locais -->
         <section class="sd-section" id="sdOthersSection" hidden>
             <div class="sd-section-head">
-                <h2 class="sd-section-title">Nuvem e outros locais</h2>
+                <h2 class="sd-section-title" data-i18n="sdOthers">Nuvem e outros locais</h2>
             </div>
             <div class="sd-list" id="sdOthers"></div>
         </section>
@@ -104,7 +104,7 @@
     <!-- Ficha técnica do disco -->
     <div class="sd-modal" id="sdModal" hidden>
         <div class="sd-modal-card" role="dialog" aria-modal="true" aria-labelledby="sdModalTitle">
-            <button type="button" class="sd-modal-close" id="sdModalClose" aria-label="Fechar">×</button>
+            <button type="button" class="sd-modal-close" id="sdModalClose" aria-label="Fechar" data-i18n-aria="sdClose">×</button>
             <div id="sdModalBody"></div>
         </div>
     </div>

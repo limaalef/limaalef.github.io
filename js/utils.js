@@ -117,6 +117,35 @@ const Utils = {
         return this.VALID_SPORTS.includes(s) ? s : fallback;
     },
 
+    // Remove acentos ("Atlético" → "Atletico").
+    stripAccents(value) {
+        return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    },
+
+    // Nome de arquivo/pasta: minúsculas, sem acentos, espaços → sep ("Copa do Brasil" → copa_do_brasil).
+    slug(value, sep = '_') {
+        return this.stripAccents(value).toLowerCase().replace(/\s+/g, sep);
+    },
+
+    // Slug estrito: só a-z0-9, o resto vira sep ("Atlético-MG" → atletico-mg com sep "-").
+    slugify(value, sep = '-') {
+        return this.stripAccents(value).toLowerCase().replace(/[^a-z0-9]+/g, sep)
+            .replace(new RegExp(`^${sep}+|${sep}+$`, 'g'), '');
+    },
+
+    // Logo da competição por edição: competition_logos/<slug>_<ano>.png
+    competitionLogoUrl(name, dateStr) {
+        if (!name || !dateStr) return '';
+        const d = this.parseDate(dateStr);
+        return `competition_logos/${this.slug(name)}_${d ? d.getFullYear() : new Date().getFullYear()}.png`;
+    },
+
+    // Data e hora no idioma da página (ISO ou Date).
+    formatDateTime(value, options = { dateStyle: 'short', timeStyle: 'short' }) {
+        const d = value instanceof Date ? value : new Date(value);
+        return isNaN(d) ? '' : d.toLocaleString(typeof LanguageManager !== 'undefined' ? LanguageManager.getLanguage() : 'pt-BR', options);
+    },
+
     // Normaliza para comparação: minúsculas, sem acentos, espaços simples.
     normalizeSearch(value) {
         return String(value ?? '')
@@ -267,10 +296,7 @@ const Utils = {
     },
 
     escapeHtml(str) {
-        return String(str).replace(/&/g, '&amp;')
-                          .replace(/</g, '&lt;')
-                          .replace(/>/g, '&gt;')
-                          .replace(/"/g, '&quot;');
+        return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     },
 
     parseSport(value, fallback = 'football') {
@@ -295,10 +321,6 @@ const Utils = {
     emptyStateHtml(title, message) {
         return `<div class="empty-state"><h2>${title}</h2><p>${message}</p></div>`;
     },
-
-    sectionStateHtml(icon, message) {
-        return `<div class="section-state"><div class="icon">${icon}</div><p>${message}</p></div>`;
-    }    
 }
 
 const STATS_ORDER = [
@@ -610,10 +632,6 @@ const Elements = {
         }
     },
 
-    renderStorage(techOrLocal, cloud, divId) {
-        this.fillSection(divId, this.storageMethod(techOrLocal, cloud));
-    },
-
     renderAttRev(detail, divId) {
         // Público e renda: sem nenhum dos dois, o bloco não é exibido (só estádio/capacidade repetiria o local da partida)
         const attendance = (Array.isArray(detail.attendance) ? detail.attendance : [detail.attendance])
@@ -748,7 +766,7 @@ const Elements = {
         const items  = [...(detail.plays || []), ...(detail.penalties || [])];
         const abbrs  = [...new Set(items.map(i => i.teamAbbr).filter(Boolean))];
         const awayTla = detail.away_team?.tla;
-        const norm = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const norm = v => Utils.slugify(v || '');
         const homeSlug = norm(detail.home_team?.name);
         const awaySlug = norm(detail.away_team?.name);
 
@@ -1166,16 +1184,13 @@ const Elements = {
         const col = document.createElement('div');
         col.className = 'me-lineup-col';
 
-        // Faixa de cores no topo da coluna — reutiliza getTeamColorsStyle (a página de partida usa o retângulo ao lado do nome)
         const swatch = this.usesTeamSwatch();
-        if (team.colors && !swatch) {
-            col.style.cssText += this.getTeamColorsStyle(team.colors);
-        }
+
         col.innerHTML = `
             <div class="me-lineup-team-header">
-                ${swatch ? this.teamSwatch(team.colors) : ''}
+                ${this.teamSwatch(team.colors)}
                 <div class="me-lineup-team-info">
-                    <div class="me-lineup-team-name"${color && !swatch ? ` style="color:${color}"` : ''}>
+                    <div class="me-lineup-team-name" style="${`color:${color}`}">
                         <span>${LanguageManager.t(team.name) || ''}</span>
                     </div>
                     ${formation ? `<div class="me-lineup-formation">${formation}</div>` : ''}

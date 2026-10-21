@@ -93,21 +93,6 @@
     object-fit: contain;
 }
 
-.br-fields {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
-    min-width: 0;
-}
-
-.br-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .br-actions {
     display: flex;
     gap: var(--sp-2);

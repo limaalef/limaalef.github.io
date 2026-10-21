@@ -184,7 +184,7 @@ CONFIG._setupHeaderUser = async function (container) {
     }
     if (typeof Auth === 'undefined') return;
 
-    const esc = v => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const esc = v => Utils.escapeHtml(v);
     const tr = k => LanguageManager.t(k);
 
     let closeTimer = null;

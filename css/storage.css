@@ -77,12 +77,6 @@
     margin-bottom: var(--sp-4);
 }
 
-.sd-tools {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-3);
-}
-
 .sd-search {
     min-width: 260px;
 }

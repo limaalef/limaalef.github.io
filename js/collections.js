@@ -54,10 +54,6 @@ const CollectionsDB = (() => {
             return _data.find(e => e.key.toLowerCase() === q) || null;
         },
 
-        bySport(sport) {
-            return _data.filter(e => e.sport === sport);
-        },
-
         upsert(entry) {
             const idx = _data.findIndex(
                 e => e.key.toLowerCase() === entry.key.toLowerCase()

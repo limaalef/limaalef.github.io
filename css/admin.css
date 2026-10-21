@@ -229,13 +229,6 @@
     flex: 1;
 }
 
-.adm-bulk-actions {
-    display: flex;
-    gap: var(--sp-3);
-    flex-wrap: wrap;
-    align-items: center;
-}
-
 .adm-expiry-inline {
     display: none;
     align-items: center;
@@ -531,13 +524,6 @@ body.page-admin .container {
     padding: var(--sp-3) 0;
 }
 
-.adm-row-actions {
-    display: flex;
-    gap: var(--sp-2);
-    justify-content: flex-end;
-    flex-wrap: wrap;
-}
-
 .adm-toggle:disabled {
     opacity: .6;
     cursor: progress;
@@ -559,7 +545,7 @@ button.adm-nav-item {
    Visual do admin: sem bordas, superfícies suaves, linhas finas.
    Escopado em body.page-admin para não alterar as páginas públicas
    que compartilham components.css. O accent roxo continua vindo do
-   \3c style> de admin.html.
+   <style> de admin.html.
 ═══════════════════════════════════════════════════════════════ */
 body.page-admin .profile-box {
     margin: var(--sp-3);

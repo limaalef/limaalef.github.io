@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="css/ui-components.css">
     <link rel="stylesheet" href="css/my-requests.css">
 </head>
-<body>
+<body class="page-my-requests">
     <header>
         <div class="header-frame" id="header"
             data-title-key="requestMyRequests"
@@ -36,7 +36,7 @@
     </header>
 
     <!-- Auth -->
-    <div id="rq-auth">
+    <div id="rq-auth" class="auth-gate">
         <div class="icon-lg">📦</div>
         <h2 data-i18n="requestMyRequests">Meus Pedidos</h2>
         <p data-i18n="requestMyRequestsDesc">Faça login para acompanhar seus pedidos e acessar os links de download.</p>
@@ -56,7 +56,7 @@
         <div class="adm-layout narrow-width">
             <!-- Conteúdo -->
             <div class="adm-main px-5">
-                <h1 class="rq-title" data-i18n="requestMyRequests">Meus Pedidos</h1>
+                <h1 class="page-heading" data-i18n="requestMyRequests">Meus Pedidos</h1>
                 <div class="status-message" id="rq-loading" data-i18n="requestLoadingOrders">Carregando pedidos...</div>
                 <div class="is-hidden" id="rq-content"></div>
             </div>

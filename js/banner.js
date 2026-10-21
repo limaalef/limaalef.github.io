@@ -13,7 +13,7 @@ const BannerCarousel = (() => {
         next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
     };
 
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const esc = v => Utils.escapeHtml(v);
     const safeColor = (value, fallback) => (HEX.test(value || '') ? value : fallback);
     const safeUrl = url => (/^(https?:\/\/|\/|[\w.-]+(\/|\.html))/i.test(url || '') && !/^\s*(javascript|data):/i.test(url) ? url : '');
 
