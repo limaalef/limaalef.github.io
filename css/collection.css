@@ -4,39 +4,118 @@
    ============================================================ */
 
 /* Seletor de esporte (header): chips com ícone; abaixo de 640px só o ícone */
-.page-collection .sport-selector { flex-wrap: nowrap; }
-.page-collection .sport-chip { white-space: nowrap; }
-.page-collection .sport-chip .inline-icon { flex: none; }
+.page-collection .sport-selector {
+    flex-wrap: nowrap;
+}
+
+.page-collection .sport-chip {
+    white-space: nowrap;
+}
+
+.page-collection .sport-chip .inline-icon {
+    flex: none;
+}
+
 @media (max-width: 640px) {
-    .page-collection .sport-chip { padding: var(--sp-3); }
-    .page-collection .sport-chip-name { display: none; }
+    .page-collection .sport-chip {
+        padding: var(--sp-3);
+    }
+
+    .page-collection .sport-chip-name {
+        display: none;
+    }
 }
 
 /* Indicadores */
 /* Só o container do conteúdo: o header também tem um .container e não pode virar coluna/ganhar padding */
-body.page-collection > .container { display: flex; flex-direction: column; gap: var(--sp-6); padding: var(--sp-7) var(--sp-5) var(--sp-7); }
-@media (max-width: 496px) { body.page-collection > .container { padding-bottom: calc(var(--om-fab-size-sm, 40px) + var(--sp-7)); } }
-.page-collection .collection-stats { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
-.page-collection .collection-stats .stat-tile { flex: 1 1 10rem; min-width: 0; }
-.page-collection .collection-stats[style*="none"] { display: none; }
+body.page-collection>.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+    padding: var(--sp-7) var(--sp-5) var(--sp-7);
+}
+
+@media (max-width: 496px) {
+    body.page-collection>.container {
+        padding-bottom: calc(var(--om-fab-size-sm, 40px) + var(--sp-7));
+    }
+}
+
+.page-collection .collection-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+}
+
+.page-collection .collection-stats .stat-tile {
+    flex: 1 1 10rem;
+    min-width: 0;
+}
+
+.page-collection .collection-stats[style*="none"] {
+    display: none;
+}
 
 /* Controles */
-.page-collection .collection-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
-.page-collection .collection-filter { display: inline-flex; align-items: center; gap: var(--sp-3); font-size: var(--font-size-sm); color: var(--text-muted); }
-.page-collection .collection-filter .field { width: auto; min-width: 5.5rem; }
-.page-collection .collection-search { flex: 1 1 14rem; min-width: 0; }
-.page-collection .collection-search .field { width: 100%; padding: var(--sp-3) var(--sp-5); }
-.page-collection .collection-controls .paginator { margin-left: auto; }
+.page-collection .collection-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+}
 
-.page-collection .match-container { padding: 0; }
+.page-collection .collection-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.page-collection .collection-filter .field {
+    width: auto;
+    min-width: 5.5rem;
+}
+
+.page-collection .collection-search {
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+.page-collection .collection-search .field {
+    width: 100%;
+    padding: var(--sp-3) var(--sp-5);
+}
+
+.page-collection .collection-controls .paginator {
+    margin-left: auto;
+}
+
+.page-collection .match-container {
+    padding: 0;
+}
 
 /* Estado vazio / carregando (gerado por Utils.emptyStateHtml) */
-.page-collection .empty-state { padding: var(--sp-9) var(--sp-5); text-align: center; color: var(--text-muted); background: none; border: 0; }
-.page-collection .empty-state h2 { margin: 0 0 var(--sp-2); font-size: var(--font-size-xl); color: var(--text-primary); }
+.page-collection .empty-state {
+    padding: var(--sp-9) var(--sp-5);
+    text-align: center;
+    color: var(--text-muted);
+    background: none;
+    border: 0;
+}
+
+.page-collection .empty-state h2 {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+}
 
 @media (max-width: 900px) {
-    .page-collection .collection-controls .paginator { margin-left: 0; width: 100%; justify-content: center; }
+    .page-collection .collection-controls .paginator {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Mobile: a busca flutua no rodapé ao lado do carrinho (regra .search-box de components.css) */
-

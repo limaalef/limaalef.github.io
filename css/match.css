@@ -59,6 +59,7 @@
     display: flex;
     gap: 5px;
 }
+
 .me-form-win,
 .me-form-loss,
 .me-form-draw {
@@ -71,9 +72,21 @@
     font-size: 0;
     font-weight: 700;
 }
-.me-form-win  { background: #6dff33; color: var(--text-success); }
-.me-form-loss { background: #ff2323; color: var(--text-error); }
-.me-form-draw { background: #585858; color: var(--text-tertiary); }
+
+.me-form-win {
+    background: #6dff33;
+    color: var(--text-success);
+}
+
+.me-form-loss {
+    background: #ff2323;
+    color: var(--text-error);
+}
+
+.me-form-draw {
+    background: #585858;
+    color: var(--text-tertiary);
+}
 
 /* ── Estatísticas ── */
 .me-stats-list {
@@ -83,12 +96,14 @@
     background-color: var(--bg-secondary);
     padding-bottom: var(--sp-4);
 }
+
 .me-stat-row {
     align-items: center;
     gap: 8px;
     align-items: end;
     padding: 0 var(--sp-4);
 }
+
 .me-stat-value {
     font-size: var(--font-size-md);
     font-weight: 700;
@@ -96,24 +111,28 @@
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
+
 .me-stat-data {
     display: flex;
     align-items: center;
     width: 100%;
     justify-content: space-between;
 }
+
 .me-stat-center {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
 }
+
 .me-stat-label {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     text-align: center;
     line-height: 1.2;
 }
+
 .me-stat-bar {
     width: 100%;
     height: 4px;
@@ -122,6 +141,7 @@
     overflow: hidden;
     background: var(--border-color);
 }
+
 .me-stat-bar-home {
     height: 100%;
     border-radius: 2px 0 0 2px;
@@ -151,6 +171,7 @@
     padding: var(--sp-4);
     background-color: var(--bg-secondary);
 }
+
 .me-lineup-col:first-child {
     border-right: 1px solid var(--border-color);
 }
@@ -167,6 +188,7 @@
     flex: 1;
     min-width: 0;
 }
+
 .me-lineup-team-name {
     font-size: var(--font-size-sm);
     text-transform: uppercase;
@@ -174,12 +196,14 @@
     font-weight: 700;
     line-height: 1.2;
 }
+
 .me-lineup-formation {
     font-size: var(--font-size-sm);
     color: var(--accent-color);
     font-weight: 700;
     margin-top: 2px;
 }
+
 .me-lineup-coach {
     font-size: var(--font-size-xs);
     color: var(--text-tertiary);
@@ -194,20 +218,32 @@
     font-size: var(--font-size-mdm);
     color: var(--text-primary);
 }
-.me-player-row:last-child { border-bottom: none; }
+
+.me-player-row:last-child {
+    border-bottom: none;
+}
+
 .me-player-num {
     font-size: var(--font-size-sm);
     color: var(--text-tertiary);
     min-width: 18px;
     font-variant-numeric: tabular-nums;
 }
-.me-player-name { flex: 1; }
+
+.me-player-name {
+    flex: 1;
+}
+
 .me-player-pos {
     font-size: var(--font-size-xs);
     color: var(--text-tertiary);
     text-align: right;
 }
-.me-player-row.sub { opacity: 0.55; }
+
+.me-player-row.sub {
+    opacity: 0.55;
+}
+
 .me-lineup-sub-label {
     display: flex;
     justify-content: space-between;
@@ -238,16 +274,34 @@
     flex-wrap: wrap;
     margin-bottom: 12px;
 }
+
 .me-tag {
     padding: 5px 14px;
     border-radius: var(--border-radius-size-circle);
     font-size: var(--font-size-md);
     font-weight: 600;
 }
-.me-tag.record   { background: var(--bg-warning);   color: var(--text-warning);   }
-.me-tag.historic { background: var(--bg-info);       color: var(--text-info);      }
-.me-tag.scorer   { background: var(--bg-success);    color: var(--text-success);   }
-.me-tag.default  { background: var(--bg-secondary);  color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+.me-tag.record {
+    background: var(--bg-warning);
+    color: var(--text-warning);
+}
+
+.me-tag.historic {
+    background: var(--bg-info);
+    color: var(--text-info);
+}
+
+.me-tag.scorer {
+    background: var(--bg-success);
+    color: var(--text-success);
+}
+
+.me-tag.default {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
 
 /* ── Responsivo ── */
 @media (max-width: 640px) {
@@ -280,6 +334,7 @@
     text-align: center;
     position: relative;
 }
+
 .plays-period-label::before,
 .plays-period-label::after {
     content: '';
@@ -289,9 +344,15 @@
     height: 1px;
     background: var(--border-color);
 }
-.plays-period-label::before { left: 0; }
-.plays-period-label::after  { right: 0; }
- 
+
+.plays-period-label::before {
+    left: 0;
+}
+
+.plays-period-label::after {
+    right: 0;
+}
+
 /* Linha de um gol */
 .plays-row {
     display: grid;
@@ -299,36 +360,41 @@
     align-items: center;
     padding: 0;
 }
-.plays-row:last-child { padding-bottom: var(--sp-3); }
- 
+
+.plays-row:last-child {
+    padding-bottom: var(--sp-3);
+}
+
 /* Coluna lateral (home = esquerda, away = direita) */
 .plays-side {
     display: flex;
     align-items: center;
     gap: var(--sp-1);
     min-width: 0;
-    opacity: 0;          /* oculto quando não é o lado do gol */
+    opacity: 0;
+    /* oculto quando não é o lado do gol */
     pointer-events: none;
 }
+
 .plays-side--active {
     opacity: 1;
     pointer-events: auto;
 }
- 
+
 /* Home: alinha à direita (nome fica junto ao centro) */
 .plays-home {
     justify-content: flex-end;
     flex-direction: row;
     text-align: right;
 }
- 
+
 /* Away: alinha à esquerda */
 .plays-away {
     justify-content: flex-start;
     flex-direction: row;
     text-align: left;
 }
- 
+
 /* Nome do jogador */
 .plays-player-name {
     font-size: var(--font-size-mdm);
@@ -338,7 +404,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
- 
+
 /* Minuto central */
 .plays-minute {
     font-size: var(--font-size-mdm);
@@ -355,7 +421,7 @@
     font-weight: 400;
     color: var(--text-tertiary);
 }
- 
+
 /* Badge de tipo de gol (P = pênalti, C = contra) */
 .goals-type-badge {
     display: inline-flex;
@@ -369,10 +435,12 @@
     flex-shrink: 0;
     line-height: 1;
 }
+
 .goals-type-penalty {
     background: var(--bg-info);
     color: var(--text-info);
 }
+
 .goals-type-own-goal {
     background: var(--bg-error);
     color: var(--text-error);
@@ -394,17 +462,28 @@
     text-align: left;
 }
 
-.plays-sub-in  { color: #22c55e; }
-.plays-sub-out { color: #ef4444; }
+.plays-sub-in {
+    color: #22c55e;
+}
+
+.plays-sub-out {
+    color: #ef4444;
+}
 
 /* Responsivo: nomes menores em telas muito pequenas */
 @media (max-width: 360px) {
-    .plays-player-name { max-width: 88px; font-size: var(--font-size-sm); }
-    .plays-minute      { min-width: 30px; }
+    .plays-player-name {
+        max-width: 88px;
+        font-size: var(--font-size-sm);
+    }
+
+    .plays-minute {
+        min-width: 30px;
+    }
 }
- 
+
 /* Cabeçalho com nomes dos times e placar */
- 
+
 .pen-score {
     font-size: var(--font-size-lg);
     font-weight: 700;
@@ -423,6 +502,7 @@
     text-align: center;
     position: relative;
 }
+
 .pen-score-row::before,
 .pen-score-row::after {
     content: '';
@@ -432,9 +512,15 @@
     height: 1px;
     background: var(--border-color);
 }
-.pen-score-row::before { left: 0; }
-.pen-score-row::after  { right: 0; }
- 
+
+.pen-score-row::before {
+    left: 0;
+}
+
+.pen-score-row::after {
+    right: 0;
+}
+
 /* Indicador de quem bateu primeiro */
 .pen-first-label {
     display: grid;
@@ -443,15 +529,18 @@
     font-size: var(--font-size-sm);
     gap: 6px;
 }
- 
+
 /* Linha de uma rodada */
 .pen-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
 }
-.pen-row:last-child { padding-bottom: var(--sp-3); }
- 
+
+.pen-row:last-child {
+    padding-bottom: var(--sp-3);
+}
+
 /* Número da rodada (centro) */
 .pen-round {
     font-size: var(--font-size-xs);
@@ -461,7 +550,7 @@
     text-align: center;
     flex-shrink: 0;
 }
- 
+
 /* Célula de uma cobrança */
 .pen-cell {
     display: flex;
@@ -469,10 +558,22 @@
     gap: var(--sp-2);
     min-width: 0;
 }
-.pen-cell.home { justify-content: flex-start; flex-direction: row-reverse; }
-.pen-cell.away { justify-content: flex-end;   flex-direction: row-reverse; }
-.pen-cell.empty { opacity: 0; pointer-events: none; }
- 
+
+.pen-cell.home {
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+}
+
+.pen-cell.away {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+
+.pen-cell.empty {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Ícone de gol/erro */
 .pen-icon {
     font-size: var(--font-size-md);
@@ -480,7 +581,7 @@
     width: 18px;
     text-align: center;
 }
- 
+
 /* Nome do cobrador */
 .pen-name {
     font-size: var(--font-size-mdm);
@@ -489,16 +590,31 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
- 
+
 /* Coloração por resultado */
-.pen-cell.scored .pen-name { color: var(--text-primary); }
-.pen-cell.missed .pen-name { color: var(--text-tertiary); text-decoration: line-through; }
-.pen-cell.missed .pen-icon { opacity: 0.45; }
- 
+.pen-cell.scored .pen-name {
+    color: var(--text-primary);
+}
+
+.pen-cell.missed .pen-name {
+    color: var(--text-tertiary);
+    text-decoration: line-through;
+}
+
+.pen-cell.missed .pen-icon {
+    opacity: 0.45;
+}
+
 /* Responsivo */
 @media (max-width: 360px) {
-    .pen-name  { max-width: 76px; font-size: var(--font-size-sm); }
-    .pen-round { min-width: 22px; }
+    .pen-name {
+        max-width: 76px;
+        font-size: var(--font-size-sm);
+    }
+
+    .pen-round {
+        min-width: 22px;
+    }
 }
 
 /* Botão "Editar dados" (aparece só para administrador) */
@@ -517,5 +633,13 @@
     white-space: nowrap;
     transition: background 0.3s, transform 0.3s;
 }
-@media (hover: hover) { .me-edit-link:hover { background: var(--white-a25); } }
-.me-edit-link:active { transform: scale(.97); }
+
+@media (hover: hover) {
+    .me-edit-link:hover {
+        background: var(--white-a25);
+    }
+}
+
+.me-edit-link:active {
+    transform: scale(.97);
+}

@@ -1,20 +1,124 @@
 /* Painel "Times e narradores" do admin — só layout */
-.br-columns { display: grid; gap: var(--sp-8); padding-bottom: var(--sp-9); }
-@media (min-width: 1000px) { .br-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.br-picker { position: relative; margin-bottom: var(--sp-4); }
-.br-results { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + var(--sp-2)); display: flex; flex-direction: column;
-    padding: var(--sp-2); border-radius: var(--border-radius-size-lg); background: var(--bg-secondary); box-shadow: 0 8px 24px var(--black-a30); }
-.br-result { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border: 0; border-radius: var(--border-radius-size-md);
-    background: transparent; color: var(--text-primary); font: inherit; font-size: var(--font-size-mdm); text-align: left; cursor: pointer; }
-.br-result small { color: var(--text-muted); font-size: var(--font-size-xs); }
-.br-result:hover, .br-result:focus-visible { background: var(--soft-bg); outline: none; }
-.br-result--manual { color: var(--text-muted); }
-.br-list { display: flex; flex-direction: column; }
-.br-row { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) auto; gap: var(--sp-4); align-items: center; padding: var(--sp-4) 0; border-top: 1px solid var(--soft-line); }
-.br-row:first-child { border-top: 0; }
-.br-thumb { width: 3.25rem; height: 3.25rem; border-radius: var(--border-radius-size-circle); background: var(--soft-bg); display: grid; place-items: center; overflow: hidden; }
-.br-thumb img { width: 100%; height: 100%; object-fit: contain; }
-.br-fields { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
-.br-name { font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.br-actions { display: flex; gap: var(--sp-2); }
-@media (max-width: 768px) { .br-row { grid-template-columns: 3.25rem minmax(0, 1fr); } .br-actions { grid-column: 1 / -1; } }
+.br-columns {
+    display: grid;
+    gap: var(--sp-8);
+    padding-bottom: var(--sp-9);
+}
+
+@media (min-width: 1000px) {
+    .br-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.br-picker {
+    position: relative;
+    margin-bottom: var(--sp-4);
+}
+
+.br-results {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    top: calc(100% + var(--sp-2));
+    display: flex;
+    flex-direction: column;
+    padding: var(--sp-2);
+    border-radius: var(--border-radius-size-lg);
+    background: var(--bg-secondary);
+    box-shadow: 0 8px 24px var(--black-a30);
+}
+
+.br-result {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border: 0;
+    border-radius: var(--border-radius-size-md);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: var(--font-size-mdm);
+    text-align: left;
+    cursor: pointer;
+}
+
+.br-result small {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.br-result:hover, .br-result:focus-visible {
+    background: var(--soft-bg);
+    outline: none;
+}
+
+.br-result--manual {
+    color: var(--text-muted);
+}
+
+.br-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.br-row {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+    gap: var(--sp-4);
+    align-items: center;
+    padding: var(--sp-4) 0;
+    border-top: 1px solid var(--soft-line);
+}
+
+.br-row:first-child {
+    border-top: 0;
+}
+
+.br-thumb {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: var(--border-radius-size-circle);
+    background: var(--soft-bg);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.br-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.br-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    min-width: 0;
+}
+
+.br-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.br-actions {
+    display: flex;
+    gap: var(--sp-2);
+}
+
+@media (max-width: 768px) {
+    .br-row {
+        grid-template-columns: 3.25rem minmax(0, 1fr);
+    }
+
+    .br-actions {
+        grid-column: 1 / -1;
+    }
+}
