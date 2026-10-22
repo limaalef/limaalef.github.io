@@ -12,7 +12,7 @@ const AdminBanners = (() => {
         disabled:  ['off',     'Desativado'],
     };
     const DEFAULTS = { bg_color: '#1f2937', text_color: '#ffffff', title_bg_color: '#8b5cf6', title_text_color: '#ffffff' };
-    const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+    const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
     const IMAGE_TYPES = ['image/png', 'image/webp', 'image/jpeg', 'image/avif'];
 
     let banners = [], loaded = false;

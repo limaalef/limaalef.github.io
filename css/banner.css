@@ -68,7 +68,6 @@ a.banner:focus-visible {
     top: 0;
     right: 0;
     height: 100%;
-    aspect-ratio: 5 / 3;
     width: auto;
     object-fit: cover;
     object-position: right center;

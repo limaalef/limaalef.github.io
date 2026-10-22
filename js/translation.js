@@ -332,6 +332,7 @@ const translations = {
         sectionWorldCupTitle: 'Pesquisa por Copa do Mundo FIFA',
 
         'sectioncompetition-worldcup': 'Copa do Mundo FIFA',
+        'sectioncompetition-wcu17fem26': 'Marrocos 2026',
         'sectioncompetition-wcu20fem26': 'Polônia 2026',
         'sectioncompetition-worldcup26': 'América 2026',
         'sectioncompetition-wcclub2025': 'EUA 2025',
@@ -971,6 +972,7 @@ const translations = {
         sectionWorldCupTitle: 'FIFA World Cup',
 
         'sectioncompetition-worldcup': 'FIFA World Cup',
+        'sectioncompetition-wcu17fem26': 'Marocco 2026',
         'sectioncompetition-wcu20fem26': 'Poland 2026',
         'sectioncompetition-worldcup26': 'America 2026',
         'sectioncompetition-wcclub2025': 'USA 2025',
