@@ -21,7 +21,7 @@
     font-size: var(--font-size-xl);
     line-height: 1.6;
     color: var(--text-secondary);
-    margin: 0;
+    margin: var(--sp-3);
     max-width: 40rem;
 }
 

@@ -171,7 +171,8 @@ a.banner:focus-visible {
     right: var(--sp-5);
 }
 
-.banner-carousel:hover .banner-arrow, .banner-arrow:focus-visible {
+.banner-carousel:hover .banner-arrow,
+.banner-arrow:focus-visible {
     opacity: 1;
 }
 
@@ -213,7 +214,8 @@ a.banner:focus-visible {
 }
 
 /* Carrossel com um só banner: sem controles */
-.banner-carousel.is-single .banner-arrow, .banner-carousel.is-single .banner-dots {
+.banner-carousel.is-single .banner-arrow,
+.banner-carousel.is-single .banner-dots {
     display: none;
 }
 
@@ -228,7 +230,8 @@ a.banner:focus-visible {
         --banner-max-height: 10.5rem;
     }
 
-    .banner-track, .banner {
+    .banner-track,
+    .banner {
         border-radius: var(--border-radius-size-lg);
     }
 
@@ -257,7 +260,8 @@ a.banner:focus-visible {
         scroll-behavior: auto;
     }
 
-    .banner-dot, .banner-arrow {
+    .banner-dot,
+    .banner-arrow {
         transition: none;
     }
 }

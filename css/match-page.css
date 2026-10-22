@@ -590,7 +590,8 @@
     }
 }
 
-.match-highlight, .match-stats-card {
+.match-highlight,
+.match-stats-card {
     background: var(--soft-bg);
     border-radius: var(--border-radius-size-lg);
     padding: var(--sp-5) var(--sp-6);
@@ -836,7 +837,8 @@
         aspect-ratio: auto;
     }
 
-    .match-stage::after, .match-stage-toggle {
+    .match-stage::after,
+    .match-stage-toggle {
         display: none;
     }
 
@@ -845,7 +847,8 @@
         inset: auto;
     }
 
-    .match-stage .modal-image-carousel, .match-stage .modal-image {
+    .match-stage .modal-image-carousel,
+    .match-stage .modal-image {
         height: auto;
         border-radius: 0;
     }
@@ -875,7 +878,8 @@
         font-size: var(--font-size-mxxl);
     }
 
-    .match-stage .section-title.modal-title-competition, .page-match .score-date-row span {
+    .match-stage .section-title.modal-title-competition,
+    .page-match .score-date-row span {
         color: var(--text-accent-color)
     }
 
@@ -901,7 +905,8 @@
         color: var(--bg-primary)
     }
 
-    .page-match .match-buttons .match-action--primary, .page-match .match-buttons .match-action--primary:hover {
+    .page-match .match-buttons .match-action--primary,
+    .page-match .match-buttons .match-action--primary:hover {
         background: var(--text-primary);
         color: var(--bg-primary);
     }
@@ -943,7 +948,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .match-stage::after, .match-stage .score-overlay {
+
+    .match-stage::after,
+    .match-stage .score-overlay {
         transition: none;
     }
 }
@@ -956,7 +963,8 @@
     gap: 0;
 }
 
-.match-shots-off, .match-shots-blocked {
+.match-shots-off,
+.match-shots-blocked {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -977,17 +985,20 @@
     border-top: 1px solid var(--soft-line);
 }
 
-.match-shots-off b, .match-shots-blocked b {
+.match-shots-off b,
+.match-shots-blocked b {
     color: var(--text-primary);
     font-size: var(--font-size-md);
     font-variant-numeric: tabular-nums;
 }
 
-.match-shots-off b:first-child, .match-shots-blocked b:first-child {
+.match-shots-off b:first-child,
+.match-shots-blocked b:first-child {
     text-align: left;
 }
 
-.match-shots-off b:last-child, .match-shots-blocked b:last-child {
+.match-shots-off b:last-child,
+.match-shots-blocked b:last-child {
     text-align: right;
 }
 

@@ -584,7 +584,8 @@
     letter-spacing: -.02em;
 }
 
-.modal .score-value-modal, .modal .score-mobile-value {
+.modal .score-value-modal,
+.modal .score-mobile-value {
     font-weight: 600;
     letter-spacing: -.03em;
 }
@@ -663,7 +664,8 @@
 }
 
 /* Fechar / compartilhar */
-.modal .close-btn, .modal .share-btn {
+.modal .close-btn,
+.modal .share-btn {
     top: var(--sp-5);
     width: 2.25rem;
     height: 2.25rem;
@@ -693,7 +695,9 @@
 }
 
 @media (hover:hover) {
-    .modal .close-btn:hover, .modal .share-btn:hover {
+
+    .modal .close-btn:hover,
+    .modal .share-btn:hover {
         transform: none;
         border: 0;
         background: rgba(0, 0, 0, .34);
@@ -708,7 +712,8 @@
     padding-bottom: var(--sp-7);
 }
 
-.modal-body>.modal-image-carousel, .modal-body>.modal-image {
+.modal-body>.modal-image-carousel,
+.modal-body>.modal-image {
     display: block;
     width: 100%;
     margin: 0;
@@ -757,12 +762,14 @@
     border-radius: var(--border-radius-size-lg);
 }
 
-.modal .detail-list-label, .modal .detail-label {
+.modal .detail-list-label,
+.modal .detail-label {
     font-size: var(--font-size-md);
     color: var(--text-muted);
 }
 
-.modal .detail-list-value, .modal .detail-value {
+.modal .detail-list-value,
+.modal .detail-value {
     font-size: var(--font-size-md);
     font-weight: 500;
 }
@@ -798,7 +805,8 @@
     padding: 0 var(--sp-5);
 }
 
-.modal .motor-event-content .modal-image-carousel, .modal .motor-event-content .modal-image {
+.modal .motor-event-content .modal-image-carousel,
+.modal .motor-event-content .modal-image {
     margin: 0;
     width: 100%;
     border-radius: 0;

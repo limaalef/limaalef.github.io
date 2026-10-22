@@ -10,7 +10,9 @@
     margin: 0 auto;
 }
 
-.mx-page [hidden], .mx-picker [hidden], .mx-savebar [hidden] {
+.mx-page [hidden],
+.mx-picker [hidden],
+.mx-savebar [hidden] {
     display: none !important;
 }
 
@@ -133,7 +135,8 @@ body.mx-lock {
     color: color-mix(in srgb, var(--mx-on) 65%, transparent);
 }
 
-.mx-hero-top .mx-input:hover, .mx-hero-top .mx-input:focus {
+.mx-hero-top .mx-input:hover,
+.mx-hero-top .mx-input:focus {
     border-bottom: 1px solid #ffffff;
 }
 
@@ -185,7 +188,9 @@ body.mx-lock {
     grid-area: x;
 }
 
-.mx-hero-score-input.hs, .mx-hero-score-input.as, .mx-hero-x {
+.mx-hero-score-input.hs,
+.mx-hero-score-input.as,
+.mx-hero-x {
     background: transparent;
     border: 0px;
     font-size: var(--font-size-xxxl);
@@ -202,7 +207,8 @@ body.mx-lock {
     appearance: textfield;
 }
 
-.mx-hero-score-input::-webkit-outer-spin-button, .mx-hero-score-input::-webkit-inner-spin-button {
+.mx-hero-score-input::-webkit-outer-spin-button,
+.mx-hero-score-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -927,7 +933,8 @@ select.mx-input option {
     padding: var(--sp-1) var(--sp-2);
 }
 
-.mx-pl-head, .mx-player {
+.mx-pl-head,
+.mx-player {
     display: grid;
     grid-template-columns: 46px minmax(90px, 1fr) minmax(120px, 1.4fr) minmax(110px, 1fr) 62px auto;
     gap: var(--sp-2);
@@ -1167,12 +1174,14 @@ select.mx-input option {
     min-width: 100px;
 }
 
-.mx-chip.VICTORY, .mx-chip.WIN {
+.mx-chip.VICTORY,
+.mx-chip.WIN {
     border-color: var(--success-color);
     background: var(--bg-success);
 }
 
-.mx-chip.DEFEAT, .mx-chip.LOSS {
+.mx-chip.DEFEAT,
+.mx-chip.LOSS {
     border-color: var(--error-color);
     background: var(--bg-error);
 }
@@ -1222,7 +1231,8 @@ select.mx-input option {
 }
 
 /* ── Matchdata novo / tela de criação ── */
-body.mx-new .mx-panel .mx-savebar, body.mx-new .mx-summary .mx-savebar {
+body.mx-new .mx-panel .mx-savebar,
+body.mx-new .mx-summary .mx-savebar {
     display: none;
 }
 
@@ -1324,7 +1334,7 @@ body.mx-new .mx-panel .mx-savebar, body.mx-new .mx-summary .mx-savebar {
 
     .mx-hero-score {
         grid-template-columns: minmax(0, 1fr) 72px;
-        grid-template-areas: "hp hs""ap as";
+        grid-template-areas: "hp hs" "ap as";
     }
 
     .mx-hero-x {

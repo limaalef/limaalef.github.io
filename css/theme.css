@@ -8,12 +8,12 @@
     --bg-primary: #f9f8f3;
     --bg-secondary: #eae8e4;
     --bg-tertiary: #d6d7da;
-    
+
     /* Textos */
     --text-primary: #1a1a18;
     --text-secondary: #2e2e2c;
     --text-tertiary: #a0a09a;
-    
+
     /* Cores de Interface */
     --header-color: var(--bg-primary);
     --border-color: #d8d6d0;
@@ -29,7 +29,7 @@
     --accent-hover: #7c3aed;
     --bg-accent-color: #ede9fe;
     --text-accent-color: #ffffff;
-    
+
     /* Cores de Status */
     --success-color: #10b981;
     --warning-color: #f59e0b;
@@ -51,7 +51,7 @@
     --mode-multisport: #f59e0b;
     --mode-motor: #ef4444;
     --mode-carnaval: #bd10ae;
-    
+
     /* Max sizes */
     --page-width-size: 1400px;
 
@@ -124,7 +124,8 @@
     --z-modal-top: 1010;
     --z-modal-editor: 1020;
     --z-nav: 1100;
-    --float-bottom: 30px;              /* posição vertical dos controles flutuantes (busca e carrinho) */
+    --float-bottom: 30px;
+    /* posição vertical dos controles flutuantes (busca e carrinho) */
     --float-side: 1.75rem;
     --float-gap: 12px;
     --black-a25: rgba(0, 0, 0, 0.25);
@@ -184,7 +185,7 @@
         --font-size-xxxxxl: 2.2rem;
 
         --logo-size: 40px;
-        
+
         --sp-4: 0.5rem;
         --sp-5: 0.75rem;
         --sp-6: 1rem;
@@ -237,7 +238,7 @@ body.theme-carnaval {
         --bg-primary: rgb(19, 19, 19);
         --bg-secondary: rgb(31, 31, 31);
         --bg-tertiary: rgb(58, 58, 58);
-        
+
         /* Textos */
         --text-primary: #e8e8e8;
         --text-secondary: #aaaaaa;
@@ -246,7 +247,7 @@ body.theme-carnaval {
         /* Superfícies, linhas e texto suaves derivados do texto atual (valem para claro e escuro) */
         --soft-bg: #232323;
         --soft-bg-hover: #2C2C2C;
-        
+
         /* Interface */
         --border-color: #333333;
 
@@ -257,7 +258,7 @@ body.theme-carnaval {
         --text-accent-color: #000000;
 
         /* Cores de Status */
-        --bg-success:   #053f30;
+        --bg-success: #053f30;
         --bg-warning: #451a03;
         --bg-info: #081758;
         --bg-error: #450a0a;
@@ -269,4 +270,3 @@ body.theme-carnaval {
     }
 
 }
-

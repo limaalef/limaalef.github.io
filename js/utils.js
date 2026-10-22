@@ -140,6 +140,14 @@ const Utils = {
         return `competition_logos/${this.slug(name)}_${d ? d.getFullYear() : new Date().getFullYear()}.png`;
     },
 
+    // Primeira imagem de um campo que pode vir como texto ou lista; completa a pasta quando só vem o arquivo.
+    firstImage(value, folder = 'matches_image/') {
+        const first = Array.isArray(value) ? value.find(Boolean) : value;
+        const src = typeof first === 'string' ? first.trim() : (first?.url || first?.src || first?.path || '');
+        if (!src) return '';
+        return /^(https?:)?\/\/|^\//.test(src) || src.startsWith(folder) ? src : folder + src;
+    },
+
     // Data e hora no idioma da página (ISO ou Date).
     formatDateTime(value, options = { dateStyle: 'short', timeStyle: 'short' }) {
         const d = value instanceof Date ? value : new Date(value);

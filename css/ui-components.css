@@ -26,7 +26,8 @@
     white-space: nowrap;
 }
 
-.status-pill i, .status-dot {
+.status-pill i,
+.status-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
@@ -35,23 +36,28 @@
     display: inline-block;
 }
 
-.status-pill--success i, .status-dot--success {
+.status-pill--success i,
+.status-dot--success {
     background: var(--success-color);
 }
 
-.status-pill--waiting i, .status-dot--waiting {
+.status-pill--waiting i,
+.status-dot--waiting {
     background: var(--warning-color);
 }
 
-.status-pill--error i, .status-dot--error {
+.status-pill--error i,
+.status-dot--error {
     background: var(--error-color);
 }
 
-.status-pill--info i, .status-dot--info {
+.status-pill--info i,
+.status-dot--info {
     background: var(--info-color);
 }
 
-.status-pill--accent i, .status-dot--accent {
+.status-pill--accent i,
+.status-dot--accent {
     background: var(--accent-color);
 }
 
@@ -61,7 +67,9 @@
 }
 
 @keyframes status-blink {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1
     }
 
@@ -380,11 +388,13 @@
     transition: width .4s ease;
 }
 
-.usage-bar-segment--archive, .usage-legend-key--archive {
+.usage-bar-segment--archive,
+.usage-legend-key--archive {
     background: var(--accent-color);
 }
 
-.usage-bar-segment--other, .usage-legend-key--other {
+.usage-bar-segment--other,
+.usage-legend-key--other {
     background: color-mix(in srgb, var(--text-primary) 38%, transparent);
 }
 
@@ -502,7 +512,8 @@
     color: var(--text-muted);
 }
 
-.stepper-step.done .stepper-label, .stepper-step.active .stepper-label {
+.stepper-step.done .stepper-label,
+.stepper-step.active .stepper-label {
     color: var(--text-primary);
 }
 
@@ -581,7 +592,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .status-dot--live, .spinner {
+
+    .status-dot--live,
+    .spinner {
         animation: none;
     }
 }
@@ -649,7 +662,9 @@
 }
 
 @keyframes skeleton-pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
 

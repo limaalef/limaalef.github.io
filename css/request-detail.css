@@ -31,7 +31,7 @@
 .rd-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
-    grid-template-areas: "head aside""main aside";
+    grid-template-areas: "head aside" "main aside";
     grid-template-rows: auto 1fr;
     column-gap: var(--sp-8);
     align-items: start;
@@ -73,7 +73,7 @@
 @media (max-width: 900px) {
     .rd-layout {
         grid-template-columns: 1fr;
-        grid-template-areas: "head""aside""main";
+        grid-template-areas: "head" "aside" "main";
         grid-template-rows: auto;
     }
 

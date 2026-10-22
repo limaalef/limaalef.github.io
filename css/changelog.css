@@ -475,12 +475,15 @@
     }
 }
 
-.page-changelog .fc-action, .page-changelog .fc-field, .page-changelog .change-id {
+.page-changelog .fc-action,
+.page-changelog .fc-field,
+.page-changelog .change-id {
     text-transform: none;
     letter-spacing: 0;
 }
 
-.page-changelog .sync-entry-header, .page-changelog .sync-entry.open .sync-entry-header {
+.page-changelog .sync-entry-header,
+.page-changelog .sync-entry.open .sync-entry-header {
     border: 0;
     box-shadow: none;
 }

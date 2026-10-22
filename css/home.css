@@ -343,7 +343,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: var(--sp-5);
-    min-height: 7rem;
+    min-height: 5rem;
     padding: var(--sp-5);
     border: 0;
     border-radius: var(--border-radius-size-xl);
@@ -392,8 +392,10 @@
 
 @media (hover: hover) {
 
-    .page-home .sport-nav-card.football:hover, .page-home .sport-nav-card.multisport:hover,
-    .page-home .sport-nav-card.motor:hover, .page-home .sport-nav-card.carnaval:hover,
+    .page-home .sport-nav-card.football:hover,
+    .page-home .sport-nav-card.multisport:hover,
+    .page-home .sport-nav-card.motor:hover,
+    .page-home .sport-nav-card.carnaval:hover,
     .page-home .sport-nav-card:hover {
         background: var(--soft-bg-hover);
         color: var(--text-primary);
@@ -676,4 +678,162 @@
 .cl-item-badge.removed {
     background: var(--bg-error);
     color: var(--text-error);
+}
+
+/* ── Hoje na história: cartões 16:9 que revelam a imagem do jogo ao passar o ponteiro ── */
+.page-home .tih-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    flex: 0 0 auto;
+    width: clamp(15rem, 23vw, 19rem);
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-5);
+    cursor: pointer;
+    scroll-snap-align: start;
+    background: var(--soft-bg);
+    color: var(--text-primary);
+    border-radius: calc(var(--border-radius-size-xl) * 1.25);
+}
+
+.page-home .tih-card-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.06);
+    transition: opacity .35s, transform .6s;
+}
+
+.page-home .tih-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity .35s;
+    background: linear-gradient(180deg, var(--black-a30) 0%, var(--black-a72) 100%);
+}
+
+.page-home .tih-card-top {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-width: 0;
+}
+
+.page-home .tih-card-year {
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--border-radius-size-circle);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-accent-color);
+    background: var(--accent-color);
+}
+
+.page-home .tih-card-comp {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    transition: color .3s;
+}
+
+.page-home .tih-card-match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+}
+
+.page-home .tih-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    flex: 1;
+    min-width: 0;
+}
+
+.page-home .tih-team-logo {
+    height: 2rem;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.page-home .tih-team-name {
+    max-width: 100%;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color .3s;
+}
+
+.page-home .tih-team.winner .tih-team-name {
+    color: var(--text-primary);
+}
+
+.page-home .tih-card-score {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    flex: none;
+}
+
+.page-home .tih-score {
+    min-width: 1ch;
+    font-size: var(--font-size-xxxl);
+    font-weight: 600;
+    letter-spacing: -.03em;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    transition: color .3s;
+}
+
+.page-home .tih-score.winner {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.page-home .tih-score-sep {
+    font-size: var(--font-size-md);
+    color: var(--text-muted);
+}
+
+.page-home .tih-card:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) {
+
+    .page-home .tih-card:hover.has-media .tih-card-media,
+    .page-home .tih-card.has-media:focus-visible .tih-card-media {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .page-home .tih-card:hover.has-media::after,
+    .page-home .tih-card.has-media:focus-visible::after {
+        opacity: 1;
+    }
+
+    .page-home .tih-card.has-media:hover :is(.tih-card-comp, .tih-team-name, .tih-score, .tih-score-sep) {
+        color: var(--on-media-muted);
+    }
+
+    .page-home .tih-card.has-media:hover :is(.tih-team.winner .tih-team-name, .tih-score.winner) {
+        color: var(--white);
+    }
 }

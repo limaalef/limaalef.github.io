@@ -82,7 +82,8 @@
 }
 
 /* Lista de discos (uma linha por disco; vira cartão no celular) */
-.sd-head, .sd-row {
+.sd-head,
+.sd-row {
     display: grid;
     align-items: center;
     column-gap: var(--sp-6);
@@ -296,7 +297,7 @@ body.sd-lock {
 
     .sd-row {
         grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas: "id state""usage usage""used free";
+        grid-template-areas: "id state" "usage usage" "used free";
     }
 
     .sd-id {

@@ -115,8 +115,10 @@ const TodayInHistory = {
         const homeLogo = item.home_team.logo ? `<img src="${item.home_team.logo}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
         const awayLogo = item.away_team.logo ? `<img src="${item.away_team.logo}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
 
+        const image = Utils.firstImage(item.image);
         return `
-        <div class="tih-card" onclick="TodayModal.show(${id}, 'football')">
+        <div class="tih-card${image ? ' has-media' : ''}" onclick="TodayModal.show(${id}, 'football')">
+            ${image ? `<span class="tih-card-media" data-src="${Utils.escapeHtml(image)}" aria-hidden="true"></span>` : ''}
             <div class="tih-card-top">
                 <span class="tih-card-year">${year}</span>
                 <span class="tih-card-comp">${LanguageManager.translateText(comp)}${fase ? ` · ${LanguageManager.translateText(fase)}` : ''}</span>
@@ -154,6 +156,16 @@ const TodayInHistory = {
         // Atualiza indicador de página ao scrollar
         const grid = document.getElementById('tihGrid');
         grid.addEventListener('scroll', () => this._onScroll(), { passive: true });
+
+        // A imagem só é baixada quando o cartão recebe o ponteiro (ou foco)
+        const loadMedia = e => {
+            const media = e.target.closest?.('.tih-card')?.querySelector('.tih-card-media[data-src]');
+            if (!media) return;
+            media.style.backgroundImage = `url("${media.dataset.src}")`;
+            media.removeAttribute('data-src');
+        };
+        grid.addEventListener('pointerover', loadMedia);
+        grid.addEventListener('focusin', loadMedia);
     },
 
     // Seta avança/volta pela largura visível do grid (um "viewport" de cards)

@@ -50,7 +50,8 @@
     font-size: var(--font-size-xs);
 }
 
-.br-result:hover, .br-result:focus-visible {
+.br-result:hover,
+.br-result:focus-visible {
     background: var(--soft-bg);
     outline: none;
 }

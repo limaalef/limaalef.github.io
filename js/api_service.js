@@ -45,7 +45,7 @@ const APIService = {
         const base = 'https://api.limaalef.com/archive/matches';
         const url = new URL(base);
         url.searchParams.set('today_in_history', 'true');
-        url.searchParams.set('fields', 'id,date,home_team,away_team,championship');
+        url.searchParams.set('fields', 'id,date,home_team,away_team,championship,image');
 
         return this._fetchJson(url.toString());
     },

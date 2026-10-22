@@ -461,7 +461,8 @@
         display: block;
     }
 
-    .adm-amount-status, .adm-row-actions {
+    .adm-amount-status,
+    .adm-row-actions {
         justify-content: flex-start;
     }
 }
@@ -649,13 +650,18 @@ body.page-admin .btn-ghost {
     }
 }
 
-body.page-admin .btn-danger, body.page-admin .adm-btn-success, body.page-admin .adm-btn-warning {
+body.page-admin .btn-danger,
+body.page-admin .adm-btn-success,
+body.page-admin .adm-btn-warning {
     background: var(--soft-bg);
     color: var(--text-primary);
 }
 
 @media (hover: hover) {
-    body.page-admin .btn-danger:hover, body.page-admin .adm-btn-success:hover, body.page-admin .adm-btn-warning:hover {
+
+    body.page-admin .btn-danger:hover,
+    body.page-admin .adm-btn-success:hover,
+    body.page-admin .adm-btn-warning:hover {
         background: var(--soft-bg-hover);
         filter: none;
     }
@@ -776,7 +782,9 @@ body.page-admin .mp-settings-card .button-group {
     padding: var(--sp-6) 0;
 }
 
-.adm-sec+.adm-sec, .adm-col+.adm-col>.adm-sec:first-child, .adm-editor-body-grid+.adm-sec {
+.adm-sec+.adm-sec,
+.adm-col+.adm-col>.adm-sec:first-child,
+.adm-editor-body-grid+.adm-sec {
     border-top: 1px solid var(--soft-line);
 }
 

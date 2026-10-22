@@ -19,7 +19,8 @@
     object-fit: contain;
 }
 
-.modal-title-competition, .modal-title-phase {
+.modal-title-competition,
+.modal-title-phase {
     text-align: left;
 }
 
@@ -498,7 +499,8 @@
     letter-spacing: -0.02em;
 }
 
-.pen-score-row::before, .pen-score-row::after {
+.pen-score-row::before,
+.pen-score-row::after {
     width: 46%;
 }
 

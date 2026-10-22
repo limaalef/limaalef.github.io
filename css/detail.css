@@ -403,7 +403,8 @@
         align-items: center;
     }
 
-    .page-detail .entity-image[data-shape="emblem"], .page-detail .entity-image[data-shape="icon"] {
+    .page-detail .entity-image[data-shape="emblem"],
+    .page-detail .entity-image[data-shape="icon"] {
         width: 4.5rem;
         height: 4.5rem;
     }
@@ -419,7 +420,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .page-detail .sidebar-skeleton-emblem, .page-detail .sidebar-skeleton-line {
+
+    .page-detail .sidebar-skeleton-emblem,
+    .page-detail .sidebar-skeleton-line {
         animation: none;
     }
 }

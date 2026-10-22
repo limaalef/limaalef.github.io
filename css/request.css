@@ -723,7 +723,8 @@
     gap: var(--sp-3);
 }
 
-.om-panel .action-btn, .om-step .action-btn {
+.om-panel .action-btn,
+.om-step .action-btn {
     flex: 1;
     padding: var(--sp-3) var(--sp-5);
     border: 0;
@@ -803,7 +804,10 @@
 }
 
 @media (hover: hover) {
-    .om-oauth-btn:hover, .om-oauth-btn.om-google:hover, .om-oauth-btn.om-microsoft:hover {
+
+    .om-oauth-btn:hover,
+    .om-oauth-btn.om-google:hover,
+    .om-oauth-btn.om-microsoft:hover {
         background: var(--soft-bg-hover);
         border: 0;
     }

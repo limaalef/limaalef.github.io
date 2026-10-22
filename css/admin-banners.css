@@ -181,7 +181,8 @@
         justify-content: flex-start;
     }
 
-    .bn-grid-2, .bn-colors {
+    .bn-grid-2,
+    .bn-colors {
         grid-template-columns: 1fr;
     }
 
