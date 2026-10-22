@@ -75,9 +75,11 @@ function attachEditButton(id, sport) {
     if (!row || row.querySelector('.me-edit-link')) return;
     const link = document.createElement('a');
     link.className = 'me-edit-link match-action--ghost';
-    link.href = `match-edit.html?id=${encodeURIComponent(id)}&sport=${encodeURIComponent(sport)}`;
+    link.href = `${CONFIG.MATCHDATA_EDIT_URL}?id=${encodeURIComponent(id)}&sport=${encodeURIComponent(sport)}`;
     link.textContent = LanguageManager.t('editData');
     link.setAttribute('aria-label', LanguageManager.t('editDataLabel'));
+    link.target = '_blank';
+    link.rel = 'noopener';
     row.appendChild(link);
 }
 

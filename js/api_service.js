@@ -70,13 +70,7 @@ const APIService = {
 
     async fetchEnrichment(matchId, sport) {
         try {
-            let url = `${CONFIG.REQUEST_API_BASE}/v2/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
-            // Depois de uma edição (match-edit.html) o detalhe em cache (3 h) estaria velho: o admin que acabou de
-            // editar busca uma URL nova. Os demais visitantes só veem a mudança quando o cache expirar.
-            try {
-                const bust = sessionStorage.getItem(`me_bust:${sport}:${matchId}`);
-                if (bust) url += `?_v=${encodeURIComponent(bust)}`;
-            } catch { /* storage indisponível */ }
+            const url = `${CONFIG.REQUEST_API_BASE}/v2/matches/${encodeURIComponent(sport)}/${encodeURIComponent(matchId)}/detail`;
             const res = await fetch(url);
             if (!res.ok) return null;
             const response = await res.json();

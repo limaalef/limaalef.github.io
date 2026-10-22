@@ -31,51 +31,41 @@
 
 @media (hover: hover) {
     .sport-nav-card.football:hover {
-        background-color: var(--mode-football);
-        color: var(--white)
-    }
+    background-color: var(--mode-football);
+    color: var(--white)
+}
 }
 
 @media (hover: hover) {
     .sport-nav-card.multisport:hover {
-        background-color: var(--mode-multisport);
-        color: var(--black)
-    }
+    background-color: var(--mode-multisport);
+    color: var(--black)
+}
 }
 
 @media (hover: hover) {
     .sport-nav-card.motor:hover {
-        background-color: var(--mode-motor);
-        color: var(--white)
-    }
+    background-color: var(--mode-motor);
+    color: var(--white)
+}
 }
 
 @media (hover: hover) {
     .sport-nav-card.carnaval:hover {
-        background-color: var(--mode-carnaval);
-        color: var(--white)
-    }
+    background-color: var(--mode-carnaval);
+    color: var(--white)
 }
-
-@media (hover: hover) {
-    .sport-nav-card.general:hover {
-        background-color: var(--accent-color);
-        color: var(--text-accent-color);
-    }
 }
 
 @media (hover: hover) {
     .sport-nav-card:hover {
-        background-color: var(--text-primary);
-        color: var(--bg-primary)
-    }
+    background-color: var(--text-primary);
+    color: var(--bg-primary)
+}
 }
 
 @media (max-width: 600px) {
-    .sport-nav {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--sp-3);
-    }
+    .sport-nav { grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
 }
 
 .browse-grid-section {
@@ -130,9 +120,7 @@
     padding-top: var(--sp-8);
 }
 
-.browse-scroll-list::-webkit-scrollbar {
-    display: none;
-}
+.browse-scroll-list::-webkit-scrollbar { display: none; }
 
 .browse-badge-card {
     scroll-snap-align: start;
@@ -148,9 +136,9 @@
 
 @media (hover: hover) {
     .browse-badge-card:hover {
-        transform: translateY(2px);
-        opacity: 0.85;
-    }
+    transform: translateY(2px);
+    opacity: 0.85;
+}
 }
 
 .browse-badge-circle {
@@ -192,9 +180,9 @@
 
 @media (hover: hover) {
     .browse-badge-card:hover .browse-badge-circle {
-        border-color: var(--accent-color);
-        background: var(--bg-accent-color, var(--bg-secondary));
-    }
+    border-color: var(--accent-color);
+    background: var(--bg-accent-color, var(--bg-secondary));
+}
 }
 
 .browse-badge-name {
@@ -212,7 +200,6 @@
     .browse-grid {
         grid-template-columns: 1fr;
     }
-
     .browse-col-aside {
         border-left: none;
         padding-left: 0;
@@ -228,366 +215,108 @@
    maior do carrossel de narradores continuam como estavam.
 ═══════════════════════════════════════════════════════════════ */
 
-.page-home .home-container {
-    gap: var(--sp-4);
-    padding-bottom: var(--sp-8);
-}
-
-.page-home .home-section {
-    padding: var(--sp-4) var(--sp-5);
-}
+.page-home .home-container { gap: var(--sp-4); padding-bottom: var(--sp-8); }
+.page-home .home-section { padding: var(--sp-4) var(--sp-5); }
 
 /* Menos linhas: as seções se separam por espaço */
-.page-home .section-divider {
-    display: none;
-}
-
-.page-home .browse-sub-divider {
-    height: var(--sp-6);
-    margin: 0;
-    border: 0;
-    background: none;
-}
-
-.page-home .browse-sub-section+.browse-sub-section {
-    margin-top: var(--sp-7);
-}
+.page-home .section-divider { display: none; }
+.page-home .browse-sub-divider { height: var(--sp-6); margin: 0; border: 0; background: none; }
+.page-home .browse-sub-section + .browse-sub-section { margin-top: var(--sp-7); }
 
 /* ── Títulos de seção ── */
-.page-home .home-section-header {
-    margin-bottom: var(--sp-5);
-    gap: var(--sp-4);
-}
-
+.page-home .home-section-header { margin-bottom: var(--sp-5); gap: var(--sp-4); }
 .page-home .home-section-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    letter-spacing: -.02em;
-    text-transform: none;
-    color: var(--text-primary);
-    margin: 0;
+    font-size: var(--font-size-xl); font-weight: 600; letter-spacing: -.02em;
+    text-transform: none; color: var(--text-primary); margin: 0;
 }
-
-.page-home .home-section-detail {
-    color: var(--text-muted);
-    font-size: var(--font-size-mdm);
-    font-weight: 400;
-    letter-spacing: 0;
-}
-
-.page-home .home-section-header-action {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-}
-
-.page-home .home-section-action {
-    color: var(--text-muted);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-}
-
+.page-home .home-section-detail { color: var(--text-muted); font-size: var(--font-size-mdm); font-weight: 400; letter-spacing: 0; }
+.page-home .home-section-header-action { display: flex; align-items: center; gap: var(--sp-2); }
+.page-home .home-section-action { color: var(--text-muted); font-size: var(--font-size-sm); font-weight: 500; }
 @media (hover: hover) {
-    .page-home .home-section-action:hover {
-        padding: 0;
-        background: none;
-        color: var(--text-primary);
-    }
+    .page-home .home-section-action:hover { padding: 0; background: none; color: var(--text-primary); }
 }
 
 /* ── Setas: botões neutros circulares, sem contorno colorido ── */
 .page-home .nav-btn {
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    border: 0;
-    border-radius: var(--border-radius-size-circle);
-    display: grid;
-    place-items: center;
-    background: var(--soft-bg);
-    color: var(--text-primary);
-    font-size: var(--font-size-xl);
-    line-height: 1;
-    transition: background .2s, opacity .2s;
+    width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: var(--border-radius-size-circle);
+    display: grid; place-items: center; background: var(--soft-bg); color: var(--text-primary);
+    font-size: var(--font-size-xl); line-height: 1; transition: background .2s, opacity .2s;
 }
-
 @media (hover: hover) {
-    .page-home .nav-btn:hover:not(:disabled) {
-        background: var(--soft-bg-hover);
-        color: var(--text-primary);
-    }
+    .page-home .nav-btn:hover:not(:disabled) { background: var(--soft-bg-hover); color: var(--text-primary); }
 }
-
-.page-home .nav-btn:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-}
-
-.page-home .nav-btn:disabled {
-    opacity: .3;
-}
-
-@media (hover: none) {
-    .page-home .browse-sub-section .nav-btn {
-        display: none;
-    }
-}
+.page-home .nav-btn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.page-home .nav-btn:disabled { opacity: .3; }
+@media (hover: none) { .page-home .browse-sub-section .nav-btn { display: none; } }
 
 /* ── Categorias ── */
-.page-home .sport-nav {
-    gap: var(--sp-4);
-}
-
+.page-home .sport-nav { gap: var(--sp-4); }
 .page-home .sport-nav-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--sp-5);
-    min-height: 5rem;
-    padding: var(--sp-5);
-    border: 0;
-    border-radius: var(--border-radius-size-xl);
-    background: var(--soft-bg);
-    color: var(--text-primary);
+    display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-5);
+    min-height: 7rem; padding: var(--sp-5); border: 0; border-radius: var(--border-radius-size-xl);
+    background: var(--soft-bg); color: var(--text-primary);
     transition: background .2s, transform .2s;
 }
-
-.page-home .sport-nav-card .nav-icon {
-    margin: 0;
-    line-height: 0;
-}
-
-.page-home .sport-nav-card .nav-icon svg {
-    width: 1.75rem;
-    height: 1.75rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.page-home .sport-nav-card .nav-text {
-    margin: 0;
-    font-size: var(--font-size-md);
-    font-weight: 600;
-    letter-spacing: -.01em;
-}
-
-.page-home .sport-nav-card.football .nav-icon {
-    color: var(--mode-football);
-}
-
-.page-home .sport-nav-card.multisport .nav-icon {
-    color: var(--mode-multisport);
-}
-
-.page-home .sport-nav-card.motor .nav-icon {
-    color: var(--mode-motor);
-}
-
-.page-home .sport-nav-card.carnaval .nav-icon {
-    color: var(--mode-carnaval);
-}
-
+.page-home .sport-nav-card .nav-icon { margin: 0; line-height: 0; }
+.page-home .sport-nav-card .nav-icon svg { width: 1.75rem; height: 1.75rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.page-home .sport-nav-card .nav-text { margin: 0; font-size: var(--font-size-md); font-weight: 600; letter-spacing: -.01em; }
+.page-home .sport-nav-card.football   .nav-icon { color: var(--mode-football); }
+.page-home .sport-nav-card.multisport .nav-icon { color: var(--mode-multisport); }
+.page-home .sport-nav-card.motor      .nav-icon { color: var(--mode-motor); }
+.page-home .sport-nav-card.carnaval   .nav-icon { color: var(--mode-carnaval); }
 @media (hover: hover) {
-
-    .page-home .sport-nav-card.football:hover,
-    .page-home .sport-nav-card.multisport:hover,
-    .page-home .sport-nav-card.motor:hover,
-    .page-home .sport-nav-card.carnaval:hover,
-    .page-home .sport-nav-card:hover {
-        background: var(--soft-bg-hover);
-        color: var(--text-primary);
-    }
-
-    .page-home .sport-nav-card:hover {
-        transform: translateY(-2px);
-    }
+    .page-home .sport-nav-card.football:hover, .page-home .sport-nav-card.multisport:hover,
+    .page-home .sport-nav-card.motor:hover, .page-home .sport-nav-card.carnaval:hover,
+    .page-home .sport-nav-card:hover { background: var(--soft-bg-hover); color: var(--text-primary); }
+    .page-home .sport-nav-card:hover { transform: translateY(-2px); }
 }
-
-.page-home .sport-nav-card:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-}
-
-@media (max-width: 600px) {
-    .page-home .sport-nav-card {
-        min-height: 5.5rem;
-        padding: var(--sp-4);
-    }
-}
+.page-home .sport-nav-card:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+@media (max-width: 600px) { .page-home .sport-nav-card { min-height: 5.5rem; padding: var(--sp-4); } }
 
 /* ── Carrosséis (os círculos e o tamanho do de narradores seguem como estavam) ── */
-.page-home .browse-badge-circle {
-    border: 0;
-    background: var(--soft-bg);
-    transition: background .2s, transform .2s;
-}
-
-.page-home .browse-badge-card {
-    transition: opacity .2s;
-}
-
+.page-home .browse-badge-circle { border: 0; background: var(--soft-bg); transition: background .2s, transform .2s; }
+.page-home .browse-badge-card { transition: opacity .2s; }
 @media (hover: hover) {
-    .page-home .browse-badge-card:hover {
-        transform: none;
-        opacity: 1;
-    }
-
-    .page-home .browse-badge-card:hover .browse-badge-circle {
-        background: var(--soft-bg-hover);
-        border-color: transparent;
-        transform: translateY(calc(var(--sp-1) * -1));
-    }
+    .page-home .browse-badge-card:hover { transform: none; opacity: 1; }
+    .page-home .browse-badge-card:hover .browse-badge-circle { background: var(--soft-bg-hover); border-color: transparent; transform: translateY(calc(var(--sp-1) * -1)); }
 }
-
-.page-home .browse-badge-card:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 4px;
-    border-radius: var(--border-radius-size-lg);
-}
-
+.page-home .browse-badge-card:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 4px; border-radius: var(--border-radius-size-lg); }
 .page-home .browse-badge-name {
-    white-space: normal;
-    text-overflow: clip;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    color: var(--text-primary);
-    font-weight: 500;
+    white-space: normal; text-overflow: clip; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    color: var(--text-primary); font-weight: 500;
 }
-
 /* Esmaecido nas bordas onde ainda há conteúdo (classes marcadas por js/index.js) */
-.page-home .browse-scroll-list {
-    --fade: var(--sp-8);
-}
-
-.page-home .browse-scroll-list.has-more-end:not(.has-more-start) {
-    -webkit-mask-image: linear-gradient(90deg, var(--black) calc(100% - var(--fade)), transparent);
-    mask-image: linear-gradient(90deg, var(--black) calc(100% - var(--fade)), transparent);
-}
-
-.page-home .browse-scroll-list.has-more-start:not(.has-more-end) {
-    -webkit-mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade));
-    mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade));
-}
-
-.page-home .browse-scroll-list.has-more-start.has-more-end {
-    -webkit-mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade), var(--black) calc(100% - var(--fade)), transparent);
-    mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade), var(--black) calc(100% - var(--fade)), transparent);
-}
+.page-home .browse-scroll-list { --fade: var(--sp-8); }
+.page-home .browse-scroll-list.has-more-end:not(.has-more-start) { -webkit-mask-image: linear-gradient(90deg, var(--black) calc(100% - var(--fade)), transparent); mask-image: linear-gradient(90deg, var(--black) calc(100% - var(--fade)), transparent); }
+.page-home .browse-scroll-list.has-more-start:not(.has-more-end) { -webkit-mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade)); mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade)); }
+.page-home .browse-scroll-list.has-more-start.has-more-end { -webkit-mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade), var(--black) calc(100% - var(--fade)), transparent); mask-image: linear-gradient(90deg, transparent, var(--black) var(--fade), var(--black) calc(100% - var(--fade)), transparent); }
 
 /* ── Últimas alterações: painel suave, sem bolinha ── */
-.page-home .browse-col-aside {
-    border-left: 0;
-    padding: var(--sp-6);
-    border-radius: var(--border-radius-size-xl);
-    background: var(--bg-secondary);
-}
-
-.page-home .browse-col-aside .home-section-header {
-    margin-bottom: var(--sp-3);
-}
-
-.page-home .cl-group {
-    padding: var(--sp-5) 0;
-}
-
-.page-home .cl-group+.cl-group {
-    border-top: 1px solid var(--soft-line);
-}
-
-.page-home .cl-group:first-child {
-    padding-top: var(--sp-3);
-}
-
-.page-home .cl-group:last-child {
-    padding-bottom: 0;
-}
-
-.page-home .cl-group-header {
-    margin-bottom: var(--sp-3);
-}
-
-.page-home .cl-group-ts {
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-}
-
-.page-home .cl-group-item {
-    align-items: center;
-    padding: var(--sp-1) 0;
-}
-
-.page-home .cl-item-desc {
-    color: var(--text-primary);
-    font-size: var(--font-size-mdm);
-}
-
+.page-home .browse-col-aside { border-left: 0; padding: var(--sp-6); border-radius: var(--border-radius-size-xl); background: var(--bg-secondary); }
+.page-home .browse-col-aside .home-section-header { margin-bottom: var(--sp-3); }
+.page-home .cl-group { padding: var(--sp-5) 0; }
+.page-home .cl-group + .cl-group { border-top: 1px solid var(--soft-line); }
+.page-home .cl-group:first-child { padding-top: var(--sp-3); }
+.page-home .cl-group:last-child { padding-bottom: 0; }
+.page-home .cl-group-header { margin-bottom: var(--sp-3); }
+.page-home .cl-group-ts { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.page-home .cl-group-item { align-items: center; padding: var(--sp-1) 0; }
+.page-home .cl-item-desc { color: var(--text-primary); font-size: var(--font-size-mdm); }
 /* Pills e rótulos neutros: a cor só aparece no texto, sem fundo colorido */
-.page-home .cl-group .pill {
-    background: var(--bg-primary);
-    font-weight: 500;
-    font-size: var(--font-size-mds);
-    font-variant-numeric: tabular-nums;
-}
-
-.page-home .cl-group .pill-added {
-    color: var(--text-success);
-}
-
-.page-home .cl-group .pill-modified {
-    color: var(--text-warning);
-}
-
-.page-home .cl-group .pill-removed {
-    color: var(--text-error);
-}
-
-.page-home .cl-group .pill-unchanged {
-    color: var(--text-muted);
-}
-
-.page-home .cl-item-badge {
-    padding: 0;
-    background: none;
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    letter-spacing: .04em;
-}
-
-.page-home .cl-item-badge.added {
-    background: none;
-    color: var(--text-success);
-}
-
-.page-home .cl-item-badge.modified {
-    background: none;
-    color: var(--text-warning);
-}
-
-.page-home .cl-item-badge.removed {
-    background: none;
-    color: var(--text-error);
-}
-
-.page-home .cl-group-overflow {
-    color: var(--text-muted);
-}
-
-@media (max-width: 640px) {
-    .page-home .browse-col-aside {
-        border-top: 0;
-        padding: var(--sp-5);
-    }
-}
+.page-home .cl-group .pill { background: var(--bg-primary); font-weight: 500; font-size: var(--font-size-mds); font-variant-numeric: tabular-nums; }
+.page-home .cl-group .pill-added    { color: var(--text-success); }
+.page-home .cl-group .pill-modified { color: var(--text-warning); }
+.page-home .cl-group .pill-removed  { color: var(--text-error); }
+.page-home .cl-group .pill-unchanged { color: var(--text-muted); }
+.page-home .cl-item-badge { padding: 0; background: none; font-size: var(--font-size-xs); font-weight: 600; letter-spacing: .04em; }
+.page-home .cl-item-badge.added    { background: none; color: var(--text-success); }
+.page-home .cl-item-badge.modified { background: none; color: var(--text-warning); }
+.page-home .cl-item-badge.removed  { background: none; color: var(--text-error); }
+.page-home .cl-group-overflow { color: var(--text-muted); }
+@media (max-width: 640px) { .page-home .browse-col-aside { border-top: 0; padding: var(--sp-5); } }
 
 /* ── Carregando e erro: esqueletos e mensagem discreta ── */
-.page-home .status-message {
-    padding: var(--sp-8) var(--sp-5);
-}
+.page-home .status-message { padding: var(--sp-8) var(--sp-5); }
 
 /* ── Mudanças recentes (lista da página inicial) — migrado do antigo components.css ── */
 .changelog-list {
@@ -600,9 +329,7 @@
     transition: background 0.15s;
 }
 
-.cl-group:last-child {
-    border-bottom: none;
-}
+.cl-group:last-child { border-bottom: none; }
 
 .cl-group-header {
     display: flex;
@@ -643,7 +370,7 @@
 .cl-item-desc {
     flex: 1;
     font-size: var(--font-size-md);
-    margin: 0;
+    margin: 0; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -665,175 +392,46 @@
     margin-top: 4px;
 }
 
-.cl-item-badge.added {
-    background: var(--bg-success);
-    color: var(--text-success);
-}
+.cl-item-badge.added    { background: var(--bg-success); color: var(--text-success); }
 
-.cl-item-badge.modified {
-    background: var(--bg-warning);
-    color: var(--text-warning);
-}
+.cl-item-badge.modified { background: var(--bg-warning); color: var(--text-warning); }
 
-.cl-item-badge.removed {
-    background: var(--bg-error);
-    color: var(--text-error);
-}
+.cl-item-badge.removed  { background: var(--bg-error); color: var(--text-error); }
 
 /* ── Hoje na história: cartões 16:9 que revelam a imagem do jogo ao passar o ponteiro ── */
 .page-home .tih-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    flex: 0 0 auto;
-    width: clamp(15rem, 23vw, 19rem);
-    aspect-ratio: 16 / 9;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--sp-3);
-    padding: var(--sp-5);
-    cursor: pointer;
-    scroll-snap-align: start;
-    background: var(--soft-bg);
-    color: var(--text-primary);
+    position: relative; isolation: isolate; overflow: hidden;
+    flex: 0 0 auto; width: clamp(15rem, 26vw, 19rem); aspect-ratio: 16 / 9;
+    display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-3);
+    padding: var(--sp-5); cursor: pointer; scroll-snap-align: start;
+    background: var(--soft-bg); color: var(--text-primary);
     border-radius: calc(var(--border-radius-size-xl) * 1.25);
 }
-
 .page-home .tih-card-media {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transform: scale(1.06);
-    transition: opacity .35s, transform .6s;
+    position: absolute; inset: 0; z-index: -2;
+    background-size: cover; background-position: center;
+    opacity: 0; transform: scale(1.06); transition: opacity .35s, transform .6s;
 }
-
 .page-home .tih-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity .35s;
+    content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity .35s;
     background: linear-gradient(180deg, var(--black-a30) 0%, var(--black-a72) 100%);
 }
-
-.page-home .tih-card-top {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-3);
-    min-width: 0;
-}
-
-.page-home .tih-card-year {
-    padding: var(--sp-1) var(--sp-3);
-    border-radius: var(--border-radius-size-circle);
-    font-size: var(--font-size-sm);
-    font-weight: 700;
-    color: var(--text-accent-color);
-    background: var(--accent-color);
-}
-
-.page-home .tih-card-comp {
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: wrap;
-    transition: color .3s;
-}
-
-.page-home .tih-card-match {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-3);
-}
-
-.page-home .tih-team {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--sp-2);
-    flex: 1;
-    min-width: 0;
-}
-
-.page-home .tih-team-logo {
-    height: 2rem;
-    max-width: 100%;
-    object-fit: contain;
-}
-
-.page-home .tih-team-name {
-    max-width: 100%;
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: color .3s;
-}
-
-.page-home .tih-team.winner .tih-team-name {
-    color: var(--text-primary);
-}
-
-.page-home .tih-card-score {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    flex: none;
-}
-
-.page-home .tih-score {
-    min-width: 1ch;
-    font-size: var(--font-size-xxxl);
-    font-weight: 600;
-    letter-spacing: -.03em;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-    transition: color .3s;
-}
-
-.page-home .tih-score.winner {
-    color: var(--text-primary);
-    font-weight: 700;
-}
-
-.page-home .tih-score-sep {
-    font-size: var(--font-size-md);
-    color: var(--text-muted);
-}
-
-.page-home .tih-card:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-}
-
+.page-home .tih-card-top { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.page-home .tih-card-year { padding: var(--sp-1) var(--sp-3); border-radius: var(--border-radius-size-circle); font-size: var(--font-size-sm); font-weight: 700; color: var(--text-accent-color); background: var(--accent-color); }
+.page-home .tih-card-comp { font-size: var(--font-size-sm); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color .3s; }
+.page-home .tih-card-match { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.page-home .tih-team { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); flex: 1; min-width: 0; }
+.page-home .tih-team-logo { height: 2rem; max-width: 100%; object-fit: contain; }
+.page-home .tih-team-name { max-width: 100%; font-size: var(--font-size-sm); font-weight: 600; color: var(--text-secondary); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color .3s; }
+.page-home .tih-team.winner .tih-team-name { color: var(--text-primary); }
+.page-home .tih-card-score { display: flex; align-items: center; gap: var(--sp-2); flex: none; }
+.page-home .tih-score { min-width: 1ch; font-size: var(--font-size-xxxl); font-weight: 600; letter-spacing: -.03em; color: var(--text-muted); font-variant-numeric: tabular-nums; transition: color .3s; }
+.page-home .tih-score.winner { color: var(--text-primary); font-weight: 700; }
+.page-home .tih-score-sep { font-size: var(--font-size-md); color: var(--text-muted); }
+.page-home .tih-card:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 @media (hover: hover) {
-
-    .page-home .tih-card:hover.has-media .tih-card-media,
-    .page-home .tih-card.has-media:focus-visible .tih-card-media {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .page-home .tih-card:hover.has-media::after,
-    .page-home .tih-card.has-media:focus-visible::after {
-        opacity: 1;
-    }
-
-    .page-home .tih-card.has-media:hover :is(.tih-card-comp, .tih-team-name, .tih-score, .tih-score-sep) {
-        color: var(--on-media-muted);
-    }
-
-    .page-home .tih-card.has-media:hover :is(.tih-team.winner .tih-team-name, .tih-score.winner) {
-        color: var(--white);
-    }
+    .page-home .tih-card:hover.has-media .tih-card-media, .page-home .tih-card.has-media:focus-visible .tih-card-media { opacity: 1; transform: scale(1); }
+    .page-home .tih-card:hover.has-media::after, .page-home .tih-card.has-media:focus-visible::after { opacity: 1; }
+    .page-home .tih-card.has-media:hover :is(.tih-card-comp, .tih-team-name, .tih-score, .tih-score-sep) { color: var(--on-media-muted); }
+    .page-home .tih-card.has-media:hover :is(.tih-team.winner .tih-team-name, .tih-score.winner) { color: var(--white); }
 }

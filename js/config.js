@@ -12,8 +12,11 @@ const CONFIG = {
         motor: 'https://api-archive.limaalef.com/v2/motorsport/',
         carnaval: 'https://api-archive.limaalef.com/matches/carnaval'
     },
-    // Edição administrativa do matchdata (match-edit.html). Exige "Authorization: Bearer <token da sessão admin>".
+    // API administrativa (busca de times/narradores no admin). Exige "Authorization: Bearer <token da sessão admin>".
     ADMIN_API_BASE:    'https://api-archive.limaalef.com/v2/admin',
+
+    // A edição do matchdata fica em um site próprio; o botão da página do jogo leva para lá com as mesmas queries.
+    MATCHDATA_EDIT_URL: 'https://admin-archive.limaalef.com/matchdata/',
 
     HOME_BROWSE_API_BASE: 'https://api-archive.limaalef.com/browse',
     BANNERS_API_BASE:  'https://api-archive.limaalef.com/banners',
@@ -38,7 +41,7 @@ const AppNav = {
     ITEMS: [
         { id: 'home',       href: 'index.html',       key: 'navHome',       pages: ['index'] },
         { id: 'about',      href: 'about.html',       key: 'navAbout',      pages: ['about'] },
-        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'match-edit', 'watch', 'event', 'storage', 'changelog'] },
+        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'watch', 'event', 'storage', 'changelog'] },
         { id: 'requests',   href: 'my-requests.html', key: 'myrequests',    pages: ['my-requests', 'request-detail'] }
     ],
 
