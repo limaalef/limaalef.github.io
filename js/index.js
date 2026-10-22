@@ -1,6 +1,6 @@
 /* ── render the 3 most recent sync groups ── */
-function renderRecentChanges(entries) {
-    const groups = entries.slice(0, 3);
+function renderRecentChanges(entries, limit) {
+    const groups = entries.slice(0, limit);
     const container = document.getElementById('recentChanges');
 
     if (groups.length === 0) {
@@ -54,10 +54,10 @@ async function loadRecentChanges() {
     const container = document.getElementById('recentChanges');
     try {
         const page = '1'
-        const limit = '3'
+        const limit = '5'
         const data = await APIService.fetchChangelog(page, limit);
 
-        renderRecentChanges(data.data || []);
+        renderRecentChanges(data.data || [], limit);
     } catch (err) {
         container.innerHTML = `<div class="status-message">${LanguageManager.t('errorChanges')}</div>`;
         console.error('Changelog fetch error:', err);
