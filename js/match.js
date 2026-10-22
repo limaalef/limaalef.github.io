@@ -124,6 +124,7 @@ function renderMatch(match, sport) {
     renderHero(match);
     Elements.renderImages(match, "matches_image/");
     renderAside(match);
+    Elements.renderArchiveStatus(match);
     Elements.renderObsAndTags(match);
     Elements.renderLineups(match.home_team, match.away_team);
     Elements.renderStatistics(match);

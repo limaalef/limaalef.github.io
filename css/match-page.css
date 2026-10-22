@@ -1373,3 +1373,126 @@
     font-weight: 600;
     letter-spacing: 0;
 }
+
+/* ── Situação do arquivo (timeline horizontal) ── */
+.page-match .arc-track {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-end;
+}
+
+.page-match .arc-part {
+    flex: var(--w) 1 0;
+    min-width: 2rem;
+}
+
+.page-match .arc-bars {
+    display: flex;
+    gap: var(--sp-1);
+}
+
+.page-match .arc-wrap {
+    flex: var(--w) 1 0;
+    min-width: 0;
+}
+
+.page-match .arc-part-name {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--sp-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.page-match .arc-bar {
+    position: relative;
+    height: 1.5rem;
+    border-radius: var(--border-radius-size-sm);
+    background: var(--bg-secondary);
+    overflow: hidden;
+}
+
+.page-match .arc-seg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    overflow: hidden;
+}
+
+.page-match .arc-seg b {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.page-match .arc-marks {
+    position: relative;
+    height: 1rem;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.page-match .arc-marks span {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.page-match [data-state="ok"] {
+    background: color-mix(in srgb, var(--success-color) 55%, var(--bg-secondary));
+}
+
+.page-match [data-state="quality"] {
+    background: color-mix(in srgb, var(--warning-color) 60%, var(--bg-secondary));
+    color: var(--text-warning);
+}
+
+.page-match [data-state="origin"] {
+    background: color-mix(in srgb, var(--accent-color) 60%, var(--bg-secondary));
+    color: var(--text-accent-color);
+}
+
+.page-match [data-state="missing"] {
+    background: repeating-linear-gradient(135deg, var(--bg-secondary) 0 4px, color-mix(in srgb, var(--text-muted) 35%, var(--bg-secondary)) 4px 8px);
+}
+
+.page-match .arc-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-3);
+}
+
+.page-match .arc-legend,
+.page-match .arc-flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.page-match .arc-key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.page-match .arc-key i {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--border-radius-size-xs);
+    display: inline-block;
+}
+
+.page-match .arc-flag {
+    padding: 0 var(--sp-3);
+    border-radius: var(--border-radius-size-circle);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}

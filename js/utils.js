@@ -627,8 +627,18 @@ const Elements = {
         }
     },
 
+    // Timeline da situação do arquivo, extraída das observações; sem dados a seção fica oculta
+    renderArchiveStatus(match) {
+        const section = document.getElementById('meArchiveSection');
+        if (!section) return;
+        const html = ArchiveStatus.html(ArchiveStatus.parse(match.additional_info), match.technical_details?.video_quality || '');
+        section.style.display = html ? 'block' : 'none';
+        document.getElementById('meArchive').innerHTML = html;
+    },
+
     renderObsAndTags(match) {
-        const obs = match.additional_info || '';
+        // O que virou timeline não volta como texto
+        const obs = ArchiveStatus.parse(match.additional_info).rest;
         if (!obs) return;
         const tags = this.TAG_RULES.filter(r => r.pattern.test(obs));
         if (tags.length || obs) document.getElementById('meTagsSection').style.display = 'block';
@@ -1268,6 +1278,252 @@ const Elements = {
             </div>`;
         }).join('');
     }
+};
+
+// ══════════════════════════════════════════════════════════════════
+//  ArchiveStatus — situação do arquivo (trechos faltando, outra qualidade ou outra origem)
+//  Lê o campo de observações (additional_info), extrai o que se refere ao arquivo e devolve
+//  dados estruturados; o que foi extraído NÃO volta como texto (só o que sobrou vai em `rest`).
+//  Sem nenhum dado, `hasData` é falso e a timeline não aparece.
+//
+//  Uma instrução por frase (frase = termina em . ; ou quebra de linha). PT e EN.
+//    Entre 26:55 e 36:55 apenas em 1080p.            trecho com outra qualidade
+//    Entre 10:00 e 20:00 em origem Streaming.         trecho com outra origem
+//    Sem conteúdo entre 10:00 e 12:30 do 2T.          trecho faltando
+//    Disponível a partir de 03:10 do primeiro tempo.  falta o começo (⇒ sem pré-jogo)
+//    Disponível até 39:41 do segundo tempo.           falta o final (⇒ sem pós-jogo)
+//    Disponível até 13:50 do segundo tempo da prorrogação.
+//    Disponível a partir de 101:56 em origem Streaming.   (a partir dali, outra origem)
+//    Disponível a partir do início do 2º tempo / até o fim do 1º tempo.
+//    Disponível pré/pós-jogo.  Disponível prorrogação.  Disponível pênaltis.
+//    Premiação.  Levantamento de taça.                indicativos opcionais
+//  Pré e pós-jogo são quadros fixos (presentes, salvo "a partir de"/"até"/"Sem"); prorrogação e pênaltis só aparecem quando há informação.
+//  Tempo = mm:ss dentro do tempo citado (1º/2º tempo, 1T/2T, "da prorrogação" soma dois tempos).
+//  Sem tempo citado é relógio de jogo: <50:00 1º tempo; <95:00 2º (− 45:00); <105:00 1º da prorrogação (− 90:00); depois 2º (− 105:00).
+// ══════════════════════════════════════════════════════════════════
+const ArchiveStatus = {
+    BASE: { 1: 2700, 2: 2700, 3: 900, 4: 900 },
+    START: { h: 1, s: 0 },
+    END: { h: 5, s: 0 },
+    _RE: {
+        token:   /(\d{1,3}):(\d{2})|\b(in[ií]cio|come[cç]o|kick-?off|start|fim|final|t[eé]rmino|end)\b/gi,
+        isStart: /^(?:in[ií]cio|come[cç]o|kick-?off|start)$/i,
+        h1:      /(?:1\s*[ºo°ª]?\s*(?:t\b|tempo)|primeiro\s+tempo|1st\s+half|first\s+half)/i,
+        h2:      /(?:2\s*[ºo°ª]?\s*(?:t\b|tempo)|segundo\s+tempo|2nd\s+half|second\s+half)/i,
+        et:      /prorroga[cç][aã]o|extra[\s-]?time|\bET\b/i,
+        quality: /\b(4k|2160p|1440p|1080[pi]|720p|576p|480p|360p|full\s?hd|hd|sd)\b/i,
+        origin:  /(?:origem|origin|fonte|source)\s*:?\s*([^.;,\n]+)/i,
+        missing: /falt|sem\b|ausen|indispon|cortad|corte|missing|without|no\s+(?:content|video)/i,
+        from:    /a\s+partir\s+d[eo]|desde|come[cç]a|inicia|starts?\s+(?:at|from)|from\b/i,
+        until:   /\bat[eé](?![a-zà-ú])|termina|acaba|ends?\s+at|until/i,
+        guard:   /dispon|apenas|somente|s[oó]\b|only|available|sem\b|falt|entre|between|a\s+partir|from/i,
+        avail:   /dispon[ií]vel|available|possui|inclui|includes|\bhas\b|\bwith\b/i,
+        neg:     /\bsem\b|n[aã]o\s+(?:tem|possui|h[aá])|ausen|without|\bno\s+(?:pre|post)/i,
+        pre:     /pr[eé][\s-]?jogo|pre[\s-]?game|pre[\s-]?match/i,
+        post:    /p[oó]s[\s-]?jogo|post[\s-]?game|post[\s-]?match/i,
+        both:    /pr[eé]\s*\/\s*p[oó]s/i,
+        pens:    /p[eê]naltis|penalt(?:y|ies)|shoot-?out/i,
+        prize:   /premia[cç][aã]o|awards?\b|medal/i,
+        trophy:  /ta[cç]a|trophy|levantamento/i,
+    },
+
+    // Tempo (1–4: 1º, 2º, 1º e 2º da prorrogação) citado perto de um marcador
+    _half(tail, before = '') {
+        const R = this._RE;
+        const et = R.et.test(tail);
+        let h = null;
+        if (R.h1.test(tail) || /(?:1\s*[ºo°ª]?\s*(?:t|tempo)|first\s+half|1st\s+half)\s*$/i.test(before)) h = 1;
+        if (R.h2.test(tail) || /(?:2\s*[ºo°ª]?\s*(?:t|tempo)|second\s+half|2nd\s+half)\s*$/i.test(before)) h = 2;
+        return { half: et ? (h || 1) + 2 : h, et };
+    },
+
+    // Marcadores (horário ou início/fim) em ordem, cada um com o tempo citado junto
+    _tokens(sentence) {
+        const R = this._RE, found = [];
+        const all = [...sentence.matchAll(R.token)];
+        all.forEach((m, i) => {
+            const end = m.index + m[0].length;
+            const stop = i + 1 < all.length ? all[i + 1].index : sentence.length;
+            const tail = sentence.slice(end, Math.min(stop, end + 40));
+            const before = sentence.slice(Math.max(0, m.index - 14), m.index);
+            const { half, et } = this._half(tail, before);
+            if (m[1] !== undefined) found.push({ kind: 'time', sec: (+m[1]) * 60 + (+m[2]), half, et });
+            else found.push({ kind: R.isStart.test(m[3]) ? 'start' : 'end', half, et });
+        });
+        return found;
+    },
+
+    // Posição {h, s}. Fim de um tempo = início do seguinte (h+1); fim do jogo = END.
+    _pos(t, inherited) {
+        const half = t.half || inherited;
+        if (t.kind === 'start') return { h: half || 1, s: 0 };
+        if (t.kind === 'end')   return half ? { h: half + 1, s: 0 } : this.END;
+        if (half) return { h: half, s: t.sec };
+        if (t.sec < 3000) return { h: 1, s: t.sec };
+        if (t.sec < 5700) return { h: 2, s: t.sec - 2700 };
+        if (t.sec < 6300) return { h: 3, s: t.sec - 5400 };
+        return { h: 4, s: t.sec - 6300 };
+    },
+
+    parse(text) {
+        const out = { events: [], pre: null, post: null, et: false, pens: false, prize: false, trophy: false, rest: '', hasData: false };
+        const raw = String(text ?? '');
+        if (!raw.trim()) return out;
+        const R = this._RE, S = this.START, E = this.END;
+        const explicit = { pre: false, post: false };
+        const kept = [];
+        const setPart = (k, v, isExplicit) => {
+            if (isExplicit) { out[k] = v; explicit[k] = true; }
+            else if (out[k] === null) out[k] = v;
+        };
+
+        raw.split(/(?<=[.;!?])\s+|\n+/).forEach(sentence => {
+            const s = sentence.trim();
+            if (!s) return;
+            let used = false;
+            const neg = R.neg.test(s), avail = R.avail.test(s);
+            const hasPre = R.pre.test(s) || R.both.test(s), hasPost = R.post.test(s) || R.both.test(s);
+            const tokens = this._tokens(s);
+
+            // Pré/pós-jogo, prorrogação e pênaltis: explícitos ("Disponível …" ou "Sem …")
+            if (!tokens.length) {
+                if ((hasPre || hasPost) && (neg || avail)) {
+                    const v = neg ? 'missing' : 'ok';
+                    if (hasPre) setPart('pre', v, true);
+                    if (hasPost) setPart('post', v, true);
+                    used = true;
+                }
+                if (avail && !neg && R.et.test(s))   { out.et = true;   used = true; }
+                if (avail && !neg && R.pens.test(s)) { out.pens = true; used = true; }
+                // Indicativos opcionais (só quando explícitos e sem negação)
+                if (!neg && !hasPre && !hasPost && !R.et.test(s) && !R.pens.test(s)) {
+                    if (R.prize.test(s))  { out.prize = true;  used = true; }
+                    if (R.trophy.test(s)) { out.trophy = true; used = true; }
+                }
+            }
+
+            // Trechos (por horário ou por início/fim de tempo)
+            const hasKeyword = tokens.some(t => t.kind !== 'time');
+            if (tokens.length && tokens.length <= 2 && (!hasKeyword || R.guard.test(s))) {
+                const inherit = tokens.length === 2 ? (tokens[0].half || tokens[1].half) : null;
+                if (tokens.some(t => t.et)) out.et = true;
+                const label = s.match(R.origin)?.[1]?.trim();
+                const q = s.match(R.quality)?.[1];
+                const kind = label ? 'origin' : q ? 'quality' : null;
+                const lab = label || (q ? q.toUpperCase().replace(/\s/g, '') : '');
+                let ev = null;
+                if (tokens.length === 2) {
+                    const a = this._pos(tokens[0], inherit), b = this._pos(tokens[1], inherit);
+                    if (kind) ev = { a, b, state: kind, label: lab };
+                    else if (R.missing.test(s)) ev = { a, b, state: 'missing' };
+                } else {
+                    const p = this._pos(tokens[0], null);
+                    const isFrom = R.from.test(s) || tokens[0].kind === 'start' && !R.until.test(s);
+                    const isUntil = !isFrom && R.until.test(s);
+                    if (isFrom || isUntil) {
+                        const [a, b] = isFrom ? [p, E] : [S, p];          // parte disponível
+                        if (kind) ev = { a, b, state: kind, label: lab };
+                        else ev = isFrom ? { a: S, b: p, state: 'missing' } : { a: p, b: E, state: 'missing' };
+                    }
+                }
+                if (ev) {
+                    out.events.push(ev);
+                    if (ev.state === 'missing') {          // faltar o começo/fim do jogo = sem pré/pós-jogo
+                        if (ev.a.h === 1 && ev.a.s === 0) setPart('pre', 'missing', false);
+                        if (ev.b.h === 5) setPart('post', 'missing', false);
+                    }
+                    used = true;
+                }
+            }
+            if (!used) kept.push(s);
+        });
+
+        if (out.events.some(e => [e.a.h, e.b.h].some(h => h === 3 || h === 4))) out.et = true;
+        out.rest = kept.join(' ');
+        out.hasData = out.events.length > 0 || out.pre !== null || out.post !== null || out.et || out.pens || out.prize || out.trophy;
+        return out;
+    },
+
+    // Faixas contínuas de um tempo (1–4) em segundos: [{from, to, state, label}]
+    _segments(events, half) {
+        const base = this.BASE[half];
+        const D = Math.max(base, ...events.flatMap(e => [e.a, e.b].filter(p => p.h === half).map(p => Math.ceil(p.s / 60) * 60)));
+        const clip = e => {
+            const from = e.a.h < half ? 0 : e.a.h > half ? null : e.a.s;
+            const to   = e.b.h > half ? D : e.b.h < half ? null : e.b.s;
+            return from === null || to === null || to <= from ? null : { from, to, state: e.state, label: e.label || '' };
+        };
+        const parts = events.map(clip).filter(Boolean);
+        const cuts = [...new Set([0, D, ...parts.flatMap(p => [p.from, p.to])])].sort((x, y) => x - y);
+        const segs = [];
+        for (let i = 0; i < cuts.length - 1; i++) {
+            const from = cuts[i], to = cuts[i + 1];
+            const over = parts.filter(p => p.from <= from && p.to >= to);
+            const top = over.some(p => p.state === 'missing') ? { state: 'missing', label: '' }
+                : [...over].reverse().find(p => p.state !== 'missing') || { state: 'ok', label: '' };
+            const last = segs[segs.length - 1];
+            if (last && last.state === top.state && last.label === top.label) last.to = to;
+            else segs.push({ from, to, state: top.state, label: top.label });
+        }
+        return { D, segs };
+    },
+
+    _fmt(sec) { return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; },
+
+    // HTML da timeline (vazio quando não há dados). baseQuality = qualidade geral do arquivo (opcional).
+    html(parsed, baseQuality = '') {
+        if (!parsed?.hasData) return '';
+        const t = k => LanguageManager.t(k), esc = s => Utils.escapeHtml(s);
+        const used = new Set(['ok']), origins = new Set();
+        const wrap = (body, marks, w) => `<div class="arc-wrap" style="--w:${w}"><div class="arc-bar">${body}</div><div class="arc-marks">${marks}</div></div>`;
+        const part = (name, weight, wraps) => `
+            <div class="arc-part" style="--w:${weight}">
+                <div class="arc-part-name" title="${esc(name)}">${esc(name)}</div>
+                <div class="arc-bars">${wraps}</div>
+            </div>`;
+        const whole = state => {
+            used.add(state);
+            const title = state === 'missing' ? t('archiveMissing') : '';
+            return wrap(`<span class="arc-seg" data-state="${state}" style="left:0;width:100%" title="${esc(title)}"></span>`, '', 1);
+        };
+        // Soma dos pesos da trilha: rótulo dentro do trecho só quando ele é largo o bastante (o título guarda o resto)
+        const totalW = 90 + (parsed.et ? 30 : 0) + 6 * [true, parsed.pens, true].filter(Boolean).length;
+        const half = n => {
+            const { D, segs } = this._segments(parsed.events, n);
+            const body = segs.map(g => {
+                used.add(g.state);
+                if (g.state === 'origin') origins.add(g.label);
+                const label = g.state === 'missing' ? t('archiveMissing') : g.label;
+                const title = `${this._fmt(g.from)} – ${this._fmt(g.to)}${label ? ' · ' + label : ''}`;
+                return `<span class="arc-seg" data-state="${g.state}" style="left:${(g.from / D) * 100}%;width:${((g.to - g.from) / D) * 100}%" title="${esc(title)}">${g.label && (g.to - g.from) / 60 / totalW > 0.04 + 0.02 * g.label.length ? `<b>${esc(g.label)}</b>` : ''}</span>`;
+            }).join('');
+            const marks = segs.slice(1).map(g => `<span style="left:${(g.from / D) * 100}%">${this._fmt(g.from)}</span>`).join('');
+            return { D, html: wrap(body, marks, D / 60) };
+        };
+
+        const hasET = parsed.et;
+        const h1 = half(1), h2 = half(2);
+        const parts = [
+            part(t('archivePre'), 6, whole(parsed.pre || 'ok')),   // quadros fixos: presentes, salvo "a partir de"/"até"/"Sem"
+            part(t('archiveFirstHalf'), h1.D / 60, h1.html),
+            part(t('archiveSecondHalf'), h2.D / 60, h2.html),
+            hasET && (() => { const a = half(3), b = half(4); return part(t('archiveExtraTime'), (a.D + b.D) / 60, a.html + b.html); })(),
+            parsed.pens && part(t('archivePens'), 6, whole('ok')),
+            part(t('archivePost'), 6, whole(parsed.post || 'ok')),
+        ].filter(Boolean).join('');
+
+        const legend = [
+            ['ok', baseQuality ? `${t('archiveComplete')} · ${baseQuality}` : t('archiveComplete')],
+            ['quality', t('archiveQualityDiff')],
+            ['origin', `${t('archiveOrigin')}: ${[...origins].join(', ')}`],
+            ['missing', t('archiveMissing')],
+        ].filter(([k]) => used.has(k)).map(([k, l]) => `<span class="arc-key"><i data-state="${k}"></i>${esc(l)}</span>`).join('');
+        const flags = [parsed.prize && t('archivePrize'), parsed.trophy && t('archiveTrophy')].filter(Boolean)
+            .map(l => `<span class="arc-flag">${esc(l)}</span>`).join('');
+
+        return `<div class="arc-track">${parts}</div>
+            <div class="arc-foot"><div class="arc-legend">${legend}</div>${flags ? `<div class="arc-flags">${flags}</div>` : ''}</div>`;
+    },
 };
 
 LanguageManager.init()

@@ -458,7 +458,7 @@ const ModalAdapters = {
                     { title: LanguageManager.t('refereeInfo'),   html: Elements.renderRefereeInfo(item) },
                     { title: LanguageManager.t('attRevInfo'),    html: Elements.renderAttRev(item) }
                 ],
-                notes: item.additional_info
+                notes: ArchiveStatus.parse(item.additional_info).rest
             }
         };
     },
@@ -486,7 +486,7 @@ const ModalAdapters = {
                         { title: LanguageManager.t('eventInfo'),     html: Elements.renderTvInfo(evt, false, false) },
                         { title: LanguageManager.t('technicalInfo'), html: Elements.renderTechInfo(evt), after: Elements.storageMethod(evt.technical_details) }
                     ],
-                    notes: evt.additional_info
+                    notes: ArchiveStatus.parse(evt.additional_info).rest
                 }))
             }
         };
@@ -556,7 +556,7 @@ const ModalAdapters = {
                     { title: LanguageManager.t('tvInfo'),           html: tvInfo },
                     { title: LanguageManager.t('technicalInfo'),    html: techGrid, boxClass: 'detail-grid technical', after: Elements.storageMethod(tech) }
                 ],
-                notes: item.additional_info
+                notes: ArchiveStatus.parse(item.additional_info).rest
             }
         };
     }
