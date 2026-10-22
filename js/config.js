@@ -54,11 +54,16 @@ const AppNav = {
         const nav = document.createElement('nav');
         nav.className = 'bottom-nav';
         nav.setAttribute('aria-label', 'Principal');
-        nav.innerHTML = this.ITEMS.map(item => {
+        // Acervo fica sempre no centro; os demais se distribuem no espaço de cada lado
+        const link = item => {
             const active = item.pages.includes(page);
             return `<a href="${item.href}" data-nav="${item.id}" class="bottom-nav-item${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>
                 ${this.ICONS[item.id]}<span data-i18n="${item.key}"></span></a>`;
-        }).join('');
+        };
+        const mid = this.ITEMS.findIndex(i => i.id === 'collection');
+        nav.innerHTML = `<div class="bottom-nav-side bottom-nav-side--start">${this.ITEMS.slice(0, mid).map(link).join('')}</div>`
+            + link(this.ITEMS[mid])
+            + `<div class="bottom-nav-side bottom-nav-side--end">${this.ITEMS.slice(mid + 1).map(link).join('')}</div>`;
         document.body.appendChild(nav);
         document.body.classList.add('has-bottom-nav');
         // O módulo de pedidos (request.js) insere o carrinho nesta barra, como faz com o botão flutuante

@@ -217,8 +217,9 @@ const RequestModule = (() => {
             <span class="bottom-nav-badge" id="nav-cart-badge" hidden>0</span>
             <span data-i18n="navCart">${LanguageManager.t('navCart')}</span>`;
         item.addEventListener('click', () => API.openPanel());
-        // Antes do último item (Meus pedidos)
-        nav.insertBefore(item, nav.lastElementChild);
+        // Lado direito, antes do último item (Meus pedidos)
+        const side = nav.querySelector('.bottom-nav-side--end');
+        side.insertBefore(item, side.lastElementChild);
         _renderBadge();
     }
     document.addEventListener('bottomnavmounted', _mountNavCart);
