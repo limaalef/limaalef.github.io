@@ -148,6 +148,19 @@ const Utils = {
         return /^(https?:)?\/\/|^\//.test(src) || src.startsWith(folder) ? src : folder + src;
     },
 
+    // Logo vindo da API: nome do arquivo sem acento e com hífen ("matches_image/vitória_da_conquista.svg"
+    // → "matches_imagens/vitoria-da-conquista.svg"). Mantém a extensão e URLs absolutas.
+    normalizeLogoUrl(value) {
+        const src = String(value ?? '').trim();
+        if (!src || /^(https?:)?\/\//.test(src)) return src;
+        const i = src.lastIndexOf('/');
+        const folder = (i < 0 ? '' : src.slice(0, i + 1));
+        const file = src.slice(i + 1);
+        const dot = file.lastIndexOf('.');
+        const name = dot < 0 ? file : file.slice(0, dot), ext = dot < 0 ? '' : file.slice(dot).toLowerCase();
+        return folder + this.slugify(name, '-') + ext;
+    },
+
     // Data e hora no idioma da página (ISO ou Date).
     formatDateTime(value, options = { dateStyle: 'short', timeStyle: 'short' }) {
         const d = value instanceof Date ? value : new Date(value);

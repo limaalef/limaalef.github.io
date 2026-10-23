@@ -620,6 +620,7 @@ const translations = {
         'Copa do Mundo FIFA 2026': 'FIFA World Cup 2026',
         'Copa do Mundo Feminina FiFA França 2019': "FIFA Women's World Cup France 2019",
         'Copa do Mundo Feminina FIFA Austrália/Nova Zelândia 2023': "FIFA Women's World Cup Australia & New Zealand 2023",
+        'Copa do Mundo Feminina Sub-17 FIFA Marrocos 2026': "FIFA U-17 Women's World Cup Marocco 2026",
         'Copa do Mundo Feminina Sub-20 FIFA Polônia 2026': "FIFA U-20 Women's World Cup Poland 2026",
         'Copa do Mundo Feminina FIFA Brasil 2027': "FIFA Women's World Cup Brasil 2027",
         'FIFA Series Feminina': "Women's FIFA Series",

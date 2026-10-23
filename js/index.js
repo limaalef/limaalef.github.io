@@ -112,8 +112,8 @@ const TodayInHistory = {
         const fase     = Utils.escapeHtml(item.championship.phase || '');
         const home     = Utils.escapeHtml(item.home_team.name || '?');
         const away     = Utils.escapeHtml(item.away_team.name || '?');
-        const homeLogo = item.home_team.logo ? `<img src="${item.home_team.logo}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
-        const awayLogo = item.away_team.logo ? `<img src="${item.away_team.logo}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
+        const homeLogo = item.home_team.logo ? `<img src="${Utils.normalizeLogoUrl(item.home_team.logo)}"  class="tih-team-logo" onerror="this.style.display='none'">` : '';
+        const awayLogo = item.away_team.logo ? `<img src="${Utils.normalizeLogoUrl(item.away_team.logo)}" class="tih-team-logo" onerror="this.style.display='none'">` : '';
 
         const image = Utils.firstImage(item.image);
         return `
