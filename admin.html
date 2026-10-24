@@ -165,6 +165,10 @@
                     <div class="bn-editor-grid">
                         <div class="bn-preview adm-col">
                             <h3 class="adm-sub-title">Preview</h3>
+                            <div class="chip-group" id="bn-lang" role="group" aria-label="Idioma do preview">
+                                <button type="button" class="chip active" data-lang="pt">Português</button>
+                                <button type="button" class="chip" data-lang="en">English</button>
+                            </div>
                             <div id="bn-preview"></div>
                         </div>
 
@@ -186,10 +190,17 @@
 
                             <label class="bn-field stack"><span class="bn-label">Título (retângulo acima do destaque) <span class="bn-hint" id="bn-title-count"></span></span>
                                 <input class="field field--on-surface" id="bn-title" maxlength="40" placeholder="Ex.: NOVO"></label>
-                            <label class="bn-field stack"><span class="bn-label">Texto de destaque <span class="bn-hint" id="bn-headline-count"></span></span>
+                            <label class="bn-field stack"><span class="bn-label">Texto de destaque · PT <span class="bn-hint" id="bn-headline-count"></span></span>
                                 <input class="field field--on-surface" id="bn-headline" maxlength="90" placeholder="Ex.: Final da Copa do Brasil 2025"></label>
-                            <label class="bn-field stack"><span class="bn-label">Texto auxiliar <span class="bn-hint" id="bn-subtitle-count"></span></span>
+                            <label class="bn-field stack"><span class="bn-label">Texto auxiliar · PT <span class="bn-hint" id="bn-subtitle-count"></span></span>
                                 <input class="field field--on-surface" id="bn-subtitle" maxlength="160" placeholder="Ex.: Já disponível no arquivo"></label>
+                            <label class="bn-field stack"><span class="bn-label">Title (box above the headline) · EN <span class="bn-hint" id="bn-title_en-count"></span></span>
+                                <input class="field field--on-surface" id="bn-title_en" maxlength="40" placeholder="e.g. NEW"></label>
+                            <label class="bn-field stack"><span class="bn-label">Headline · EN <span class="bn-hint" id="bn-headline_en-count"></span></span>
+                                <input class="field field--on-surface" id="bn-headline_en" maxlength="90" placeholder="e.g. 2025 Copa do Brasil final"></label>
+                            <label class="bn-field stack"><span class="bn-label">Supporting text · EN <span class="bn-hint" id="bn-subtitle_en-count"></span></span>
+                                <input class="field field--on-surface" id="bn-subtitle_en" maxlength="160" placeholder="e.g. Now available in the archive"></label>
+                            <p class="bn-hint">Os campos em inglês são opcionais: vazios, o site mostra o texto em português.</p>
                             <label class="bn-field stack"><span class="bn-label">Link de destino <span class="bn-hint">https://… ou página do site</span></span>
                                 <input class="field field--on-surface" id="bn-link" maxlength="500" placeholder="collection.html?sport=football"></label>
 

@@ -19,6 +19,8 @@ const AdminBanners = (() => {
     let draft = null;          // banner em edição
     let pendingFile = null;    // arquivo escolhido, enviado só ao salvar
     let pendingUrl = '';       // object URL do arquivo escolhido
+    let previewLang = 'pt';    // idioma do preview
+    const TEXT_FIELDS = [['title', 40], ['headline', 90], ['subtitle', 160]];   // cada um tem versão _en
 
     const $ = id => document.getElementById(id);
     const api = path => `${CONFIG.BANNERS_API_BASE}/admin${path}`;
@@ -94,12 +96,13 @@ const AdminBanners = (() => {
     // ── editor ──
     function openEditor(b) {
         draft = b ? { ...b } : { ...DEFAULTS, title: '', headline: '', subtitle: '', link_url: '', image_url: '', image_key: '',
-                                 sort_order: banners.length, enabled: true, starts_at: null, ends_at: null };
+                                 title_en: '', headline_en: '', subtitle_en: '', sort_order: banners.length, enabled: true, starts_at: null, ends_at: null };
         pendingFile = null; pendingUrl = '';
         $('bn-editor-title').textContent = b ? 'Editar banner' : 'Novo banner';
         const set = (id, v) => { $(id).value = v ?? ''; };
         set('bn-title', draft.title); set('bn-headline', draft.headline); set('bn-subtitle', draft.subtitle); set('bn-link', draft.link_url);
         set('bn-order', draft.sort_order);
+        for (const [k] of TEXT_FIELDS) set(`bn-${k}_en`, draft[k + '_en']);
         for (const k of Object.keys(DEFAULTS)) set('bn-' + k, draft[k]);
         $('bn-enabled').checked = !!draft.enabled;
         set('bn-starts', toLocalInput(draft.starts_at)); set('bn-ends', toLocalInput(draft.ends_at));
@@ -123,6 +126,7 @@ const AdminBanners = (() => {
         return {
             ...draft,
             title: v('bn-title'), headline: v('bn-headline'), subtitle: v('bn-subtitle'), link_url: v('bn-link'),
+            title_en: v('bn-title_en'), headline_en: v('bn-headline_en'), subtitle_en: v('bn-subtitle_en'),
             sort_order: parseInt($('bn-order').value, 10) || 0, enabled: $('bn-enabled').checked,
             starts_at: fromLocalInput($('bn-starts').value), ends_at: fromLocalInput($('bn-ends').value),
             bg_color: $('bn-bg_color').value, text_color: $('bn-text_color').value,
@@ -134,7 +138,7 @@ const AdminBanners = (() => {
     function refresh() {
         const b = readForm();
         for (const k of Object.keys(DEFAULTS)) $(`bn-${k}-hex`).textContent = b[k];
-        for (const [id, max] of [['bn-title', 40], ['bn-headline', 90], ['bn-subtitle', 160]]) $(id + '-count').textContent = `${$(id).value.length}/${max}`;
+        for (const [k, max] of TEXT_FIELDS) for (const id of [`bn-${k}`, `bn-${k}_en`]) $(id + '-count').textContent = `${$(id).value.length}/${max}`;
 
         const thumb = $('bn-upload-thumb');
         thumb.style.background = b.bg_color;
@@ -142,8 +146,10 @@ const AdminBanners = (() => {
         $('bn-upload-name').textContent = pendingFile ? pendingFile.name : (b.image_url ? 'Imagem atual' : 'Nenhuma imagem');
 
         $('bn-preview').innerHTML = `<div class="banner-carousel is-single"><div class="banner-track">${
-            BannerCarousel.slideHtml({ ...b, title: b.title || 'TÍTULO', headline: b.headline || 'Texto de destaque do banner',
-                                       subtitle: b.subtitle || 'Texto auxiliar abaixo do destaque' }, { eager: true, preview: true })}</div></div>`;
+            BannerCarousel.slideHtml({ ...b,
+                title: b.title || (b.title_en ? '' : 'TÍTULO'), headline: b.headline || (b.headline_en ? '' : 'Texto de destaque do banner'),
+                subtitle: b.subtitle || (b.subtitle_en ? '' : 'Texto auxiliar abaixo do destaque') },
+                { eager: true, preview: true, lang: previewLang })}</div></div>`;
 
         const [kind, label] = STATUS[statusOf(b)];
         $('bn-status').innerHTML = pill(kind, label);
@@ -216,6 +222,13 @@ const AdminBanners = (() => {
         $('bn-remove-image').addEventListener('click', () => { if (pendingUrl) URL.revokeObjectURL(pendingUrl); pendingFile = null; pendingUrl = ''; draft.image_url = ''; draft.image_key = ''; $('bn-file').value = ''; refresh(); });
         $('bn-clear-ends').addEventListener('click', () => { $('bn-ends').value = ''; refresh(); });
         $('bn-form').addEventListener('input', refresh);
+        $('bn-lang').addEventListener('click', e => {
+            const chip = e.target.closest('[data-lang]');
+            if (!chip) return;
+            previewLang = chip.dataset.lang;
+            $('bn-lang').querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+            refresh();
+        });
     }
 
     return { init, load };

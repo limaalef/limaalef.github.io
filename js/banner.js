@@ -17,7 +17,15 @@ const BannerCarousel = (() => {
     const safeColor = (value, fallback) => (HEX.test(value || '') ? value : fallback);
     const safeUrl = url => (/^(https?:\/\/|\/|[\w.-]+(\/|\.html))/i.test(url || '') && !/^\s*(javascript|data):/i.test(url) ? url : '');
 
-    function slideHtml(b, { eager = false, preview = false } = {}) {
+    // Texto no idioma da página: português em PT; nos demais, inglês. Campo vazio usa o outro idioma.
+    const isPt = () => (typeof LanguageManager !== 'undefined' ? LanguageManager.getLanguage() : 'pt-BR').toLowerCase().startsWith('pt');
+    const pick = (b, key, lang) => {
+        const pt = b[key] || '', en = b[key + '_en'] || '';
+        return (lang === 'pt' || (lang === undefined && isPt())) ? (pt || en) : (en || pt);
+    };
+
+    function slideHtml(b, { eager = false, preview = false, lang } = {}) {
+        const title = pick(b, 'title', lang), headline = pick(b, 'headline', lang), subtitle = pick(b, 'subtitle', lang);
         const style = [
             b.bg_color ? `--banner-bg:${safeColor(b.bg_color, '')}` : '',
             b.text_color ? `--banner-text:${safeColor(b.text_color, '')}` : '',
@@ -28,9 +36,9 @@ const BannerCarousel = (() => {
         const inner = `
             ${b.image_url ? `<img class="banner-image" src="${esc(b.image_url)}" alt="" ${eager ? '' : 'loading="lazy"'} decoding="async" draggable="false">` : ''}
             <div class="banner-content">
-                ${b.title ? `<span class="banner-title">${esc(b.title)}</span>` : ''}
-                <p class="banner-headline">${esc(b.headline)}</p>
-                ${b.subtitle ? `<p class="banner-subtitle">${esc(b.subtitle)}</p>` : ''}
+                ${title ? `<span class="banner-title">${esc(title)}</span>` : ''}
+                <p class="banner-headline">${esc(headline)}</p>
+                ${subtitle ? `<p class="banner-subtitle">${esc(subtitle)}</p>` : ''}
             </div>`;
 
         const link = preview ? '' : safeUrl(b.link_url);
@@ -47,8 +55,25 @@ const BannerCarousel = (() => {
 
         fetch(url, { headers: { Accept: 'application/json' } })
             .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
-            .then(data => render(host, Array.isArray(data.banners) ? data.banners : []))
+            .then(data => {
+                const banners = Array.isArray(data.banners) ? data.banners : [];
+                render(host, banners);
+                // Trocar o idioma redesenha com o texto da outra língua
+                document.addEventListener('languagechange', () => retext(host, banners));
+            })
             .catch(() => { host.hidden = true; });
+    }
+
+    // Troca só os textos dos slides já montados (mantém posição do carrossel e rotação)
+    function retext(host, banners) {
+        const tpl = document.createElement('template');
+        host.querySelectorAll('.banner').forEach((el, i) => {
+            if (!banners[i]) return;
+            tpl.innerHTML = slideHtml(banners[i], { preview: true });
+            const content = tpl.content.querySelector('.banner-content');
+            const target = el.querySelector('.banner-content');
+            if (content && target) target.innerHTML = content.innerHTML;
+        });
     }
 
     function render(host, banners) {
