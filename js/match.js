@@ -169,26 +169,28 @@ function renderAside(match) {
         { label: t('refereeFourth'), value: ref.fourth_official },
     ]);
 
-    // Público e renda: sem nenhum dos dois, o bloco não aparece (só estádio/capacidade repetiria o local da partida)
+    // Público e renda
     const attendance = (Array.isArray(match.attendance) ? match.attendance : [match.attendance])
         .filter(item => item && item.value != null);
     const revenue = match.revenue?.value != null ? match.revenue : null;
     let attRev = '';
-    if (attendance.length || revenue) {
+    if (match.venue?.name) {
         let html = rows([
             { label: t('stadium'),             value: match.venue?.name || (typeof match.venue === 'string' ? match.venue : '') },
             { label: t('stadiumCapacityFull'), value: match.venue?.capacity?.toLocaleString(lang) },
         ]);
-        attendance.forEach(item => {
-            html += rows([{ label: t(item.label), value: item.value.toLocaleString(lang) }]);
-            const showOccupancy = item.occupancy && (attendance.length === 1 || String(item.label).toLowerCase() === 'público total');
-            if (showOccupancy) {
-                const percent = Math.max(0, Math.min(100, Number(item.occupancy) || 0));
-                html += `<div class="usage-bar" role="img" aria-label="${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}">
-                    <div class="usage-bar-segment usage-bar-segment--archive" style="width:${percent}%"></div></div>`
-                    + keyValueRow(esc(t('occupancy')), `${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}`);
-            }
-        });
+        if (attendance.length) {
+            attendance.forEach(item => {
+                html += rows([{ label: t(item.label), value: item.value.toLocaleString(lang) }]);
+                const showOccupancy = item.occupancy && (attendance.length === 1 || String(item.label).toLowerCase() === 'público total');
+                if (showOccupancy) {
+                    const percent = Math.max(0, Math.min(100, Number(item.occupancy) || 0));
+                    html += `<div class="usage-bar" role="img" aria-label="${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}">
+                        <div class="usage-bar-segment usage-bar-segment--archive" style="width:${percent}%"></div></div>`
+                        + keyValueRow(esc(t('occupancy')), `${esc(item.occupancy)}% ${esc(LanguageManager.translateText('stadiumCapacity'))}`);
+                }
+            });
+        }
         if (revenue) {
             // Renda segue o mesmo padrão das demais linhas (sem destaque)
             html += rows([
