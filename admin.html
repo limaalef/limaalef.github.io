@@ -83,6 +83,11 @@
                         </span> 
                         Pedidos
                     </button>
+                    <button type="button" class="adm-nav-item" data-panel="downloads" onclick="switchPanel('downloads')">
+                        <span class="adm-nav-icon">
+                            <svg viewBox="0 0 12 12"><path d="M5.25 1h1.5v4.9l1.7-1.7 1.05 1.05L6 8.9 2.5 5.25 3.55 4.2l1.7 1.7z"/><path d="M1.5 10h9v1.2h-9z"/></svg>
+                        </span> Downloads
+                    </button>
                     <button type="button" class="adm-nav-item" data-panel="mp-settings" onclick="switchPanel('mp-settings')">
                         <span class="adm-nav-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
@@ -300,6 +305,84 @@
                     </div>
                     <div id="adm-editor-body"></div>
                   </section>
+                </div>
+
+                <!-- PAINEL: DOWNLOADS -->
+                <div class="adm-panel" id="panel-downloads">
+                    <div class="adm-dl-toolbar">
+                        <h2 class="block-title">Downloads <span class="counter" id="dl-count">0</span></h2>
+                        <button type="button" class="button" id="dl-refresh">Atualizar</button>
+                    </div>
+
+                    <div class="adm-dl-filters">
+                        <div class="chip-group" id="dl-period" role="group" aria-label="Período">
+                            <button type="button" class="chip" data-days="1">Hoje</button>
+                            <button type="button" class="chip active" data-days="7">7 dias</button>
+                            <button type="button" class="chip" data-days="30">30 dias</button>
+                        </div>
+                        <div class="chip-group" id="dl-actor" role="group" aria-label="Origem do download">
+                            <button type="button" class="chip active" data-actor="owner">Clientes</button>
+                            <button type="button" class="chip" data-actor="admin">Admin</button>
+                            <button type="button" class="chip" data-actor="">Todos</button>
+                        </div>
+                        <input class="field adm-dl-search" id="dl-search" autocomplete="off" spellcheck="false"
+                            placeholder="Buscar por e-mail, pedido (ORD-…) ou jogo" aria-label="Buscar downloads">
+                    </div>
+
+                    <div class="status-message" id="dl-status">Carregando downloads...</div>
+
+                    <div class="is-hidden" id="dl-content">
+                        <div class="stats d-flex mb-5">
+                            <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="dl-tile-downloads">—</div><div class="stat-tile-label">Downloads</div></div>
+                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-users">—</div><div class="stat-tile-label">Usuários</div></div>
+                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-orders">—</div><div class="stat-tile-label">Pedidos</div></div>
+                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-ips">—</div><div class="stat-tile-label">IPs distintos</div></div>
+                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-bytes">—</div><div class="stat-tile-label">Tamanho pedido</div></div>
+                        </div>
+                        <div class="status-message is-hidden" id="dl-truncated">O período tem mais registros do que o painel consegue somar de uma vez: os totais são parciais. Reduza o período ou use filtros.</div>
+
+                        <div class="adm-dl-grid">
+                            <section class="adm-dl-section adm-dl-section--wide">
+                                <h3 class="block-title">Downloads por dia</h3>
+                                <div class="adm-dl-days" id="dl-days" role="list"></div>
+                            </section>
+                            <section class="adm-dl-section">
+                                <h3 class="block-title">Jogos mais baixados</h3>
+                                <div id="dl-games"></div>
+                            </section>
+                            <section class="adm-dl-section">
+                                <h3 class="block-title">Usuários</h3>
+                                <div id="dl-users"></div>
+                            </section>
+                            <section class="adm-dl-section">
+                                <h3 class="block-title">Pedidos com mais IPs</h3>
+                                <p class="adm-dl-note">Muitos IPs diferentes no mesmo pedido podem indicar link compartilhado.</p>
+                                <div id="dl-orders"></div>
+                            </section>
+                            <section class="adm-dl-section">
+                                <h3 class="block-title">Cidades</h3>
+                                <p class="adm-dl-note">Localização aproximada pelo IP; VPN e operadoras móveis podem errar.</p>
+                                <div id="dl-cities"></div>
+                            </section>
+                            <section class="adm-dl-section adm-dl-section--wide">
+                                <h3 class="block-title">Últimos downloads</h3>
+                                <div class="adm-table-box is-hidden" id="dl-table-box">
+                                    <div class="adm-table-wrap">
+                                        <table class="adm-table adm-dl-table">
+                                            <thead><tr>
+                                                <th>Quando</th><th>Usuário</th><th>Jogo</th><th>Pedido</th>
+                                                <th>Local</th><th>Origem</th><th>Tamanho</th>
+                                            </tr></thead>
+                                            <tbody id="dl-tbody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="status-message is-hidden" id="dl-empty">Nenhum download no período.</div>
+                                <div class="adm-dl-more"><button type="button" class="button is-hidden" id="dl-more">Carregar mais</button></div>
+                                <p class="adm-dl-note">Cada download conta uma vez, no pedido inicial; retomadas não entram. O tamanho é a soma dos arquivos solicitados, não o volume efetivamente baixado.</p>
+                            </section>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- PAINEL: PAYPAL -->
@@ -628,6 +711,243 @@
     <script src="js/managers.js"></script>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
+const AdminDownloads = (() => {
+    const TZ_OFFSET_MS   = -3 * 36e5;   // dias do log são em America/Sao_Paulo (UTC-3), como no worker
+    const PAGE_SIZE      = 50;          // eventos por página da tabela
+    const STALE_MS       = 2 * 60e3;    // reabrir o painel antes disso não consulta de novo (poupa listagens do KV)
+    const SHARING_IPS    = 3;           // pedido com este nº de IPs distintos (ou mais) é sinalizado
+    const SEARCH_DELAY   = 350;
+
+    const state = { days: 7, actor: 'owner', query: '', cursor: null, token: 0, loadedAt: 0, shown: 0 };
+    let ctx = null;                     // { fetch, apiBase, openOrder }
+    let searchTimer = 0;
+
+    const $   = id => document.getElementById(id);
+    const esc = s => Utils.escapeHtml(String(s ?? ''));
+    const num = n => Number(n || 0).toLocaleString('pt-BR');
+
+    // ── Datas (mesma regra de dias do worker) ───────────────────────────────
+    const dayOf = ts => new Date(ts + TZ_OFFSET_MS).toISOString().slice(0, 10);
+    const shiftDay = (day, n) => new Date(Date.parse(day + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+    const dayLabel = day => day.slice(8, 10) + '/' + day.slice(5, 7);
+    const whenLabel = iso => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+    function fmtBytes(n) {
+        if (!(n > 0)) return '—';
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        let i = 0, v = n;
+        while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+        return v.toLocaleString('pt-BR', { maximumFractionDigits: v >= 100 || i === 0 ? 0 : 1 }) + ' ' + units[i];
+    }
+
+    // ── Requisições ─────────────────────────────────────────────────────────
+    function params(extra = {}) {
+        const to = dayOf(Date.now());
+        const p = new URLSearchParams({ from: shiftDay(to, -(state.days - 1)), to });
+        if (state.actor) p.set('actor', state.actor);
+        const q = state.query.trim();
+        if (q) p.set(/^ord-/i.test(q) ? 'order' : q.includes('@') ? 'email' : 'game', q);
+        Object.entries(extra).forEach(([k, v]) => v != null && p.set(k, v));
+        return p;
+    }
+
+    async function get(path, p) {
+        const res = await ctx.fetch(`${ctx.apiBase}${path}?${p}`);
+        if (res.status === 401 || res.status === 403) return null;      // sessão encerrada pelo Auth
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw Object.assign(new Error(body.error || 'HTTP ' + res.status), { status: res.status });
+        return body;
+    }
+
+    // ── Render ──────────────────────────────────────────────────────────────
+    const share = (v, max) => max > 0 ? Math.max(2, Math.round(v / max * 100)) : 0;
+
+    function daysChart(summary) {
+        const to = summary.range.to, from = summary.range.from;
+        const counts = new Map(summary.byDay.map(d => [d.day, d.downloads]));
+        const days = [];
+        for (let d = from; d <= to; d = shiftDay(d, 1)) days.push(d);
+        const max = Math.max(...days.map(d => counts.get(d) || 0), 0);
+        const dense = days.length > 10;
+        return days.map((d, i) => {
+            const n = counts.get(d) || 0;
+            const showLabel = !dense || i % 5 === 0 || i === days.length - 1;
+            return `<div class="adm-dl-day" role="listitem" aria-label="${dayLabel(d)}: ${num(n)} downloads" title="${dayLabel(d)}: ${num(n)}">
+                <span class="adm-dl-day-value">${dense ? '' : n ? num(n) : ''}</span>
+                <span class="adm-dl-day-track"><i class="adm-dl-day-bar${n ? '' : ' is-empty'}" style="--share:${n ? share(n, max) : 0}"></i></span>
+                <span class="adm-dl-day-label">${showLabel ? dayLabel(d) : ''}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function rankList(rows, empty = 'Sem dados no período.') {
+        if (!rows.length) return `<div class="status-message">${empty}</div>`;
+        const max = Math.max(...rows.map(r => r.value));
+        return `<ol class="adm-dl-rank-list">${rows.map(r => `
+            <li class="adm-dl-rank">
+                <div class="adm-dl-rank-main">${r.name}${r.meta ? `<div class="adm-dl-rank-meta">${r.meta}</div>` : ''}</div>
+                <span class="adm-dl-rank-value">${r.valueHtml ?? num(r.value)}</span>
+                <span class="adm-dl-meter" aria-hidden="true"><i style="--share:${share(r.value, max)}"></i></span>
+            </li>`).join('')}</ol>`;
+    }
+
+    const orderButton = id => `<button type="button" class="adm-item-name" data-order="${esc(id)}">${esc(String(id).replace('ORD-', ''))}</button>`;
+
+    function renderSummary(s) {
+        const t = s.totals;
+        $('dl-count').textContent = num(t.downloads);
+        $('dl-tile-downloads').textContent = num(t.downloads);
+        $('dl-tile-users').textContent     = num(t.uniqueUsers);
+        $('dl-tile-orders').textContent    = num(t.uniqueOrders);
+        $('dl-tile-ips').textContent       = num(t.uniqueIps);
+        $('dl-tile-bytes').textContent     = fmtBytes(t.fileBytes);
+        $('dl-truncated').classList.toggle('is-hidden', !s.truncated);
+
+        $('dl-days').innerHTML = daysChart(s);
+
+        $('dl-games').innerHTML = rankList(s.byGame.map(g => ({
+            name: `<span class="adm-dl-rank-name">${esc(g.name || g.id || '—')}</span>`,
+            meta: esc([g.mode, g.id && g.name ? 'ID ' + g.id : ''].filter(Boolean).join(' · ')),
+            value: g.downloads,
+            valueHtml: `${num(g.downloads)}<span class="adm-dl-rank-unit"> · ${num(g.uniqueUsers)} usuário${g.uniqueUsers === 1 ? '' : 's'}</span>`
+        })));
+
+        $('dl-users').innerHTML = rankList(s.byUser.map(u => ({
+            name: `<span class="adm-dl-rank-name">${esc(u.user)}</span>`,
+            meta: `Último: ${esc(whenLabel(u.lastAt))} · ${num(u.distinctIps)} IP${u.distinctIps === 1 ? '' : 's'}`,
+            value: u.downloads
+        })));
+
+        // Sinal de compartilhamento: muitos IPs diferentes no mesmo pedido
+        $('dl-orders').innerHTML = rankList(s.byOrder.map(o => ({
+            name: `<span class="adm-dl-rank-name">${orderButton(o.order)}</span>`,
+            meta: `${esc(o.user || '—')} · ${num(o.distinctCities)} cidade${o.distinctCities === 1 ? '' : 's'} · ${num(o.downloads)} download${o.downloads === 1 ? '' : 's'}`,
+            value: o.distinctIps,
+            valueHtml: `${num(o.distinctIps)} IP${o.distinctIps === 1 ? '' : 's'}`
+                + (o.distinctIps >= SHARING_IPS ? ' ' + pill('waiting', 'Verificar') : '')
+        })));
+
+        $('dl-cities').innerHTML = rankList(s.byCity.map(c => ({
+            name: `<span class="adm-dl-rank-name">${esc(c.city)}</span>`,
+            meta: esc([c.region, c.country].filter(Boolean).join(' · ')),
+            value: c.downloads
+        })));
+    }
+
+    function rowHtml(e) {
+        const where = [e.city || '—', e.region].filter(Boolean).join(' · ');
+        return `<tr>
+            <td data-label="Quando" class="col-fit text-sm nowrap"><span class="adm-dl-cell">${esc(whenLabel(e.at))}</span></td>
+            <td data-label="Usuário"><span class="adm-dl-cell fw-600">${esc(e.user || '—')}</span></td>
+            <td data-label="Jogo"><span class="adm-dl-cell">${esc(e.game?.name || e.game?.id || '—')}</span></td>
+            <td data-label="Pedido" class="col-fit"><span class="adm-dl-cell">${orderButton(e.order)}</span></td>
+            <td data-label="Local"><span class="adm-dl-cell">${esc(where)}<code class="text-xs text-secondary">${esc(e.ip || '—')}</code></span></td>
+            <td data-label="Origem" class="col-fit"><span class="adm-dl-cell">${e.actor === 'admin' ? pill('info', 'Admin') : pill('off', 'Cliente')}</span></td>
+            <td data-label="Tamanho" class="col-fit text-sm nowrap"><span class="adm-dl-cell">${esc(fmtBytes(e.fileBytes))}</span></td>
+        </tr>`;
+    }
+
+    function renderEvents(list, append) {
+        const tbody = $('dl-tbody');
+        tbody.insertAdjacentHTML(append ? 'beforeend' : 'afterbegin', (list.events || []).map(rowHtml).join(''));
+        state.shown = (append ? state.shown : 0) + (list.events || []).length;
+        state.cursor = list.nextCursor || null;
+        $('dl-empty').classList.toggle('is-hidden', state.shown > 0);
+        $('dl-table-box').classList.toggle('is-hidden', state.shown === 0);
+        $('dl-more').classList.toggle('is-hidden', !state.cursor);
+        $('dl-more').disabled = false;
+    }
+
+    // ── Estados da tela ─────────────────────────────────────────────────────
+    function setView(view, message) {            // 'loading' | 'error' | 'ready'
+        $('dl-status').classList.toggle('is-hidden', view === 'ready');
+        $('dl-status').textContent = message || '';
+        $('dl-content').classList.toggle('is-hidden', view !== 'ready');
+    }
+
+    function errorText(e) {
+        if (e.status === 503) return 'O log de downloads ainda não está configurado no worker (binding DOWNLOAD_LOG_KV).';
+        return 'Não foi possível carregar os downloads: ' + e.message;
+    }
+
+    // ── Carregar ────────────────────────────────────────────────────────────
+    async function refresh() {
+        const token = ++state.token;
+        $('dl-refresh').disabled = true;
+        setView('loading', 'Carregando downloads...');
+        try {
+            const [summary, list] = await Promise.all([
+                get('/admin/downloads/summary', params()),
+                get('/admin/downloads', params({ limit: PAGE_SIZE }))
+            ]);
+            if (token !== state.token || !summary || !list) return;
+            $('dl-tbody').innerHTML = '';
+            renderSummary(summary);
+            renderEvents(list, false);
+            state.loadedAt = Date.now();
+            setView('ready');
+        } catch (e) {
+            if (token === state.token) setView('error', errorText(e));
+        } finally {
+            if (token === state.token) $('dl-refresh').disabled = false;
+        }
+    }
+
+    async function loadMore() {
+        if (!state.cursor) return;
+        const token = state.token;
+        const btn = $('dl-more');
+        btn.disabled = true;
+        try {
+            const list = await get('/admin/downloads', params({ limit: PAGE_SIZE, cursor: state.cursor }));
+            if (token !== state.token || !list) return;
+            renderEvents(list, true);
+        } catch (e) {
+            btn.disabled = false;
+            Utils.showNotification(errorText(e), 'error');
+        }
+    }
+
+    // ── Eventos ─────────────────────────────────────────────────────────────
+    function pickChip(groupId, button) {
+        $(groupId).querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === button));
+    }
+
+    function init(deps) {
+        ctx = deps;
+        $('dl-period').addEventListener('click', e => {
+            const b = e.target.closest('.chip'); if (!b) return;
+            state.days = parseInt(b.dataset.days, 10); pickChip('dl-period', b); refresh();
+        });
+        $('dl-actor').addEventListener('click', e => {
+            const b = e.target.closest('.chip'); if (!b) return;
+            state.actor = b.dataset.actor; pickChip('dl-actor', b); refresh();
+        });
+        $('dl-search').addEventListener('input', e => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { state.query = e.target.value; refresh(); }, SEARCH_DELAY);
+        });
+        $('dl-search').addEventListener('keydown', e => {
+            if (e.key !== 'Enter') return;
+            clearTimeout(searchTimer); state.query = e.target.value; refresh();
+        });
+        $('dl-refresh').addEventListener('click', refresh);
+        $('dl-more').addEventListener('click', loadMore);
+        $('panel-downloads').addEventListener('click', e => {
+            const b = e.target.closest('[data-order]');
+            if (b) ctx.openOrder(b.dataset.order);
+        });
+    }
+
+    // Reabrir o painel não consulta de novo logo em seguida (cada consulta usa listagens do KV)
+    function load() {
+        if (state.loadedAt && Date.now() - state.loadedAt < STALE_MS) return;
+        refresh();
+    }
+
+    return { init, load, refresh };
+})();
+
 // ── Configuração ───────────────────────────────────────────────────────────
 const ADM_CFG = {
     apiBase:        CONFIG.REQUEST_API_BASE,
@@ -637,6 +957,11 @@ const ADM_CFG = {
 const session   = Auth.admin;
 AdminBanners.init();
 AdminBrowse.init();
+AdminDownloads.init({
+    fetch:     (url, options) => admFetch(url, options),
+    apiBase:   ADM_CFG.apiBase,
+    openOrder: id => { switchPanel('orders'); openOrder(id); }
+});
 let allOrders    = [];
 let filterStatus = '';
 let filterQuery  = '';
@@ -654,6 +979,7 @@ function switchPanel(name) {
     }
     if (name === 'banners') AdminBanners.load();
     if (name === 'browse') AdminBrowse.load();
+    if (name === 'downloads') AdminDownloads.load();
     if (name === 'paypal-settings') {
         loadPaypalSettings();
         loadExternalSettings();
@@ -1949,6 +2275,8 @@ async function cancelPayment(orderId, btn) {
         notify('Falha de conexão: ' + e.message);
     }
 }
+
+
 
 function esc(s) { return Utils.escapeHtml(s); }
 </script>

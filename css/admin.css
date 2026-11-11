@@ -427,10 +427,17 @@
         border-top: 1px solid var(--soft-line);
         gap: 0;
         margin: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .page-admin .adm-sidebar-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .page-admin .adm-nav-item {
         flex: 1;
+        min-width: max-content;
         flex-direction: column;
         justify-content: center;
         gap: 2px;
@@ -885,5 +892,244 @@ body.page-admin .mp-settings-card .button-group {
     body.page-admin .field--end-aligned {
         text-align: left;
         max-width: none;
+    }
+}
+
+/* Painel de downloads */
+.adm-dl-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    padding: var(--sp-5) 0 var(--sp-4);
+}
+
+.adm-dl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-5);
+}
+
+.adm-dl-search {
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+.adm-dl-note {
+    margin-top: var(--sp-4);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Seções: linhas finas, sem caixas */
+.adm-dl-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--sp-8);
+}
+
+.adm-dl-section {
+    min-width: 0;
+    padding: var(--sp-6) 0;
+    border-top: 1px solid var(--soft-line);
+}
+
+@media (min-width: 1000px) {
+    .adm-dl-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adm-dl-section--wide {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Downloads por dia */
+.adm-dl-days {
+    display: flex;
+    align-items: stretch;
+    gap: var(--sp-2);
+    height: 10rem;
+}
+
+.adm-dl-day {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-1);
+}
+
+.adm-dl-day-value,
+.adm-dl-day-label {
+    min-height: 1.2em;
+    font-size: var(--font-size-xs);
+    line-height: 1.2;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.adm-dl-day-track {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.adm-dl-day-bar {
+    display: block;
+    width: 100%;
+    max-width: 2.5rem;
+    height: calc(var(--share, 0) * 1%);
+    min-height: 3px;
+    border-radius: var(--border-radius-size-xs) var(--border-radius-size-xs) 0 0;
+    background: var(--accent-color);
+}
+
+.adm-dl-day-bar.is-empty {
+    background: var(--soft-bg-hover);
+}
+
+/* Rankings: rótulo, valor e uma barra fina */
+.adm-dl-rank-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-dl-rank {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--sp-5);
+    row-gap: var(--sp-3);
+    padding: var(--sp-4) 0;
+}
+
+.adm-dl-rank+.adm-dl-rank {
+    border-top: 1px solid var(--soft-line);
+}
+
+.adm-dl-rank-main {
+    min-width: 0;
+}
+
+.adm-dl-rank-name {
+    font-size: var(--font-size-mdm);
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+}
+
+.adm-dl-rank-meta {
+    margin-top: var(--sp-1);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+.adm-dl-rank-value {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--font-size-mdm);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.adm-dl-rank-unit {
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.adm-dl-meter {
+    grid-column: 1 / -1;
+    height: 4px;
+    border-radius: var(--border-radius-size-circle);
+    background: var(--soft-bg-hover);
+    overflow: hidden;
+}
+
+.adm-dl-meter>i {
+    display: block;
+    height: 100%;
+    width: calc(var(--share, 0) * 1%);
+    border-radius: inherit;
+    background: var(--accent-color);
+}
+
+/* Últimos downloads */
+.adm-dl-cell {
+    display: block;
+    min-width: 0;
+}
+
+.adm-dl-cell code {
+    display: block;
+}
+
+.adm-dl-more {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--sp-5);
+}
+
+@media (max-width: 768px) {
+
+    .adm-dl-toolbar,
+    .adm-dl-filters {
+        flex-wrap: wrap;
+    }
+
+    .adm-dl-days {
+        height: 8rem;
+    }
+
+    /* Tabela vira lista de cartões: rótulo à esquerda, valor à direita */
+    .adm-dl-table thead {
+        display: none;
+    }
+
+    .adm-dl-table tr {
+        display: block;
+        padding: var(--sp-4) 0;
+        border-bottom: 1px solid var(--soft-line);
+    }
+
+    .adm-dl-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .adm-dl-table td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--sp-5);
+        width: auto;
+        padding: var(--sp-2) 0;
+        border-bottom: none;
+        white-space: normal;
+    }
+
+    .adm-dl-cell {
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .adm-dl-table td::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        text-align: left;
     }
 }
