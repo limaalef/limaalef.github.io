@@ -313,6 +313,28 @@
                         <h2 class="block-title">Downloads <span class="counter" id="dl-count">0</span></h2>
                         <button type="button" class="button" id="dl-refresh">Atualizar</button>
                     </div>
+ 
+                    <div class="adm-dl-delivery" id="dl-delivery">
+                        <div class="adm-dl-delivery-text">
+                            <div class="adm-dl-delivery-title">Entrega dos arquivos <span id="dl-mode-pill"></span></div>
+                            <p class="adm-dl-delivery-desc" id="dl-mode-desc">Consultando o modo de entrega...</p>
+                        </div>
+                        <button type="button" role="switch" aria-checked="false" class="adm-toggle" id="dl-mode-toggle"
+                            aria-label="Modo de emergência: entregar pelo link direto do Drive" title="Modo de emergência: link direto do Drive" disabled>
+                            <span class="adm-toggle-knob"></span>
+                        </button>
+                    </div>
+
+                    <div class="stats d-flex mb-5">
+                        <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="dl-tile-downloads">—</div><div class="stat-tile-label">Downloads</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-users">—</div><div class="stat-tile-label">Usuários</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-orders">—</div><div class="stat-tile-label">Pedidos</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-ips">—</div><div class="stat-tile-label">IPs distintos</div></div>
+                        <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-bytes">—</div><div class="stat-tile-label">Tamanho pedido</div></div>
+                    </div>
+                    <div class="status-message is-hidden" id="dl-truncated">O período tem mais registros do que o painel consegue somar de uma vez: os totais são parciais. Reduza o período ou use filtros.</div>
+
+                    <div class="section-divider"></div>
 
                     <div class="adm-dl-filters">
                         <div class="chip-group" id="dl-period" role="group" aria-label="Período">
@@ -332,15 +354,6 @@
                     <div class="status-message" id="dl-status">Carregando downloads...</div>
 
                     <div class="is-hidden" id="dl-content">
-                        <div class="stats d-flex mb-5">
-                            <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="dl-tile-downloads">—</div><div class="stat-tile-label">Downloads</div></div>
-                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-users">—</div><div class="stat-tile-label">Usuários</div></div>
-                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-orders">—</div><div class="stat-tile-label">Pedidos</div></div>
-                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-ips">—</div><div class="stat-tile-label">IPs distintos</div></div>
-                            <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-bytes">—</div><div class="stat-tile-label">Tamanho pedido</div></div>
-                        </div>
-                        <div class="status-message is-hidden" id="dl-truncated">O período tem mais registros do que o painel consegue somar de uma vez: os totais são parciais. Reduza o período ou use filtros.</div>
-
                         <div class="adm-dl-grid">
                             <section class="adm-dl-section adm-dl-section--wide">
                                 <h3 class="block-title">Downloads por dia</h3>
@@ -370,7 +383,7 @@
                                     <div class="adm-table-wrap">
                                         <table class="adm-table adm-dl-table">
                                             <thead><tr>
-                                                <th>Quando</th><th>Usuário</th><th>Jogo</th><th>Pedido</th>
+                                                <th>Quando</th><th>Jogo</th><th>Pedido</th>
                                                 <th>Local</th><th>Origem</th><th>Tamanho</th>
                                             </tr></thead>
                                             <tbody id="dl-tbody"></tbody>
@@ -718,7 +731,7 @@ const AdminDownloads = (() => {
     const SHARING_IPS    = 3;           // pedido com este nº de IPs distintos (ou mais) é sinalizado
     const SEARCH_DELAY   = 350;
 
-    const state = { days: 7, actor: 'owner', query: '', cursor: null, token: 0, loadedAt: 0, shown: 0 };
+    const state = { days: 7, actor: 'owner', query: '', cursor: null, token: 0, loadedAt: 0, shown: 0, mode: null };
     let ctx = null;                     // { fetch, apiBase, openOrder }
     let searchTimer = 0;
 
@@ -838,9 +851,8 @@ const AdminDownloads = (() => {
         const where = [e.city || '—', e.region].filter(Boolean).join(' · ');
         return `<tr>
             <td data-label="Quando" class="col-fit text-sm nowrap"><span class="adm-dl-cell">${esc(whenLabel(e.at))}</span></td>
-            <td data-label="Usuário"><span class="adm-dl-cell fw-600">${esc(e.user || '—')}</span></td>
             <td data-label="Jogo"><span class="adm-dl-cell">${esc(e.game?.name || e.game?.id || '—')}</span></td>
-            <td data-label="Pedido" class="col-fit"><span class="adm-dl-cell">${orderButton(e.order)}</span></td>
+            <td data-label="Pedido" class="col-fit"><span class="adm-dl-cell">${orderButton(e.order)}</span><span class="adm-dl-cell">${esc(e.user || '—')}</span></td>
             <td data-label="Local"><span class="adm-dl-cell">${esc(where)}<code class="text-xs text-secondary">${esc(e.ip || '—')}</code></span></td>
             <td data-label="Origem" class="col-fit"><span class="adm-dl-cell">${e.actor === 'admin' ? pill('info', 'Admin') : pill('off', 'Cliente')}</span></td>
             <td data-label="Tamanho" class="col-fit text-sm nowrap"><span class="adm-dl-cell">${esc(fmtBytes(e.fileBytes))}</span></td>
@@ -907,6 +919,79 @@ const AdminDownloads = (() => {
             Utils.showNotification(errorText(e), 'error');
         }
     }
+    
+    // ── Modo de entrega: proxy ↔ link direto do Drive (emergência) ───────────
+    // Independe do log: a chave aparece mesmo se o KV de downloads não estiver configurado.
+    const MODE_TEXT = {
+        proxy:  'Os downloads passam pelo worker: o arquivo sai com o nome do pedido e a URL do Drive fica oculta.',
+        direct: 'O worker valida pedido, pagamento e expiração e redireciona direto ao Drive. O nome do arquivo e a URL do Drive ficam visíveis a quem baixar.',
+        forced: 'Forçado pela variável DRIVE_PROXY_DISABLED do worker. Para voltar ao proxy, remova a variável no painel da Cloudflare.',
+        missing: 'O worker ainda não tem o modo de emergência (rota /admin/drive-proxy).',
+        failed: 'Não foi possível consultar o modo de entrega.'
+    };
+
+    // m = resposta de GET/PUT /admin/drive-proxy; nulo = indisponível (problem escolhe o texto)
+    function renderMode(m, problem) {
+        const toggle = $('dl-mode-toggle');
+        if (!m) {
+            state.mode = null;
+            $('dl-mode-pill').innerHTML = '';
+            $('dl-mode-desc').textContent = MODE_TEXT[problem || 'failed'];
+            toggle.classList.remove('on'); toggle.setAttribute('aria-checked', 'false'); toggle.disabled = true;
+            return;
+        }
+        state.mode = m;
+        const direct = m.mode === 'direct';
+        toggle.classList.toggle('on', direct);
+        toggle.setAttribute('aria-checked', String(direct));
+        toggle.disabled = !!m.forcedByEnv;
+        $('dl-mode-pill').innerHTML = direct
+            ? pill( m.updated_by === 'auto:429' ? 'error' : 'waiting', m.forcedByEnv ? 'Link direto · forçado' : m.updated_by === 'auto:429' ? `Link direto · automático valido até ${Utils.formatDateTime(m.until)}` : 'Link direto')
+            : pill('success', 'Proxy ativo');
+        $('dl-mode-desc').textContent = m.forcedByEnv ? MODE_TEXT.forced : direct ? MODE_TEXT.direct : MODE_TEXT.proxy;
+    }
+
+    async function loadMode() {
+        try {
+            const res = await ctx.fetch(`${ctx.apiBase}/admin/drive-proxy`);
+            if (res.status === 401 || res.status === 403) return;       // sessão encerrada pelo Auth
+            if (res.status === 404) return renderMode(null, 'missing');
+            if (!res.ok) return renderMode(null);
+            renderMode(await res.json());
+        } catch (e) {
+            renderMode(null);
+        }
+    }
+
+    async function toggleMode() {
+        const toggle = $('dl-mode-toggle');
+        if (toggle.disabled) return;
+        const turnOn = !toggle.classList.contains('on');                // ligado = link direto (proxy desligado)
+        if (turnOn && !confirm('LIGAR O MODO DE EMERGÊNCIA?\n\nOs downloads passam a ir direto para o Google Drive: o nome do arquivo deixa de ser o do pedido e a URL do Drive fica visível a quem baixar. Pedido, pagamento e expiração continuam sendo validados.')) return;
+        const before = state.mode;
+        toggle.disabled = true;
+        try {
+            const res = await ctx.fetch(`${ctx.apiBase}/admin/drive-proxy`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ disabled: turnOn })
+            });
+            if (res.status === 401 || res.status === 403) return;
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                renderMode(before);
+                Utils.showNotification('Erro ao salvar o modo de entrega: ' + (d.error || 'HTTP ' + res.status), 'error');
+                return;
+            }
+            renderMode(d);
+            Utils.showNotification(turnOn
+                ? 'Modo de emergência ligado. Pode levar até cerca de 1 minuto para valer em todos os pontos.'
+                : 'Proxy religado.', 'success');
+        } catch (e) {
+            renderMode(before);
+            Utils.showNotification('Falha de conexão: ' + e.message, 'error');
+        }
+    }
 
     // ── Eventos ─────────────────────────────────────────────────────────────
     function pickChip(groupId, button) {
@@ -931,7 +1016,8 @@ const AdminDownloads = (() => {
             if (e.key !== 'Enter') return;
             clearTimeout(searchTimer); state.query = e.target.value; refresh();
         });
-        $('dl-refresh').addEventListener('click', refresh);
+        $('dl-refresh').addEventListener('click', () => { loadMode(); refresh(); });
+        $('dl-mode-toggle').addEventListener('click', toggleMode);
         $('dl-more').addEventListener('click', loadMore);
         $('panel-downloads').addEventListener('click', e => {
             const b = e.target.closest('[data-order]');
@@ -941,6 +1027,7 @@ const AdminDownloads = (() => {
 
     // Reabrir o painel não consulta de novo logo em seguida (cada consulta usa listagens do KV)
     function load() {
+        loadMode();
         if (state.loadedAt && Date.now() - state.loadedAt < STALE_MS) return;
         refresh();
     }
