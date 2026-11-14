@@ -1133,3 +1133,35 @@ body.page-admin .mp-settings-card .button-group {
         text-align: left;
     }
 }
+
+/* Chave do modo de entrega (proxy ↔ link direto do Drive) */
+.adm-dl-delivery {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    margin-bottom: var(--sp-5);
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--soft-bg);
+    border-radius: var(--border-radius-size-lg);
+}
+
+.adm-dl-delivery-text {
+    min-width: 0;
+}
+
+.adm-dl-delivery-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.adm-dl-delivery-desc {
+    margin-top: var(--sp-1);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
