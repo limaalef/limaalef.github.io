@@ -263,7 +263,8 @@ const CollectionApp = {
         if (!CollectionState.query) return;
 
         try {
-            const apiResponse = await APIService.fetchByTeam(AppState.currentPage, AppState.itemsPerPage);
+            const apiResponse = this._prefetched || await APIService.fetchByTeam(AppState.currentPage, AppState.itemsPerPage);
+            this._prefetched = null;
             PaginationManager.update(apiResponse);
             AppState.matches         = APIService.transformData(apiResponse);
             AppState.filteredMatches = AppState.matches;
@@ -288,17 +289,42 @@ const CollectionApp = {
         }
     },
 
+    // Ordem de tentativa quando o esporte não é informado: futebol; se não houver jogos, multiesporte; por fim motorsport
+    SPORT_PROBE_ORDER: ['football', 'multisport', 'motor'],
+
+    // Esporte da busca: 1) ?sport= na URL; 2) esporte cadastrado no collections.json;
+    // 3) sondagem — o primeiro esporte da ordem acima que tiver ao menos 1 jogo. Sem jogos em nenhum, fica futebol.
     async resolveSport() {
-        const fromUrl = new URLSearchParams(location.search).get('sport');
+        // Aceita "motorsport" como apelido de "motor"
+        const raw = new URLSearchParams(location.search).get('sport');
+        const fromUrl = raw === 'motorsport' ? 'motor' : raw;
         if (Utils.VALID_SPORTS.includes(fromUrl)) { this.applyTheme(fromUrl); return; }
         try {
             if (typeof CollectionsDB !== 'undefined') {
                 await CollectionsDB.ready();
                 const entry = CollectionsDB.find(CollectionState.query);
-                if (entry?.sport && Utils.VALID_SPORTS.includes(entry.sport)) this.applyTheme(entry.sport);
+                if (entry?.sport && Utils.VALID_SPORTS.includes(entry.sport)) { this.applyTheme(entry.sport); return; }
             }
         } catch (err) {
             console.warn('resolveSport:', err.message);
+        }
+        // Narrador usa o endpoint que mistura esportes: não há o que sondar
+        if (CollectionState.type === 'commentary') return;
+        // Lembra o esporte achado nesta aba (voltar/recarregar não repete a sondagem)
+        const memo = `sa_sport:${CollectionState.type}:${CollectionState.query}`;
+        try {
+            const saved = sessionStorage.getItem(memo);
+            if (Utils.VALID_SPORTS.includes(saved)) { this.applyTheme(saved); return; }
+        } catch { /* sem sessionStorage */ }
+
+        for (const sport of this.SPORT_PROBE_ORDER) {
+            const { total, response } = await APIService.probeByTeam(sport, AppState.currentPage, AppState.itemsPerPage);
+            if (total > 0) {
+                this.applyTheme(sport);
+                this._prefetched = response;      // já é a lista da página: loadData não pede de novo
+                try { sessionStorage.setItem(memo, sport); } catch { /* ignora */ }
+                return;
+            }
         }
     },
 

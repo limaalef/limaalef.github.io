@@ -50,22 +50,29 @@ const APIService = {
         return this._fetchJson(url.toString());
     },
 
-    async fetchByTeam(page, itemsPerPage = 50) {
-        const loadingMessage = LanguageManager.t('loadingData');
-        Utils.showNotification(loadingMessage, 'info');
-        let url = null
+    // Jogos da busca (time, campeonato ou narrador) no endpoint do esporte; sem `silent`, avisa que está carregando.
+    async fetchByTeam(page, itemsPerPage = 50, { sport = CONFIG.currentSport, silent = false } = {}) {
+        if (!silent) Utils.showNotification(LanguageManager.t('loadingData'), 'info');
+        const base = CollectionState.type === 'commentary' ? CONFIG.API_URLS.allsports : CONFIG.API_URLS[sport];
+        const url = new URL(base);
 
-        if (CollectionState.type === "commentary") {
-            url = new URL(CONFIG.API_URLS.allsports);
-        } else {
-            url = new URL(CONFIG.API_URLS[CONFIG.currentSport]);
-        }
-        
         url.searchParams.append('max_items', itemsPerPage);
         url.searchParams.append('page', page);
         url.searchParams.append(CollectionState.type, CollectionState.query);
 
         return this._fetchJson(url.toString());
+    },
+
+    // Testa um esporte pedindo já a página que será exibida: se houver jogos, a resposta serve de lista (sem 2ª chamada).
+    // Erro conta como 0 jogos.
+    async probeByTeam(sport, page, itemsPerPage) {
+        try {
+            const response = await this.fetchByTeam(page, itemsPerPage, { sport, silent: true });
+            const total = Number(response?.pagination?.total_items ?? response?.total_registros ?? response?.total_records ?? (response?.data || []).length) || 0;
+            return { total, response };
+        } catch {
+            return { total: 0, response: null };
+        }
     },
 
     async fetchEnrichment(matchId, sport) {

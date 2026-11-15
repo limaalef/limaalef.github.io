@@ -31,6 +31,7 @@ const Directory = (() => {
     function normalize(raw) {
         return (Array.isArray(raw?.items) ? raw.items : []).filter(i => i && i.name).map(i => ({
             name: String(i.name),
+            sport: String(i.sport),
             image: i.image || '',
             matches: Number.isFinite(+i.matches) ? +i.matches : null,
             channels: (Array.isArray(i.channels) ? i.channels : []).filter(c => c && c.name)
@@ -51,7 +52,7 @@ const Directory = (() => {
         const channels = item.channels.length ? `
             <div class="dir-channels-label">${t('dirChannels')}</div>
             <ul class="dir-channels">${item.channels.map(c => `<li class="dir-channel"><span>${esc(c.name)}</span><b>${c.matches.toLocaleString(LanguageManager.getLanguage())}</b></li>`).join('')}</ul>` : '';
-        return `<a class="dir-card" data-shape="${state.cfg.shape}" href="detail.html?type=${state.cfg.type}&q=${encodeURIComponent(item.name)}">
+        return `<a class="dir-card" data-shape="${state.cfg.shape}" href="detail.html?type=${state.cfg.type}&sport=${item.sport}&q=${encodeURIComponent(item.name)}">
             <div class="dir-card-top">${avatar(item)}
                 <span class="dir-card-text"><span class="dir-name item-name">${esc(item.name)}</span>${sub ? `<span class="dir-sub">${esc(sub)}</span>` : ''}</span>
             </div>${channels}</a>`;
