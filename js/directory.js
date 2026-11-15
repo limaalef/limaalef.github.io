@@ -92,28 +92,42 @@ const Directory = (() => {
         index.hidden = false;
         index.innerHTML = [...LETTERS, ...(present.has(OTHER) ? [OTHER] : [])]
             .map(k => `<button type="button" class="dir-index-btn" data-letter="${k}"${present.has(k) ? '' : ' disabled'}>${k}</button>`).join('');
+        measure();
+    }
+
+    // Posição de cada seção, medida uma vez por renderização: o scroll não lê o layout (evita travar a rolagem)
+    let tops = [], current = '';
+    function measure() {
+        const y = window.scrollY;
+        tops = [...document.querySelectorAll('.dir-group')].map(g => ({ letter: g.dataset.letter, top: g.getBoundingClientRect().top + y }));
+        current = '';
         spy();
     }
+    const indexOffset = () => ($('dirIndex').offsetHeight || 0) + 12;
 
     function jump(letter) {
-        const target = document.querySelector(`.dir-group[data-letter="${letter}"]`);
-        if (target) target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        const target = tops.find(g => g.letter === letter);
+        if (target) window.scrollTo({ top: target.top - indexOffset(), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
 
-    // Destaca no índice a letra da seção que está no topo
+    // Destaca no índice a letra da seção que está no topo. Só mexe no DOM quando a letra muda e
+    // rola o índice na horizontal por scrollLeft (scrollIntoView rolaria também a página e brigaria com o dedo).
     let spyQueued = false;
     function spy() {
         if (spyQueued) return;
         spyQueued = true;
         requestAnimationFrame(() => {
             spyQueued = false;
-            const offset = ($("dirIndex").offsetHeight || 0) + 40;
-            let current = '';
-            document.querySelectorAll('.dir-group').forEach(g => { if (g.getBoundingClientRect().top <= offset) current = g.dataset.letter; });
-            $('dirIndex').querySelectorAll('.dir-index-btn').forEach(b => {
-                const on = b.dataset.letter === current;
+            const line = window.scrollY + indexOffset() + 28;
+            let letter = '';
+            for (const g of tops) { if (g.top <= line) letter = g.letter; else break; }
+            if (letter === current) return;
+            current = letter;
+            const index = $('dirIndex');
+            index.querySelectorAll('.dir-index-btn').forEach(b => {
+                const on = b.dataset.letter === letter;
                 b.classList.toggle('active', on);
-                if (on) b.scrollIntoView({ block: 'nearest', inline: 'center' });
+                if (on) index.scrollLeft = b.offsetLeft - (index.clientWidth - b.offsetWidth) / 2;
             });
         });
     }
@@ -154,6 +168,8 @@ const Directory = (() => {
         $('dirSearch').addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => { state.query = e.target.value; render(); }, 120); });
         $('dirIndex').addEventListener('click', e => { const b = e.target.closest('[data-letter]'); if (b && !b.disabled) jump(b.dataset.letter); });
         window.addEventListener('scroll', spy, { passive: true });
+        let resizeTimer;
+        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(measure, 150); });
         document.addEventListener('languagechange', () => { if (state.items.length) { render(); showUpdated(); } });
         load();
     }

@@ -8,7 +8,8 @@
 .page-directory .dir-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-bottom: var(--sp-4); }
 .page-directory .dir-title { font-size: var(--font-size-xxl); font-weight: 700; letter-spacing: -.03em; color: var(--text-primary); }
 .page-directory .dir-title .counter { margin-left: var(--sp-2); background: transparent; padding: 0; font-size: var(--font-size-sm); font-weight: 500; }
-.page-directory .dir-search { min-width: min(20rem, 100%); }
+.page-directory .dir-search-box { flex: 0 1 20rem; }
+.page-directory .dir-search-box .field { width: 100%; padding: var(--sp-3) var(--sp-5); }
 
 /* Índice por letra: fixo no topo ao rolar; no celular rola na horizontal */
 .page-directory .dir-index { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--sp-1); overflow-x: auto; scrollbar-width: none;
@@ -23,11 +24,11 @@
 @media (hover: hover) { .page-directory .dir-index-btn:not(:disabled):not(.active):hover { background: var(--soft-bg-hover); color: var(--text-primary); } }
 
 /* Grupos por letra */
-.page-directory .dir-group { margin-bottom: var(--sp-7); scroll-margin-top: 4.5rem; content-visibility: auto; contain-intrinsic-size: auto 12rem; }
+.page-directory .dir-group { margin-bottom: var(--sp-7); scroll-margin-top: 4.5rem; }
 .page-directory .dir-letter { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-4); padding-bottom: var(--sp-2);
     border-bottom: 1px solid var(--border-color); font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); }
 .page-directory .dir-letter .counter { background: transparent; padding: 0; font-weight: 500; }
-.page-directory .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); gap: var(--sp-1) var(--sp-4); }
+.page-directory .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: var(--sp-1) var(--sp-4); }
 .page-directory .dir-grid[data-shape="portrait"] { grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); row-gap: var(--sp-4); padding-top: var(--sp-5); }
 
 /* Item compacto: sem fundo próprio (só aparece ao passar o mouse) */
@@ -64,5 +65,6 @@
 
 @media (max-width: 600px) {
     .page-directory .dir-page { padding-inline: var(--sp-4); }
-    .page-directory .dir-search { width: 100%; }
+    /* A busca flutua no rodapé (regra .search-box de components.css): reserva espaço para ela */
+    .page-directory .dir-page { padding-bottom: calc(var(--float-bottom) + var(--om-fab-size-sm, 40px) + var(--sp-8)); }
 }
