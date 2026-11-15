@@ -1,0 +1,68 @@
+/* ═══════════════════════════════════════════════════════════════
+   DIRECTORY — listagem de clubes, campeonatos e narradores
+   Campos, chips, contador, estado vazio e skeleton vêm de css/ui-components.css.
+   A imagem segue o padrão de detail.html (emblema / retrato), em tamanho reduzido.
+═══════════════════════════════════════════════════════════════ */
+.page-directory .dir-page { max-width: var(--page-width-size); margin: 0 auto; padding: var(--sp-5) var(--sp-6) var(--sp-9); }
+
+.page-directory .dir-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-bottom: var(--sp-4); }
+.page-directory .dir-title { font-size: var(--font-size-xxl); font-weight: 700; letter-spacing: -.03em; color: var(--text-primary); }
+.page-directory .dir-title .counter { margin-left: var(--sp-2); background: transparent; padding: 0; font-size: var(--font-size-sm); font-weight: 500; }
+.page-directory .dir-search { min-width: min(20rem, 100%); }
+
+/* Índice por letra: fixo no topo ao rolar; no celular rola na horizontal */
+.page-directory .dir-index { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--sp-1); overflow-x: auto; scrollbar-width: none;
+    padding: var(--sp-3) 0; margin-bottom: var(--sp-5); background: var(--bg-primary); }
+.page-directory .dir-index::-webkit-scrollbar { display: none; }
+.page-directory .dir-index[hidden] { display: none; }
+.page-directory .dir-index-btn { flex: none; min-width: 2rem; padding: var(--sp-2) var(--sp-3); border: 0; border-radius: var(--border-radius-size-md); cursor: pointer;
+    background: var(--soft-bg); color: var(--text-secondary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; }
+.page-directory .dir-index-btn:disabled { opacity: .35; cursor: default; }
+.page-directory .dir-index-btn.active { background: var(--accent-color); color: var(--text-accent-color); }
+.page-directory .dir-index-btn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+@media (hover: hover) { .page-directory .dir-index-btn:not(:disabled):not(.active):hover { background: var(--soft-bg-hover); color: var(--text-primary); } }
+
+/* Grupos por letra */
+.page-directory .dir-group { margin-bottom: var(--sp-7); scroll-margin-top: 4.5rem; content-visibility: auto; contain-intrinsic-size: auto 12rem; }
+.page-directory .dir-letter { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-4); padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--border-color); font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); }
+.page-directory .dir-letter .counter { background: transparent; padding: 0; font-weight: 500; }
+.page-directory .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); gap: var(--sp-1) var(--sp-4); }
+.page-directory .dir-grid[data-shape="portrait"] { grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); row-gap: var(--sp-4); padding-top: var(--sp-5); }
+
+/* Item compacto: sem fundo próprio (só aparece ao passar o mouse) */
+.page-directory .dir-card { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); border-radius: var(--border-radius-size-md);
+    background: transparent; color: inherit; text-decoration: none; }
+@media (hover: hover) { .page-directory a.dir-card:hover { background: var(--soft-bg); } }
+.page-directory a.dir-card:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.page-directory .dir-card-top { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.page-directory .dir-card-text { display: flex; flex-direction: column; min-width: 0; }
+.page-directory .dir-name { font-size: var(--font-size-mdm); font-weight: 600; line-height: 1.25; color: var(--text-primary); }
+.page-directory .dir-sub { font-size: var(--font-size-xs); color: var(--text-muted); }
+
+/* Imagem: mesmo padrão de detail, reduzido (emblema = quadrado suave; retrato = círculo com a foto saindo pelo topo) */
+.page-directory .dir-avatar { position: relative; display: grid; place-items: center; flex: none; box-sizing: border-box; width: 2.25rem; height: 2.25rem;
+    background: var(--soft-bg); color: var(--text-muted); border-radius: var(--border-radius-size-lg); overflow: hidden; --pad: var(--sp-1); }
+.page-directory .dir-avatar[data-shape="portrait"] { width: 2.75rem; height: 2.75rem; border-radius: 50%; overflow: visible; }
+.page-directory .dir-avatar img { position: absolute; inset: var(--pad); width: calc(100% - 2 * var(--pad)); height: calc(100% - 2 * var(--pad)); object-fit: contain; }
+.page-directory .dir-avatar[data-shape="portrait"].has-image { display: flex; align-items: flex-end; justify-content: center; }
+.page-directory .dir-avatar[data-shape="portrait"] img { position: static; width: 96%; height: auto; object-position: bottom; }
+.page-directory .dir-avatar-fallback { font-size: var(--font-size-sm); font-weight: 700; letter-spacing: -.03em; }
+.page-directory .dir-avatar.has-image .dir-avatar-fallback { display: none; }
+.page-directory .dir-skel-avatar { width: 2.25rem; height: 2.25rem; border-radius: var(--border-radius-size-lg); flex: none; }
+
+/* Jogos por canal (narradores) */
+.page-directory .dir-channels-label { font-size: var(--font-size-xs); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+.page-directory .dir-channels { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.page-directory .dir-channel { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--border-radius-size-circle);
+    background: var(--soft-bg); color: var(--text-secondary); font-size: var(--font-size-xs); }
+.page-directory .dir-channel b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.page-directory .dir-updated { margin-top: var(--sp-6); font-size: var(--font-size-sm); color: var(--text-muted); text-align: center; }
+.page-directory .dir-updated:empty { display: none; }
+.page-directory .dir-error { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+
+@media (max-width: 600px) {
+    .page-directory .dir-page { padding-inline: var(--sp-4); }
+    .page-directory .dir-search { width: 100%; }
+}

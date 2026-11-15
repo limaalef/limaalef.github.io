@@ -231,6 +231,7 @@
 }
 .page-home .home-section-detail { color: var(--text-muted); font-size: var(--font-size-mdm); font-weight: 400; letter-spacing: 0; }
 .page-home .home-section-header-action { display: flex; align-items: center; gap: var(--sp-2); }
+.page-home .home-section-header-action .home-section-action { margin-right: var(--sp-2); }
 .page-home .home-section-action { color: var(--text-muted); font-size: var(--font-size-sm); font-weight: 500; }
 @media (hover: hover) {
     .page-home .home-section-action:hover { padding: 0; background: none; color: var(--text-primary); }

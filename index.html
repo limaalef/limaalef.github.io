@@ -45,7 +45,6 @@
     <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="css/banner.css">
     <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/request.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJZTBEGJ91"></script>
     <script>
@@ -146,12 +145,6 @@
                             </div>
                             <div class="browse-scroll-wrapper">
                                 <div class="browse-scroll-list" id="cupList">
-                                    <a href="/detail.html?type=competition&q=Copa+do+Mundo+Feminina+Sub-17+FIFA+Marrocos+2026" class="browse-badge-card">
-                                        <div class="browse-badge-circle">
-                                            <img src="competition_logos/copa_do_mundo_feminina_sub-17_fifa_marrocos_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
-                                        </div>
-                                        <span class="browse-badge-name" data-i18n="sectioncompetition-wcu17fem26">Marrocos 2026</span>
-                                    </a>
                                     <a href="/detail.html?type=competition&q=Copa+do+Mundo+Feminina+Sub-20+FIFA+Polônia+2026" class="browse-badge-card">
                                         <div class="browse-badge-circle">
                                             <img src="competition_logos/copa_do_mundo_feminina_sub-20_fifa_polonia_2026_2026.png" class="browse-team-logo" onerror="this.style.display='none'">
@@ -219,6 +212,7 @@
                                     <p class="home-section-title" data-i18n="sectionClubsTitle"></p>
                                 </div>
                                 <div class="home-section-header-action">
+                                    <a class="home-section-action" href="teams.html" data-i18n="dirSeeAll"></a>
                                     <button class="nav-btn" id="clubsPrev" aria-label="Anterior">‹</button>
                                     <button class="nav-btn" id="clubsNext" aria-label="Próximo">›</button>
                                 </div>
@@ -375,6 +369,7 @@
                                     <p class="home-section-title" data-i18n="sectionCompetitionsTitle"></p>
                                 </div>
                                 <div class="home-section-header-action">
+                                    <a class="home-section-action" href="competitions.html" data-i18n="dirSeeAll"></a>
                                     <button class="nav-btn" id="compPrev" aria-label="Anterior">‹</button>
                                     <button class="nav-btn" id="compNext" aria-label="Próximo">›</button>
                                 </div>
@@ -448,6 +443,7 @@
                                     <p class="home-section-title" data-i18n="sectionCommentorsTitle"></p>
                                 </div>
                                 <div class="home-section-header-action">
+                                    <a class="home-section-action" href="commentators.html" data-i18n="dirSeeAll"></a>
                                     <button class="nav-btn" id="commentPrev" aria-label="Anterior">‹</button>
                                     <button class="nav-btn" id="commentNext" aria-label="Próximo">›</button>
                                 </div>
@@ -609,9 +605,6 @@
     <script src="js/banner.js"></script>
     <script src="js/home-browse.js"></script>
     <script src="js/index.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/request.js"></script>
-</body>
     <script>BannerCarousel.mount('#homeBanners');</script>
 
 </body>

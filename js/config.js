@@ -19,6 +19,7 @@ const CONFIG = {
     MATCHDATA_EDIT_URL: 'https://admin-archive.limaalef.com/matchdata/',
 
     HOME_BROWSE_API_BASE: 'https://api-archive.limaalef.com/browse',
+    DIRECTORY_API_BASE: 'https://api-archive.limaalef.com/directory',   // /teams, /competitions, /commentary (KV)
     BANNERS_API_BASE:  'https://api-archive.limaalef.com/banners',
     REQUEST_API_BASE:  'https://api-archive.limaalef.com',
     PAYMENTS_API_BASE: 'https://api-archive.limaalef.com',
@@ -41,7 +42,7 @@ const AppNav = {
     ITEMS: [
         { id: 'home',       href: 'index.html',       key: 'navHome',       pages: ['index'] },
         { id: 'about',      href: 'about.html',       key: 'navAbout',      pages: ['about'] },
-        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'watch', 'event', 'storage', 'changelog'] },
+        { id: 'collection', href: 'collection.html',  key: 'navCollection', pages: ['collection', 'detail', 'match', 'watch', 'event', 'storage', 'changelog', 'teams', 'competitions', 'commentators'] },
         { id: 'requests',   href: 'my-requests.html', key: 'myrequests',    pages: ['my-requests', 'request-detail'] }
     ],
 
