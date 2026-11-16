@@ -203,7 +203,9 @@ function buildOrderDetail(o) {
     // ── Resumo de valores (mesmo formato para Pix e PayPal, pago ou não) ───
     const fig = paymentFigures(o);
     const paymentValueHtml = fig ? (() => {
-        const taxaVal = fig.total * (fig.feePct / 100);
+        const taxaVal = (fig.total + fig.discount) * (fig.feePct / 100);
+        const discVal = fig.discount * (fig.feePct / 100)
+        const discount = (fig.discount - discVal) * (fig.feePct / 100);
         const fmt = v => fmtMoney(v, fig.currency);
         const pct = Number(fig.feePct).toLocaleString(loc(), { maximumFractionDigits: 2 });
         return `
@@ -211,7 +213,8 @@ function buildOrderDetail(o) {
             <h3 class="block-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
             ${kv(t('requestValue'), fmt(fig.total - taxaVal + fig.discount))}
             ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'muted')}
-            ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(fig.discount)) : ''}
+            ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(fig.discount - discount)) : ''}
+            ${discount > 0 ? kv(t('requestDiscountFee'), '− ' + fmt(discount), 'muted') : ''}
             <div class="rd-total">
                 <span>${t('requestTotalValue')}</span>
                 <strong>${fmt(fig.total)}</strong>
