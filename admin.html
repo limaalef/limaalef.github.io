@@ -98,6 +98,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 192L64 224L576 224L576 192C576 156.7 547.3 128 512 128L128 128C92.7 128 64 156.7 64 192zM64 272L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 272L64 272zM128 424C128 410.7 138.7 400 152 400L200 400C213.3 400 224 410.7 224 424C224 437.3 213.3 448 200 448L152 448C138.7 448 128 437.3 128 424zM272 424C272 410.7 282.7 400 296 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L296 448C282.7 448 272 437.3 272 424z"/></svg>
                         </span> PayPal
                     </button>
+                    <button type="button" class="adm-nav-item" data-panel="user-pricing" onclick="switchPanel('user-pricing')">
+                        <span class="adm-nav-icon">
+                            <svg viewBox="0 0 12 12"><circle cx="6" cy="3.5" r="2.25"/><path d="M1.5 10.5c0-2.2 2-3.5 4.5-3.5s4.5 1.3 4.5 3.5z"/></svg>
+                        </span> Valores por usuário
+                    </button>
 
                     <button type="button" class="adm-nav-item" data-panel="browse" onclick="switchPanel('browse')">
                         <span class="adm-nav-icon">
@@ -330,7 +335,7 @@
                             <span class="adm-toggle-knob"></span>
                         </button>
                     </div>
- 
+
                     <div class="adm-dl-filters">
                         <div class="view-toggle" id="dl-period" role="group" aria-label="Período">
                             <button type="button" class="adm-filter-btn" data-days="1">Hoje</button>
@@ -394,6 +399,67 @@
                             </section>
                         </div>
                     </div>
+                </div>
+
+                <!-- PAINEL: VALORES POR USUÁRIO -->
+                <div class="adm-panel" id="panel-user-pricing">
+                    <div class="adm-up-toolbar">
+                        <h2 class="block-title">Valores por usuário <span class="counter" id="up-count">0</span></h2>
+                        <button type="button" class="button" id="up-refresh">Atualizar</button>
+                    </div>
+                    <p class="adm-up-note">Valor por item e desconto por item padrão de cada usuário, no Mercado Pago e no PayPal. Valem para todos os pedidos dele
+                        (valor e desconto × quantidade de itens; a taxa global é aplicada sobre o valor). Prioridade: valor definido no pedido, depois o do usuário, depois o padrão global.</p>
+
+                    <div class="adm-up-email">
+                        <input class="field" id="up-email" type="email" list="up-emails" placeholder="E-mail do usuário" autocomplete="off" spellcheck="false" aria-label="E-mail do usuário">
+                        <datalist id="up-emails"></datalist>
+                        <span id="up-status"></span>
+                    </div>
+
+                    <div class="adm-up-grid">
+                        <section class="adm-up-method">
+                            <h3 class="block-title">Mercado Pago</h3>
+                            <div class="detail-list">
+                                <div class="detail-list-item"><span class="detail-list-label">Valor por item</span><span class="detail-list-value"><div class="adm-amount-wrap"><span class="adm-amount-prefix">R$</span>
+                                    <input class="field field--amount" id="up-mp-base" type="number" min="0" step="0.01" inputmode="decimal" placeholder="padrão"></div></span></div>
+                                <div class="detail-list-item"><span class="detail-list-label">Desconto por item</span><span class="detail-list-value"><div class="adm-amount-wrap"><span class="adm-amount-prefix">R$</span>
+                                    <input class="field field--amount" id="up-mp-discount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div></span></div>
+                            </div>
+                            <p class="adm-up-hint" id="up-mp-hint"></p>
+                        </section>
+                        <section class="adm-up-method">
+                            <h3 class="block-title">PayPal</h3>
+                            <div class="detail-list">
+                                <div class="detail-list-item"><span class="detail-list-label">Moeda</span><span class="detail-list-value"><div class="adm-amount-wrap">
+                                    <input class="field field--amount field--currency" id="up-pp-cur" maxlength="3" placeholder="USD" autocomplete="off" title="Código ISO (USD, EUR, BRL...). O valor não é convertido automaticamente."></div></span></div>
+                                <div class="detail-list-item"><span class="detail-list-label">Valor por item</span><span class="detail-list-value"><div class="adm-amount-wrap">
+                                    <input class="field field--amount" id="up-pp-base" type="number" min="0" step="0.01" inputmode="decimal" placeholder="padrão"></div></span></div>
+                                <div class="detail-list-item"><span class="detail-list-label">Desconto por item</span><span class="detail-list-value"><div class="adm-amount-wrap">
+                                    <input class="field field--amount" id="up-pp-discount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div></span></div>
+                            </div>
+                            <p class="adm-up-hint" id="up-pp-hint"></p>
+                        </section>
+                    </div>
+
+                    <div class="adm-up-actions">
+                        <span class="adm-up-msg" id="up-msg" role="status" aria-live="polite"></span>
+                        <button type="button" class="button" id="up-remove" disabled>Remover cadastro</button>
+                        <button type="button" class="button button--solid" id="up-save" disabled>Salvar valores</button>
+                    </div>
+
+                    <section class="adm-up-list">
+                        <h3 class="block-title">Usuários com valor próprio</h3>
+                        <div class="adm-table-box is-hidden" id="up-table-box">
+                            <div class="adm-table-wrap">
+                                <table class="adm-table adm-up-table">
+                                    <thead><tr><th>Usuário</th><th>Mercado Pago</th><th>PayPal</th><th>Atualizado</th><th></th></tr></thead>
+                                    <tbody id="up-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="status-message" id="up-empty">Nenhum usuário com valor próprio. Informe um e-mail acima para cadastrar.</div>
+                        <p class="adm-dl-note">Valores salvos manualmente em um pedido continuam valendo nele. O desconto do usuário é por item; um desconto (mesmo 0) definido no pedido substitui o do usuário.</p>
+                    </section>
                 </div>
 
                 <!-- PAINEL: PAYPAL -->
@@ -1032,6 +1098,278 @@ const AdminDownloads = (() => {
     return { init, load, refresh };
 })();
 
+/* Valores padrão por usuário (Mercado Pago e PayPal) */
+const AdminUserPricing = (() => {
+    const STALE_MS = 60e3;
+
+    const state = { rows: [], global: null, email: '', loaded: null, loadedAt: 0, token: 0, edits: 0 };
+    let ctx = null;
+
+    const $   = id => document.getElementById(id);
+    const esc = s => Utils.escapeHtml(String(s ?? ''));
+    const FIELDS = ['mp-base', 'mp-discount', 'pp-base', 'pp-cur', 'pp-discount'];
+    const CUR_RE = /^[A-Z]{3}$/;
+
+    function money(v, currency) {
+        const n = Number(v || 0);
+        try { return n.toLocaleString('pt-BR', { style: 'currency', currency: currency || 'BRL' }); }
+        catch { return `${currency} ${n.toFixed(2)}`; }
+    }
+    // Valor cobrado para que, descontada a taxa de processamento, sobre o valor base (mesma regra do worker)
+    const grossFrom = (base, feePct) => {
+        const r = (feePct || 0) / 100;
+        return Math.round((r >= 1 ? base : base / (1 - r)) * 100) / 100;
+    };
+    const normEmail = v => String(v || '').trim().toLowerCase();
+    const isEmail = v => /^[^\s@]+@[^\s@]+$/.test(v);
+
+    // ── Requisições ─────────────────────────────────────────────────────────
+    async function request(path, options) {
+        const res = await ctx.fetch(`${ctx.apiBase}${path}`, options);
+        if (res.status === 401 || res.status === 403) return null;      // sessão encerrada pelo Auth
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw Object.assign(new Error(body.error || 'HTTP ' + res.status), { status: res.status });
+        return body;
+    }
+    const notify = (msg, type = 'error') => Utils.showNotification(msg, type);
+
+    // ── Formulário ──────────────────────────────────────────────────────────
+    const val = id => $('up-' + id).value.trim();
+
+    function readForm() {
+        const mp = { base_amount: val('mp-base'), discount: val('mp-discount') };
+        const paypal = { base_amount: val('pp-base'), currency: val('pp-cur').toUpperCase(), discount: val('pp-discount') };
+        return { mp, paypal };
+    }
+
+    // Mesmo formato de readForm(), a partir de um cadastro salvo
+    function formOf(pricing) {
+        const p = pricing || {}, str = v => v == null ? '' : String(v);
+        return {
+            mp: { base_amount: str(p.mp?.base_amount), discount: str(p.mp?.discount) },
+            paypal: { base_amount: str(p.paypal?.base_amount), currency: str(p.paypal?.currency), discount: str(p.paypal?.discount) }
+        };
+    }
+
+    // keepInputs: o admin já começou a digitar enquanto o cadastro carregava; não sobrescreve o que ele digitou
+    function fillForm(pricing, keepInputs = false) {
+        const f = formOf(pricing);
+        if (!keepInputs) {
+            $('up-mp-base').value     = f.mp.base_amount;
+            $('up-mp-discount').value = f.mp.discount;
+            $('up-pp-base').value     = f.paypal.base_amount;
+            $('up-pp-cur').value      = f.paypal.currency;
+            $('up-pp-discount').value = f.paypal.discount;
+        }
+        state.loaded = JSON.stringify(f);
+    }
+
+    function clearForm() { fillForm(null); }
+
+    const dirty = () => JSON.stringify(readForm()) !== state.loaded;
+    const hasValues = f => !!(f.mp.base_amount || f.mp.discount || f.paypal.base_amount || f.paypal.currency || f.paypal.discount);
+
+    function renderStatus() {
+        const email = normEmail($('up-email').value);
+        const ok = isEmail(email);
+        const f = readForm();
+        const existing = state.rows.some(r => r.email === email);
+        const ppCur = f.paypal.currency || state.global?.paypal?.currency || 'USD';
+
+        // Prévia: valor cobrado por item, já com a taxa global
+        const g = state.global;
+        const prev = (base, fee, cur) => {
+            const b = parseFloat(base);
+            return b > 0 ? `Cobrado por item: ${money(grossFrom(b, fee), cur)} (taxa de ${fee || 0}%)` : '';
+        };
+        $('up-mp-hint').textContent = prev(f.mp.base_amount, g?.mp.fee_percent, 'BRL')
+            || (g ? `Sem valor próprio: usa o padrão de ${money(g.mp.base_amount, 'BRL')} por item` : '');
+        $('up-pp-hint').textContent = prev(f.paypal.base_amount, g?.paypal.fee_percent, ppCur)
+            || (g ? `Sem valor próprio: usa o padrão de ${money(g.paypal.base_amount, g.paypal.currency)} por item` : '');
+        $('up-pp-cur').placeholder = g?.paypal.currency || 'USD';
+
+        let pill;
+        if (!email) pill = '';
+        else if (!ok) pill = `<span class="status-pill status-pill--error"><i></i>E-mail inválido</span>`;
+        else if (dirty()) pill = `<span class="status-pill status-pill--waiting"><i></i>Alteração não salva</span>`;
+        else if (existing) pill = `<span class="status-pill status-pill--success"><i></i>Valores próprios salvos</span>`;
+        else pill = `<span class="status-pill"><i></i>Usa os padrões</span>`;
+        $('up-status').innerHTML = pill;
+
+        $('up-save').disabled   = !ok || !dirty();
+        $('up-remove').disabled = !ok || !existing;
+        $('up-save').textContent = ok && dirty() && !hasValues(f) && existing ? 'Remover valores' : 'Salvar valores';
+    }
+
+    function setMsg(text, kind = '') {
+        const el = $('up-msg');
+        el.textContent = text || '';
+        el.className = 'adm-up-msg' + (kind ? ' ' + kind : '');
+    }
+
+    function validate(f) {
+        for (const [label, v] of [['Valor por item (Mercado Pago)', f.mp.base_amount], ['Desconto por item (Mercado Pago)', f.mp.discount],
+                                  ['Valor por item (PayPal)', f.paypal.base_amount], ['Desconto por item (PayPal)', f.paypal.discount]]) {
+            if (v !== '' && (isNaN(parseFloat(v)) || parseFloat(v) < 0)) return `${label}: informe um número maior ou igual a zero.`;
+        }
+        if (f.paypal.currency && !CUR_RE.test(f.paypal.currency)) return 'Moeda do PayPal: use o código ISO de 3 letras (ex.: USD, EUR).';
+        return '';
+    }
+
+    // ── Dados ───────────────────────────────────────────────────────────────
+    async function loadUser(email) {
+        const token = ++state.token;
+        const edits = state.edits;
+        state.email = email;
+        setMsg('');
+        if (!isEmail(email)) { clearForm(); renderStatus(); return; }
+        try {
+            const data = await request(`/admin/user-pricing/${encodeURIComponent(email)}`);
+            if (!data || token !== state.token) return;
+            state.global = data.global;
+            fillForm(data.pricing, state.edits !== edits);
+        } catch (e) {
+            clearForm();
+            setMsg('Não foi possível consultar: ' + e.message, 'err');
+        }
+        renderStatus();
+    }
+
+    async function save() {
+        const email = normEmail($('up-email').value);
+        const f = readForm();
+        const problem = validate(f);
+        if (problem) return setMsg(problem, 'err');
+        const removing = !hasValues(f);
+        const btn = $('up-save'), label = btn.textContent;
+        btn.disabled = true; btn.textContent = 'Salvando...';
+        try {
+            const data = await request(`/admin/user-pricing/${encodeURIComponent(email)}`, { method: 'PUT', body: JSON.stringify(f) });
+            if (!data) return;
+            fillForm(data.pricing);
+            notify(removing ? 'Valores do usuário removidos.' : 'Valores do usuário salvos.', 'success');
+            setMsg(removing ? 'Voltou aos padrões globais.' : 'Salvo. Vale para todos os pedidos deste usuário que não tenham valor próprio.', 'ok');
+            await refreshList();
+        } catch (e) {
+            setMsg(e.message, 'err');
+        } finally {
+            btn.textContent = label;
+            renderStatus();
+        }
+    }
+
+    async function remove() {
+        const email = normEmail($('up-email').value);
+        if (!confirm(`Remover os valores padrão de ${email}?\n\nOs pedidos voltam a usar os padrões globais (valores salvos manualmente em cada pedido continuam).`)) return;
+        try {
+            const data = await request(`/admin/user-pricing/${encodeURIComponent(email)}`, { method: 'DELETE' });
+            if (!data) return;
+            clearForm();
+            notify('Valores do usuário removidos.', 'success');
+            setMsg('');
+            await refreshList();
+        } catch (e) {
+            setMsg(e.message, 'err');
+        }
+        renderStatus();
+    }
+
+    // ── Lista de usuários com valor próprio ─────────────────────────────────
+    function userName(email) {
+        const u = (ctx.users?.() || []).find(x => x.email === email);
+        return u?.name || '';
+    }
+
+    function cellMp(p) {
+        if (!p) return '<span class="text-tertiary">—</span>';
+        const parts = [];
+        if (p.base_amount) parts.push(`${money(p.base_amount, 'BRL')} / item`);
+        if (p.discount) parts.push(`desc. ${money(p.discount, 'BRL')} / item`);
+        return esc(parts.join(' · ')) || '<span class="text-tertiary">—</span>';
+    }
+    function cellPp(p) {
+        if (!p) return '<span class="text-tertiary">—</span>';
+        const cur = p.currency || state.global?.paypal?.currency || 'USD';
+        const parts = [];
+        if (p.base_amount) parts.push(`${money(p.base_amount, cur)} / item`);
+        else if (p.currency) parts.push(`moeda ${p.currency}`);
+        if (p.discount) parts.push(`desc. ${money(p.discount, cur)} / item`);
+        return esc(parts.join(' · ')) || '<span class="text-tertiary">—</span>';
+    }
+
+    function renderList() {
+        $('up-count').textContent = state.rows.length;
+        const empty = !state.rows.length;
+        $('up-empty').classList.toggle('is-hidden', !empty);
+        $('up-table-box').classList.toggle('is-hidden', empty);
+        $('up-tbody').innerHTML = state.rows.map(r => {
+            const name = userName(r.email);
+            const when = r.updatedAt ? new Date(r.updatedAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+            return `<tr>
+                <td data-label="Usuário"><span class="adm-up-cell"><strong>${esc(name || r.email)}</strong>${name ? `<br><span class="text-xs text-secondary">${esc(r.email)}</span>` : ''}</span></td>
+                <td data-label="Mercado Pago"><span class="adm-up-cell">${cellMp(r.mp)}</span></td>
+                <td data-label="PayPal"><span class="adm-up-cell">${cellPp(r.paypal)}</span></td>
+                <td data-label="Atualizado"><span class="adm-up-cell">${esc(when)}</span></td>
+                <td data-label=""><button type="button" class="action-btn btn-xs" data-edit="${esc(r.email)}">Editar</button></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function renderKnownUsers() {
+        const seen = new Map();
+        (ctx.users?.() || []).forEach(u => { if (u.email && !seen.has(u.email)) seen.set(u.email, u); });
+        $('up-emails').innerHTML = [...seen.values()]
+            .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email))
+            .map(u => `<option value="${esc(u.email)}">${esc(u.name || '')}${u.orders ? ` · ${u.orders} ${u.orders === 1 ? 'pedido' : 'pedidos'}` : ''}</option>`)
+            .join('');
+    }
+
+    async function refreshList() {
+        const data = await request('/admin/user-pricing');
+        if (!data) return;
+        state.rows = data.users || [];
+        state.global = data.global || state.global;
+        state.loadedAt = Date.now();
+        renderList();
+        renderStatus();
+    }
+
+    async function load(force) {
+        renderKnownUsers();
+        if (!force && state.loadedAt && Date.now() - state.loadedAt < STALE_MS) { renderList(); return; }
+        try {
+            await refreshList();
+        } catch (e) {
+            $('up-empty').textContent = 'Não foi possível carregar: ' + e.message;
+            $('up-empty').classList.remove('is-hidden');
+        }
+    }
+
+    function edit(email) {
+        $('up-email').value = email;
+        loadUser(email);
+        $('up-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function init(c) {
+        ctx = c;
+        $('up-refresh').addEventListener('click', () => load(true));
+        $('up-save').addEventListener('click', save);
+        $('up-remove').addEventListener('click', remove);
+        $('up-email').addEventListener('change', () => loadUser(normEmail($('up-email').value)));
+        $('up-email').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); loadUser(normEmail($('up-email').value)); } });
+        $('up-email').addEventListener('input', renderStatus);
+        FIELDS.forEach(f => $('up-' + f).addEventListener('input', () => { state.edits++; setMsg(''); renderStatus(); }));
+        $('up-tbody').addEventListener('click', e => {
+            const btn = e.target.closest('[data-edit]');
+            if (btn) edit(btn.dataset.edit);
+        });
+        renderStatus();
+    }
+
+    return { init, load };
+})();
+
 // ── Configuração ───────────────────────────────────────────────────────────
 const ADM_CFG = {
     apiBase:        CONFIG.REQUEST_API_BASE,
@@ -1045,6 +1383,22 @@ AdminDownloads.init({
     fetch:     (url, options) => admFetch(url, options),
     apiBase:   ADM_CFG.apiBase,
     openOrder: id => { switchPanel('orders'); openOrder(id); }
+});
+AdminUserPricing.init({
+    fetch:   (url, options) => admFetch(url, options),
+    apiBase: ADM_CFG.paymentsBase,
+    // usuários que já fizeram pedidos (para sugerir o e-mail)
+    users:   () => {
+        const byEmail = new Map();
+        allOrders.forEach(o => {
+            const email = (o.user?.email || '').trim().toLowerCase();
+            if (!email) return;
+            const u = byEmail.get(email) || { email, name: o.user?.name || '', orders: 0 };
+            u.orders++;
+            byEmail.set(email, u);
+        });
+        return [...byEmail.values()];
+    }
 });
 let allOrders    = [];
 let filterStatus = '';
@@ -1064,6 +1418,7 @@ function switchPanel(name) {
     if (name === 'banners') AdminBanners.load();
     if (name === 'browse') AdminBrowse.load();
     if (name === 'downloads') AdminDownloads.load();
+    if (name === 'user-pricing') AdminUserPricing.load();
     if (name === 'paypal-settings') {
         loadPaypalSettings();
         loadExternalSettings();
@@ -1417,9 +1772,11 @@ const grossFrom = (base, feePct) => { const r = feePct / 100; return Math.round(
 function amtLoadState(o) {
     const num = v => (v === '' || v == null || isNaN(parseFloat(v))) ? null : parseFloat(v);
     const ds = o.externalDue || null;
-    amtState.pix = { saved: num(o.paymentAmount), savedCur: 'BRL', discount: num(o.paymentDiscount) || 0, def: null, defCur: 'BRL' };
-    amtState.ext = { saved: ds ? num(ds.amount) : null, savedCur: ds?.currency || null, discount: num(ds?.discount) || 0,
-                     def: null, defCur: o.externalDueEffective?.currency || 'USD' };
+    // discountSaved: o pedido tem desconto próprio (mesmo 0); senão vale o desconto padrão do usuário
+    amtState.pix = { saved: num(o.paymentAmount), savedCur: 'BRL', discount: num(o.paymentDiscount) || 0, discountSaved: o.paymentDiscount != null,
+                     def: null, defCur: 'BRL', userDefault: false };
+    amtState.ext = { saved: ds ? num(ds.amount) : null, savedCur: ds?.currency || null, discount: num(ds?.discount) || 0, discountSaved: !!ds,
+                     def: null, defCur: o.externalDueEffective?.currency || 'USD', userDefault: false };
 }
 
 function amountBlockHtml(o, kind) {
@@ -1713,12 +2070,27 @@ async function amtInit(order, kind) {
     const defEl = amtEl(kind, 'default');
     if (!defEl) return;
     try {
-        const res  = await admFetch(`${ADM_CFG.paymentsBase}/admin/${c.settings}`);
+        const email = (order.user?.email || '').trim().toLowerCase();
+        const [res, upData] = await Promise.all([
+            admFetch(`${ADM_CFG.paymentsBase}/admin/${c.settings}`),
+            email ? admFetch(`${ADM_CFG.paymentsBase}/admin/user-pricing/${encodeURIComponent(email)}`).then(r => r.ok ? r.json() : null).catch(() => null) : null
+        ]);
         const data = await res.json();
-        const base = parseFloat(data.base_amount) || 0;
+        // valores padrão do usuário (Valores por usuário) sobrepõem o valor base e a moeda globais
+        const up = upData?.pricing?.[kind === 'pix' ? 'mp' : 'paypal'] || null;
+        const userBase = parseFloat(up?.base_amount) || 0;
+        // o desconto do usuário é por item: no pedido vale desconto × quantidade de itens
+        const userDisc = Math.round((parseFloat(up?.discount) || 0) * ((order.items || []).length || 1) * 100) / 100;
+        const base = userBase > 0 ? userBase : (parseFloat(data.base_amount) || 0);
         const fee  = parseFloat(data.fee_percent)  || 0;
+        st.userDefault = !!(userBase > 0 || userDisc > 0 || (c.editCur && up?.currency));
+        if (!st.discountSaved && st.saved === null && userDisc > 0) {
+            st.discount = userDisc;
+            const discInput = amtEl(kind, 'discount');
+            if (discInput) discInput.value = userDisc.toFixed(2);
+        }
         if (c.editCur) {
-            st.defCur = data.currency || 'USD';
+            st.defCur = up?.currency || data.currency || 'USD';
             const curInput = amtEl(kind, 'cur');
             if (st.saved === null && curInput) curInput.value = st.defCur;
         }
@@ -1727,7 +2099,7 @@ async function amtInit(order, kind) {
             defEl.textContent = 'não configurado'; st.def = null;
         } else {
             st.def = grossFrom(base * n, fee);
-            defEl.textContent = extMoney(st.def, st.defCur);
+            defEl.textContent = extMoney(st.def, st.defCur) + (st.userDefault ? ' · valor do usuário' : '');
             const input = amtEl(kind, 'amount');
             if (st.saved === null && input) input.value = st.def.toFixed(2);   // pré-preenche com o padrão
         }
@@ -1774,8 +2146,8 @@ function amtRender(kind) {
         pill = `<span class="status-pill status-pill--success"><i></i>Salvo · ${money(Math.max(0, st.saved - st.discount))}</span>`;
         hint = 'Valor personalizado' + (st.discount > 0 ? ` · desconto de ${money(st.discount)}` : '');
     } else if (st.def !== null && st.def > 0) {
-        pill = `<span class="status-pill"><i></i>Padrão · ${money(st.def)}</span>`;
-        hint = 'Nenhum valor personalizado salvo';
+        pill = `<span class="status-pill"><i></i>Padrão · ${money(Math.max(0, st.def - st.discount))}</span>`;
+        hint = st.userDefault ? 'Valores padrão deste usuário (Valores por usuário)' : 'Nenhum valor personalizado salvo';
     } else {
         pill = `<span class="status-pill status-pill--error"><i></i>Nenhum valor definido</span>`;
         hint = `Configure o valor base em ${c.hintBase}`;
@@ -2363,8 +2735,6 @@ async function cancelPayment(orderId, btn) {
         notify('Falha de conexão: ' + e.message);
     }
 }
-
-
 
 function esc(s) { return Utils.escapeHtml(s); }
 </script>
