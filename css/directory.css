@@ -9,7 +9,7 @@
 .page-directory .dir-title { font-size: var(--font-size-xxl); font-weight: 700; letter-spacing: -.03em; color: var(--text-primary); }
 .page-directory .dir-title .counter { margin-left: var(--sp-2); background: transparent; padding: 0; font-size: var(--font-size-sm); font-weight: 500; }
 .page-directory .dir-search-box { flex: 0 1 20rem; }
-.page-directory .dir-search-box .field { width: 100%; padding: var(--sp-3) var(--sp-5); }
+.page-directory .dir-search-box .field { max-width: 300px; padding: var(--sp-3) var(--sp-5); }
 
 /* Índice por letra: fixo no topo ao rolar; no celular rola na horizontal */
 .page-directory .dir-index { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--sp-1); overflow-x: auto; scrollbar-width: none;

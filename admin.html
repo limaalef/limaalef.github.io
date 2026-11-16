@@ -170,9 +170,9 @@
                     <div class="bn-editor-grid">
                         <div class="bn-preview adm-col">
                             <h3 class="adm-sub-title">Preview</h3>
-                            <div class="chip-group" id="bn-lang" role="group" aria-label="Idioma do preview">
-                                <button type="button" class="chip active" data-lang="pt">Português</button>
-                                <button type="button" class="chip" data-lang="en">English</button>
+                            <div class="view-toggle" id="bn-lang" role="group" aria-label="Idioma do preview">
+                                <button type="button" class="adm-filter-btn active" data-lang="pt">Português</button>
+                                <button type="button" class="adm-filter-btn" data-lang="en">English</button>
                             </div>
                             <div id="bn-preview"></div>
                         </div>
@@ -309,22 +309,6 @@
 
                 <!-- PAINEL: DOWNLOADS -->
                 <div class="adm-panel" id="panel-downloads">
-                    <div class="adm-dl-toolbar">
-                        <h2 class="block-title">Downloads <span class="counter" id="dl-count">0</span></h2>
-                        <button type="button" class="button" id="dl-refresh">Atualizar</button>
-                    </div>
- 
-                    <div class="adm-dl-delivery" id="dl-delivery">
-                        <div class="adm-dl-delivery-text">
-                            <div class="adm-dl-delivery-title">Entrega dos arquivos <span id="dl-mode-pill"></span></div>
-                            <p class="adm-dl-delivery-desc" id="dl-mode-desc">Consultando o modo de entrega...</p>
-                        </div>
-                        <button type="button" role="switch" aria-checked="false" class="adm-toggle" id="dl-mode-toggle"
-                            aria-label="Modo de emergência: entregar pelo link direto do Drive" title="Modo de emergência: link direto do Drive" disabled>
-                            <span class="adm-toggle-knob"></span>
-                        </button>
-                    </div>
-
                     <div class="stats d-flex mb-5">
                         <div class="stat-tile stat-tile--highlight"><div class="stat-tile-value" id="dl-tile-downloads">—</div><div class="stat-tile-label">Downloads</div></div>
                         <div class="stat-tile"><div class="stat-tile-value" id="dl-tile-users">—</div><div class="stat-tile-label">Usuários</div></div>
@@ -336,19 +320,33 @@
 
                     <div class="section-divider"></div>
 
+                    <div class="adm-dl-delivery" id="dl-delivery">
+                        <div class="adm-dl-delivery-text">
+                            <div class="adm-dl-delivery-title">Entrega dos arquivos <span id="dl-mode-pill"></span></div>
+                            <p class="adm-dl-delivery-desc" id="dl-mode-desc">Consultando o modo de entrega...</p>
+                        </div>
+                        <button type="button" role="switch" aria-checked="false" class="adm-toggle" id="dl-mode-toggle"
+                            aria-label="Modo de emergência: entregar pelo link direto do Drive" title="Modo de emergência: link direto do Drive" disabled>
+                            <span class="adm-toggle-knob"></span>
+                        </button>
+                    </div>
+ 
                     <div class="adm-dl-filters">
-                        <div class="chip-group" id="dl-period" role="group" aria-label="Período">
-                            <button type="button" class="chip" data-days="1">Hoje</button>
-                            <button type="button" class="chip active" data-days="7">7 dias</button>
-                            <button type="button" class="chip" data-days="30">30 dias</button>
+                        <div class="view-toggle" id="dl-period" role="group" aria-label="Período">
+                            <button type="button" class="adm-filter-btn" data-days="1">Hoje</button>
+                            <button type="button" class="adm-filter-btn active" data-days="7">7 dias</button>
+                            <button type="button" class="adm-filter-btn" data-days="30">30 dias</button>
                         </div>
-                        <div class="chip-group" id="dl-actor" role="group" aria-label="Origem do download">
-                            <button type="button" class="chip active" data-actor="owner">Clientes</button>
-                            <button type="button" class="chip" data-actor="admin">Admin</button>
-                            <button type="button" class="chip" data-actor="">Todos</button>
+                        <div class="view-toggle" id="dl-actor" role="group" aria-label="Origem do download">
+                            <button type="button" class="adm-filter-btn active" data-actor="">Todos</button>
+                            <button type="button" class="adm-filter-btn" data-actor="owner">Clientes</button>
+                            <button type="button" class="adm-filter-btn" data-actor="admin">Admin</button>
                         </div>
-                        <input class="field adm-dl-search" id="dl-search" autocomplete="off" spellcheck="false"
-                            placeholder="Buscar por e-mail, pedido (ORD-…) ou jogo" aria-label="Buscar downloads">
+                        <button type="button" class="button" id="dl-refresh">Atualizar</button>
+                        <div class="search-box">
+                            <input id="dl-search" autocomplete="off" spellcheck="false"
+                                placeholder="Buscar por e-mail, pedido (ORD-…) ou jogo" aria-label="Buscar downloads">
+                        </div>
                     </div>
 
                     <div class="status-message" id="dl-status">Carregando downloads...</div>
@@ -731,7 +729,7 @@ const AdminDownloads = (() => {
     const SHARING_IPS    = 3;           // pedido com este nº de IPs distintos (ou mais) é sinalizado
     const SEARCH_DELAY   = 350;
 
-    const state = { days: 7, actor: 'owner', query: '', cursor: null, token: 0, loadedAt: 0, shown: 0, mode: null };
+    const state = { days: 7, actor: '', query: '', cursor: null, token: 0, loadedAt: 0, shown: 0, mode: null };
     let ctx = null;                     // { fetch, apiBase, openOrder }
     let searchTimer = 0;
 
@@ -808,7 +806,6 @@ const AdminDownloads = (() => {
 
     function renderSummary(s) {
         const t = s.totals;
-        $('dl-count').textContent = num(t.downloads);
         $('dl-tile-downloads').textContent = num(t.downloads);
         $('dl-tile-users').textContent     = num(t.uniqueUsers);
         $('dl-tile-orders').textContent    = num(t.uniqueOrders);
@@ -995,17 +992,17 @@ const AdminDownloads = (() => {
 
     // ── Eventos ─────────────────────────────────────────────────────────────
     function pickChip(groupId, button) {
-        $(groupId).querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === button));
+        $(groupId).querySelectorAll('.adm-filter-btn').forEach(c => c.classList.toggle('active', c === button));
     }
 
     function init(deps) {
         ctx = deps;
         $('dl-period').addEventListener('click', e => {
-            const b = e.target.closest('.chip'); if (!b) return;
+            const b = e.target.closest('.adm-filter-btn'); if (!b) return;
             state.days = parseInt(b.dataset.days, 10); pickChip('dl-period', b); refresh();
         });
         $('dl-actor').addEventListener('click', e => {
-            const b = e.target.closest('.chip'); if (!b) return;
+            const b = e.target.closest('.adm-filter-btn'); if (!b) return;
             state.actor = b.dataset.actor; pickChip('dl-actor', b); refresh();
         });
         $('dl-search').addEventListener('input', e => {
@@ -1467,6 +1464,8 @@ function buildOrderDetail(o) {
 
     const itemsHtml = items.map((item, idx) => {
         const link     = item.link;
+        const adLink = link.proxyUrl || ''
+        console.log(adLink)
         const expired  = link && link.expiresAt && new Date(link.expiresAt) < now;
         const disabled = link?.disabled;
         const url      = link ? (link.proxyUrl || link.url || '#') : null;
@@ -1478,6 +1477,9 @@ function buildOrderDetail(o) {
             ? `<div class="adm-item-link-row">
                 <span class="adm-item-link-exp ${expired?'expired':''}">${expText}</span>
                 ${disabled ? '<span class="status-pill status-pill--off text-xs"><i></i>OFF</span>' : ''}
+                <a href="${adLink}" class="action-btn btn-xs adm-btn-warning">
+                    Download
+                </a>
                 <button type="button" class="action-btn btn-xs ${disabled?'adm-btn-success':'adm-btn-warning'}"
                     onclick="toggleItemLink('${o.id}',${idx},${disabled ? 'true' : 'false'})">
                     ${disabled ? 'Ligar' : 'Pausar'}
