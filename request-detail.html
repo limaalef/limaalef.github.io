@@ -203,18 +203,28 @@ function buildOrderDetail(o) {
     // ── Resumo de valores (mesmo formato para Pix e PayPal, pago ou não) ───
     const fig = paymentFigures(o);
     const paymentValueHtml = fig ? (() => {
-        const taxaVal = (fig.total + fig.discount) * (fig.feePct / 100);
-        const discVal = fig.discount * (fig.feePct / 100)
-        const discount = (fig.discount - discVal) * (fig.feePct / 100);
+        let taxaVal = 0
+        let taxa = 0
+        const discount = (fig.discount) * (fig.feePct / 100);
+        if (fig.paidAt && new Date(fig.paidAt) < new Date("2026-11-16T22:00:00.000Z")) {
+            console.log('aqui 0')
+            taxaVal = (fig.total + fig.discount - discount) * (fig.feePct / 100);
+            taxa = fig.discount;
+        } else {
+            console.log('aqui 1')
+            taxaVal = (fig.total) * (fig.feePct / 100);
+            taxaDisc = (fig.total + fig.discount) * (fig.feePct / 100);
+            taxa = fig.discount - discount;
+        }
         const fmt = v => fmtMoney(v, fig.currency);
+        console.log(taxaVal);
         const pct = Number(fig.feePct).toLocaleString(loc(), { maximumFractionDigits: 2 });
         return `
         <section class="rd-sec">
             <h3 class="block-title" data-i18n="requestPaymentSummary">${t('requestPaymentSummary')}</h3>
-            ${kv(t('requestValue'), fmt(fig.total - taxaVal + fig.discount))}
+            ${kv(t('requestValue'), fmt(fig.total + fig.discount - taxaDisc))}
+            ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(taxa)) : ''}
             ${kv(`${t('requestFee')} (${pct}%)`, fmt(taxaVal), 'muted')}
-            ${fig.discount > 0 ? kv(t('requestDiscount'), '− ' + fmt(fig.discount - discount)) : ''}
-            ${discount > 0 ? kv(t('requestDiscountFee'), '− ' + fmt(discount), 'muted') : ''}
             <div class="rd-total">
                 <span>${t('requestTotalValue')}</span>
                 <strong>${fmt(fig.total)}</strong>
@@ -329,10 +339,10 @@ function paymentFigures(o) {
     const ext = o.externalPayment;
     const disc = x => Math.max(0, parseFloat(x) || 0);   // desconto aplicado pelo admin (0 = sem desconto)
     if (ext) return { total: parseFloat(ext.amount), currency: ext.currency, feePct: o.externalFeePercent || 0,
-                      discount: disc(ext.discount ?? o.externalDueEffective?.discount ?? o.externalDue?.discount) };
+                      discount: disc(ext.discount ?? o.externalDueEffective?.discount ?? o.externalDue?.discount), paidAt: o.payment.paidAt ?? null };
     if (o.paymentExternal) {
         const due = o.externalDueEffective;
-        return (A.showValues && due) ? { total: parseFloat(due.amount), currency: due.currency, feePct: o.externalFeePercent || 0, discount: disc(due.discount) } : null;
+        return (A.showValues && due) ? { total: parseFloat(due.amount), currency: due.currency, feePct: o.externalFeePercent || 0, discount: disc(due.discount) ?? null } : null;
     }
     const v = o.valueEffective;
     return ((A.showValues || A.paid) && v && v.method === 'mercadopago' && o.platformFeePercent != null)

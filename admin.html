@@ -1178,13 +1178,16 @@ const AdminUserPricing = (() => {
 
         // Prévia: valor cobrado por item, já com a taxa global
         const g = state.global;
-        const prev = (base, fee, cur) => {
+        // Valores cadastrados são sem taxa; o desconto é abatido antes de somar a taxa
+        const prev = (base, disc, fee, cur) => {
             const b = parseFloat(base);
-            return b > 0 ? `Cobrado por item: ${money(grossFrom(b, fee), cur)} (taxa de ${fee || 0}%)` : '';
+            if (!(b > 0)) return '';
+            const net = Math.max(0, b - (parseFloat(disc) || 0));
+            return `Total por item ao usuário: ${money(grossFrom(net, fee), cur)} (com taxa de ${fee || 0}%)`;
         };
-        $('up-mp-hint').textContent = prev(f.mp.base_amount, g?.mp.fee_percent, 'BRL')
+        $('up-mp-hint').textContent = prev(f.mp.base_amount, f.mp.discount, g?.mp.fee_percent, 'BRL')
             || (g ? `Sem valor próprio: usa o padrão de ${money(g.mp.base_amount, 'BRL')} por item` : '');
-        $('up-pp-hint').textContent = prev(f.paypal.base_amount, g?.paypal.fee_percent, ppCur)
+        $('up-pp-hint').textContent = prev(f.paypal.base_amount, f.paypal.discount, g?.paypal.fee_percent, ppCur)
             || (g ? `Sem valor próprio: usa o padrão de ${money(g.paypal.base_amount, g.paypal.currency)} por item` : '');
         $('up-pp-cur').placeholder = g?.paypal.currency || 'USD';
 
