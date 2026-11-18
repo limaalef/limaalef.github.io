@@ -1439,12 +1439,24 @@ const LanguageManager = {
             if (text.includes('Disputa 3º Lugar')) {
                 return `Play-off for 3rd place`;
             }
+            if (text.includes('Disputa 5º Lugar')) {
+                return `Play-off for 5th place`;
+            }
+            if (text.includes('Disputa do Ouro')) {
+                return `Gold medal match`;
+            }
+            if (text.includes('Disputa do Bronze')) {
+                return `Bronze medal match`;
+            }
+            
             
             let leg = '';
-            if (text.includes('Ida')) {
+            if (text.includes('Ida') || text.includes('1º Jogo')) {
                 leg = ' - 1st Leg';
-            } else if (text.includes('Volta')) {
+            } else if (text.includes('Volta') || text.includes('2º Jogo')) {
                 leg = ' - 2nd Leg';
+            } else if (text.includes('3º Jogo')) {
+                leg = ' - 3rd Leg';
             }
 
             if (text.includes('Oitavas de Final')) {
@@ -1455,6 +1467,10 @@ const LanguageManager = {
                 return `Semifinals${leg}`;
             } else if (text.includes('Final')) {
                 return `Final${leg}`;
+            } else if (text.includes('Play-in')) {
+                return `Play-in${leg}`;
+            } else if (text.includes('Playoff')) {
+                return `Playoff${leg}`;
             }
 
             const roundMatch = text.match(/(\d+)ª Rodada/);
@@ -1465,10 +1481,14 @@ const LanguageManager = {
             }
 
             const phaseMatch = text.match(/(\d+)ª Fase/);
-            if (roundMatch) {
-                const number = roundMatch[1];
+            if (phaseMatch) {
+                const number = phaseMatch[1];
                 const suffix = this.getOrdinalSuffix(number);
-                return `Phase ${number}`;
+                if (leg){
+                    return `Phase ${number}${leg}`;
+                } else {
+                    return `Phase ${number}`;
+                }
             }
         }
         
