@@ -480,6 +480,7 @@ const RequestModule = (() => {
                 body: JSON.stringify({
                     user:    { name: user.name, email: user.email, picture: user.picture, provider: user.provider },
                     contact: { channel, value: contact },
+                    lang: LanguageManager.currentLang || document.documentElement.lang || 'en',
                     items:   cart,
                     notes:   notes || '',
                 }),
